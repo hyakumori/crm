@@ -6,11 +6,10 @@ default:
     key: ${CI_COMMIT_REF_SLUG}
 
 test-frontend:
-  image: node:12
+  image: node:12-alpine
   cache:
     paths:
-      - node_modules/
-      - .yarn
+      - $CI_PROJECT_DIR/mamori/static/mamori/node_modules/
   before_script:
     - cd mamori/static/mamori
     - yarn install
