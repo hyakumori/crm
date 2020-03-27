@@ -1,9 +1,29 @@
 stages:
   - test
 
-test:
-  stage: test
+default:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+
+test-frontend:
+  image: node:12
+  cache:
+    paths:
+      - node_modules/
+      - .yarn
+  before_script:
+    - cd mamori/static/mamori
+    - yarn install
+  script:
+    - yarn test --passWithNoTests
+
+test-backend:
   image: python:3.7
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  cache:
+    paths:
+      - .cache/pip
   script:
     - export MAMORI_LIGHT_BUILD=1
     - pip install -U pip setuptools
