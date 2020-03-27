@@ -5,6 +5,7 @@ test:
   stage: test
   image: python:3.7
   script:
+    - export MAMORI_LIGHT_BUILD=1
     - pip install -U pip setuptools
     - pip install -e '.[dev]'
     - ./manage.py test
