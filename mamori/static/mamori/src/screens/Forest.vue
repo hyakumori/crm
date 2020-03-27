@@ -1,5 +1,5 @@
 <template>
-  <v-row class="mt-4">
+  <v-row class="pt-4 main-section">
     <v-col cols="3">
       <search-card />
     </v-col>
@@ -12,8 +12,8 @@
         <v-icon>mdi-chevron-down</v-icon>
       </div>
       <data-list
-        class="mr-xs-3 mr-sm-3 mr-md-4 mr-lg-9 mr-xl-9"
-        :showSelect=false
+        class="mt-4 mr-xs-3 mr-sm-3 mr-md-4 mr-lg-9 mr-xl-9"
+        :showSelect="false"
         v-on:rowData="rowData"
       ></data-list>
     </v-col>
@@ -30,6 +30,32 @@ export default {
     DataList,
     SearchCard
   },
+  data() {
+    return {
+      headers: [
+        {
+          text: "id"
+        },
+        {
+          text: "name"
+        },
+        {
+          text: "age"
+        },
+        {
+          text: "options"
+        }
+      ],
+      datas: [
+        {
+          id: 1,
+          name: "bao",
+          age: 22,
+          options: "hello"
+        }
+      ]
+    };
+  },
   methods: {
     rowData(val) {
       console.log(val);
@@ -39,8 +65,12 @@ export default {
 </script>
 
 <style lang="scss">
+.main-section {
+  background-color: #dddddd;
+}
+
 .list-header {
-  background: #ffd6004d;
+  background: #f7eaa5;
   border-radius: 4px;
   height: 56px;
 

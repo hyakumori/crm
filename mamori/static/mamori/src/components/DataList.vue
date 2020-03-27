@@ -9,7 +9,7 @@
     :show-select="showSelect"
     v-model="selected"
     @click:row="clickRow"
-    :loading="!datas"
+    :loading="isLoading"
     mobile-breakpoint="800"
   >
     <template v-slot:header.options>
@@ -47,17 +47,8 @@ export default {
     };
   },
   mounted() {
-    if (this.$refs.dataTable) {
-      selectAll("i.mdi-arrow-up")
-        .classed("mdi-chevron-up", true)
-        .classed("mdi-arrow-up", false);
-    }
-    if (this.headers) {
-      for (let i = 0; i < this.headers.length; i++) {
-        const element = this.headers[i];
-        element.value = Object.keys(this.datas[0])[i];
-      }
-    }
+    this.changeSortIcon();
+    this.createDynamicHeaderValue();
   },
   computed: {
     iconMode() {
@@ -69,12 +60,24 @@ export default {
     },
     isLoading() {
       return !this.datas;
-    },
-    getHeaders() {
-      return this.headers;
     }
   },
   methods: {
+    changeSortIcon() {
+      if (this.$refs.dataTable) {
+        selectAll("i.mdi-arrow-up")
+          .classed("mdi-chevron-up", true)
+          .classed("mdi-arrow-up", false);
+      }
+    },
+    createDynamicHeaderValue() {
+      if (this.headers) {
+        for (let i = 0; i < this.headers.length; i++) {
+          const element = this.headers[i];
+          element.value = Object.keys(this.datas[0])[i];
+        }
+      }
+    },
     clickRow(value) {
       this.$emit("rowData", value.id);
     },
@@ -128,9 +131,5 @@ export default {
       right: 0;
     }
   }
-
-  // & .v-data-table__mobile-row__cell {
-  //   width: 100%;
-  // }
 }
 </style>

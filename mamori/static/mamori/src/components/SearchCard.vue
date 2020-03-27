@@ -2,8 +2,10 @@
   <v-card class="search-section ml-xs-3 ml-sm-3 ml-md-4 ml-lg-9 ml-xl-9">
     <h5>検索条件</h5>
     <div class="mb-2 mt-2 d-flex align-center">
-        <h5 class="font-weight-regular mb-0" style="color: #999999">項目を選択</h5>
-        <v-icon>mdi-chevron-down</v-icon>
+      <h5 class="font-weight-regular mb-0" style="color: #999999">
+        項目を選択
+      </h5>
+      <v-icon>mdi-chevron-down</v-icon>
     </div>
     <v-text-field clearable placeholder="パスワード" outlined></v-text-field>
     <div class="d-block">
@@ -12,7 +14,7 @@
     </div>
   </v-card>
 </template>
- 
+
 <script>
 export default {
   name: "search-card"
@@ -38,10 +40,10 @@ export default {
 }
 
 .d-block {
-    color: #12C7A6 !important;
+  color: #12c7a6 !important;
 
-    & .v-icon {
-        color: #12C7A6 !important;
-    }
+  & .v-icon {
+    color: #12c7a6 !important;
+  }
 }
 </style>
