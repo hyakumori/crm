@@ -1,20 +1,21 @@
 <template>
   <v-app>
-    <v-img src="./assets/app-bar.png" height="150"></v-img>
+    <page-header />
     <forest />
   </v-app>
 </template>
 
 <script>
 import Forest from "./screens/Forest";
+import PageHeader from './components/PageHeader';
 
 export default {
   name: "App",
 
   components: {
-    Forest
+    Forest,
+    PageHeader
   },
-
   data: () => ({}),
   methods: {
     rowData(val) {
