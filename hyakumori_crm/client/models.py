@@ -27,13 +27,21 @@ class ClientProfileCreate(BaseModel):
     mobile_number: Optional[str]
 
 
+<<<<<<< HEAD:hyakumori_crm/client/models.py
 class ClientCreate(HyakumoriDanticModel):
+=======
+class ClientCreate(MamoriDanticModel):
+>>>>>>> writing out idea:mamori/client/models.py
     internal_id: str
     profile: ClientProfileCreate
     attributes: dict = {}
 
 
+<<<<<<< HEAD:hyakumori_crm/client/models.py
 class ClientRead(HyakumoriDanticModel):
+=======
+class ClientRead(MamoriDanticModel):
+>>>>>>> writing out idea:mamori/client/models.py
     id: str
     internal_id: Optional[str]
     profile: ClientProfileCreate
