@@ -74,3 +74,19 @@ Using `pip-tools`
 - Compile to `requirements-dev.txt`: `pip-compile requirements-dev.in`
 
 Remember to reinstall package.
+
+
+### Using Docker build
+- See `docker-compose.infra.yml` for local infrastructure reference
+- Assume `.env`
+```
+DEBUG=True
+SECRET_KEY=0fdafa9ea1f1436cb1d3ff56fcd95586
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/hyakumori_crm_local
+STATIC_DIR=mamori/static/mamori/dist
+```
+- Examples docker build
+```
+docker build --build-arg MAMORI_VERSION=0.1.0 -t mamori_crm:0.1.0 .
+docker run --rm -it --env-file .env --network=host --name=mamori_crm_test mamori_crm:latest
+```
