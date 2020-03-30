@@ -38,4 +38,4 @@ RUN MAMORI_LIGHT_BUILD=1 pip install .
 
 EXPOSE 8000
 
-CMD gunicorn mamori.asgi:application
+CMD uvicorn mamori.asgi:application
