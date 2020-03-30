@@ -38,7 +38,7 @@ postgres=# CREATE DATABASE mamori OWNER mamori;
 
 - Create virtualenv: `python -m venv venv`
 
-- Activate virtualenv: `source venv/bin/activation`
+- Activate virtualenv: `source venv/bin/activate`
 
 - Update `pip` and `setuptools`: `pip install -U pip setuptools`
 
@@ -46,11 +46,10 @@ postgres=# CREATE DATABASE mamori OWNER mamori;
 
 ### Run on local
 
-0. Copy `.env.example` to `.env` and fill necessary variables for both backend and fontend.
-
 1. Install once with `MAMORI_LIGHT_BUILD=1 pip install -e .[dev]`
-
-1. Run dev server with `STATIC_DIR="" mamori runserver`. You might want to set `STATIC_DIR=""` in `.env`.
+2. Copy `.env.example` to `.env` and fill necessary variables for both backend and fontend.
+3. [FRONTEND] Move to `mamori/static/mamori` run `yarn`
+4. Run dev server with `STATIC_DIR="" mamori runserver`. You might want to set `STATIC_DIR=""` in `.env`.
 
 ### Dependency management
 
