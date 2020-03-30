@@ -1,0 +1,114 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Forest {
+  attributes: JSON
+  basic_info: JSON
+  geodata: JSON
+  id: ID!
+  internal_id: String
+}
+
+type ForestConnection {
+  items: [Forest]
+  nextToken: String
+}
+
+type Mutation {
+  createForest(input: CreateForestInput!): Forest
+  deleteForest(input: DeleteForestInput!): Forest
+  updateForest(input: UpdateForestInput!): Forest
+}
+
+type Query {
+  getForest(id: ID!): Forest
+  listForests(filter: TableForestFilterInput, limit: Int, nextToken: String): ForestConnection
+}
+
+type Subscription {
+  onCreateForest(attributes: JSON, basic_info: JSON, geodata: JSON, id: ID, internal_id: String): Forest @subscribe(mutations : ["createForest"])
+  onDeleteForest(attributes: JSON, basic_info: JSON, geodata: JSON, id: ID, internal_id: String): Forest @subscribe(mutations : ["deleteForest"])
+  onUpdateForest(attributes: JSON, basic_info: JSON, geodata: JSON, id: ID, internal_id: String): Forest @subscribe(mutations : ["updateForest"])
+}
+
+input CreateForestInput {
+  attributes: JSON
+  basic_info: JSON
+  geodata: JSON
+  internal_id: String
+}
+
+input DeleteForestInput {
+  id: ID!
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableForestFilterInput {
+  id: TableIDFilterInput
+  internal_id: TableStringFilterInput
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateForestInput {
+  attributes: JSON
+  basic_info: JSON
+  geodata: JSON
+  id: ID!
+  internal_id: String
+}

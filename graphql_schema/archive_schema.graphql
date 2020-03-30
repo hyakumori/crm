@@ -1,0 +1,123 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Archive {
+  attributes: JSON
+  basic_info: JSON
+  client_id: ID!
+  end_date: DateTime
+  forest_id: ID!
+  id: ID!
+  start_date: DateTime
+}
+
+type ArchiveConnection {
+  items: [Archive]
+  nextToken: String
+}
+
+type Mutation {
+  createArchive(input: CreateArchiveInput!): Archive
+  deleteArchive(input: DeleteArchiveInput!): Archive
+  updateArchive(input: UpdateArchiveInput!): Archive
+}
+
+type Query {
+  getArchive(client_id: ID!, forest_id: ID!): Archive
+  listArchives(filter: TableArchiveFilterInput, limit: Int, nextToken: String): ArchiveConnection
+}
+
+type Subscription {
+  onCreateArchive(client_id: ID, end_date: DateTime, forest_id: ID, id: ID, start_date: DateTime): Archive @subscribe(mutations : ["createArchive"])
+  onDeleteArchive(client_id: ID, end_date: DateTime, forest_id: ID, id: ID, start_date: DateTime): Archive @subscribe(mutations : ["deleteArchive"])
+  onUpdateArchive(client_id: ID, end_date: DateTime, forest_id: ID, id: ID, start_date: DateTime): Archive @subscribe(mutations : ["updateArchive"])
+}
+
+input CreateArchiveInput {
+  attributes: JSON
+  basic_info: JSON
+  client_id: ID!
+  end_date: DateTime
+  forest_id: ID!
+  start_date: DateTime
+}
+
+input DeleteArchiveInput {
+  id: ID!
+}
+
+input TableArchiveFilterInput {
+  client_id: TableIDFilterInput
+  end_date: TableStringFilterInput
+  forest_id: TableIDFilterInput
+  id: TableIDFilterInput
+  start_date: TableStringFilterInput
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateArchiveInput {
+  attributes: JSON
+  basic_info: JSON
+  client_id: ID
+  end_date: DateTime
+  forest_id: ID
+  id: ID!
+  start_date: DateTime
+}

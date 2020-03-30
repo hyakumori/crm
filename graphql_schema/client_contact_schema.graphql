@@ -1,0 +1,116 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type ClientContact {
+  attributes: JSON
+  client_id: ID!
+  contact_id: ID!
+  id: ID!
+  relative_type: String
+}
+
+type ClientContactConnection {
+  items: [ClientContact]
+  nextToken: String
+}
+
+type Mutation {
+  createClientContact(input: CreateClientContactInput!): ClientContact
+  deleteClientContact(input: DeleteClientContactInput!): ClientContact
+  updateClientContact(input: UpdateClientContactInput!): ClientContact
+}
+
+type Query {
+  getClientContact(client_id: ID!, contact_id: ID!): ClientContact
+  listClientContacts(filter: TableClientContactFilterInput, limit: Int, nextToken: String): ClientContactConnection
+}
+
+type Subscription {
+  onCreateClientContact(attributes: JSON, client_id: ID, contact_id: ID, id: ID, relative_type: String): ClientContact @subscribe(mutations : ["createClientContact"])
+  onDeleteClientContact(attributes: JSON, client_id: ID, contact_id: ID, id: ID, relative_type: String): ClientContact @subscribe(mutations : ["deleteClientContact"])
+  onUpdateClientContact(attributes: JSON, client_id: ID, contact_id: ID, id: ID, relative_type: String): ClientContact @subscribe(mutations : ["updateClientContact"])
+}
+
+input CreateClientContactInput {
+  attributes: JSON
+  client_id: ID!
+  contact_id: ID!
+  relative_type: String
+}
+
+input DeleteClientContactInput {
+  id: ID!
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableClientContactFilterInput {
+  client_id: TableIDFilterInput
+  contact_id: TableIDFilterInput
+  id: TableIDFilterInput
+  relative_type: TableStringFilterInput
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateClientContactInput {
+  attributes: JSON
+  client_id: ID
+  contact_id: ID
+  id: ID!
+  relative_type: String
+}

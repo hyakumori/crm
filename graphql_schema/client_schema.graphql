@@ -1,0 +1,111 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Client {
+  attributes: JSON
+  id: ID!
+  internal_id: String
+  profile: JSON
+}
+
+type ClientConnection {
+  items: [Client]
+  nextToken: String
+}
+
+type Mutation {
+  createClient(input: CreateClientInput!): Client
+  deleteClient(input: DeleteClientInput!): Client
+  updateClient(input: UpdateClientInput!): Client
+}
+
+type Query {
+  getClient(id: ID!): Client
+  listClients(filter: TableClientFilterInput, limit: Int, nextToken: String): ClientConnection
+}
+
+type Subscription {
+  onCreateClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["createClient"])
+  onDeleteClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["deleteClient"])
+  onUpdateClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["updateClient"])
+}
+
+input CreateClientInput {
+  attributes: JSON
+  internal_id: String
+  profile: JSON
+}
+
+input DeleteClientInput {
+  id: ID!
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableClientFilterInput {
+  id: TableIDFilterInput
+  internal_id: TableStringFilterInput
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateClientInput {
+  attributes: JSON
+  id: ID!
+  internal_id: String
+  profile: JSON
+}
