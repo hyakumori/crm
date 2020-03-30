@@ -1,30 +1,30 @@
 <template>
   <v-data-table
+    item-key="id"
     ref="dataTable"
+    v-model="selected"
     :headers="headers"
     :items="datas"
+    :loading="isLoading"
     :sort-by="['id']"
     :sort-desc="[true]"
-    item-key="id"
     :show-select="showSelect"
-    v-model="selected"
     @click:row="clickRow"
-    :loading="isLoading"
-    mobile-breakpoint="800"
   >
     <template v-slot:header.options>
       <v-icon>mdi-dots-vertical</v-icon>
     </template>
+
     <template v-slot:item.id="{ item }">
       <div class="d-flex align-center justify-space-between">
         <v-icon class="icon-mode mr-2" small>{{ iconMode }}</v-icon>
+
         <p class="mb-0">{{ item.id }}</p>
       </div>
     </template>
+
     <template v-slot:item.owners="{ item }">
-      <p class="owner-negotiation" v-if="item.owners === 'negotiation'">
-        商談中
-      </p>
+      <p class="owner-negotiation" v-if="isOwnerNegotiation(item.owners)">商談中</p>
       <p class="d-inline" v-else>{{ item.owners }}</p>
     </template>
   </v-data-table>
@@ -41,27 +41,32 @@ export default {
     datas: Array,
     headers: Array
   },
+
   data() {
     return {
       selected: []
     };
   },
+
   mounted() {
     this.changeSortIcon();
     this.createDynamicHeaderValue();
   },
+
   computed: {
     iconMode() {
       return this.isForestMode
         ? "mdi-image-filter-hdr"
-        : this.isCustomerMode
+        : this.isClientMode
         ? "mdi-account"
         : "mdi-book-account";
     },
+
     isLoading() {
       return !this.datas;
     }
   },
+
   methods: {
     changeSortIcon() {
       if (this.$refs.dataTable) {
@@ -70,25 +75,36 @@ export default {
           .classed("mdi-arrow-up", false);
       }
     },
+
     createDynamicHeaderValue() {
-      if (this.headers) {
+      if (this.datas && this.headers) {
         for (let i = 0; i < this.headers.length; i++) {
           const element = this.headers[i];
           element.value = Object.keys(this.datas[0])[i];
         }
       }
     },
+
     clickRow(value) {
       this.$emit("rowData", value.id);
     },
+
     isForestMode() {
       return this.mode === "forest";
+    },
+
+    isClientMode() {
+      return this.mode === "client";
+    },
+
+    isOwnerNegotiation(val) {
+      return val === "negotiation";
     }
   }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 %text-overflow-shared {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -116,10 +132,8 @@ export default {
     cursor: pointer;
   }
 
-  & tr {
-    & p {
-      @extend %text-overflow-shared;
-    }
+  & tr p {
+    @extend %text-overflow-shared;
   }
 
   & th {
