@@ -15,8 +15,8 @@
 
       <data-list
         class="mt-4"
-        v-on:rowData="rowData"
         mode="client"
+        v-on:rowData="rowData"
         :headers="getHeaders"
         :datas="getDatas"
         :showSelect="true"
