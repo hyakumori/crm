@@ -18,7 +18,7 @@ class InternalMixin(models.Model):
         abstract = True
 
 
-class MamoriDanticModel(BaseModel):
+class HyakumoriDanticModel(BaseModel):
     class Config:
         orm_mode = True
         validate_assignment = True
