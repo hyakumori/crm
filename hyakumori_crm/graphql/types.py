@@ -19,7 +19,7 @@ interface Editor {
     updated_by: User
 }
 
-interface MamoriResponse {
+interface HyakumoriResponse {
     ok: Boolean!
     error: JSON
 }

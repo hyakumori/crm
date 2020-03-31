@@ -18,7 +18,7 @@ type ClientConnection {
   nextToken: String
 }
 
-type ClientResponse implements MamoriResponse {
+type ClientResponse implements HyakumoriResponse {
   ok: Boolean!
   error: JSON
   client: Client
@@ -32,13 +32,32 @@ type Mutation {
 
 type Query {
   get_client(id: ID!): ClientResponse
-  list_clients(filter: TableClientFilterInput, limit: Int, nextToken: String): ClientConnection
+  list_clients(
+    filter: TableClientFilterInput
+    limit: Int
+    nextToken: String
+  ): ClientConnection
 }
 
 type Subscription {
-  onCreateClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["createClient"])
-  onDeleteClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["deleteClient"])
-  onUpdateClient(attributes: JSON, id: ID, internal_id: String, profile: JSON): Client @subscribe(mutations : ["updateClient"])
+  onCreateClient(
+    attributes: JSON
+    id: ID
+    internal_id: String
+    profile: JSON
+  ): Client @subscribe(mutations: ["createClient"])
+  onDeleteClient(
+    attributes: JSON
+    id: ID
+    internal_id: String
+    profile: JSON
+  ): Client @subscribe(mutations: ["deleteClient"])
+  onUpdateClient(
+    attributes: JSON
+    id: ID
+    internal_id: String
+    profile: JSON
+  ): Client @subscribe(mutations: ["updateClient"])
 }
 
 input CreateClientInput {

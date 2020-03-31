@@ -12,6 +12,7 @@ def validate_model(input_model, get_func=None):
             try:
                 data = kwargs["data"]
                 pk = kwargs.get("pk")
+                # when update obj
                 if pk:
                     assert get_func is not None, "get_func can't be None"
                     obj = get_func(pk=pk)

@@ -17,7 +17,7 @@ type ClientConnection {
   nextToken: String
 }
 
-type ClientResponse implements MamoriResponse {
+type ClientResponse implements HyakumoriResponse {
   ok: Boolean!
   error: JSON
   client: Client
