@@ -1,14 +1,16 @@
+from functools import wraps
 from ariadne import ObjectType
-from pydantic import ValidationError
 
-from .models import ClientCreate, Client, ClientRead
+from hyakumori_crm.core.decorators import validate_model
+from .models import ClientCreate, ClientRead, ClientUpdate
+from .service import create, update, get
 
 query = ObjectType("Query")
 mutation = ObjectType("Mutation")
 
 
 @query.field("get_client")
-def get_client_by_id(*_, id: str = None) -> dict:
+def get_client_by_id(_, info, id: str = None) -> dict:
     return {
         "ok": True,
         "client": {
@@ -21,13 +23,17 @@ def get_client_by_id(*_, id: str = None) -> dict:
 
 
 @mutation.field("create_client")
-def create_client(*_, data: dict = None) -> dict:
-    try:
-        c = Client(**ClientCreate(**data).dict())
-        c.save()
-        return {"ok": True, "client": ClientRead.from_orm(c).dict()}
-    except ValidationError as e:
-        return {"ok": False, "error": e.errors()}
+@validate_model(ClientCreate)
+def create_client(_, info, data: dict = None) -> dict:
+    c = create(data)
+    return {"client": ClientRead.from_orm(c).dict()}
+
+
+@mutation.field("update_client")
+@validate_model(ClientUpdate, get)
+def update_client(_, info, obj=None, data: dict = None) -> dict:
+    obj = update(obj, data)
+    return {"client": {"id": obj.id}}
 
 
 resolvers = [query, mutation]
