@@ -3,7 +3,8 @@ import uuid
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from pydantic import BaseModel, validator
-from hyakumori_crm.core.models import (
+
+from ..core.models import (
     TimestampMixin,
     InternalMixin,
     HyakumoriDanticModel,

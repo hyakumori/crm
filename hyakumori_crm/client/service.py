@@ -10,10 +10,11 @@ def get(pk):
 
 
 def create(data):
-    c = Client(**data)
-    c.save()
-    return c
+    client = Client(**data)
+    client.save()
+    return client
 
 
 def update(client, data):
+    # do update...
     return client
