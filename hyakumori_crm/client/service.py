@@ -6,7 +6,7 @@ def get(pk):
     try:
         return Client.objects.get(pk=pk)
     except (Client.DoesNotExist, ValidationError):
-        raise Client.DoesNotExist
+        return None
 
 
 def create(data):

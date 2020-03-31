@@ -2,7 +2,6 @@ from functools import wraps
 from datetime import datetime
 import pytz
 from pydantic import ValidationError
-from django.core.exceptions import ObjectDoesNotExist
 
 
 def validate_model(input_model, get_func=None):
@@ -16,6 +15,8 @@ def validate_model(input_model, get_func=None):
                 if pk:
                     assert get_func is not None, "get_func can't be None"
                     obj = get_func(pk=pk)
+                    if not obj:
+                        return {"ok": False, "error": {"msg": "Not found"}}
                     del kwargs["pk"]
                     kwargs["obj"] = obj
                     data["context"] = {"updated_at": obj.updated_at}
@@ -25,8 +26,6 @@ def validate_model(input_model, get_func=None):
             kwargs["data"] = validated_data
             try:
                 output = f(_, info, **kwargs)
-            except ObjectDoesNotExist:
-                return {"ok": False, "error": {"msg": "Not found"}}
             except Exception as e:
                 return {"ok": False, "error": dict(message=str(e))}
             return {"ok": True, **output}
