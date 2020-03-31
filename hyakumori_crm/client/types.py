@@ -2,6 +2,17 @@ from ariadne import gql
 
 types = gql(
     """
+enum RelativeType {
+  SON
+  DAUGHTER
+  WIFE
+  HUSBAND
+  GRANDSON
+  GRANDDAUGHTER
+  SISTER
+  BROTHER
+}
+
 type Client implements Timestamp & Editor {
   id: ID!
   internal_id: String
