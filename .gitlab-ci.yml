@@ -28,4 +28,5 @@ test-backend:
     - export HYAKUMORI_LIGHT_BUILD=1
     - pip install -U pip setuptools
     - pip install '.[dev]'
-    - ./manage.py test
+    - coverage run -m pytest tests
+    - coverage report -m

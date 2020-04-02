@@ -13,19 +13,25 @@ from ..core.models import (
 )
 
 
-class Client(TimestampMixin, InternalMixin, models.Model):
+class Customer(TimestampMixin, InternalMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile = JSONField(default=dict)
     attributes = JSONField(default=dict)
-    contacts = models.ManyToManyField(through="ClientContact", to="Contact")
+    contacts = models.ManyToManyField(through="CustomerContact", to="Contact")
 
     def add_attribute(self, key, value):
         pass
+
+    def __repr__(self):
+        return self.profile["last_name"] + " " + self.profile["first_name"]
 
 
 class Contact(TimestampMixin, InternalMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile = JSONField(default=dict)
+
+    def __repr__(self):
+        return self.profile["last_name"] + " " + self.profile["first_name"]
 
 
 class RELATIONSHIP_TYPE(models.TextChoices):
@@ -39,16 +45,17 @@ class RELATIONSHIP_TYPE(models.TextChoices):
     BROTHER = "BROTHER", _("Brother")
 
 
-class ClientContact(TimestampMixin, models.Model):
-    client = models.ForeignKey("Client", on_delete=models.CASCADE)
+class CustomerContact(TimestampMixin, models.Model):
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
     contact = models.ForeignKey("Contact", on_delete=models.CASCADE)
     attributes = JSONField(default=dict)
     relationship_type = models.CharField(
-        max_length=20, choices=RELATIONSHIP_TYPE.choices, null=True
+        max_length=20, choices=RELATIONSHIP_TYPE.choices
     )
+    default = models.BooleanField(default=False)
 
 
-class ClientProfileCreate(BaseModel):
+class CustomerProfileCreate(BaseModel):
     first_name: str
     last_name: str
     middle_name: Optional[str]
@@ -58,23 +65,24 @@ class ClientProfileCreate(BaseModel):
 
 class ContactCreate(BaseModel):
     internal_id: Optional[str]
-    profile: ClientProfileCreate
+    profile: CustomerProfileCreate
     relationship_type: RELATIONSHIP_TYPE
+    default: Optional[bool]
 
 
-class ClientCreate(HyakumoriDanticModel):
+class CustomerCreate(HyakumoriDanticModel):
     internal_id: Optional[str]
-    profile: ClientProfileCreate
+    profile: CustomerProfileCreate
     attributes: Optional[dict]
     contacts: Optional[List[ContactCreate]]
 
 
-class ClientUpdate(HyakumoriDanticUpdateModel, ClientCreate):
+class CustomerUpdate(HyakumoriDanticUpdateModel, CustomerCreate):
     pass
 
 
-class ClientRead(HyakumoriDanticModel):
+class CustomerRead(HyakumoriDanticModel):
     id: str
     internal_id: Optional[str]
-    profile: ClientProfileCreate
+    profile: CustomerProfileCreate
     attributes: dict = {}

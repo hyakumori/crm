@@ -52,7 +52,7 @@ export default {
 
   data() {
     return {
-      selected: []
+      selected: [],
     };
   },
 
@@ -109,8 +109,8 @@ export default {
 
     isNegotiation(val) {
       return val === "negotiation";
-    }
-  }
+    },
+  },
 };
 </script>
 

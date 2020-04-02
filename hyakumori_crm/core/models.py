@@ -1,8 +1,8 @@
-from typing import Any
+from typing import Any, List, Sequence, Optional, List
 import datetime
 from uuid import UUID
 from django.db import models
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field, root_validator
 
 
 class TimestampMixin(models.Model):
@@ -51,3 +51,57 @@ class HyakumoriDanticUpdateModel(HyakumoriDanticModel):
         latest_update = values["context"]["updated_at"]
         if v < latest_update:
             raise ValueError("Some data has changed")
+
+
+class Paginator(BaseModel):
+    page_num: int = Field(1, alias="page")
+    per_page: int = Field(10, alias="itemsPerPage")
+    # if user is on page 2, and they want to expand more items
+    # we make sure they will be stay in the same offset
+    pre_per_page: int = Field(None, alias="preItemsPerPage")
+    sortBy: Sequence[str] = []
+    sortDesc: Sequence[str] = []
+    sort_by: Optional[Sequence[str]]
+
+    @validator("page_num")
+    def validate_page_num(cls, page_num):
+        if page_num <= 0:
+            return 1
+        return page_num
+
+    @validator("per_page")
+    def validate_per_page(cls, per_page):
+        if per_page <= 0:
+            return 10
+        elif per_page > 100:
+            return 100
+        return per_page
+
+    @validator("pre_per_page")
+    def validate_pre_per_page(cls, pre_per_page):
+        if pre_per_page is None:
+            return pre_per_page
+        if pre_per_page <= 0:
+            return 10
+        elif pre_per_page > 100:
+            return 100
+        return pre_per_page
+
+    @root_validator
+    def validate_sort_by(cls, values):
+        sortBy = values.get("sortBy")
+        sortDesc = values.get("sortDesc")
+        if sortBy is None or sortDesc is None:
+            return values
+        if len(sortDesc) != len(sortBy):
+            raise ValueError("sortBy and sortDesc length not match")
+        values["sort_by"] = map(cls.get_sort_by, zip(sortBy, sortDesc))
+        return values
+
+    @staticmethod
+    def get_sort_by(field_pair):
+        field = field_pair[0]
+        isDesc = field_pair[1]
+        if isDesc:
+            field = f"-{field}"
+        return field

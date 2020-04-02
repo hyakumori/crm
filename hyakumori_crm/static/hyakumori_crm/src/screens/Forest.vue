@@ -35,7 +35,7 @@ export default {
   components: {
     DataList,
     SearchCard,
-    TableAction
+    TableAction,
   },
 
   apollo: {
@@ -50,7 +50,7 @@ export default {
   methods: {
     rowData() {
       // console.log(val);
-    }
+    },
   },
 
   computed: {
