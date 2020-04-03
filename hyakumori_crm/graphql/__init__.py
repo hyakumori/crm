@@ -15,7 +15,15 @@ from .scalars import json_scalar
 type_defs = [common_types, customers_types, forests_types]
 
 schema = make_executable_schema(
-    type_defs, [date_scalar, datetime_scalar, json_scalar, *customers_resolvers, *forest_resolvers]
+    type_defs,
+    [
+        date_scalar,
+        datetime_scalar,
+        json_scalar,
+        *customers_resolvers,
+        *forest_resolvers,
+    ],
+)
 
 
 view = GraphQLView.as_view(schema=schema)

@@ -47,7 +47,7 @@ export default {
     data: Array,
     headers: Array,
     negotiationCols: Array,
-    serverItemsLength: Number
+    serverItemsLength: Number,
   },
 
   data() {
@@ -83,7 +83,7 @@ export default {
         }
       }
       return this.headers;
-    }
+    },
   },
 
   methods: {

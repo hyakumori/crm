@@ -27,7 +27,6 @@ import SearchCard from "../components/SearchCard";
 import TableAction from "../components/TableAction";
 import headers from "../assets/dump/table_header_forest.json";
 import GetForestList from "../graphql/GetForestList.gql";
-import gql from "graphql-tag";
 
 export default {
   name: "forest",
@@ -40,11 +39,9 @@ export default {
 
   apollo: {
     forestsInfo: {
-      query: gql`
-        ${GetForestList}
-      `,
-      update: data => data.list_forests
-    }
+      query: GetForestList,
+      update: data => data.list_forests,
+    },
   },
 
   methods: {
@@ -68,7 +65,7 @@ export default {
             acreage: element.basic_info.acreage,
             status: element.basic_info.status,
             ownerName: `${element.owner.profile.first_name} ${element.owner.profile.last_name}`,
-            customerId: element.customer.id
+            customerId: element.customer.id,
           };
         });
       } else {
@@ -82,7 +79,7 @@ export default {
       } else {
         return 0;
       }
-    }
-  }
+    },
+  },
 };
 </script>

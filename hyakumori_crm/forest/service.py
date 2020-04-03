@@ -18,7 +18,7 @@ def get_all():
                 "forests": forests,
                 "total": dump_total,
             }
-    except FileNotFoundError, json.JSONDecodeError:
+    except (FileNotFoundError, json.JSONDecodeError):
         return {"ok": False, "forests": None, "total": 0}
 
 

@@ -14,18 +14,4 @@ module.exports = {
     },
   },
   transpileDependencies: ["vuetify"],
-  configureWebpack: {
-    module: {
-      rules: [
-        {
-          test: /\.(graphql|gql)$/,
-          use: [
-            {
-              loader: "graphql-tag/loader",
-            },
-          ],
-        },
-      ],
-    },
-  },
 };
