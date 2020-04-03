@@ -14,6 +14,10 @@ types = gql("""
         created_at: DateTime
     }
 
+    extend type Query {
+        list_forests: ForestListResponse
+    }
+
     type ForestBasicInfo {
         acreage: String,
         status: String
@@ -22,6 +26,7 @@ types = gql("""
     type ForestListResponse implements HyakumoriResponse {
         ok: Boolean!
         error: JSON
-        forests: [Forest]
+        forests: [Forest!]
+        total: Int
     }
 """)

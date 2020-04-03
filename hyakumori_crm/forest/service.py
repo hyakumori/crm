@@ -1,22 +1,28 @@
 from .models import Forest
 from django.core.exceptions import ValidationError
+from django.conf import settings
 import json
 import os
 
 def get_all():
-    f = load_dummy_data()
-    if f is None:
-        return {
-            "ok": False,
-            "forest": None
-        }
-    else:
-        data = f.read()
-        forests = json.loads(data)
-        return {
-            "ok": True,
-            "forests": forests if forests else None
-        }
+    dump_total = 50
+    dummyDataPath = os.path.join(settings.BASE_DIR, "hyakumori_crm/dummy", "forest_data.json")
+    with open(dummyDataPath, 'r') as file:
+        if file is None:
+            return {
+                "ok": False,
+                "forests": None,
+                "total": 0
+            }
+        else:
+            data = file.read()
+            forests = json.loads(data)
+            file.close()
+            return {
+                "ok": True,
+                "forests": forests if forests else None,
+                "total": dump_total
+            }
 
 def get(pk):
     try:
@@ -25,10 +31,7 @@ def get(pk):
         return None
 
 def create(data):
-    forest = Forest (**data)
+    forest = Forest(**data)
     forest.save()
     return forest
 
-def load_dummy_data():
-    dummyDataDir = os.path.join(os.getcwd(), "hyakumori_crm/dummy", "forest_data.json")
-    return open(dummyDataDir, 'r')

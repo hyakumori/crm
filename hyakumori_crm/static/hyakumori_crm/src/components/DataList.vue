@@ -9,6 +9,7 @@
     :sort-by="['id']"
     :sort-desc="[true]"
     :show-select="showSelect"
+    :server-items-length="serverItemsLength"
     @click:row="clickRow"
   >
     <template v-slot:header.options>
@@ -45,7 +46,8 @@ export default {
     showSelect: Boolean,
     data: Array,
     headers: Array,
-    negotiationCols: Array
+    negotiationCols: Array,
+    serverItemsLength: Number
   },
 
   data() {
@@ -62,8 +64,8 @@ export default {
     iconMode() {
       if (this.isForestMode) {
         return this.$t("icon.forest_icon");
-      } else if (this.isClientMode) {
-        return this.$t("icon.client_icon");
+      } else if (this.isCustomerMode) {
+        return this.$t("icon.customer_icon");
       } else {
         return this.$t("icon.archive_icon");
       }
@@ -101,8 +103,8 @@ export default {
       return this.mode === "forest";
     },
 
-    isClientMode() {
-      return this.mode === "client";
+    isCustomerMode() {
+      return this.mode === "customer";
     },
 
     isNegotiation(val) {

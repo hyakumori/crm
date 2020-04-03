@@ -9,12 +9,13 @@
 
       <data-list
         class="mt-4"
-        mode="client"
+        mode="forest"
         v-on:rowData="rowData"
         :headers="getHeaders"
         :data="getData"
         :showSelect="true"
         :negotiationCols="['status']"
+        :serverItemsLength="getTotalForests"
       ></data-list>
     </v-col>
   </v-row>
@@ -42,7 +43,7 @@ export default {
       query: gql`
         ${GetForestList}
       `,
-      update: data => data.list_forests.forests
+      update: data => data.list_forests
     }
   },
 
@@ -59,19 +60,27 @@ export default {
 
     getData() {
       if (this.forestsInfo) {
-        return this.forestsInfo.map(e => {
+        return this.forestsInfo.forests.map(element => {
           return {
-            id: e.id,
-            address: e.geo_data.address,
+            id: element.id,
+            address: element.geo_data.address,
             ground: "",
-            acreage: e.basic_info.acreage,
-            status: e.basic_info.status,
-            ownerName: `${e.owner.profile.first_name} ${e.owner.profile.last_name}`,
-            customerId: e.customer.id
+            acreage: element.basic_info.acreage,
+            status: element.basic_info.status,
+            ownerName: `${element.owner.profile.first_name} ${element.owner.profile.last_name}`,
+            customerId: element.customer.id
           };
         });
       } else {
         return this.forestsInfo;
+      }
+    },
+
+    getTotalForests() {
+      if (this.forestsInfo) {
+        return this.forestsInfo.total;
+      } else {
+        return 0;
       }
     }
   }
