@@ -1,4 +1,4 @@
-from typing import Any, List, Sequence, Optional, List
+from typing import Any, List, Sequence, Optional, List, ClassVar
 import datetime
 from uuid import UUID
 from django.db import models
@@ -63,7 +63,7 @@ class Paginator(BaseModel):
     sort_desc: Sequence[str] = Field([], alias="sortDesc")
     order_by: Optional[Sequence[str]]
 
-    MAX_ITEMS = 100
+    MAX_ITEMS: ClassVar = 100
 
     @validator("page_num")
     def validate_page_num(cls, page_num):
@@ -75,8 +75,8 @@ class Paginator(BaseModel):
     def validate_per_page(cls, per_page):
         if per_page <= 0:
             return 10
-        elif per_page > MAX_ITEMS:
-            return MAX_ITEMS
+        elif per_page > cls.MAX_ITEMS:
+            return cls.MAX_ITEMS
         return per_page
 
     @validator("pre_per_page")
@@ -85,8 +85,8 @@ class Paginator(BaseModel):
             return pre_per_page
         if pre_per_page <= 0:
             return 10
-        elif pre_per_page > MAX_ITEMS:
-            return MAX_ITEMS
+        elif pre_per_page > cls.MAX_ITEMS:
+            return cls.MAX_ITEMS
         return pre_per_page
 
     @root_validator
@@ -97,7 +97,7 @@ class Paginator(BaseModel):
             return values
         if len(sort_desc) != len(sort_by):
             raise ValueError("sortBy and sortDesc length not match")
-        values["order_by"] = map(cls.get_order_by, zip(sort_by, sortDesc))
+        values["order_by"] = map(cls.get_order_by, zip(sort_by, sort_desc))
         return values
 
     @staticmethod
