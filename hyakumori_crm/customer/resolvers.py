@@ -30,7 +30,7 @@ def list_customers(_, info, data: dict = None) -> dict:
         page_num=data["page_num"],
         per_page=data["per_page"],
         pre_per_page=data["pre_per_page"],
-        sort_by=data["sort_by"],
+        order_by=data["order_by"],
     )
     return {"items": customers, "total": total}
 

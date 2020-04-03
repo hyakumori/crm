@@ -59,9 +59,11 @@ class Paginator(BaseModel):
     # if user is on page 2, and they want to expand more items
     # we make sure they will be stay in the same offset
     pre_per_page: int = Field(None, alias="preItemsPerPage")
-    sortBy: Sequence[str] = []
-    sortDesc: Sequence[str] = []
-    sort_by: Optional[Sequence[str]]
+    sort_by: Sequence[str] = Field([], alias="sortBy")
+    sort_desc: Sequence[str] = Field([], alias="sortDesc")
+    order_by: Optional[Sequence[str]]
+
+    MAX_ITEMS = 100
 
     @validator("page_num")
     def validate_page_num(cls, page_num):
@@ -73,8 +75,8 @@ class Paginator(BaseModel):
     def validate_per_page(cls, per_page):
         if per_page <= 0:
             return 10
-        elif per_page > 100:
-            return 100
+        elif per_page > MAX_ITEMS:
+            return MAX_ITEMS
         return per_page
 
     @validator("pre_per_page")
@@ -83,25 +85,25 @@ class Paginator(BaseModel):
             return pre_per_page
         if pre_per_page <= 0:
             return 10
-        elif pre_per_page > 100:
-            return 100
+        elif pre_per_page > MAX_ITEMS:
+            return MAX_ITEMS
         return pre_per_page
 
     @root_validator
     def validate_sort_by(cls, values):
-        sortBy = values.get("sortBy")
-        sortDesc = values.get("sortDesc")
-        if sortBy is None or sortDesc is None:
+        sort_by = values.get("sort_by")
+        sort_desc = values.get("sort_desc")
+        if sort_by is None or sort_desc is None:
             return values
-        if len(sortDesc) != len(sortBy):
+        if len(sort_desc) != len(sort_by):
             raise ValueError("sortBy and sortDesc length not match")
-        values["sort_by"] = map(cls.get_sort_by, zip(sortBy, sortDesc))
+        values["order_by"] = map(cls.get_order_by, zip(sort_by, sortDesc))
         return values
 
     @staticmethod
-    def get_sort_by(field_pair):
+    def get_order_by(field_pair):
         field = field_pair[0]
-        isDesc = field_pair[1]
-        if isDesc:
+        is_desc = field_pair[1]
+        if is_desc:
             field = f"-{field}"
         return field

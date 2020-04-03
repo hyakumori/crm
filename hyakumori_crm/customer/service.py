@@ -17,12 +17,11 @@ def get_list(
     page_num: int = 1,
     per_page: int = 10,
     pre_per_page: Union[int, None] = None,
-    sort_by: Union[Iterator, None] = None,
+    order_by: Union[Iterator, None] = None,
 ):
-    assert per_page <= 100, "per_page must not be greater than 100"
     offset = (pre_per_page or per_page) * (page_num - 1)
-    if not sort_by:
-        sort_by = []
+    if not order_by:
+        order_by = []
     representatives = (
         Contact.objects.annotate(
             fullname=RawSQL(
@@ -44,7 +43,7 @@ def get_list(
         .values("fullname", "phone", "address", "representative")
     )
     total = query.count()
-    customers = query.order_by(*sort_by)[offset:per_page]
+    customers = query.order_by(*order_by)[offset:per_page]
     return customers, total
 
 
@@ -64,10 +63,10 @@ def add_contacts(customer, contact_data):
             relationship_type = ""
         contact = Contact(**data)
         contacts.append(contact)
-        cc = CustomerContact(
+        customer_contact = CustomerContact(
             customer=customer, contact=contact, relationship_type=relationship_type
         )
-        customer_contacts.append(cc)
+        customer_contacts.append(customer_contact)
     Contact.objects.bulk_create(contacts)
     CustomerContact.objects.bulk_create(customer_contacts)
     customer.save(update_fields=["updated_at"])
