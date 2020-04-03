@@ -27,9 +27,9 @@ class Customer(BaseResourceModel):
     所有者ID    土地所有者名    土地所有者住所	連絡先情報  口座情報	タグ
     """
 
-    name = JSONField(default=DefaultCustomer.name, blank=True, null=True)
-    address = JSONField(default=DefaultCustomer.address, blank=True, null=True)
-    banking = JSONField(default=DefaultCustomer.banking, blank=True, null=True)
+    name = JSONField(default=DefaultCustomer.name)
+    address = JSONField(default=DefaultCustomer.address)
+    banking = JSONField(default=DefaultCustomer.banking)
     status = models.CharField(
         max_length=20,
         choices=CustomerRegisterStatuses.choices,
@@ -44,4 +44,4 @@ class DefaultContact:
 
 
 class Contact(BaseResourceModel):
-    contact_info = JSONField(default=DefaultContact.contact_info, blank=True, null=True)
+    contact_info = JSONField(default=DefaultContact.contact_info)

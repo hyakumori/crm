@@ -26,8 +26,8 @@ class DefaultForest:
 
 
 class Forest(BaseResourceModel):
-    cadastral = JSONField(default=DefaultForest.cadastral, blank=True, null=True)
-    owner = JSONField(default=DefaultForest.owner, blank=True, null=True)
-    contract = JSONField(default=DefaultForest.contract, blank=True, null=True)
-    tag = JSONField(default=DefaultForest.tag, blank=True, null=True)
-    geodata = JSONField(default=DefaultForest.geodata, blank=True, null=True)
+    cadastral = JSONField(default=DefaultForest.cadastral)
+    owner = JSONField(default=DefaultForest.owner)
+    contract = JSONField(default=DefaultForest.contract)
+    tag = JSONField(default=DefaultForest.tag)
+    geodata = JSONField(default=DefaultForest.geodata)

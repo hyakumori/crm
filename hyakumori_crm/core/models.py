@@ -34,7 +34,7 @@ class InternalMixin(models.Model):
 
 
 class AttributesMixin(models.Model):
-    attributes = JSONField(default=dict, blank=True, null=True)
+    attributes = JSONField(default=dict)
 
     class Meta:
         abstract = True
