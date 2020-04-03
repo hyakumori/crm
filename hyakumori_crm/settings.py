@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from distutils.util import strtobool
+
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -24,12 +26,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "know your weakness" if not os.getenv("SECRET_KEY") else os.getenv("SECRET_KEY")
-)
+SECRET_KEY = os.getenv("SECRET_KEY", "change this please")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.getenv("DEBUG") in ["1", "True", "true"] else False
+DEBUG = strtobool(os.getenv("DEBUG", ""))
 
 ALLOWED_HOSTS = ["localhost"]
 
@@ -47,11 +47,14 @@ if not STATIC_ROOT:
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
-    *static_app,
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
     "ariadne.contrib.django",
+    # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
+    *static_app,
+    "hyakumori_crm.users",
+    "hyakumori_crm.crm",
     "hyakumori_crm.customer",
     "hyakumori_crm.forest",
 ]
@@ -89,8 +92,12 @@ WSGI_APPLICATION = "hyakumori_crm.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
-
+DATABASES = {
+    "default": dict(
+        **dj_database_url.config(default=os.getenv("DATABASE_URL")),
+        TEST={"NAME": "hyakumori_crm_test"}
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -99,9 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
@@ -124,3 +131,5 @@ USE_TZ = True
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/"
+
+AUTH_USER_MODEL = "users.User"
