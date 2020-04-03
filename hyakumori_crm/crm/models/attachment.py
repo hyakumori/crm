@@ -21,7 +21,7 @@ def attachment_upload(instance, filename):
 class AttachmentManager(models.Manager):
     def attachments_for_object(self, obj):
         object_type = ContentType.objects.get_for_model(obj)
-        return self.filter(content_type__pk=object_type.id, object_id=obj.pk)
+        return self.filter(content_type__pk=object_type.pk, object_id=obj.pk)
 
 
 class Attachment(BaseResourceModel):
