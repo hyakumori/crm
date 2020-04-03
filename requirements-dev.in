@@ -11,3 +11,5 @@ pandas
 xlrd
 django-extensions
 click
+pydantic
+pydantic[email]
