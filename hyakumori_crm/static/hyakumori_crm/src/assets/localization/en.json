@@ -14,7 +14,8 @@
     "setting": "Setting"
   },
   "raw_text": {
-    "search": "Search"
+    "search": "Search",
+    "in_negotiation": "In negotiation"
   },
   "search": {
     "add_search_condition": "Add condition",

@@ -23,17 +23,6 @@ type ClientResponse implements HyakumoriResponse {
   client: Client
 }
 
-type Mutation {
-  create_client(data: CreateClientInput!): ClientResponse
-  delete_client(pk: ID!): ClientResponse
-  update_client(pk: ID!, data: UpdateClientInput!): ClientResponse
-}
-
-type Query {
-  get_client(id: ID!): ClientResponse
-  list_clients(filter: TableClientFilterInput, limit: Int, nextToken: String): ClientConnection
-}
-
 input CreateClientInput {
   internal_id: String
   profile: JSON

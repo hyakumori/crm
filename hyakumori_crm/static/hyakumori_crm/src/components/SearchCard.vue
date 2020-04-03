@@ -39,7 +39,7 @@
         </span>
       </div>
 
-      <v-btn class="mt-md-2" dark depressed color="#1B756A">
+      <v-btn class="mt-md-2 mt-lg-0 mt-xl-0" dark depressed color="#1B756A">
         {{ $t("raw_text.search") }}
         <v-icon dark>mdi-magnify</v-icon>
       </v-btn>

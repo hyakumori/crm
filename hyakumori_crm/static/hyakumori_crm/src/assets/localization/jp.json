@@ -13,6 +13,10 @@
     "negotiate_mgm": "ユーザー管理",
     "setting": "設定"
   },
+  "raw_text": {
+    "search": "探す",
+    "in_negotiation": "商談中"
+  },
   "search": {
     "add_search_condition": "検索条件を追加",
     "enter_condition": "条件を入力",

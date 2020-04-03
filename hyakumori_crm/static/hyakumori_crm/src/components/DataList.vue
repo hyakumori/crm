@@ -3,8 +3,8 @@
     item-key="id"
     ref="dataTable"
     v-model="selected"
-    :headers="headers"
-    :items="datas"
+    :headers="dynamicHeaders"
+    :items="data"
     :loading="isLoading"
     :sort-by="['id']"
     :sort-desc="[true]"
@@ -23,11 +23,14 @@
       </div>
     </template>
 
-    <template v-slot:item.owners="{ item }">
-      <p class="owner-negotiation" v-if="isOwnerNegotiation(item.owners)">
-        商談中
+    <template
+      v-for="(nego, index) in negotiationCols"
+      v-slot:[`item.${nego}`]="{ item }"
+    >
+      <p class="negotiation" v-if="isNegotiation(item[nego])" :key="index">
+        {{ $t("raw_text.in_negotiation") }}
       </p>
-      <p class="d-inline" v-else>{{ item.owners }}</p>
+      <p class="d-inline" v-else :key="index">{{ item[nego] }}</p>
     </template>
   </v-data-table>
 </template>
@@ -40,8 +43,9 @@ export default {
   props: {
     mode: String,
     showSelect: Boolean,
-    datas: Array,
-    headers: Array
+    data: Array,
+    headers: Array,
+    negotiationCols: Array
   },
 
   data() {
@@ -52,7 +56,6 @@ export default {
 
   mounted() {
     this.changeSortIcon();
-    this.createDynamicHeaderValue();
   },
 
   computed: {
@@ -67,7 +70,17 @@ export default {
     },
 
     isLoading() {
-      return !this.datas;
+      return !this.data;
+    },
+
+    dynamicHeaders() {
+      if (this.data && this.headers) {
+        for (let i = 0; i < this.headers.length; i++) {
+          const element = this.headers[i];
+          element.value = Object.keys(this.data[0])[i];
+        }
+      }
+      return this.headers;
     }
   },
 
@@ -77,15 +90,6 @@ export default {
         selectAll("i.mdi-arrow-up")
           .classed("mdi-chevron-up", true)
           .classed("mdi-arrow-up", false);
-      }
-    },
-
-    createDynamicHeaderValue() {
-      if (this.datas && this.headers) {
-        for (let i = 0; i < this.headers.length; i++) {
-          const element = this.headers[i];
-          element.value = Object.keys(this.datas[0])[i];
-        }
       }
     },
 
@@ -101,7 +105,7 @@ export default {
       return this.mode === "client";
     },
 
-    isOwnerNegotiation(val) {
+    isNegotiation(val) {
       return val === "negotiation";
     }
   }
@@ -124,7 +128,7 @@ export default {
     border-radius: 50%;
   }
 
-  & .owner-negotiation {
+  & .negotiation {
     display: inline;
     padding: 5px;
     background: #ffa726;
@@ -136,6 +140,7 @@ export default {
     cursor: pointer;
 
     td {
+      text-align: center;
       @extend %text-overflow-shared;
     }
 
