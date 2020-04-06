@@ -1,9 +1,9 @@
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
-from ..models.customer import Customer, Contact
+from ..models.customer import Contact, Customer
 from ..models.relations import CustomerContact
 from ..schemas.customer import CustomerSchema
 
@@ -13,10 +13,12 @@ class CustomerService:
     def create_customer(customer: CustomerSchema, author: AbstractUser) -> Customer:
         _customer = Customer()
         _customer.internal_id = customer.internal_id
-        _customer.name = customer.name.dict()
+        _customer.name_kanji = customer.name_kanji.dict()
+        _customer.name_kana = customer.name_kana.dict()
         _customer.address = customer.address.dict()
         _customer.banking = customer.banking.dict()
         _customer.status = customer.status.name
+        _customer.tags = customer.tags
         _customer.editor = author
         _customer.author = author
         _customer.save()
@@ -46,4 +48,3 @@ class CustomerService:
         for contact_link in customer.customercontact_set.all().iterator():
             contact_link.delete()
             contact_link.contact.delete()
-

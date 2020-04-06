@@ -10,7 +10,11 @@ from ..schemas.customer import Name
 
 class DefaultCustomer:
     @staticmethod
-    def name():
+    def name_kanji():
+        return Name().dict()
+
+    @staticmethod
+    def name_kana():
         return Name().dict()
 
     @staticmethod
@@ -27,9 +31,11 @@ class Customer(BaseResourceModel):
     所有者ID    土地所有者名    土地所有者住所	連絡先情報  口座情報	タグ
     """
 
-    name = JSONField(default=DefaultCustomer.name)
-    address = JSONField(default=DefaultCustomer.address)
+    name_kanji = JSONField(default=DefaultCustomer.name_kanji, db_index=True)
+    name_kana = JSONField(default=DefaultCustomer.name_kana, db_index=True)
+    address = JSONField(default=DefaultCustomer.address, db_index=True)
     banking = JSONField(default=DefaultCustomer.banking)
+    tags = JSONField(default=list)
     status = models.CharField(
         max_length=20,
         choices=CustomerRegisterStatuses.choices,
