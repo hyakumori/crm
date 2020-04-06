@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ["localhost"]
 STATIC_ROOT = os.path.join(
     BASE_DIR, os.getenv("STATIC_DIR", "hyakumori_crm/static/hyakumori_crm/dist")
 )
+
 if os.getenv("STATIC_DIR") == "":
     STATIC_ROOT = None
 
@@ -47,12 +48,12 @@ if not STATIC_ROOT:
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
+    *static_app,  # this need high priority due to some override commands
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
     "ariadne.contrib.django",
     # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
-    *static_app,
     "hyakumori_crm.users",
     "hyakumori_crm.crm",
     "hyakumori_crm.customer",

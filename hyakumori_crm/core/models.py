@@ -1,4 +1,4 @@
-from typing import Any, List, Sequence, Optional, List, ClassVar
+from typing import Any, Sequence, Optional, List, ClassVar
 import datetime
 import uuid
 

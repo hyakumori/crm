@@ -1,11 +1,10 @@
 import uuid
 
-import uuid
-
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from .managers import UserManager
 
 

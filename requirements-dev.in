@@ -7,9 +7,5 @@ requests
 filelock
 pytest-django
 coverage
-pandas
-xlrd
-django-extensions
-click
 pydantic
 pydantic[email]
