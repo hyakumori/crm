@@ -1,8 +1,6 @@
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.db import models
 
 from ...core.models import BaseResourceModel
-from ..common.choices import CustomerRegisterStatuses
 from ..schemas.customer import Address, Banking
 from ..schemas.customer import Contact as ContactSchema
 from ..schemas.customer import Name
@@ -36,11 +34,6 @@ class Customer(BaseResourceModel):
     address = JSONField(default=DefaultCustomer.address, db_index=True)
     banking = JSONField(default=DefaultCustomer.banking)
     tags = JSONField(default=list)
-    status = models.CharField(
-        max_length=20,
-        choices=CustomerRegisterStatuses.choices,
-        default=CustomerRegisterStatuses.UNREGISTERED,
-    )
 
 
 class DefaultContact:
