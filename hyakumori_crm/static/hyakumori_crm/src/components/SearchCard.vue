@@ -1,18 +1,22 @@
 <template>
   <v-card class="search-card">
-    <v-card-title class="search-card__title">
-      {{ $t("search.search_condition") }}
-    </v-card-title>
+    <v-card-title class="search-card__title">{{
+      $t("search.search_condition")
+    }}</v-card-title>
 
     <v-form ref="form">
-      <div class="search-card__search" v-for="(condition, index) in conditions" :key="index">
+      <div
+        class="search-card__search"
+        v-for="(condition, index) in conditions"
+        :key="index"
+      >
         <div class="d-flex justify-space-between">
           <select-list
             class="search-card__search--spacing"
             :placeHolder="$t('search.select_item')"
             :actions="searchCriteria"
             :index="index"
-            :rules="conditionRules"
+            :rules="[rules.required]"
             @selectedAction="onSelected"
           />
 
@@ -27,18 +31,18 @@
           clearable
           outlined
           :placeholder="$t('search.enter_condition')"
-          :rules="dataRules"
+          :rules="[rules.required, rules.searchData]"
         ></v-text-field>
       </div>
 
-      <div class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn">
+      <div
+        class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn"
+      >
         <div @click="addSearchField">
           <v-icon>mdi-plus</v-icon>
 
           <span class="ml-1 caption">
-            {{
-            $t("search.add_search_condition")
-            }}
+            {{ $t("search.add_search_condition") }}
           </span>
         </div>
 
@@ -53,6 +57,7 @@
 
 <script>
 import SelectList from "./SelectList";
+import { searchValidInput } from "../common/regex";
 
 export default {
   name: "search-card",
@@ -67,8 +72,10 @@ export default {
 
   data() {
     return {
-      dataRules: [val => !!val || "This field is required"],
-      conditionRules: [val => !!val || "Condition is required"],
+      rules: {
+        required: val => !!val || this.$t("search.required_field"),
+        searchData: val => searchValidInput.test(val) || this.$t("search.invalid_input"),
+      },
       conditions: [
         {
           data: null,

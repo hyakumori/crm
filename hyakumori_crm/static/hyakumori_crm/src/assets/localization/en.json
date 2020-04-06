@@ -27,6 +27,8 @@
     "selected_action": "Selected",
     "duplicate_criteria_msg": "You can not search with duplicate condition criteria!!",
     "unable_to_remove_search_msg": "You can not remove anymore!!",
-    "condition_is_maximum": "Search condition is maximum!!"
+    "condition_is_maximum": "Search condition is maximum!!",
+    "required_field": "This field is required",
+    "invalid_input": "Invalid input"
   }
 }

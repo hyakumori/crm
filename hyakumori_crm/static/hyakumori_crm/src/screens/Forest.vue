@@ -84,7 +84,7 @@ export default {
         this.isShowErr = true;
         this.errMsg = this.$t("search.duplicate_criteria_msg");
       } else {
-        // Handling search data
+        // Handling data search
       }
     },
 

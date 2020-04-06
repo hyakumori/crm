@@ -136,7 +136,6 @@ export default {
   }
 
   & ::v-deep tr {
-    
     td {
       text-align: center;
       @extend %text-overflow-shared;
