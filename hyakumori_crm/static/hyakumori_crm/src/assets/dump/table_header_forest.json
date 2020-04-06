@@ -32,9 +32,5 @@
         "text": "土地管理ID",
         "align": "center",
         "sortable": false
-    },
-    {
-        "align": "center",
-        "sortable": false
     }
 ]

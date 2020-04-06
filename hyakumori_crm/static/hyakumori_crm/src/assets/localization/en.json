@@ -15,7 +15,8 @@
   },
   "raw_text": {
     "search": "Search",
-    "in_negotiation": "In negotiation"
+    "in_negotiation": "In negotiation",
+    "agree": "I agree"
   },
   "search": {
     "add_search_condition": "Add condition",
@@ -23,6 +24,9 @@
     "search_condition": "Search condition",
     "select_action": "Select action",
     "select_item": "Selected item",
-    "selected_action": "Selected"
+    "selected_action": "Selected",
+    "duplicate_criteria_msg": "You can not search with duplicate condition criteria!!",
+    "unable_to_remove_search_msg": "You can not remove anymore!!",
+    "condition_is_maximum": "Search condition is maximum!!"
   }
 }
