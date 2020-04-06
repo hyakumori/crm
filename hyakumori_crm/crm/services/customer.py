@@ -17,7 +17,7 @@ class CustomerService:
         _customer.name_kana = customer.name_kana.dict()
         _customer.address = customer.address.dict()
         _customer.banking = customer.banking.dict()
-        _customer.status = customer.status.name
+        _customer.basic_contact = customer.basic_contact.dict()
         _customer.tags = customer.tags
         _customer.editor = author
         _customer.author = author

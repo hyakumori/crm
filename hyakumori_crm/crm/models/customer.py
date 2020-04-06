@@ -24,6 +24,12 @@ class DefaultCustomer:
         return Banking().dict()
 
 
+class DefaultContact:
+    @staticmethod
+    def contact_info():
+        return ContactSchema().dict()
+
+
 class Customer(BaseResourceModel):
     """
     所有者ID    土地所有者名    土地所有者住所	連絡先情報  口座情報	タグ
@@ -33,13 +39,8 @@ class Customer(BaseResourceModel):
     name_kana = JSONField(default=DefaultCustomer.name_kana, db_index=True)
     address = JSONField(default=DefaultCustomer.address, db_index=True)
     banking = JSONField(default=DefaultCustomer.banking)
+    basic_contact = JSONField(default=DefaultContact.contact_info, db_index=True)
     tags = JSONField(default=list)
-
-
-class DefaultContact:
-    @staticmethod
-    def contact_info():
-        return ContactSchema().dict()
 
 
 class Contact(BaseResourceModel):
