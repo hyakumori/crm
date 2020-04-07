@@ -12,3 +12,4 @@ pydantic[email]
 django-model-utils
 django-behaviors
 djangorestframework
+django-extensions
