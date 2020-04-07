@@ -9,6 +9,7 @@ from behaviors.querysets import AuthoredQuerySet, EditoredQuerySet, StoreDeleted
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field, root_validator, validator
 
 
@@ -84,6 +85,15 @@ class HyakumoriDanticModel(BaseModel):
         validate_assignment = True
         min_anystr_length = 1
         anystr_strip_whitespace = True
+        error_msg_templates = {
+            "type_error.none.not_allowed": _("Required"),
+        }
+
+    @validator("*", pre=True)
+    def parse_input(cls, v):
+        if v == "":
+            return None
+        return v
 
     @validator("id", pre=True, check_fields=False)
     def get_str_from_uuid(cls, v):

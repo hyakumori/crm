@@ -56,8 +56,12 @@ type Query {
 
 input CreateCustomerInput {
   internal_id: String
-  profile: JSON
-  attributes: JSON
+  name_kanji: JSON!
+  name_kana: JSON!
+  address: JSON
+  basic_contact: JSON!
+  banking: JSON
+  status: String
 }
 
 input TableCustomerFilterInput {

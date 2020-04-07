@@ -15,6 +15,7 @@ import urllib.parse
 from distutils.util import strtobool
 
 import dj_database_url
+from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -68,6 +69,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -123,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ja"
 
 TIME_ZONE = "UTC"
 
@@ -141,3 +143,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/"
 
 AUTH_USER_MODEL = "users.User"
+
+LANGUAGES = [("ja", _("Japan"))]
+
+LOCALE_PATHS = [os.path.join(BASE_DIR, "hyakumori_crm", "locale")]

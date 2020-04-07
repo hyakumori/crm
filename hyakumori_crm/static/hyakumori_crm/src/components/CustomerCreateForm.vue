@@ -1,8 +1,8 @@
 <template>
   <v-dialog v-model="shown" scrollable max-width="720">
     <template v-slot:activator="{ on }">
-      <v-btn rounded flat outlined v-on="on">
-        Click Me
+      <v-btn rounded dark outlined v-on="on">
+        <v-icon>mdi-plus</v-icon>{{ $t("buttons.add_customer") }}
       </v-btn>
     </template>
     <v-card>
@@ -14,71 +14,94 @@
         <v-icon @click="shown = false">mdi-close</v-icon>
       </v-card-actions>
       <v-divider></v-divider>
-      <v-card-text style="min-height: 300px;padding: 20px 24px 0;">
+      <v-card-text style="min-height: 300px;padding: 20px 24px;">
         <ValidationObserver ref="form">
           <v-form>
             <v-row no-gutters>
               <v-col class="pe-2">
-                <label class="font-weight-bold" for="">{{
-                  $t("forms.labels.customer.last_name")
+                <label class="font-weight-bold">{{
+                  $t("forms.labels.customer.last_name_kanji")
                 }}</label>
-                <TextInput v-model="form.last_name" name="last_name" />
+                <TextInput
+                  v-model="form.last_name_kanji"
+                  name="name_kanji.last_name"
+                />
               </v-col>
               <v-col class="pe-6">
-                <label class="font-weight-bold" for="">{{
-                  $t("forms.labels.customer.first_name")
+                <label class="font-weight-bold">{{
+                  $t("forms.labels.customer.first_name_kanji")
                 }}</label>
-                <TextInput v-model="form.first_name" name="first_name" />
+                <TextInput
+                  v-model="form.first_name_kanji"
+                  name="name_kanji.first_name"
+                />
               </v-col>
               <v-col class="pe-2">
-                <label class="font-weight-bold" for="">セイ</label>
+                <label class="font-weight-bold">セイ</label>
                 <TextInput
                   v-model="form.last_name_kana"
-                  name="last_name_kana"
+                  name="name_kana.last_name"
                 />
               </v-col>
               <v-col>
-                <label class="font-weight-bold" for="">メイ</label>
+                <label class="font-weight-bold">メイ</label>
                 <TextInput
                   v-model="form.first_name_kana"
-                  name="first_name_kana"
+                  name="name_kana.first_name"
                 />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="pe-6">
-                <label class="font-weight-bold" for="">{{
+                <label class="font-weight-bold">{{
                   $t("forms.labels.customer.postal_code")
                 }}</label>
-                <TextInput v-model="form.postal_code" name="postal_code" />
+                <TextInput
+                  v-model="form.postal_code"
+                  name="basic_contact.postal_code"
+                />
               </v-col>
               <v-col>
-                <label class="font-weight-bold" for="">{{
+                <label class="font-weight-bold">{{
                   $t("forms.labels.customer.address")
                 }}</label>
-                <TextInput v-model="form.address" name="address" />
+                <TextInput v-model="form.address" name="address.address" />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="pe-6">
-                <label class="font-weight-bold" for="">{{
+                <label class="font-weight-bold">{{
                   $t("forms.labels.customer.phone_number")
                 }}</label>
-                <TextInput name="phone_number" v-model="form.phone_number" />
+                <TextInput
+                  name="basic_contact.phone_number"
+                  v-model="form.phone_number"
+                />
               </v-col>
               <v-col>
-                <label class="font-weight-bold" for="">{{
+                <label class="font-weight-bold">{{
                   $t("forms.labels.customer.mobile_number")
                 }}</label>
-                <TextInput name="mobile_phone" v-model="form.mobile_number" />
+                <TextInput
+                  name="basic_contact.mobile_phone"
+                  v-model="form.mobile_number"
+                />
               </v-col>
             </v-row>
             <v-row no-gutters>
               <v-col class="col-6 pe-3">
-                <label class="font-weight-bold" for="">{{
+                <label class="font-weight-bold">{{
                   $t("forms.labels.customer.email")
                 }}</label>
-                <TextInput name="email" v-model="form.email" />
+                <TextInput name="basic_contact.email" v-model="form.email" />
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-btn text class="primary--text"
+                  ><v-icon left>mdi-plus</v-icon
+                  >{{ $t("forms.labels.customer.add_more_info") }}</v-btn
+                >
               </v-col>
             </v-row>
           </v-form>
@@ -86,8 +109,18 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn color="blue darken-1" text @click="shown = false">Close</v-btn>
-        <v-btn color="blue darken-1" text @click="submit">Save</v-btn>
+        <v-btn color="primary" @click="submit">{{ $t("buttons.save") }}</v-btn>
+        <v-btn text @click="shown = false">{{ $t("buttons.cancel") }}</v-btn>
+        <v-btn
+          text
+          @click="
+            () => {
+              $refs.form.clear;
+              $refs.form.reset();
+            }
+          "
+          >reset</v-btn
+        >
         <v-spacer />
       </v-card-actions>
     </v-card>
@@ -98,8 +131,9 @@
 import { ValidationObserver, setInteractionMode } from "vee-validate";
 import gql from "graphql-tag";
 import TextInput from "./forms/TextInput";
+import BusEvent from "../BusEvent";
 
-setInteractionMode("passive");
+setInteractionMode("eager");
 
 export default {
   components: {
@@ -109,9 +143,14 @@ export default {
   data() {
     return {
       shown: false,
-      form: {
-        first_name: "",
-        last_name: "",
+      form: this.initForm(),
+    };
+  },
+  methods: {
+    initForm() {
+      return {
+        first_name_kanji: "",
+        last_name_kanji: "",
         first_name_kana: "",
         last_name_kana: "",
         postal_code: "",
@@ -119,46 +158,48 @@ export default {
         phone_number: "",
         mobile_number: "",
         email: "",
-      },
-    };
-  },
-  methods: {
+      };
+    },
     submit() {
-      this.$apollo.matate({
+      const customerInput = {
+        name_kanji: {
+          last_name: this.form.last_name_kanji,
+          first_name: this.form.first_name_kanji,
+        },
+        name_kana: {
+          last_name: this.form.last_name_kana,
+          first_name: this.form.first_name_kana,
+        },
+        address: {
+          address: this.form.address,
+        },
+        basic_contact: {
+          postal_code: this.form.postal_code,
+          telephone: this.form.phone_number,
+          mobilephone: this.form.mobile_number,
+          email: this.form.email,
+        },
+      };
+      this.$apollo.mutate({
         mutation: gql`
-          createCustomer ($input: CreateCustomerInput!) {
+          mutation($input: CreateCustomerInput!) {
             create_customer(data: $input) {
               ok
               error
-              customer {
-                id
-              }
             }
-        }`,
+          }
+        `,
         variables: {
-          input: {
-            name: {
-              last_name: this.data.form.last_name,
-              first_name: this.data.form.first_name,
-              last_name_kana: this.data.form.last_name_kana,
-              first_name_kana: this.data.form.first_name_kana,
-            },
-            address: {
-              prefecture: this.data.form.address,
-            },
-            contact: {
-              postal_code: this.data.form.postal_code,
-              telephone: this.data.form.phone_number,
-              mobilephone: this.data.form.mobile_number,
-              email: this.data.form.email,
-            },
-          },
+          input: customerInput,
         },
-        update: (store, { data: { ok, error } }) => {
-          if (!ok) {
-            this.$refs.form.setErrors(error);
+        update: (store, { data: { create_customer } }) => {
+          if (!create_customer.ok) {
+            this.$refs.form.setErrors(create_customer.error);
           } else {
-            this.$apollo.queries.list_customers.start();
+            this.$refs.form.reset();
+            this.initForm();
+            BusEvent.$emit("customersChanged");
+            this.shown = false;
           }
         },
       });

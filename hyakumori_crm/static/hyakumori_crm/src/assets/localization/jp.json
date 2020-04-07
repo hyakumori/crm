@@ -4,19 +4,25 @@
     "customer_icon": "mdi-account-outline",
     "forest_icon": "mdi-image-filter-hdr"
   },
+  "buttons": {
+    "cancel": "キャンセル",
+    "save": "保存",
+    "add_customer": "顧客を追加"
+  },
   "forms": {
     "titles": {
       "create_customer": "顧客情報の追加"
     },
     "labels": {
       "customer": {
-        "first_name": "名",
-        "last_name": "姓",
+        "first_name_kanji": "名",
+        "last_name_kanji": "姓",
         "postal_code": "郵便番号",
         "address": "住所",
         "phone_number": "電話番号",
         "mobile_number": "携帯番号",
-        "email": "メールアドレス"
+        "email": "メールアドレス",
+        "add_more_info": "より詳細な情報を表示"
       }
     }
   },

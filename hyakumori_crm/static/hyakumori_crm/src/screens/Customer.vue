@@ -5,7 +5,6 @@
     </v-col>
 
     <v-col cols="9">
-      <CustomerCreateForm />
       <v-data-table
         :headers="headers"
         :multi-sort="true"
@@ -20,15 +19,14 @@
 </template>
 
 <script>
+import gql from "graphql-tag";
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
-import CustomerCreateForm from "../components/CustomerCreateForm";
-import gql from "graphql-tag";
+import BusEvent from "../BusEvent";
 
 export default {
   components: {
     SearchCard,
-    CustomerCreateForm,
   },
   mixins: [ScreenMixin],
   data() {
@@ -48,6 +46,11 @@ export default {
         { text: "Representative", value: "representative" },
       ],
     };
+  },
+  mounted() {
+    BusEvent.$on("customersChanged", () => {
+      this.$apollo.queries.result.start();
+    });
   },
   computed: {
     customers() {
