@@ -5,6 +5,7 @@
     </v-col>
 
     <v-col cols="9">
+      <CustomerCreateForm />
       <v-data-table
         :headers="headers"
         :multi-sort="true"
@@ -21,11 +22,13 @@
 <script>
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
+import CustomerCreateForm from "../components/CustomerCreateForm";
 import gql from "graphql-tag";
 
 export default {
   components: {
     SearchCard,
+    CustomerCreateForm,
   },
   mixins: [ScreenMixin],
   data() {

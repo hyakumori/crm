@@ -82,6 +82,8 @@ class HyakumoriDanticModel(BaseModel):
     class Config:
         orm_mode = True
         validate_assignment = True
+        min_anystr_length = 1
+        anystr_strip_whitespace = True
 
     @validator("id", pre=True, check_fields=False)
     def get_str_from_uuid(cls, v):
