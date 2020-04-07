@@ -15,9 +15,9 @@ class DefaultForest:
     @staticmethod
     def contracts():
         return [
-            Contract(type=ContractType.long_term),
-            Contract(type=ContractType.work_road),
-            Contract(type=ContractType.fsc),
+            Contract(type=ContractType.long_term).dict(),
+            Contract(type=ContractType.work_road).dict(),
+            Contract(type=ContractType.fsc).dict(),
         ]
 
     @staticmethod
