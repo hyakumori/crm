@@ -3,9 +3,9 @@
     item-key="id"
     ref="dataTable"
     v-model="selected"
+    :loading="isLoading"
     :headers="dynamicHeaders"
     :items="data"
-    :loading="isLoading"
     :sort-by="['id']"
     :sort-desc="[true]"
     :show-select="showSelect"
@@ -43,6 +43,7 @@ export default {
   name: "data-list",
   props: {
     mode: String,
+    isLoading: Boolean,
     showSelect: Boolean,
     data: Array,
     headers: Array,
@@ -69,10 +70,6 @@ export default {
       } else {
         return this.$t("icon.archive_icon");
       }
-    },
-
-    isLoading() {
-      return !this.data;
     },
 
     dynamicHeaders() {
@@ -139,8 +136,6 @@ export default {
   }
 
   & ::v-deep tr {
-    cursor: pointer;
-
     td {
       text-align: center;
       @extend %text-overflow-shared;

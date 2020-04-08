@@ -1,55 +1,63 @@
 <template>
   <v-card class="search-card">
-    <v-card-title class="search-card__title">
-      {{ $t("search.search_condition") }}
-    </v-card-title>
+    <v-card-title class="search-card__title">{{
+      $t("search.search_condition")
+    }}</v-card-title>
 
-    <div
-      class="search-card__search"
-      v-for="(condition, index) in conditions"
-      :key="index"
-    >
-      <div class="d-flex justify-space-between">
-        <select-list
-          class="search-card__search--spacing"
-          :placeHolder="$t('search.select_item')"
-          :actions="getActions"
-          @selectedAction="onSelected"
-        />
+    <v-form ref="form">
+      <div
+        class="search-card__search"
+        v-for="(condition, index) in conditions"
+        :key="index"
+      >
+        <div class="d-flex justify-space-between">
+          <select-list
+            class="search-card__search--spacing"
+            :placeHolder="$t('search.select_item')"
+            :actions="searchCriteria"
+            :index="index"
+            :rules="[rules.required]"
+            @selectedAction="onSelected"
+          />
 
-        <v-btn @click="deleteSearchField(index)" icon>
-          <v-icon>mdi-delete-circle</v-icon>
+          <v-btn @click="deleteSearchField(index)" icon>
+            <v-icon>mdi-delete-circle</v-icon>
+          </v-btn>
+        </div>
+
+        <v-text-field
+          v-model="condition.data"
+          class="mt-1"
+          clearable
+          outlined
+          :placeholder="$t('search.enter_condition')"
+          :rules="[rules.required, rules.searchData]"
+        ></v-text-field>
+      </div>
+
+      <div
+        class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn"
+      >
+        <div @click="addSearchField">
+          <v-icon>mdi-plus</v-icon>
+
+          <span class="ml-1 caption">
+            {{ $t("search.add_search_condition") }}
+          </span>
+        </div>
+
+        <v-btn class="mt-md-2 mt-lg-0 mt-xl-0" dark depressed @click="onSearch">
+          {{ $t("raw_text.search") }}
+          <v-icon dark>mdi-magnify</v-icon>
         </v-btn>
       </div>
-
-      <v-text-field
-        v-model="condition.input"
-        clearable
-        outlined
-        :placeholder="$t('search.enter_condition')"
-      ></v-text-field>
-    </div>
-
-    <div class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn">
-      <div @click="addSearchField">
-        <v-icon>mdi-plus</v-icon>
-
-        <span class="ml-1 caption">
-          {{ $t("search.add_search_condition") }}
-        </span>
-      </div>
-
-      <v-btn class="mt-md-2 mt-lg-0 mt-xl-0" dark depressed>
-        {{ $t("raw_text.search") }}
-        <v-icon dark>mdi-magnify</v-icon>
-      </v-btn>
-    </div>
+    </v-form>
   </v-card>
 </template>
 
 <script>
 import SelectList from "./SelectList";
-import actions from "../assets/dump/table_actions.json";
+import { searchValidInput } from "../common/regex";
 
 export default {
   name: "search-card",
@@ -58,11 +66,20 @@ export default {
     SelectList,
   },
 
+  props: {
+    searchCriteria: Array,
+  },
+
   data() {
     return {
+      rules: {
+        required: val => !!val || this.$t("search.required_field"),
+        searchData: val => searchValidInput.test(val) || this.$t("search.invalid_input"),
+      },
       conditions: [
         {
-          input: null,
+          data: null,
+          criteria: null,
         },
       ],
     };
@@ -70,23 +87,41 @@ export default {
 
   methods: {
     addSearchField() {
-      this.conditions.push({ input: null });
+      if (this.conditions.length == this.searchCriteria.length) {
+        this.$emit("conditionOutOfBounds", true);
+      } else {
+        this.conditions.push({ data: null, criteria: null });
+      }
     },
 
-    onSelected() {
-      // console.log(val);
+    onSelected(item, index) {
+      this.conditions[index].criteria = item;
     },
 
     deleteSearchField(index) {
       if (this.conditions.length > 1) {
         this.conditions.splice(index, 1);
+      } else {
+        this.$emit("unableDelete", true);
       }
     },
-  },
 
-  computed: {
-    getActions() {
-      return actions;
+    isUniqueArr(arr) {
+      return arr.length === new Set(arr).size;
+    },
+
+    onSearch() {
+      const criterias = Array.from(this.conditions).map(
+        condition => condition.criteria,
+      );
+      const isDuplicateCriteria = true;
+      if (this.$refs.form.validate()) {
+        if (criterias && this.isUniqueArr(criterias)) {
+          this.$emit("onSearch", !isDuplicateCriteria, this.conditions);
+        } else {
+          this.$emit("onSearch", isDuplicateCriteria);
+        }
+      }
     },
   },
 };
@@ -119,6 +154,10 @@ $text-field--min-height: 0;
 
       input::placeholder {
         color: $text-color;
+      }
+
+      .v-input__icon > i {
+        color: $text-color !important;
       }
     }
   }
