@@ -27,13 +27,13 @@ def get_customer_by_id(_, info, id: str = None) -> dict:
 @query.field("list_customers")
 @validate_model(Paginator)
 def list_customers(_, info, data=None) -> dict:
-    # customers, total = get_list(
-    #     page_num=data["page_num"],
-    #     per_page=data["per_page"],
-    #     pre_per_page=data["pre_per_page"],
-    #     order_by=data["order_by"],
-    # )
-    customers, total = [], 0
+    pager_input = data.dict()
+    customers, total = get_list(
+        page_num=pager_input["page_num"],
+        per_page=pager_input["per_page"],
+        pre_per_page=pager_input["pre_per_page"],
+        order_by=pager_input["order_by"],
+    )
     return {"items": customers, "total": total}
 
 

@@ -14,7 +14,7 @@ from django.db.models import Value as V
 from django.db.models import When
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
-from querybuilder.query import Query
+from querybuilder.query import Expression, Query
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models.customer import Contact, Customer
@@ -54,9 +54,15 @@ def get_list(
                 }
             ],
         )
-        .join({"cc": CustomerContact}, condition="contact.id = cc.contact_id",)
-        .where("contact.customer_id = c.id")
-        .order_by(RawSQLField("case when cc.attributes->>default then 1 else 2 end"))
+        .join(
+            {"contact_rel": CustomerContact},
+            condition="contact.id = contact_rel.contact_id",
+        )
+        .where(Q(customer_id=Expression("c.id")))
+        .where(~Q(is_basic=Expression("true")))
+        .order_by(
+            "attributes->>'default'", table="contact_rel", desc=True, nulls_last=True
+        )
     )
 
     query = (
@@ -64,17 +70,22 @@ def get_list(
         .from_table(
             {"c": Customer},
             fields=[
+                "id",
                 "internal_id",
-                {"representative": RawSQLField(representatives.get_sql())},
+                {
+                    "representative": RawSQLField(
+                        representatives.get_sql(), enclose=True
+                    )
+                },
             ],
         )
         .join(
-            {"self_cc": CustomerContact},
-            condition="c.id=self_cc.customer_id and self_cc.is_basic is true",
+            {"self_contact_rel": CustomerContact},
+            condition="c.id=self_contact_rel.customer_id and self_contact_rel.is_basic is true",
         )
         .join(
             {"self_contact": Contact},
-            condition="self_cc.contact_id=self_contact.id",
+            condition="self_contact_rel.contact_id=self_contact.id",
             fields=[
                 {
                     "fullname_kana": RawSQLField(
@@ -93,23 +104,23 @@ def get_list(
             ],
         )
     )
-    return [], 0
+    total = query.copy().wrap().count()
+    for order_field in order_by:
+        query.order_by(order_field)
+    query.limit(per_page, offset)
+    return query.select(), total
 
 
 def create(customer_in: CustomerInputSchema):
     admin = User.objects.filter(is_superuser=True, is_active=True).first()
     customer = Customer()
-    customer.name_kanji = customer_in.name_kanji.dict()
-    customer.name_kana = customer_in.name_kana.dict()
-    customer.address = customer_in.address.dict()
-    customer.status = customer_in.status
     customer.author = admin
     customer.editor = admin
     contacts = []
     customer_contacts = []
 
     self_contact = Contact(
-        contact_info=customer_in.basic_contact.dict(), author=admin, editor=admin
+        **customer_in.basic_contact.dict(), author=admin, editor=admin
     )
     contacts.append(self_contact)
     contact_rel = CustomerContact(
@@ -123,7 +134,7 @@ def create(customer_in: CustomerInputSchema):
 
     if hasattr(customer_in, "contacts"):
         for data in customer_in.contacts:
-            contact = Contact(contact_info=data.dict(), author=admin, editor=admin)
+            contact = Contact(**data.dict(), author=admin, editor=admin)
             contacts.append(contact)
             contact_rel = CustomerContact(
                 customer=customer, contact=contact, author=admin, editor=admin

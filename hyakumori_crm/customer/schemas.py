@@ -20,9 +20,10 @@ class Address(HyakumoriDanticModel):
 
 
 class Contact(HyakumoriDanticModel):
-    name_kanji: Optional[Name]
-    name_kana: Optional[Name]
+    name_kanji: Name
+    name_kana: Name
     postal_code: constr(regex=regexes.POSTAL_CODE, strip_whitespace=True)
+    address: Optional[Address] = Address
     telephone: Optional[constr(regex=regexes.TELEPHONE_NUMBER, strip_whitespace=True)]
     mobilephone: Optional[
         constr(regex=regexes.MOBILEPHONE_NUMBER, strip_whitespace=True)
@@ -45,12 +46,8 @@ class CustomerStatus(str, Enum):
 
 class CustomerInputSchema(HyakumoriDanticModel):
     internal_id: Optional[str]
-    name_kanji: Name
-    name_kana: Name
-    address: Address
-    basic_contact: Optional[Contact]
+    basic_contact: Contact
     banking: Optional[Banking]
-    status: CustomerStatus = CustomerStatus.unregistered
 
 
 class CustomerRead:

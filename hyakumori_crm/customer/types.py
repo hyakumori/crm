@@ -24,9 +24,13 @@ type Customer implements Timestamp & Editor {
 }
 
 type CustomerItem {
-  fullname: String!
+  internal_id: String
+  fullname_kana: String!
+  fullname_kanji: String!
+  postal_code: String
   address: String
-  phone: String
+  telephone: String
+  mobilephone: String
   representative: String
 }
 
@@ -56,12 +60,8 @@ type Query {
 
 input CreateCustomerInput {
   internal_id: String
-  name_kanji: JSON!
-  name_kana: JSON!
-  address: JSON
   basic_contact: JSON!
   banking: JSON
-  status: String
 }
 
 input TableCustomerFilterInput {

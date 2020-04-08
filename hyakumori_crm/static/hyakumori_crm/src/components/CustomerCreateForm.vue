@@ -24,7 +24,7 @@
                 }}</label>
                 <TextInput
                   v-model="form.last_name_kanji"
-                  name="name_kanji.last_name"
+                  name="basic_contact.name_kanji.last_name"
                 />
               </v-col>
               <v-col class="pe-6">
@@ -33,21 +33,21 @@
                 }}</label>
                 <TextInput
                   v-model="form.first_name_kanji"
-                  name="name_kanji.first_name"
+                  name="basic_contact.name_kanji.first_name"
                 />
               </v-col>
               <v-col class="pe-2">
                 <label class="font-weight-bold">セイ</label>
                 <TextInput
                   v-model="form.last_name_kana"
-                  name="name_kana.last_name"
+                  name="basic_contact.name_kana.last_name"
                 />
               </v-col>
               <v-col>
                 <label class="font-weight-bold">メイ</label>
                 <TextInput
                   v-model="form.first_name_kana"
-                  name="name_kana.first_name"
+                  name="basic_contact.name_kana.first_name"
                 />
               </v-col>
             </v-row>
@@ -58,14 +58,17 @@
                 }}</label>
                 <TextInput
                   v-model="form.postal_code"
-                  name="basic_contact.postal_code"
+                  name="basic_contact.basic_contact.postal_code"
                 />
               </v-col>
               <v-col>
                 <label class="font-weight-bold">{{
                   $t("forms.labels.customer.address")
                 }}</label>
-                <TextInput v-model="form.address" name="address.address" />
+                <TextInput
+                  v-model="form.address"
+                  name="basic_contact.address.sector"
+                />
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -74,7 +77,7 @@
                   $t("forms.labels.customer.phone_number")
                 }}</label>
                 <TextInput
-                  name="basic_contact.phone_number"
+                  name="basic_contact.telephone"
                   v-model="form.phone_number"
                 />
               </v-col>
@@ -83,7 +86,7 @@
                   $t("forms.labels.customer.mobile_number")
                 }}</label>
                 <TextInput
-                  name="basic_contact.mobile_phone"
+                  name="basic_contact.mobilephone"
                   v-model="form.mobile_number"
                 />
               </v-col>
@@ -151,18 +154,18 @@ export default {
     },
     submit() {
       const customerInput = {
-        name_kanji: {
-          last_name: this.form.last_name_kanji,
-          first_name: this.form.first_name_kanji,
-        },
-        name_kana: {
-          last_name: this.form.last_name_kana,
-          first_name: this.form.first_name_kana,
-        },
-        address: {
-          sector: this.form.address,
-        },
         basic_contact: {
+          name_kanji: {
+            last_name: this.form.last_name_kanji,
+            first_name: this.form.first_name_kanji,
+          },
+          name_kana: {
+            last_name: this.form.last_name_kana,
+            first_name: this.form.first_name_kana,
+          },
+          address: {
+            sector: this.form.address,
+          },
           postal_code: this.form.postal_code,
           telephone: this.form.phone_number,
           mobilephone: this.form.mobile_number,

@@ -185,7 +185,7 @@ class RawSQLField(SimpleField):
     A field that is created from raw sql string
     """
 
-    def __init__(self, field=None, alias=None):
+    def __init__(self, field=None, alias=None, enclose=False):
         """
         Sets the name of the field to the passed in field value
 
@@ -198,6 +198,9 @@ class RawSQLField(SimpleField):
         """
         super().__init__(field, None, alias, None, None)
         self.name = field
+        self.enclose = enclose
 
     def get_select_sql(self):
+        if self.enclose:
+            return "(%s)" % (self.field)
         return "%s" % (self.field)

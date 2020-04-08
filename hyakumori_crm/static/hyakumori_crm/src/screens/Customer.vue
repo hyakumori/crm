@@ -38,11 +38,21 @@ export default {
       filter: null,
       headers: [
         {
-          text: "Fullname",
-          value: "fullname",
+          text: "Internal ID",
+          value: "internal_id",
         },
+        {
+          text: "Fullname Kana",
+          value: "fullname_kana",
+        },
+        {
+          text: "Fullname Kanji",
+          value: "fullname_kanji",
+        },
+        { text: "Postal Code", value: "postal_code" },
         { text: "Address", value: "address" },
-        { text: "Phone", value: "phone" },
+        { text: "Telephone", value: "telephone" },
+        { text: "Mobilephone", value: "mobilephone" },
         { text: "Representative", value: "representative" },
       ],
     };
@@ -82,9 +92,13 @@ export default {
           list_customers(data: $filter) {
             ok
             items {
-              fullname
+              internal_id
+              fullname_kana
+              fullname_kanji
+              postal_code
               address
-              phone
+              telephone
+              mobilephone
               representative
             }
             total
