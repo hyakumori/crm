@@ -48,7 +48,12 @@ static_app = []
 if not STATIC_ROOT:
     static_app = ["hyakumori_crm.static"]
 
+orjson_experiment = []
+if not DEBUG:
+    orjson_experiment = ["hyakumori_crm.core"]
+
 INSTALLED_APPS = [
+    *orjson_experiment,
     "whitenoise.runserver_nostatic",
     *static_app,  # this need high priority due to some override commands
     "django.contrib.auth",

@@ -17,7 +17,6 @@ class Address(HyakumoriDanticModel):
     prefecture: Optional[str]
     municipality: Optional[str]
     sector: Optional[str]
-    address: Optional[str]
 
 
 class Contact(HyakumoriDanticModel):

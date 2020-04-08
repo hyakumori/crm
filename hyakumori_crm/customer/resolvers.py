@@ -1,4 +1,4 @@
-from functools import wraps
+import uuid
 
 from ariadne import ObjectType
 
@@ -16,7 +16,7 @@ def get_customer_by_id(_, info, id: str = None) -> dict:
     return {
         "ok": True,
         "customer": {
-            "id": "asdaqw1273ajshdkc",
+            "id": uuid.uuid4(),
             "internal_id": "ajshdq8w123",
             "profile": {"first_name": "Ha", "last_name": "Tran", "middle_name": None},
             "attributes": None,

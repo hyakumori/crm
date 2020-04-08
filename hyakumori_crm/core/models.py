@@ -11,6 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field, root_validator, validator
+from querybuilder.fields import SimpleField
 
 
 class TimestampMixin(models.Model):
@@ -177,3 +178,26 @@ class Paginator(BaseModel):
         if is_desc:
             field = f"-{field}"
         return field
+
+
+class RawSQLField(SimpleField):
+    """
+    A field that is created from raw sql string
+    """
+
+    def __init__(self, field=None, alias=None):
+        """
+        Sets the name of the field to the passed in field value
+
+        :param field: A sql expression
+        :type field: str
+
+        :param alias: An alias to be used for this field
+        :type alias: str
+
+        """
+        super().__init__(field, None, alias, None, None)
+        self.name = field
+
+    def get_select_sql(self):
+        return "%s" % (self.field)

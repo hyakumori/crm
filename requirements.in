@@ -12,3 +12,4 @@ django-model-utils
 django-behaviors
 djangorestframework
 django-extensions
+django-query-builder

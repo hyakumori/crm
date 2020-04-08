@@ -1,11 +1,22 @@
 from typing import Dict, Iterator, Union
 
 from django.core.exceptions import ValidationError
-from django.db.models import CharField, F, OuterRef, Subquery
+from django.db.models import (
+    Case,
+    CharField,
+    F,
+    OuterRef,
+    PositiveSmallIntegerField,
+    Q,
+    Subquery,
+)
 from django.db.models import Value as V
+from django.db.models import When
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
+from querybuilder.query import Query
 
+from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models.customer import Contact, Customer
 from hyakumori_crm.crm.models.relations import CustomerContact
 from hyakumori_crm.users.models import User
@@ -30,29 +41,58 @@ def get_list(
     offset = (pre_per_page or per_page) * (page_num - 1)
     if not order_by:
         order_by = []
-    # representatives = (
-    #     Contact.objects.annotate(
-    #         fullname=RawSQL(
-    #             "concat(profile->>'last_name', ' ', profile->>'first_name')", [],
-    #         )
-    #     )
-    #     .filter(customer=OuterRef("pk"))
-    #     .order_by("-created_at")
-    # )
-    # query = (
-    #     Customer.objects.annotate(
-    #         fullname=RawSQL(
-    #             "concat(profile->>'last_name', ' ', profile->>'first_name')", [],
-    #         )
-    #     )
-    #     .annotate(phone=RawSQL("concat(profile->>'mobile_number')", []))
-    #     .annotate(address=RawSQL("concat(profile->>'address')", []))
-    #     .annotate(representative=Subquery(representatives.values("fullname")[:1]))
-    #     .values("fullname", "phone", "address", "representative")
-    # )
-    # total = query.count()
-    # customers = query.order_by(*order_by)[offset:per_page]
-    # return customers, total
+
+    representatives = (
+        Query()
+        .from_table(
+            {"contact": Contact},
+            [
+                {
+                    "fullname_kana": RawSQLField(
+                        "concat(contact.name_kana->>'last_name', ' ', contact.name_kana->>'first_name')"
+                    )
+                }
+            ],
+        )
+        .join({"cc": CustomerContact}, condition="contact.id = cc.contact_id",)
+        .where("contact.customer_id = c.id")
+        .order_by(RawSQLField("case when cc.attributes->>default then 1 else 2 end"))
+    )
+
+    query = (
+        Query()
+        .from_table(
+            {"c": Customer},
+            fields=[
+                "internal_id",
+                {"representative": RawSQLField(representatives.get_sql())},
+            ],
+        )
+        .join(
+            {"self_cc": CustomerContact},
+            condition="c.id=self_cc.customer_id and self_cc.is_basic is true",
+        )
+        .join(
+            {"self_contact": Contact},
+            condition="self_cc.contact_id=self_contact.id",
+            fields=[
+                {
+                    "fullname_kana": RawSQLField(
+                        "concat(self_contact.name_kana->>'last_name', ' ', self_contact.name_kana->>'first_name')"
+                    )
+                },
+                {
+                    "fullname_kanji": RawSQLField(
+                        "concat(self_contact.name_kanji->>'last_name', ' ', self_contact.name_kanji->>'first_name')"
+                    )
+                },
+                "mobilephone",
+                "telephone",
+                "postal_code",
+                {"address": "address->>'sector'"},
+            ],
+        )
+    )
     return [], 0
 
 

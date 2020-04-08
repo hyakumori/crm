@@ -111,17 +111,6 @@
       <v-card-actions>
         <v-btn color="primary" @click="submit">{{ $t("buttons.save") }}</v-btn>
         <v-btn text @click="shown = false">{{ $t("buttons.cancel") }}</v-btn>
-        <v-btn
-          text
-          @click="
-            () => {
-              $refs.form.clear;
-              $refs.form.reset();
-            }
-          "
-          >reset</v-btn
-        >
-        <v-spacer />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -171,7 +160,7 @@ export default {
           first_name: this.form.first_name_kana,
         },
         address: {
-          address: this.form.address,
+          sector: this.form.address,
         },
         basic_contact: {
           postal_code: this.form.postal_code,
