@@ -131,7 +131,7 @@ class Paginator(BaseModel):
     # we make sure they will be stay in the same offset
     pre_per_page: int = Field(None, alias="preItemsPerPage")
     sort_by: Sequence[str] = Field([], alias="sortBy")
-    sort_desc: Sequence[str] = Field([], alias="sortDesc")
+    sort_desc: Sequence[bool] = Field([], alias="sortDesc")
     order_by: Optional[Sequence[str]]
 
     MAX_ITEMS: ClassVar = 100
