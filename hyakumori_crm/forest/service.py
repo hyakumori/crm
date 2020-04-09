@@ -14,12 +14,13 @@ def get_forests_by_condition(
     pre_per_page: Union[int, None] = None,
     order_by: Union[Iterator, None] = None,
 ):
+    print(page_num, per_page, pre_per_page, order_by)
     offset = (pre_per_page or per_page) * (page_num - 1)
     if not order_by:
         order_by = []
     query = Forest.objects.all()
     total = query.count()
-    forests = query.order_by(*order_by)[offset:per_page]
+    forests = query.order_by(*order_by)[offset : offset + per_page]
     total = Forest.objects.count()
     return forests, total
 
