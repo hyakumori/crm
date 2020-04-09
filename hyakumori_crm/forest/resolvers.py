@@ -13,7 +13,6 @@ def get_list_forests(_, info, data) -> dict:
     forests, total = get_forests_by_condition(
         page_num=data["page_num"],
         per_page=data["per_page"],
-        pre_per_page=data["pre_per_page"],
         order_by=data["order_by"],
     )
     return dict(forests=forests, total=total)

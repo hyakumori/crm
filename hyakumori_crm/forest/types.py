@@ -32,7 +32,6 @@ type ForestListResponse implements HyakumoriResponse {
 input ForestListFilterInput {
     page: Int
     itemsPerPage: Int
-    preItemsPerPage: Int
     sortBy: [String]
     sortDesc: [Boolean]
 }

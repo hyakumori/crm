@@ -91,7 +91,7 @@ export default {
     changeSortIcon() {
       if (this.$refs.dataTable) {
         selectAll("i.mdi-arrow-up")
-          .classed("mdi-chevron-down", true)
+          .classed("mdi-chevron-up", true)
           .classed("mdi-arrow-up", false);
       }
     },
@@ -111,15 +111,6 @@ export default {
     isNegotiation(val) {
       return val === "negotiation";
     },
-
-    // addOptionHeader(headers) {
-    //   const optionHeader = {
-    //     value: "options",
-    //     align: "center",
-    //     sortable: false,
-    //   };
-    //   headers.push(optionHeader);
-    // },
 
     viewMore() {
       // Add more column to the table

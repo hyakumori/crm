@@ -192,6 +192,7 @@ export default {
   }
 
   &__data-section {
+    width: 100%;
     overflow: hidden;
   }
 }
