@@ -12,6 +12,8 @@ test-frontend:
       - $CI_PROJECT_DIR/hyakumori_crm/static/hyakumori_crm/node_modules/
   before_script:
     - cd hyakumori_crm/static/hyakumori_crm
+    - yarn global bin
+    - yarn global dir
     - yarn install
   script:
     - yarn lint
