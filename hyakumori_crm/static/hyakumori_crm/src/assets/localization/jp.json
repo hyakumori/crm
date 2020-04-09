@@ -1,30 +1,32 @@
 {
+  "buttons": {
+    "add_customer": "顧客を追加",
+    "cancel": "キャンセル",
+    "save": "保存"
+  },
+  "forms": {
+    "labels": {
+      "address": "住所",
+      "customer": {
+        "add_more_info": "より詳細な情報を表示",
+        "first_name_kana": "メイ",
+        "first_name_kanji": "名",
+        "last_name_kana": "セイ",
+        "last_name_kanji": "姓",
+        "mobile_number": "携帯番号",
+        "phone_number": "電話番号",
+        "postal_code": "郵便番号"
+      },
+      "email": "メールアドレス"
+    },
+    "titles": {
+      "create_customer": "顧客情報の追加"
+    }
+  },
   "icon": {
     "archive_icon": "mdi-calendar-text",
     "customer_icon": "mdi-account-outline",
     "forest_icon": "mdi-image-filter-hdr"
-  },
-  "buttons": {
-    "cancel": "キャンセル",
-    "save": "保存",
-    "add_customer": "顧客を追加"
-  },
-  "forms": {
-    "titles": {
-      "create_customer": "顧客情報の追加"
-    },
-    "labels": {
-      "customer": {
-        "first_name_kanji": "名",
-        "last_name_kanji": "姓",
-        "postal_code": "郵便番号",
-        "address": "住所",
-        "phone_number": "電話番号",
-        "mobile_number": "携帯番号",
-        "email": "メールアドレス",
-        "add_more_info": "より詳細な情報を表示"
-      }
-    }
   },
   "page_header": {
     "archive_list": "交渉履歴一覧",

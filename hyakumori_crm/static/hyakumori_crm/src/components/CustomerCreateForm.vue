@@ -14,7 +14,7 @@
         <v-icon @click="shown = false">mdi-close</v-icon>
       </v-card-actions>
       <v-divider></v-divider>
-      <v-card-text style="min-height: 300px;padding: 20px 24px;">
+      <v-card-text style="min-height: 300px;" class="px-6 py-5">
         <ValidationObserver ref="form">
           <v-form>
             <v-row no-gutters>
@@ -37,14 +37,18 @@
                 />
               </v-col>
               <v-col class="pe-2">
-                <label class="font-weight-bold">セイ</label>
+                <label class="font-weight-bold">{{
+                  $t("forms.labels.customer.last_name_kana")
+                }}</label>
                 <TextInput
                   v-model="form.last_name_kana"
                   name="basic_contact.name_kana.last_name"
                 />
               </v-col>
               <v-col>
-                <label class="font-weight-bold">メイ</label>
+                <label class="font-weight-bold">{{
+                  $t("forms.labels.customer.first_name_kana")
+                }}</label>
                 <TextInput
                   v-model="form.first_name_kana"
                   name="basic_contact.name_kana.first_name"
@@ -63,7 +67,7 @@
               </v-col>
               <v-col>
                 <label class="font-weight-bold">{{
-                  $t("forms.labels.customer.address")
+                  $t("forms.labels.address")
                 }}</label>
                 <TextInput
                   v-model="form.address"
@@ -94,7 +98,7 @@
             <v-row no-gutters>
               <v-col class="col-6 pe-3">
                 <label class="font-weight-bold">{{
-                  $t("forms.labels.customer.email")
+                  $t("forms.labels.email")
                 }}</label>
                 <TextInput name="basic_contact.email" v-model="form.email" />
               </v-col>

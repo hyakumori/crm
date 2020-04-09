@@ -43,7 +43,7 @@
             </span>
           </v-col>
           <v-col>
-            <div style="float:right;">
+            <div class="float-right">
               <CustomerCreateForm v-if="$route.name === 'customers'" />
             </div>
           </v-col>
@@ -90,7 +90,6 @@ export default {
 
     .icon-mode {
       background-color: white;
-      // margin-left: 28px;
       height: 40px;
       width: 40px;
       padding: 15px;

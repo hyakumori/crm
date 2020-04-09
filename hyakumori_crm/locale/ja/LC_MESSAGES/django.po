@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-07 22:18+0700\n"
+"POT-Creation-Date: 2020-04-09 13:16+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: core/models.py:88
+#: core/models.py:90
 msgid "Required"
 msgstr "必須"
 
-#: settings.py:147
+#: core/models.py:91
+msgid "Invalid"
+msgstr "無効"
+
+#: settings.py:152
 msgid "Japan"
-msgstr ""
+msgstr "Japan"
 
 #: users/managers.py:16
 msgid "The Email must be set"
