@@ -15,13 +15,13 @@
       <data-list
         class="mt-4"
         mode="forest"
-        v-on:rowData="rowData"
         :headers="getHeaders"
         :data="getData"
         :showSelect="true"
-        :negotiationCols="['status']"
         :isLoading="isLoading"
         :serverItemsLength="getTotalForests"
+        @rowData="rowData"
+        @optionsChange="optionsChange"
       ></data-list>
     </v-col>
 
@@ -39,7 +39,7 @@
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
 import TableAction from "../components/TableAction";
-import headers from "../assets/dump/table_header_forest.json";
+import headers from "../assets/dump/table_header_forest_jp.json";
 import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
@@ -64,6 +64,7 @@ export default {
       isShowErr: false,
       errMsg: null,
       sbTimeout: 5000,
+      filter: {},
     };
   },
 
@@ -71,6 +72,11 @@ export default {
     forestsInfo: {
       query: GetForestList,
       update: data => data.list_forests,
+      variables() {
+        return {
+          filter: this.filter,
+        };
+      },
     },
   },
 
@@ -105,6 +111,15 @@ export default {
         this.errMsg = this.$t("search.condition_is_maximum");
       }
     },
+
+    optionsChange(val) {
+      this.filter = {
+        page: val.page,
+        items_per_page: val.itemsPerPage,
+        order_by: val.sortBy[0],
+        desc: val.sortDesc[0],
+      };
+    },
   },
 
   computed: {
@@ -119,14 +134,34 @@ export default {
     getData() {
       if (this.forestsInfo) {
         return this.forestsInfo.forests.map(element => {
+          const fCadastral = element.cadastral;
+          const owner = element.owner;
+          const contract = element.contracts;
+          const tag = element.tag;
+
           return {
-            id: element.id,
-            address: element.geo_data.address,
-            ground: "",
-            acreage: element.basic_info.acreage,
-            status: element.basic_info.status,
-            ownerName: `${element.owner.profile.first_name} ${element.owner.profile.last_name}`,
-            customerId: element.customer.id,
+            internal_id: element.internal_id,
+            forestPrefecture: fCadastral.prefecture,
+            forestMunicipality: fCadastral.municipality,
+            forestSector: fCadastral.sector,
+            forestSubsector: fCadastral.subsector,
+            ownerKanji: owner.name_kana,
+            ownerKana: owner.name_kanji,
+            ownerPrefecture: owner.address.prefecture,
+            ownerMunicipality: owner.address.municipality,
+            ownerSector: owner.address.sector,
+            contractLongTerm: contract[0].status,
+            contractLongTermStart: contract[0].start_date,
+            contractLongTermEnd: contract[0].end_date,
+            contractWork: contract[1].status,
+            contractWorkStart: contract[1].start_date,
+            contractWorkEnd: contract[1].end_date,
+            contractFsc: contract[2].status,
+            contractFscStart: contract[2].start_date,
+            contractFscEnd: contract[2].end_date,
+            tagDanchi: tag.danchi,
+            tagManageType: tag.manage_type,
+            options: "",
           };
         });
       } else {

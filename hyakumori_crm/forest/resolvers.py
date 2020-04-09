@@ -1,13 +1,11 @@
-from ariadne import ObjectType
-from .service import get_all
-import json
-import os
+from ariadne import QueryType
 
-query = ObjectType("Query")
+from .service import get_forests_by_condition
+
+query = QueryType()
 
 @query.field("list_forests")
-def get_list_forests(_, info) -> dict:
-    return get_all()
-    
+def get_list_forests(_, info, filter) -> dict:
+    return get_forests_by_condition(filter)
 
 resolvers = [query]
