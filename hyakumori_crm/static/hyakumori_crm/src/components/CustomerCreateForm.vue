@@ -58,7 +58,7 @@
                 }}</label>
                 <TextInput
                   v-model="form.postal_code"
-                  name="basic_contact.basic_contact.postal_code"
+                  name="basic_contact.postal_code"
                 />
               </v-col>
               <v-col>

@@ -59,7 +59,7 @@ export default {
   },
   mounted() {
     BusEvent.$on("customersChanged", () => {
-      this.$apollo.queries.result.start();
+      this.$apollo.queries.result.refetch();
     });
   },
   computed: {
