@@ -3,21 +3,21 @@ query getForestList($filter: ForestListFilterInput!){
     ok
     total
     forests {
-      id,
-      internal_id,
-      geodata,
-      attributes,
-      cadastral,
-      owner,
-      contracts,
-      tag,
-      land_attributes,
-      forest_attributes,
+      id
+      internal_id
+      geodata
+      attributes
+      cadastral
+      owner
+      contracts
+      tag
+      land_attributes
+      forest_attributes
       geodata
       updated_by {
         id
-      },
-      updated_at,
+      }
+      updated_at
       created_at
     }
   }

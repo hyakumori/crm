@@ -112,11 +112,12 @@ export default {
     },
 
     optionsChange(val) {
+      const { sortBy, sortDesc, page, itemsPerPage } = val;
       this.filter = {
-        page: val.page,
-        items_per_page: val.itemsPerPage,
-        order_by: val.sortBy[0],
-        desc: val.sortDesc[0],
+        sortBy,
+        sortDesc,
+        page,
+        itemsPerPage,
       };
     },
   },

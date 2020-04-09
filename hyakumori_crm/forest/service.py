@@ -1,3 +1,5 @@
+from typing import Iterator, Union
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connections
@@ -6,28 +8,20 @@ from django.db.utils import OperationalError
 from ..crm.models.forest import Forest
 
 
-def get_forests_by_condition(condition):
-    if condition:
-        page = condition.get('page')
-        items_per_page = condition.get('items_per_page')
-        order_by = condition.get('order_by')
-        is_desc = condition.get('desc')
-        items_from = (page - 1) * items_per_page
-        items_to = page * items_per_page
-        if order_by:
-            if is_desc:
-                forests = Forest.objects.all().order_by(order_by)[items_from:items_to]
-            else:
-                forests = Forest.objects.all().order_by(f"-{order_by}")[items_from:items_to]
-        else:
-            forests = Forest.objects.all().order_by("-internal_id")[items_from:items_to]
-        total = Forest.objects.count()
-        if forests:
-            return {"ok": True, "forests": forests, "total": total}
-        else:
-            return {"ok": False, "forest": None, "total": 0}
-    else:
-        return {"ok": False, "forest": None, "total": 0}
+def get_forests_by_condition(
+    page_num: int = 1,
+    per_page: int = 10,
+    pre_per_page: Union[int, None] = None,
+    order_by: Union[Iterator, None] = None,
+):
+    offset = (pre_per_page or per_page) * (page_num - 1)
+    if not order_by:
+        order_by = []
+    query = Forest.objects.all()
+    total = query.count()
+    forests = query.order_by(*order_by)[offset:per_page]
+    total = Forest.objects.count()
+    return forests, total
 
 
 # def get(pk):
