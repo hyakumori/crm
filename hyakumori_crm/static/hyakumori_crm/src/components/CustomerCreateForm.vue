@@ -24,6 +24,9 @@
                 }}</label>
                 <TextInput
                   v-model="form.last_name_kanji"
+                  :placeholder="
+                    $t('forms.placeholders.customer.last_name_kanji')
+                  "
                   name="basic_contact.name_kanji.last_name"
                 />
               </v-col>
@@ -33,6 +36,9 @@
                 }}</label>
                 <TextInput
                   v-model="form.first_name_kanji"
+                  :placeholder="
+                    $t('forms.placeholders.customer.first_name_kanji')
+                  "
                   name="basic_contact.name_kanji.first_name"
                 />
               </v-col>
@@ -42,6 +48,9 @@
                 }}</label>
                 <TextInput
                   v-model="form.last_name_kana"
+                  :placeholder="
+                    $t('forms.placeholders.customer.last_name_kana')
+                  "
                   name="basic_contact.name_kana.last_name"
                 />
               </v-col>
@@ -51,6 +60,9 @@
                 }}</label>
                 <TextInput
                   v-model="form.first_name_kana"
+                  :placeholder="
+                    $t('forms.placeholders.customer.first_name_kana')
+                  "
                   name="basic_contact.name_kana.first_name"
                 />
               </v-col>
@@ -62,6 +74,7 @@
                 }}</label>
                 <TextInput
                   v-model="form.postal_code"
+                  :placeholder="$t('forms.placeholders.customer.postal_code')"
                   name="basic_contact.postal_code"
                 />
               </v-col>
@@ -71,6 +84,7 @@
                 }}</label>
                 <TextInput
                   v-model="form.address"
+                  :placeholder="$t('forms.placeholders.customer.address')"
                   name="basic_contact.address.sector"
                 />
               </v-col>
@@ -82,6 +96,7 @@
                 }}</label>
                 <TextInput
                   name="basic_contact.telephone"
+                  :placeholder="$t('forms.placeholders.customer.phone_number')"
                   v-model="form.phone_number"
                 />
               </v-col>
@@ -91,6 +106,7 @@
                 }}</label>
                 <TextInput
                   name="basic_contact.mobilephone"
+                  :placeholder="$t('forms.placeholders.customer.mobile_number')"
                   v-model="form.mobile_number"
                 />
               </v-col>
@@ -100,7 +116,11 @@
                 <label class="font-weight-bold">{{
                   $t("forms.labels.email")
                 }}</label>
-                <TextInput name="basic_contact.email" v-model="form.email" />
+                <TextInput
+                  name="basic_contact.email"
+                  :placeholder="$t('forms.placeholders.customer.email')"
+                  v-model="form.email"
+                />
               </v-col>
             </v-row>
             <v-row no-gutters>
