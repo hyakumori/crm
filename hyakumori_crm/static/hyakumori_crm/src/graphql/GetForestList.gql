@@ -1,5 +1,5 @@
 query getForestList($filter: ForestListFilterInput!){
-  list_forests(filter: $filter) {
+  list_forests(data: $filter) {
     ok
     total
     forests {

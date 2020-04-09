@@ -2,14 +2,16 @@ import datetime
 import uuid
 from typing import Any, ClassVar, List, Optional, Sequence
 
-from behaviors.behaviors import Authored as AuthoredMixin
-from behaviors.behaviors import Editored as EditoredMixin
-from behaviors.behaviors import StoreDeleted as StoreDeletedMixin
-from behaviors.querysets import AuthoredQuerySet, EditoredQuerySet, StoreDeletedQuerySet
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from pydantic import BaseModel, Field, root_validator, validator
+
+from behaviors.behaviors import Authored as AuthoredMixin
+from behaviors.behaviors import Editored as EditoredMixin
+from behaviors.behaviors import StoreDeleted as StoreDeletedMixin
+from behaviors.querysets import (AuthoredQuerySet, EditoredQuerySet,
+                                 StoreDeletedQuerySet)
 
 
 class TimestampMixin(models.Model):
@@ -116,7 +118,7 @@ class Paginator(BaseModel):
     per_page: int = Field(10, alias="itemsPerPage")
     # if user is on page 2, and they want to expand more items
     # we make sure they will be stay in the same offset
-    pre_per_page: int = Field(None, alias="preItemsPerPage")
+    pre_per_page: Optional[int] = Field(None, alias="preItemsPerPage")
     sort_by: Sequence[str] = Field([], alias="sortBy")
     sort_desc: Sequence[str] = Field([], alias="sortDesc")
     order_by: Optional[Sequence[str]]

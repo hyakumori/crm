@@ -1,15 +1,14 @@
 <template>
-  <v-row class="px-7 pt-2">
-    <v-col cols="3">
-      <search-card
-        :searchCriteria="getSearchCriteria"
-        @onSearch="onSearch"
-        @unableDelete="unableDelErr"
-        @conditionOutOfBounds="conditionOutOfBoundsErr"
-      />
-    </v-col>
+  <div class="forest d-flex px-7 pt-5">
+    <search-card
+      class="forest__search-card"
+      :searchCriteria="getSearchCriteria"
+      @onSearch="onSearch"
+      @unableDelete="unableDelErr"
+      @conditionOutOfBounds="conditionOutOfBoundsErr"
+    />
 
-    <v-col cols="9">
+    <div class="ml-7 forest__data-section">
       <table-action />
 
       <data-list
@@ -23,7 +22,7 @@
         @rowData="rowData"
         @optionsChange="optionsChange"
       ></data-list>
-    </v-col>
+    </div>
 
     <snack-bar
       color="error"
@@ -32,7 +31,7 @@
       :timeout="sbTimeout"
       @dismiss="onDismissSb"
     />
-  </v-row>
+  </div>
 </template>
 
 <script>
@@ -183,3 +182,16 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.forest {
+  &__search-card {
+    min-width: 295px;
+    max-width: 295px;
+  }
+
+  &__data-section {
+    overflow: hidden;
+  }
+}
+</style>

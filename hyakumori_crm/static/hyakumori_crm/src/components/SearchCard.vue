@@ -131,7 +131,8 @@ $text-field--min-height: 0;
 
 .search-card {
   padding: 18px;
-  min-height: 628px;
+  height: 625px;
+  overflow: auto;
   border-radius: 4px;
 
   &__title {

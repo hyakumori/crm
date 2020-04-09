@@ -19,7 +19,7 @@ types = gql(
     }
 
     extend type Query {
-        list_forests(filter: ForestListFilterInput): ForestListResponse
+        list_forests(data: ForestListFilterInput): ForestListResponse
     }
 
     type ForestListResponse implements HyakumoriResponse {
