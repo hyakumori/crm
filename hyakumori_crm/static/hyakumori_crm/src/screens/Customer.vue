@@ -1,32 +1,37 @@
 <template>
-  <v-row class="px-7 pt-2">
-    <v-col cols="3">
-      <search-card />
-    </v-col>
+  <v-container fluid class="pa-7">
+    <v-row>
+      <v-col md="3">
+        <search-card />
+      </v-col>
 
-    <v-col cols="9">
-      <v-data-table
-        :headers="headers"
-        :multi-sort="true"
-        :items="customers"
-        :options.sync="options"
-        :server-items-length="totalCustomers"
-        :loading="$apollo.queries.result.loading"
-        class="elevation-1"
-      ></v-data-table>
-    </v-col>
-  </v-row>
+      <v-col cols="12" md="9">
+        <data-list
+          :headers="headers"
+          :multiSort="true"
+          :data="customers"
+          :showSelect="true"
+          :options.sync="options"
+          :serverItemsLength="totalCustomers"
+          :tableRowIcon="tableRowIcon"
+          :isLoading="$apollo.queries.result.loading"
+        ></data-list>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
 import gql from "graphql-tag";
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
+import DataList from "../components/DataList";
 import BusEvent from "../BusEvent";
 
 export default {
   components: {
     SearchCard,
+    DataList,
   },
   mixins: [ScreenMixin],
   data() {
@@ -36,6 +41,7 @@ export default {
       pageHeader: this.$t("page_header.customer_list"),
       options: {},
       filter: null,
+      tableRowIcon: this.$t("icon.customer_icon"),
       headers: [
         {
           text: "Internal ID",
