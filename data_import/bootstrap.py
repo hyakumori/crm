@@ -27,13 +27,13 @@ def cli():
 
 @cli.command()
 def xlsx_to_pickle():
-    print("Importing from XLSX ... ", end="", flush=True)
+    click.echo("Importing from XLSX ... ", end="", flush=True)
     df = pd.read_excel(EXCEL_FILE_PATH, sheet_name=None, parse_dates=True)
-    print("DONE")
+    click.echo("DONE")
 
-    print("Writing to pickle ... ", end="", flush=True)
+    click.echo("Writing to pickle ... ", end="", flush=True)
     pickle.dump(df, open(EXCEL_PICKLE_FILE_PATH, "wb"))
-    print("DONE")
+    click.echo("DONE")
 
     return df
 
@@ -42,14 +42,14 @@ def load_data():
     if not EXCEL_PICKLE_FILE_PATH.exists():
         df = xlsx_to_pickle()
     else:
-        print("Importing from PICKLE ... ", end="", flush=True)
+        click.echo("Importing from PICKLE ... ", end="", flush=True)
         df = pickle.load(open(EXCEL_PICKLE_FILE_PATH, "rb"))
-        print("DONE")
+        click.echo("DONE")
 
     customer = df["顧客情報一覧"]
     forest = df["森林情報一覧"]
 
-    return dict(customer=customer, forest=forest, )
+    return dict(customer=customer, forest=forest,)
 
 
 def import_customer(data):
@@ -66,6 +66,7 @@ def import_forest(data):
 
     importer = Importer(data.get("forest"))
     importer.run()
+    importer.validate()
     return importer
 
 
@@ -81,17 +82,17 @@ def generate_master_pickle(forest, customer):
     data = load_data()
 
     if customer:
-        print("Importing Customer ... ", end="", flush=True)
+        click.echo("Importing Customer ... ", end="", flush=True)
         master["customer"] = import_customer(data).results
-        print("OK")
+        click.echo("OK")
 
     if forest:
-        print("Importing Forest ... ", end="", flush=True)
+        click.echo("Importing Forest ... ", end="", flush=True)
         master["forest"] = import_forest(data).results
-        print("OK")
+        click.echo("OK")
 
     if forest or customer:
-        print("Writing ... ", end="", flush=True)
+        click.echo("Writing ... ", end="", flush=True)
         pickle.dump(master, open(MASTER_DATA_PICKLE_FILE_PATH, "wb"))
 
 
@@ -100,7 +101,7 @@ def generate_master_pickle(forest, customer):
 @click.option("--customer", default=False, help="import customer", type=bool)
 def command_generate_master(forest, customer):
     generate_master_pickle(forest, customer)
-    print("DONE")
+    click.echo("DONE")
 
 
 @cli.command()
@@ -150,16 +151,16 @@ def insert_db(forest, customer):
     if customer:
         from data_import.db_importer.customer import CustomerDbImporter
 
-        print("INSERTING CUSTOMER")
+        click.echo("INSERTING CUSTOMER")
         CustomerDbImporter.insert_db(data["customer"])
-        print("DONE")
+        click.echo("DONE")
 
     if forest:
         from data_import.db_importer.forest import ForestDbImporter
 
-        print("INSERTING FOREST")
+        click.echo("INSERTING FOREST")
         ForestDbImporter.insert_db(data["forest"])
-        print("DONE")
+        click.echo("DONE")
 
 
 @cli.command("insert-db")
@@ -184,7 +185,7 @@ def create_link_forest_customer():
 @cli.command(
     "link-forest-customer",
     help="Check and insert forest, customer relation. Also generate intermediate pickle under db_importer."
-         + "Remove pickle file if want to refresh database information (eg: reimport)",
+    + "Remove pickle file if want to refresh database information (eg: reimport)",
 )
 def command_link_forest_customer():
     if not click.confirm(
@@ -202,12 +203,12 @@ def command_migrate(name):
     migration_path = Path(__file__).parent.joinpath("migrations")
 
     if not migration_path.joinpath(migration_file).exists():
-        print(f"{migration_file} not found under {migration_path}")
-        print("Options are: ")
+        click.echo(f"{migration_file} not found under {migration_path}")
+        click.echo("Options are: ")
 
         for file in os.listdir(migration_path):
             if file != "__init__.py":
-                print(file.replace(".py", ""))
+                click.echo(file.replace(".py", ""))
 
     prepare_env()
 
