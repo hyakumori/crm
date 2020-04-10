@@ -109,10 +109,14 @@ DATABASES = {
     "default": dict(
         **dj_database_url.parse(
             urllib.parse.quote(os.environ.get("DATABASE_URL"), ":/@")
-        ),
-        TEST={"NAME": "hyakumori_crm_test"}
+        )
     )
 }
+
+# Specify test database name
+DATABASES["default"]["TEST"] = dict(
+    NAME=os.getenv("DB_TEST_NAME", DATABASES["default"]["NAME"] + "__test")
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
