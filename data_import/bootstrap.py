@@ -30,14 +30,17 @@ def xlsx_to_pickle():
     print("Importing from XLSX ... ", end="", flush=True)
     df = pd.read_excel(EXCEL_FILE_PATH, sheet_name=None, parse_dates=True)
     print("DONE")
+
     print("Writing to pickle ... ", end="", flush=True)
     pickle.dump(df, open(EXCEL_PICKLE_FILE_PATH, "wb"))
     print("DONE")
 
+    return df
+
 
 def load_data():
     if not EXCEL_PICKLE_FILE_PATH.exists():
-        xlsx_to_pickle()
+        df = xlsx_to_pickle()
     else:
         print("Importing from PICKLE ... ", end="", flush=True)
         df = pickle.load(open(EXCEL_PICKLE_FILE_PATH, "rb"))
@@ -46,7 +49,7 @@ def load_data():
     customer = df["顧客情報一覧"]
     forest = df["森林情報一覧"]
 
-    return dict(customer=customer, forest=forest,)
+    return dict(customer=customer, forest=forest, )
 
 
 def import_customer(data):
@@ -70,7 +73,11 @@ def generate_master_pickle(forest, customer):
     if not click.confirm("This will override old master file. Continue?"):
         return
 
-    master = dict()
+    try:
+        master = pickle.load(open(MASTER_DATA_PICKLE_FILE_PATH, "rb"))
+    except OSError:
+        master = dict()
+
     data = load_data()
 
     if customer:
@@ -83,7 +90,9 @@ def generate_master_pickle(forest, customer):
         master["forest"] = import_forest(data).results
         print("OK")
 
-    pickle.dump(master, open(MASTER_DATA_PICKLE_FILE_PATH, "wb"))
+    if forest or customer:
+        print("Writing ... ", end="", flush=True)
+        pickle.dump(master, open(MASTER_DATA_PICKLE_FILE_PATH, "wb"))
 
 
 @cli.command("gen-master")
@@ -91,6 +100,7 @@ def generate_master_pickle(forest, customer):
 @click.option("--customer", default=False, help="import customer", type=bool)
 def command_generate_master(forest, customer):
     generate_master_pickle(forest, customer)
+    print("DONE")
 
 
 @cli.command()
@@ -133,7 +143,6 @@ def truncate_db():
 
 
 def insert_db(forest, customer):
-
     prepare_env()
 
     data = pickle.load(open(MASTER_DATA_PICKLE_FILE_PATH, "rb"))
@@ -175,7 +184,7 @@ def create_link_forest_customer():
 @cli.command(
     "link-forest-customer",
     help="Check and insert forest, customer relation. Also generate intermediate pickle under db_importer."
-    + "Remove pickle file if want to refresh database information (eg: reimport)",
+         + "Remove pickle file if want to refresh database information (eg: reimport)",
 )
 def command_link_forest_customer():
     if not click.confirm(
