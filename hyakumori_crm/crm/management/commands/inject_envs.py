@@ -21,11 +21,7 @@ class Command(BaseCommand):
         </script>
         """
 
-        return f"""
-        <script>
-            window._env = {json.dumps(envs)};
-        </script>
-        """
+        return f"<script>window._env = {json.dumps(envs)};</script>"
 
     def handle(self, *args, **kwargs):
         vue_envs = dict()
@@ -47,7 +43,7 @@ class Command(BaseCommand):
         with open(target, "w+") as file:
             file.write(content)
 
-        print("Finished!")
-        print("====================")
-        print(content)
-        print("====================")
+        self.stdout.write("Finished!")
+        self.stdout.write("====================")
+        self.stdout.write(content)
+        self.stdout.write("====================")
