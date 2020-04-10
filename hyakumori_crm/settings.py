@@ -50,8 +50,8 @@ if not STATIC_ROOT:
     static_app = ["hyakumori_crm.static"]
 
 orjson_experiment = []
-if not DEBUG:
-    orjson_experiment = ["hyakumori_crm.core"]
+if DEBUG:
+    orjson_experiment = ["hyakumori_crm.core.response"]
 
 INSTALLED_APPS = [
     *orjson_experiment,
