@@ -1,4 +1,8 @@
 # HOW TO RUN
+- Prepare environment:
+    - Copy `.env.sample` to `.env`
+    - Change setting in `.env`
+    
 - From project root:
 
 ```
@@ -25,7 +29,7 @@ python -m data_import <command>
 
 - Generate MasterData pickle:
 ```
-./bootstrap.py generate-master
+./bootstrap.py gen-master --customer=True --forest=True
 ```
 
 - Truncate database tables:
@@ -35,8 +39,27 @@ python -m data_import <command>
 
 - Load to Database
 ```
-./bootstrap.py insert-db --customer=1 --forest=1
+./bootstrap.py insert-db --customer=True --forest=True
 ```
 
+- Link forest and customer
+```
+./bootstrap.py link-forest-customer
+```
+
+- Run data migration
+```
+./bootstrap.py migrate --name <name>
+```
+
+*NOTE*: `name` is the file (except extension) under `migrations`
+
 # FLOW:
-- `XLSX -> pickle -> importer + converter -> intermediate pickle -> DbImporter -> DB`
+- `XLSX -> pickle -> importer + converter -> intermediate pickle -> DbImporter -> DbService -> DB`
+
+# TESTS:
+- Currently the tests is integreated with Django testsuite
+
+```
+./manage.py test
+```
