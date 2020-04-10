@@ -2,23 +2,6 @@
   <div class="customer">
     <search-card />
 
-<<<<<<< HEAD
-      <v-col cols="12" md="9">
-        <data-list
-          :headers="headers"
-          :autoHeaders="false"
-          :multiSort="true"
-          :data="customers"
-          :showSelect="true"
-          :options.sync="options"
-          :serverItemsLength="totalCustomers"
-          :tableRowIcon="tableRowIcon"
-          :isLoading="$apollo.queries.result.loading"
-        ></data-list>
-      </v-col>
-    </v-row>
-  </v-container>
-=======
     <data-list
       class="ml-7"
       :headers="headers"
@@ -31,7 +14,6 @@
       :isLoading="$apollo.queries.result.loading"
     ></data-list>
   </div>
->>>>>>> fix-design
 </template>
 
 <script>
@@ -57,7 +39,6 @@ export default {
       tableRowIcon: this.$t("icon.customer_icon"),
       headers: [
         {
-<<<<<<< HEAD
           text: this.$t("tables.headers.customerlist.internal_id"),
           value: "internal_id",
         },
@@ -109,24 +90,6 @@ export default {
           text: this.$t("tables.headers.customerlist.representative"),
           value: "representative",
         },
-=======
-          text: "新規ID発行",
-          value: "internal_id",
-        },
-        {
-          text: "土地所有者名_カナ",
-          value: "fullname_kana",
-        },
-        {
-          text: "土地所有者名_漢字",
-          value: "fullname_kanji",
-        },
-        { text: "郵便番号", value: "postal_code" },
-        { text: "住所", value: "address" },
-        { text: "電話番号", value: "telephone" },
-        { text: "携帯電話", value: "mobilephone" },
-        { text: "同姓同名", value: "representative" },
->>>>>>> fix-design
       ],
     };
   },
