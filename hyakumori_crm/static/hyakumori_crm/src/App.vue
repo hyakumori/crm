@@ -18,7 +18,8 @@ export default {
 </script>
 
 <style lang="scss">
-$background-color: #dddddd;
+$background-color: #F5F5F5;
+$content-width: 1400px;
 
 html {
   background-color: $background-color;
@@ -26,9 +27,14 @@ html {
 }
 
 #app {
-  width: 1400px;
   height: 100%;
   background-color: $background-color;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-content {
+  width: $content-width;
   margin-left: auto;
   margin-right: auto;
 }
