@@ -1,32 +1,29 @@
 <template>
-  <v-container fluid class="pa-7">
-    <v-row>
-      <v-col md="3">
-        <search-card
-          :searchCriteria="getSearchCriteria"
-          @onSearch="onSearch"
-          @unableDelete="unableDelErr"
-          @conditionOutOfBounds="conditionOutOfBoundsErr"
-        />
-      </v-col>
-      <v-col cols="12" md="9">
-        <table-action />
+  <div class="forest">
+    <search-card
+      :searchCriteria="getSearchCriteria"
+      @onSearch="onSearch"
+      @unableDelete="unableDelErr"
+      @conditionOutOfBounds="conditionOutOfBoundsErr"
+    />
 
-        <data-list
-          class="mt-4"
-          mode="forest"
-          itemKey="internal_id"
-          :headers="getHeaders"
-          :data="getData"
-          :showSelect="true"
-          :isLoading="$apollo.queries.forestsInfo.loading"
-          :serverItemsLength="getTotalForests"
-          @rowData="rowData"
-          :tableRowIcon="tableRowIcon"
-          :options.sync="options"
-        ></data-list>
-      </v-col>
-    </v-row>
+    <div class="ml-7 forest__data-section">
+      <table-action />
+
+      <data-list
+        class="mt-4"
+        mode="forest"
+        itemKey="internal_id"
+        :headers="getHeaders"
+        :data="getData"
+        :showSelect="true"
+        :isLoading="$apollo.queries.forestsInfo.loading"
+        :serverItemsLength="getTotalForests"
+        :tableRowIcon="tableRowIcon"
+        :options.sync="options"
+        @rowData="rowData"
+      ></data-list>
+    </div>
 
     <snack-bar
       color="error"
@@ -35,7 +32,7 @@
       :timeout="sbTimeout"
       @dismiss="onDismissSb"
     />
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -193,6 +190,7 @@ export default {
 <style lang="scss" scoped>
 .forest {
   &__data-section {
+    width: 100%;
     overflow: hidden;
   }
 }

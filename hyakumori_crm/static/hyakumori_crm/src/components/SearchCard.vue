@@ -38,13 +38,13 @@
       <div
         class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn"
       >
-        <div @click="addSearchField">
+        <div class="d-flex align-center" @click="addSearchField">
           <v-icon>mdi-plus</v-icon>
 
           <span class="ml-1 caption">{{
             $t("search.add_search_condition")
           }}</span>
-        </div>
+        </div> 
 
         <v-btn
           class="mt-md-2 mt-lg-0 mt-xl-0"
@@ -138,7 +138,8 @@ $text-field--min-height: 0;
   padding: 18px;
   height: 625px;
   overflow: auto;
-  border-radius: 4px;
+  min-width: 295px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
 
   &__title {
     font-size: 14px;
@@ -172,6 +173,10 @@ $text-field--min-height: 0;
     justify-content: space-between;
     cursor: pointer;
     margin-top: 0 !important;
+
+    & i {
+      color: $action-color;
+    }
   }
 }
 

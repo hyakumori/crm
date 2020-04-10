@@ -1,8 +1,8 @@
 <template>
   <v-data-table
     ref="dataTable"
-    item-key="itemKey"
     v-model="selected"
+    :item-key="itemKey"
     :multi-sort="multiSort"
     :loading="isLoading"
     :headers="dynamicHeaders"
@@ -98,7 +98,7 @@ export default {
     changeSortIcon() {
       if (this.$refs.dataTable) {
         selectAll("i.mdi-arrow-up")
-          .classed("mdi-chevron-down", true)
+          .classed("mdi-chevron-up", true)
           .classed("mdi-arrow-up", false);
       }
     },
@@ -134,6 +134,10 @@ export default {
 
 .v-data-table {
   padding: 10px;
+  width: 100%;
+  height: fit-content;
+  overflow: hidden;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
 
   & .icon-mode {
     padding: 10px;
