@@ -1,14 +1,15 @@
 import pickle
+from pathlib import Path
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 
-from hyakumori_crm.crm.schemas.customer import CustomerSchema, Banking
-from .base import BaseDbImporter
+from hyakumori_crm.crm.schemas.customer import Banking, CustomerSchema
+
+from ..lib.utils import parse_name_extra
 from ..services.customer import CustomerService
 from ..services.forest import ForestService
-from pathlib import Path
-from ..lib.utils import parse_name_extra
+from .base import BaseDbImporter
 
 
 class RelationDbImporter(BaseDbImporter):

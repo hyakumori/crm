@@ -7,8 +7,8 @@ from pydantic import ValidationError
 from hyakumori_crm.crm.schemas.customer import (Address, Banking, Contact,
                                                 CustomerSchema, Name)
 
-from ..lib.utils import get_or_default, process_nan_id, normalize
 from ..lib.common import Counter
+from ..lib.utils import get_or_default, normalize, process_nan_id
 from .base import BaseImporter
 
 

@@ -1,6 +1,5 @@
-from hyakumori_crm.crm.models.customer import Contact
-
 from data_import.lib.common import BaseMigration
+from hyakumori_crm.crm.models.customer import Contact
 
 
 class Migration(BaseMigration):

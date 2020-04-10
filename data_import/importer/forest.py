@@ -5,10 +5,11 @@ from pydantic import ValidationError
 from hyakumori_crm.crm.schemas.contract import ContractType
 from hyakumori_crm.crm.schemas.forest import (Address, Cadastral, Contract,
                                               ForestAttribute, ForestOwner,
-                                              ForestSchema, Name, Tag, LandAttribute)
+                                              ForestSchema, LandAttribute,
+                                              Name, Tag)
 
-from ..lib.utils import process_date, process_nan_id, normalize
 from ..lib.common import Counter
+from ..lib.utils import normalize, process_date, process_nan_id
 from .base import BaseImporter
 
 

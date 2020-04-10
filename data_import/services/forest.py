@@ -8,8 +8,9 @@ from hyakumori_crm.crm.models.customer import Customer
 from hyakumori_crm.crm.models.forest import Forest
 from hyakumori_crm.crm.models.relations import ForestCustomer
 from hyakumori_crm.crm.schemas.forest import ForestSchema
-from .customer import CustomerService
+
 from ..lib.utils import key_value_to_dict
+from .customer import CustomerService
 
 
 class ForestService:
