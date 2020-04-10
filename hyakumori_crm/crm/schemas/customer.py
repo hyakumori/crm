@@ -63,7 +63,7 @@ class CustomerStatus(str, Enum):
 
 
 class CustomerSchema(BaseModel):
-    id: str
+    id: Union[str, None] = EMPTY
     internal_id: Union[str, None] = EMPTY
     name_kanji: Name = Name()
     name_kana: Name = Name()

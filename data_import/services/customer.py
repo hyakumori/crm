@@ -2,7 +2,6 @@ from uuid import UUID, uuid4
 
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
-from ..utils import normalize
 from hyakumori_crm.crm.models.customer import Contact, Customer
 from hyakumori_crm.crm.models.relations import CustomerContact
 from hyakumori_crm.crm.schemas.customer import CustomerSchema

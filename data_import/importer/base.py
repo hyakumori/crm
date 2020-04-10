@@ -1,5 +1,4 @@
 import json
-from typing import Callable
 
 from django.core.serializers.json import DjangoJSONEncoder
 from pydantic import BaseModel

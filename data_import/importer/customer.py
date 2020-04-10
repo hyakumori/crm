@@ -1,12 +1,3 @@
-"""
-STRAGEDY:
-- Sheet 顧客情報一覧 => CustomerSchema
-    - Having record in list?
-        - [Y] -> insert Contact into the found record
-        - [N] -> insert new record
-"""
-
-from typing import Callable, List
 from uuid import uuid4
 
 import pandas as pd
@@ -16,7 +7,8 @@ from pydantic import ValidationError
 from hyakumori_crm.crm.schemas.customer import (Address, Banking, Contact,
                                                 CustomerSchema, Name)
 
-from ..utils import Counter, cell_value, get_or_default, process_nan_id, normalize
+from ..lib.utils import get_or_default, process_nan_id, normalize
+from ..lib.common import Counter
 from .base import BaseImporter
 
 
@@ -104,7 +96,8 @@ class CustomerImporter(BaseImporter):
             self.counter.mark_processed()
             try:
                 data = self.build(row)
-                self.results[data.id] = data
+                row_id = data.id if data.internal_id is None or len(data.internal_id) == 0 else data.internal_id
+                self.results[row_id] = data
                 print("OK")
                 self.counter.mark_succeed()
             except ValidationError as e:

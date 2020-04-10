@@ -7,7 +7,8 @@ from hyakumori_crm.crm.schemas.forest import (Address, Cadastral, Contract,
                                               ForestAttribute, ForestOwner,
                                               ForestSchema, Name, Tag, LandAttribute)
 
-from ..utils import Counter, get_or_default, process_date, process_nan_id, normalize
+from ..lib.utils import process_date, process_nan_id, normalize
+from ..lib.common import Counter
 from .base import BaseImporter
 
 

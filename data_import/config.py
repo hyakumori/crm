@@ -12,4 +12,5 @@ def setup_path():
 
 
 def setup_django():
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hyakumori_crm.settings")
     django.setup()

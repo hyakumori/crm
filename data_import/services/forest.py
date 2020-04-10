@@ -4,12 +4,12 @@ from uuid import UUID
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
 
-from hyakumori_crm.crm.models.customer import Customer, Contact
+from hyakumori_crm.crm.models.customer import Customer
 from hyakumori_crm.crm.models.forest import Forest
-from hyakumori_crm.crm.models.relations import ForestCustomer, CustomerContact
-from hyakumori_crm.crm.schemas.forest import ForestSchema, ForestOwner
+from hyakumori_crm.crm.models.relations import ForestCustomer
+from hyakumori_crm.crm.schemas.forest import ForestSchema
 from .customer import CustomerService
-from ..utils import key_value_to_dict
+from ..lib.utils import key_value_to_dict
 
 
 class ForestService:
