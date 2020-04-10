@@ -11,7 +11,7 @@ from hyakumori_crm.crm.schemas.forest import ForestOwner
 
 class CustomerService:
     @staticmethod
-    def create_customer(customer: CustomerSchema, author: AbstractUser, link_contact: Contact = None) -> Customer:
+    def create_customer(customer: CustomerSchema, author: AbstractUser, link_contact: Contact = None, is_basic=True) -> Customer:
         _customer = Customer()
         _customer.internal_id = customer.internal_id
         _customer.name_kanji = customer.name_kanji.dict()
@@ -27,8 +27,15 @@ class CustomerService:
             _contact = Contact()
             _contact.internal_id = uuid4().hex
             _contact.contact_info = customer.basic_contact.dict()
-            _contact.author = author
+            _contact.name_kanji = customer.basic_contact.name_kanji.dict()
+            _contact.name_kana = customer.basic_contact.name_kana.dict()
+            _contact.address = customer.basic_contact.address.dict()
+            _contact.postal_code = customer.basic_contact.postal_code
+            _contact.telephone = customer.basic_contact.telephone
+            _contact.mobilephone = customer.basic_contact.mobilephone
+            _contact.email = customer.basic_contact.email
             _contact.editor = author
+            _contact.author = author
             _contact.save()
         else:
             _contact = link_contact
@@ -36,7 +43,7 @@ class CustomerService:
         _customer_contact = CustomerContact()
         _customer_contact.customer = _customer
         _customer_contact.contact = _contact
-        _customer_contact.is_basic = True
+        _customer_contact.is_basic = is_basic
         _customer_contact.author = author
         _customer_contact.editor = author
         _customer_contact.save()
@@ -64,8 +71,6 @@ class CustomerService:
         _customer = Customer.objects.filter(
             Q(name_kanji__first_name=owner.name_kanji.first_name)
             & Q(name_kanji__last_name=owner.name_kanji.last_name)
-            # & Q(name_kana__first_name=owner.name_kana.first_name)
-            # & Q(name_kana__last_name=owner.name_kana.last_name)
             & Q(address__prefecture=owner.address.prefecture)
             & Q(address__municipality=owner.address.municipality)
             & Q(address__sector=owner.address.sector)

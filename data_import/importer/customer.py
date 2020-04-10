@@ -71,6 +71,7 @@ class CustomerImporter(BaseImporter):
             telephone=row["電話番号"],
             mobilephone=row["携帯電話"],
             email=row["メールアドレス"],
+            address=address,
         )
         banking = Banking(
             bank_name=row["銀行名"],
