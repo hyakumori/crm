@@ -71,4 +71,4 @@ class CustomerSchema(BaseModel):
     basic_contact: Contact = Contact()
     contacts: List[Contact] = []
     banking: Banking
-    tags: List[str] = []
+    tags: dict = {}

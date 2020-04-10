@@ -77,7 +77,7 @@ class CustomerImporter(BaseImporter):
             account_name=row["口座名義"],
         )
         tags_name = ["未登録/登録", "所有者順位", "同姓同名"]
-        tags = list(filter(None, [get_or_default(row[tag], None) for tag in tags_name]))
+        tags = dict(zip(tags_name, [get_or_default(row[tag], None) for tag in tags_name]))
         internal_id = process_nan_id(row["internal_id"])
 
         return CustomerSchema(
