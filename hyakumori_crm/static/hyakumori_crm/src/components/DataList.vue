@@ -2,6 +2,7 @@
   <v-data-table
     ref="dataTable"
     v-model="selected"
+    :mobile-breakpoint="0"
     :item-key="itemKey"
     :multi-sort="multiSort"
     :loading="isLoading"

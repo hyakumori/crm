@@ -1,41 +1,46 @@
 <template>
-  <div class="forest">
-    <search-card
-      :searchCriteria="getSearchCriteria"
-      @onSearch="onSearch"
-      @unableDelete="unableDelErr"
-      @conditionOutOfBounds="conditionOutOfBoundsErr"
-    />
+  <main-section class="forest">
+    <template #left>
+      <search-card
+        :searchCriteria="getSearchCriteria"
+        @onSearch="onSearch"
+        @unableDelete="unableDelErr"
+        @conditionOutOfBounds="conditionOutOfBoundsErr"
+      />
+    </template>
+    <template #content>
+      <div class="ml-7 forest__data-section">
+        <table-action />
 
-    <div class="ml-7 forest__data-section">
-      <table-action />
-
-      <data-list
-        class="mt-4"
-        mode="forest"
-        itemKey="internal_id"
-        :headers="getHeaders"
-        :data="getData"
-        :showSelect="true"
-        :isLoading="$apollo.queries.forestsInfo.loading"
-        :serverItemsLength="getTotalForests"
-        :tableRowIcon="tableRowIcon"
-        :options.sync="options"
-        @rowData="rowData"
-      ></data-list>
-    </div>
-
-    <snack-bar
-      color="error"
-      :isShow="isShowErr"
-      :msg="errMsg"
-      :timeout="sbTimeout"
-      @dismiss="onDismissSb"
-    />
-  </div>
+        <data-list
+          class="mt-4"
+          mode="forest"
+          itemKey="internal_id"
+          :headers="getHeaders"
+          :data="getData"
+          :showSelect="true"
+          :isLoading="$apollo.queries.forestsInfo.loading"
+          :serverItemsLength="getTotalForests"
+          :tableRowIcon="tableRowIcon"
+          :options.sync="options"
+          @rowData="rowData"
+        ></data-list>
+      </div>
+    </template>
+    <template #addons>
+      <snack-bar
+        color="error"
+        :isShow="isShowErr"
+        :msg="errMsg"
+        :timeout="sbTimeout"
+        @dismiss="onDismissSb"
+      />
+    </template>
+  </main-section>
 </template>
 
 <script>
+import MainSection from "../components/MainSection";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
 import TableAction from "../components/TableAction";
@@ -50,6 +55,7 @@ export default {
   mixins: [ScreenMixin],
 
   components: {
+    MainSection,
     DataList,
     SearchCard,
     TableAction,

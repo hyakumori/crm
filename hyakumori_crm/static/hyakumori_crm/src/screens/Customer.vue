@@ -1,23 +1,27 @@
 <template>
-  <div class="customer">
-    <search-card />
-
-    <data-list
-      class="ml-7"
-      :headers="headers"
-      :multiSort="true"
-      :data="customers"
-      :showSelect="true"
-      :options.sync="options"
-      :serverItemsLength="totalCustomers"
-      :tableRowIcon="tableRowIcon"
-      :isLoading="$apollo.queries.result.loading"
-    ></data-list>
-  </div>
+  <main-section class="customer">
+    <template #left>
+      <search-card />
+    </template>
+    <template #content>
+      <data-list
+        class="ml-7"
+        :headers="headers"
+        :multiSort="true"
+        :data="customers"
+        :showSelect="true"
+        :options.sync="options"
+        :serverItemsLength="totalCustomers"
+        :tableRowIcon="tableRowIcon"
+        :isLoading="$apollo.queries.result.loading"
+      ></data-list>
+    </template>
+  </main-section>
 </template>
 
 <script>
 import gql from "graphql-tag";
+import MainSection from "../components/MainSection";
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
 import DataList from "../components/DataList";
@@ -25,6 +29,7 @@ import BusEvent from "../BusEvent";
 
 export default {
   components: {
+    MainSection,
     SearchCard,
     DataList,
   },

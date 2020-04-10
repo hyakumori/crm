@@ -1,7 +1,7 @@
 <template>
-  <v-app id="app" fullheight>
+  <v-app id="app">
     <page-header />
-    <router-view class="main-content d-flex px-7 pt-5"></router-view>
+    <router-view class="main-content d-flex pa-7"></router-view>
   </v-app>
 </template>
 
@@ -18,8 +18,7 @@ export default {
 </script>
 
 <style lang="scss">
-$background-color: #F5F5F5;
-$content-width: 1400px;
+@import "./styles/variables";
 
 html {
   background-color: $background-color;
@@ -29,8 +28,6 @@ html {
 #app {
   height: 100%;
   background-color: $background-color;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .main-content {
