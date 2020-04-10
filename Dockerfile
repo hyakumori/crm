@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 ARG HYAKUMORI_VERSION=${HYAKUMORI_VERSION}
 
 WORKDIR /app
-RUN pip install unicorn
+RUN pip install uvicorn
 
 COPY ./requirements.txt /app
 RUN pip install -r requirements.txt
@@ -16,4 +16,4 @@ RUN HYAKUMORI_LIGHT_BUILD=1 pip install .
 
 EXPOSE 8000
 
-CMD uvicorn hyakumori_crm.asgi:application
+CMD uvicorn hyakumori_crm.asgi:application --host 0.0.0.0 --port 8000
