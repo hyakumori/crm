@@ -3,7 +3,6 @@ from uuid import UUID
 
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
-
 from hyakumori_crm.crm.models.customer import Customer
 from hyakumori_crm.crm.models.forest import Forest
 from hyakumori_crm.crm.models.relations import ForestCustomer

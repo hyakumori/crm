@@ -3,7 +3,6 @@ from pathlib import Path
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
-
 from hyakumori_crm.crm.schemas.customer import Banking, CustomerSchema
 
 from ..lib.utils import parse_name_extra

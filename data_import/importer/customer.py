@@ -1,11 +1,15 @@
 from uuid import uuid4
 
 import pandas as pd
+from hyakumori_crm.crm.schemas.customer import (
+    Address,
+    Banking,
+    Contact,
+    CustomerSchema,
+    Name,
+)
 from pandas import DataFrame
 from pydantic import ValidationError
-
-from hyakumori_crm.crm.schemas.customer import (Address, Banking, Contact,
-                                                CustomerSchema, Name)
 
 from ..lib.common import Counter
 from ..lib.utils import get_or_default, normalize, process_nan_id
@@ -47,14 +51,14 @@ class CustomerImporter(BaseImporter):
     def build(self, row):
         name_kanji = Name(
             first_name=normalize(row["所有者１_kanji_firstname"]),
-            last_name=normalize(row["所有者１_kanji_lastname"]))
+            last_name=normalize(row["所有者１_kanji_lastname"]),
+        )
         name_kana = Name(
             first_name=normalize(row["所有者１_kana_firstname"]),
-            last_name=normalize(row["所有者１_kana_lastname"]))
+            last_name=normalize(row["所有者１_kana_lastname"]),
+        )
         address = Address(
-            prefecture=row["都道府県"],
-            municipality=row["市町村"],
-            sector=row["大字/字"],
+            prefecture=row["都道府県"], municipality=row["市町村"], sector=row["大字/字"],
         )
         contact = Contact(
             name_kanji=name_kanji,
@@ -84,7 +88,7 @@ class CustomerImporter(BaseImporter):
             address=address,
             basic_contact=contact,
             banking=banking,
-            tags=tags
+            tags=tags,
         )
 
     def run(self):
@@ -96,7 +100,11 @@ class CustomerImporter(BaseImporter):
             self.counter.mark_processed()
             try:
                 data = self.build(row)
-                row_id = data.id if data.internal_id is None or len(data.internal_id) == 0 else data.internal_id
+                row_id = (
+                    data.id
+                    if data.internal_id is None or len(data.internal_id) == 0
+                    else data.internal_id
+                )
                 self.results[row_id] = data
                 print("OK")
                 self.counter.mark_succeed()

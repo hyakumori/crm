@@ -1,12 +1,18 @@
 import pandas as pd
+from hyakumori_crm.crm.schemas.contract import ContractType
+from hyakumori_crm.crm.schemas.forest import (
+    Address,
+    Cadastral,
+    Contract,
+    ForestAttribute,
+    ForestOwner,
+    ForestSchema,
+    LandAttribute,
+    Name,
+    Tag,
+)
 from pandas import DataFrame
 from pydantic import ValidationError
-
-from hyakumori_crm.crm.schemas.contract import ContractType
-from hyakumori_crm.crm.schemas.forest import (Address, Cadastral, Contract,
-                                              ForestAttribute, ForestOwner,
-                                              ForestSchema, LandAttribute,
-                                              Name, Tag)
 
 from ..lib.common import Counter
 from ..lib.utils import normalize, process_date, process_nan_id
@@ -41,16 +47,16 @@ class ForestImporter(BaseImporter):
             "owner_都道府県",
             "owner_市町村",
             "owner_大字/字",
-            "所有者１_kanji_lastname",
-            "所有者１_kanji_firstname",
+            "所有者1_kanji_lastname",
+            "所有者1_kanji_firstname",
             "所有者2_kanji_lastname",
             "所有者2_kanji_firstname",
             "所有者3_kanji_lastname",
             "所有者3_kanji_firstname",
             "所有者4_kanji_lastname",
             "所有者4_kanji_firstname",
-            "所有者１_kana_lastname",
-            "所有者１_kana_firstname",
+            "所有者1_kana_lastname",
+            "所有者1_kana_firstname",
             "所有者2_kana_lastname",
             "所有者2_kana_firstname",
             "所有者3_kana_lastname",
@@ -118,8 +124,8 @@ class ForestImporter(BaseImporter):
 
     def _build_status(self, value):
         mapping = {
-            "期限切り": "期限切り",
-            "締結中": "契約済み",
+            "期限切り": "期限切",
+            "締結中": "契約済",
             "交渉中": "未契約",
             "未締結": "未契約",
         }
@@ -149,7 +155,7 @@ class ForestImporter(BaseImporter):
         return result
 
     def _build_owners(self, row):
-        _indexes = ['１', '2', '3', '4']
+        _indexes = ["1", "2", "3", "4"]
         _name_template = "所有者{index}_{type}_{name_part}name"
         result = []
         for index in _indexes:
@@ -166,7 +172,7 @@ class ForestImporter(BaseImporter):
                     prefecture=row["owner_都道府県"],
                     municipality=row["owner_市町村"],
                     sector=row["owner_大字/字"],
-                )
+                ),
             )
             if _owner.name_kanji.last_name is None and _owner.name_kanji.first_name is None:
                 continue
@@ -197,17 +203,20 @@ class ForestImporter(BaseImporter):
                 type=ContractType.long_term,
                 status=self._build_status(row["長期契約"]),
                 start_date=process_date(row["長期契約_開始日"]),
-                end_date=process_date(row["長期契約_終了日"])),
+                end_date=process_date(row["長期契約_終了日"]),
+            ),
             Contract(
                 type=ContractType.work_road,
                 status=self._build_status(row["作業道契約"]),
                 start_date=process_date(row["作業道契約_開始日"]),
-                end_date=process_date(row["作業道契約_終了日"])),
+                end_date=process_date(row["作業道契約_終了日"]),
+            ),
             Contract(
                 type=ContractType.fsc,
                 status=self._build_status(row["FSC認証加入"]),
                 start_date=process_date(row["FSC認証加入_開始日"]),
-                end_date=process_date(row["FSC認証加入_終了日"])),
+                end_date=process_date(row["FSC認証加入_終了日"]),
+            ),
         ]
         tag = Tag(danchi=row["団地"], manage_type=row["管理形態"])
         forest_attributes = self._build_forest_attributes(row)
