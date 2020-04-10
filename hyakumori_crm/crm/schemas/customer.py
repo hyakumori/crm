@@ -4,7 +4,7 @@ from typing import List, Union
 from pydantic import BaseModel, EmailStr, constr
 
 from ..common import regexes
-from ..common.constants import DEFAULT_EMAIL, EMPTY, UNKNOWN
+from ..common.constants import EMPTY, UNKNOWN
 
 
 class Name(BaseModel):
@@ -72,4 +72,3 @@ class CustomerSchema(BaseModel):
     contacts: List[Contact] = []
     banking: Banking
     tags: List[str] = []
-    status: CustomerStatus = CustomerStatus.unregistered
