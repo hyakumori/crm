@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <page-header />
-    <router-view class="main-content d-flex pa-7"></router-view>
+    <router-view></router-view>
   </v-app>
 </template>
 
@@ -28,11 +28,5 @@ html {
 #app {
   height: 100%;
   background-color: $background-color;
-}
-
-.main-content {
-  width: $content-width;
-  margin-left: auto;
-  margin-right: auto;
 }
 </style>

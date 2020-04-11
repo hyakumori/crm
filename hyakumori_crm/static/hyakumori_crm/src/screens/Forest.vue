@@ -9,7 +9,7 @@
       />
     </template>
     <template #content>
-      <div class="ml-7 forest__data-section">
+      <div class="forest__data-section">
         <table-action />
 
         <data-list
