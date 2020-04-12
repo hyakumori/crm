@@ -52,6 +52,12 @@ type CustomerResponse implements HyakumoriResponse {
   customer: Customer
 }
 
+type CustomerTableHeaderResponse  implements HyakumoriResponse {
+  ok: Boolean!
+  error: JSON
+  headers: JSON
+}
+
 type Mutation {
   create_customer(data: CreateCustomerInput!): CustomerResponse
   delete_customer(pk: ID!): CustomerResponse
@@ -61,6 +67,7 @@ type Mutation {
 type Query {
   get_customer(id: ID!): CustomerResponse
   list_customers(data: TableCustomerFilterInput!): CustomerList!
+  customertable_headers: CustomerTableHeaderResponse
 }
 
 input CreateCustomerInput {
@@ -70,13 +77,12 @@ input CreateCustomerInput {
 }
 
 input TableCustomerFilterInput {
-  id: ID
-  internal_id: String
   page: Int!
   itemsPerPage: Int!
   preItemsPerPage: Int
   sortBy: [String]
   sortDesc: [Boolean]
+  filters: JSON
 }
 
 input UpdateCustomerInput {

@@ -1,11 +1,10 @@
 <template>
   <main-section class="customer">
     <template #left>
-      <search-card />
+      <search-card :fields="filterFields" :onSearch="onSearch" ref="filter" />
     </template>
     <template #content>
       <data-list
-        class="ml-7"
         :headers="headers"
         :multiSort="true"
         :data="customers"
@@ -13,6 +12,7 @@
         :options.sync="options"
         :serverItemsLength="totalCustomers"
         :tableRowIcon="tableRowIcon"
+        :autoHeaders="false"
         :isLoading="$apollo.queries.result.loading"
       ></data-list>
     </template>
@@ -42,60 +42,7 @@ export default {
       options: {},
       filter: null,
       tableRowIcon: this.$t("icon.customer_icon"),
-      headers: [
-        {
-          text: this.$t("tables.headers.customerlist.internal_id"),
-          value: "internal_id",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.fullname_kanji"),
-          value: "fullname_kanji",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.fullname_kana"),
-          value: "fullname_kana",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.postal_code"),
-          value: "postal_code",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.address"),
-          value: "address",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.prefecture"),
-          value: "prefecture",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.municipality"),
-          value: "municipality",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.ranking"),
-          value: "ranking",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.status"),
-          value: "status",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.telephone"),
-          value: "telephone",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.mobilephone"),
-          value: "mobilephone",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.email"),
-          value: "email",
-        },
-        {
-          text: this.$t("tables.headers.customerlist.representative"),
-          value: "representative",
-        },
-      ],
+      headers: [],
     };
   },
   mounted() {
@@ -110,6 +57,17 @@ export default {
     totalCustomers() {
       return this.result.total;
     },
+    filterFields() {
+      return this.headers
+        .map(h => ({ text: h.text, value: h.filter_name }))
+        .filter(f => f.value !== undefined);
+    },
+  },
+  methods: {
+    onSearch() {
+      this.filter = { ...this.filter, filters: this.$refs.filter.conditions };
+      this.$apollo.queries.result.refetch();
+    },
   },
   watch: {
     options: {
@@ -121,12 +79,25 @@ export default {
           page,
           itemsPerPage,
           preItemsPerPage: old.itemsPerPage || null,
+          filters: this.$refs.filter.conditions,
         };
       },
       deep: true,
     },
   },
   apollo: {
+    headers: {
+      query: gql`
+        query CustomerTableHeaders {
+          customertable_headers {
+            headers
+          }
+        }
+      `,
+      update(data) {
+        return data.customertable_headers.headers;
+      },
+    },
     result: {
       query: gql`
         query ListCustomers($filter: TableCustomerFilterInput!) {
@@ -163,7 +134,7 @@ export default {
         };
       },
       skip() {
-        return !this.filter;
+        return !this.filter || this.headers.length === 0;
       },
     },
   },
