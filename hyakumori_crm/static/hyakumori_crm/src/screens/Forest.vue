@@ -1,23 +1,18 @@
 <template>
   <main-section class="forest">
-    <template #left>
+    <template #section>
       <search-card
         :searchCriteria="getSearchCriteria"
         @onSearch="onSearch"
         @unableDelete="unableDelErr"
         @conditionOutOfBounds="conditionOutOfBoundsErr"
       />
-    </template>
 
-    <template #content>
-      <div class="forest__data-section">
-        <table-action
-          class="mb-4"
-          v-if="tableSelectedRow.length > 0"
-          :selectedCount="tableSelectedRow.length"
-        />
+      <div class="ml-7 forest__data-section">
+        <table-action />
 
         <data-list
+          class="mt-4"
           mode="forest"
           itemKey="internal_id"
           :headers="getHeaders"
@@ -28,12 +23,9 @@
           :tableRowIcon="tableRowIcon"
           :options.sync="options"
           @rowData="rowData"
-          @selectedRow="selectedRow"
         ></data-list>
       </div>
-    </template>
 
-    <template #addons>
       <snack-bar
         color="error"
         :isShow="isShowErr"
@@ -46,7 +38,6 @@
 </template>
 
 <script>
-import MainSection from "../components/MainSection";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
 import TableAction from "../components/TableAction";
@@ -54,6 +45,7 @@ import headers from "../assets/dump/table_header_forest_jp.json";
 import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
+import MainSection from "../components/MainSection";
 
 export default {
   name: "forest",
@@ -61,11 +53,11 @@ export default {
   mixins: [ScreenMixin],
 
   components: {
-    MainSection,
     DataList,
     SearchCard,
     TableAction,
     SnackBar,
+    MainSection,
   },
 
   data() {

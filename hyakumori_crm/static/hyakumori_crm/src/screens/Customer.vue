@@ -1,11 +1,10 @@
 <template>
-  <main-section class="customer">
-    <template #left>
+  <main-section #section class="customer">
+    <template>
       <search-card />
-    </template>
 
-    <template #content>
       <data-list
+        class="ml-7"
         :headers="headers"
         :multiSort="true"
         :data="customers"
@@ -21,17 +20,17 @@
 
 <script>
 import gql from "graphql-tag";
-import MainSection from "../components/MainSection";
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
 import DataList from "../components/DataList";
+import MainSection from "../components/MainSection";
 import BusEvent from "../BusEvent";
 
 export default {
   components: {
-    MainSection,
     SearchCard,
     DataList,
+    MainSection,
   },
   mixins: [ScreenMixin],
   data() {

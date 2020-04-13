@@ -1,8 +1,8 @@
 <template>
   <div class="d-flex align-center table-action">
-    <p
-      class="ml-4 mb-0 table-action__text"
-    >{{ selectedCount }} {{ $t("search.selected_action") }}</p>
+    <p class="ml-4 mb-0 table-action__text">
+      {{ selectedCount }} {{ $t("search.selected_action") }}
+    </p>
 
     <select-list
       class="ml-12 table-action__select"
@@ -29,7 +29,7 @@ export default {
   },
 
   methods: {
-    onSelected(val) {
+    onSelected() {
       // console.log(val)
     },
   },

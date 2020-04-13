@@ -1,11 +1,8 @@
 <template>
-  <main-section>
-    <template #left>
-      <search-card />
-    </template>
-    <template #content>
-      <data-list class="ml-7" />
-    </template>
+  <main-section #section>
+    <search-card />
+
+    <data-list class="ml-7"></data-list>
   </main-section>
 </template>
 
@@ -18,9 +15,9 @@ export default {
   name: "archive",
 
   components: {
-    MainSection,
     SearchCard,
     DataList,
+    MainSection,
   },
 };
 </script>

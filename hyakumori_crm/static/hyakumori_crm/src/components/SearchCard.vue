@@ -20,13 +20,17 @@
             @selectedAction="onSelected"
           />
 
-          <v-btn v-if="conditions.length > 1"  @click="deleteSearchField(index)" icon>
+          <v-btn
+            v-if="conditions.length > 1"
+            @click="deleteSearchField(index)"
+            icon
+          >
             <v-icon>mdi-delete-circle</v-icon>
           </v-btn>
         </div>
 
         <v-text-field
-          v-model="condition.data"
+          v-model="condition.keyword"
           class="mt-1"
           clearable
           outlined
@@ -44,7 +48,7 @@
           <span class="ml-1 caption">{{
             $t("search.add_search_condition")
           }}</span>
-        </div> 
+        </div>
 
         <v-btn
           class="mt-md-2 mt-lg-0 mt-xl-0"
@@ -80,7 +84,7 @@ export default {
       conditionRules: [val => !!val || this.$t("search.required_field")],
       conditions: [
         {
-          data: null,
+          keyword: null,
           criteria: null,
         },
       ],
@@ -92,7 +96,7 @@ export default {
       if (this.conditions.length == this.searchCriteria.length) {
         this.$emit("conditionOutOfBounds", true);
       } else {
-        this.conditions.push({ data: null, criteria: null });
+        this.conditions.push({ keyword: null, criteria: null });
       }
     },
 
@@ -140,6 +144,7 @@ $text-font-size: 14px;
   height: 625px;
   overflow: auto;
   min-width: 295px;
+  max-width: 295px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
 
   &__title {
@@ -188,7 +193,7 @@ $text-font-size: 14px;
   }
 
   fieldset {
-    border: 1px solid #E1E1E1;
+    border: 1px solid #e1e1e1;
   }
 
   & .v-text-field__details {
