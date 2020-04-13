@@ -12,6 +12,7 @@
         :options.sync="options"
         :serverItemsLength="totalCustomers"
         :tableRowIcon="tableRowIcon"
+        :autoHeaders="false"
         :isLoading="$apollo.queries.result.loading"
       ></data-list>
     </template>
