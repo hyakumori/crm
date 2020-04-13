@@ -188,7 +188,9 @@ class Paginator(BaseModel):
         if not v:
             return {}
         return {
-            f["criteria"]: f["data"] for f in v if f and f["criteria"] and f["data"]
+            f["criteria"]: f["keyword"]
+            for f in v
+            if f and f["criteria"] and f["keyword"]
         }
 
 
