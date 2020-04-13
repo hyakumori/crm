@@ -3,9 +3,9 @@
     <template #left>
       <search-card />
     </template>
+
     <template #content>
       <data-list
-        class="ml-7"
         :headers="headers"
         :multiSort="true"
         :data="customers"

@@ -73,7 +73,7 @@ export default {
 .page-header {
   position: relative;
   min-width: $content-width;
-  background-image: url("../assets/img/app-bar.jpg");
+  background-image: url("../assets/img/app-bar.webp");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

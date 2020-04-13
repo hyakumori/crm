@@ -20,7 +20,7 @@
             @selectedAction="onSelected"
           />
 
-          <v-btn @click="deleteSearchField(index)" icon>
+          <v-btn v-if="conditions.length > 1"  @click="deleteSearchField(index)" icon>
             <v-icon>mdi-delete-circle</v-icon>
           </v-btn>
         </div>

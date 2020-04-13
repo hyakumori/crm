@@ -89,6 +89,7 @@ export default {
           header.value = Object.keys(this.data[0])[i];
           headers.push(header);
         }
+        headers.push({value: "options", align: "center", sortable: false})
         return headers;
       }
       return this.headers;
@@ -122,6 +123,12 @@ export default {
       handler() {
         this.$emit("update:options", this.innerOptions);
       },
+    },
+
+    selected(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.$emit('selectedRow', newVal)
+      }
     },
   },
 };

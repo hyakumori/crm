@@ -8,12 +8,16 @@
         @conditionOutOfBounds="conditionOutOfBoundsErr"
       />
     </template>
+
     <template #content>
       <div class="forest__data-section">
-        <table-action />
+        <table-action
+          class="mb-4"
+          v-if="tableSelectedRow.length > 0"
+          :selectedCount="tableSelectedRow.length"
+        />
 
         <data-list
-          class="mt-4"
           mode="forest"
           itemKey="internal_id"
           :headers="getHeaders"
@@ -24,9 +28,11 @@
           :tableRowIcon="tableRowIcon"
           :options.sync="options"
           @rowData="rowData"
+          @selectedRow="selectedRow"
         ></data-list>
       </div>
     </template>
+
     <template #addons>
       <snack-bar
         color="error"
@@ -73,6 +79,7 @@ export default {
       sbTimeout: 5000,
       filter: {},
       options: {},
+      tableSelectedRow: [],
     };
   },
 
@@ -119,7 +126,12 @@ export default {
         this.errMsg = this.$t("search.condition_is_maximum");
       }
     },
+
+    selectedRow(val) {
+      this.tableSelectedRow = val;
+    },
   },
+
   watch: {
     options: {
       handler(val, old) {
@@ -140,6 +152,7 @@ export default {
     getHeaders() {
       return headers;
     },
+
     getData() {
       if (this.forestsInfo) {
         return this.forestsInfo.forests.map(element => {
@@ -154,8 +167,8 @@ export default {
             forestMunicipality: fCadastral.municipality,
             forestSector: fCadastral.sector,
             forestSubsector: fCadastral.subsector,
-            ownerKanji: owner.name_kana,
-            ownerKana: owner.name_kanji,
+            ownerKana: owner.name_kana,
+            ownerKanji: owner.name_kanji,
             ownerPrefecture: owner.address.prefecture,
             ownerMunicipality: owner.address.municipality,
             ownerSector: owner.address.sector,
