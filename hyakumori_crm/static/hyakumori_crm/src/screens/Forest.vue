@@ -9,10 +9,13 @@
       />
 
       <div class="ml-7 forest__data-section">
-        <table-action />
+        <table-action
+          class="mb-4"
+          v-if="tableSelectedRow.length > 0"
+          :selectedCount="tableSelectedRow.length"
+        />
 
         <data-list
-          class="mt-4"
           mode="forest"
           itemKey="internal_id"
           :headers="getHeaders"
@@ -23,6 +26,7 @@
           :tableRowIcon="tableRowIcon"
           :options.sync="options"
           @rowData="rowData"
+          @selectedRow="selectedRow"
         ></data-list>
       </div>
 
@@ -159,8 +163,8 @@ export default {
             forestMunicipality: fCadastral.municipality,
             forestSector: fCadastral.sector,
             forestSubsector: fCadastral.subsector,
-            ownerKana: owner.name_kana,
             ownerKanji: owner.name_kanji,
+            ownerKana: owner.name_kana,
             ownerPrefecture: owner.address.prefecture,
             ownerMunicipality: owner.address.municipality,
             ownerSector: owner.address.sector,
