@@ -90,7 +90,35 @@ export default {
       ],
     };
   },
-
+  computed: {
+    searchable() {
+      const criteria = uniq(map(this.conditions, "criteria"));
+      const keywords = uniq(map(this.conditions, "keyword"));
+      if (
+        (criteria.length === 1 && criteria[0] === null) ||
+        (keywords.length === 1 && keywords[0] === null)
+      )
+        return false;
+      return true;
+    },
+  },
+  watch: {
+    searchCriteria(val, old) {
+      if (old.length === 0) this.conditions[0].fields = [...val];
+      else return;
+    },
+    usedFields(val) {
+      for (let con of this.conditions) {
+        this.$set(
+          con,
+          "fields",
+          this.searchCriteria.filter(
+            f => !val.has(f.value) || f.value === con.criteria,
+          ),
+        );
+      }
+    },
+  },
   methods: {
     addSearchField() {
       if (this.conditions.length == this.searchCriteria.length) {
