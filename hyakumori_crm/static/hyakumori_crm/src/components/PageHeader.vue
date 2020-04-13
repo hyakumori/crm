@@ -1,5 +1,7 @@
 <template>
   <div class="page-header">
+    <v-img src="../assets/img/app-bar.webp" height="160"></v-img>
+
     <div class="page-header__content">
       <div class="page-header__content--center">
         <div class="d-flex justify-space-between">
@@ -59,6 +61,7 @@
 
 <script>
 import CustomerCreateForm from "./CustomerCreateForm";
+
 export default {
   name: "page-header",
   components: {
@@ -72,17 +75,20 @@ export default {
 
 .page-header {
   position: relative;
-  min-width: $content-width;
-  background-image: url("../assets/img/app-bar.webp");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  min-width: 1400px;
+
   .page-header__content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: linear-gradient(
       87.07deg,
       #1b756a 0%,
       rgba(196, 196, 196, 0) 100%
     );
+
     &--center {
       width: $content-width;
       margin: auto;

@@ -2,7 +2,6 @@
   <v-data-table
     ref="dataTable"
     v-model="selected"
-    :mobile-breakpoint="0"
     :item-key="itemKey"
     :multi-sort="multiSort"
     :loading="isLoading"
@@ -89,7 +88,7 @@ export default {
           header.value = Object.keys(this.data[0])[i];
           headers.push(header);
         }
-        headers.push({value: "options", align: "center", sortable: false})
+        headers.push({ value: "options", align: "center", sortable: false });
         return headers;
       }
       return this.headers;
@@ -127,7 +126,7 @@ export default {
 
     selected(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.$emit('selectedRow', newVal)
+        this.$emit("selectedRow", newVal);
       }
     },
   },
