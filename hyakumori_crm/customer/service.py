@@ -37,6 +37,7 @@ def get_list(
     per_page: int = 10,
     pre_per_page: Union[int, None] = None,
     order_by: Union[Iterator, None] = None,
+    filters: Union[dict, None] = None,
 ):
     offset = (pre_per_page or per_page) * (page_num - 1)
     if not order_by:
@@ -109,9 +110,14 @@ def get_list(
             ],
         )
     )
-    total = query.copy().wrap().count()
+    query = query.wrap()
+    if filters:
+        query.where(**filters)
+    total = query.copy().count()
+
     for order_field in order_by:
         query.order_by(order_field)
+
     query.limit(per_page, offset)
     return query.select(), total
 

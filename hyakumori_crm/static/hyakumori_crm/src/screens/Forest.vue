@@ -1,15 +1,15 @@
 <template>
-  <v-container fluid class="pa-7">
-    <v-row>
-      <v-col md="3">
-        <search-card
-          :searchCriteria="getSearchCriteria"
-          @onSearch="onSearch"
-          @unableDelete="unableDelErr"
-          @conditionOutOfBounds="conditionOutOfBoundsErr"
-        />
-      </v-col>
-      <v-col cols="12" md="9">
+  <main-section class="forest">
+    <template #left>
+      <search-card
+        :searchCriteria="getSearchCriteria"
+        @onSearch="onSearch"
+        @unableDelete="unableDelErr"
+        @conditionOutOfBounds="conditionOutOfBoundsErr"
+      />
+    </template>
+    <template #content>
+      <div class="forest__data-section">
         <table-action />
 
         <data-list
@@ -21,24 +21,26 @@
           :showSelect="true"
           :isLoading="$apollo.queries.forestsInfo.loading"
           :serverItemsLength="getTotalForests"
-          @rowData="rowData"
           :tableRowIcon="tableRowIcon"
           :options.sync="options"
+          @rowData="rowData"
         ></data-list>
-      </v-col>
-    </v-row>
-
-    <snack-bar
-      color="error"
-      :isShow="isShowErr"
-      :msg="errMsg"
-      :timeout="sbTimeout"
-      @dismiss="onDismissSb"
-    />
-  </v-container>
+      </div>
+    </template>
+    <template #addons>
+      <snack-bar
+        color="error"
+        :isShow="isShowErr"
+        :msg="errMsg"
+        :timeout="sbTimeout"
+        @dismiss="onDismissSb"
+      />
+    </template>
+  </main-section>
 </template>
 
 <script>
+import MainSection from "../components/MainSection";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
 import TableAction from "../components/TableAction";
@@ -53,6 +55,7 @@ export default {
   mixins: [ScreenMixin],
 
   components: {
+    MainSection,
     DataList,
     SearchCard,
     TableAction,
@@ -193,6 +196,7 @@ export default {
 <style lang="scss" scoped>
 .forest {
   &__data-section {
+    width: 100%;
     overflow: hidden;
   }
 }

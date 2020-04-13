@@ -10,48 +10,38 @@
         v-for="(condition, index) in conditions"
         :key="index"
       >
-        <div class="d-flex justify-space-between">
-          <select-list
-            class="search-card__search--spacing"
-            :placeHolder="$t('search.select_item')"
-            :actions="searchCriteria"
-            :index="index"
-            :rules="conditionRules"
-            @selectedAction="onSelected"
+        <div class="pb-2">
+          <v-select
+            ref="selectList"
+            append-icon="mdi-chevron-down"
+            append-outer-icon="mdi-delete-circle"
+            loading="false"
+            dense
+            clearable
+            hide-details
+            :name="condition.criteria"
+            v-model="condition.criteria"
+            :items="fields"
+            :placeholder="$t('search.select_item')"
+            @click:append-outer="() => deleteSearchField(index)"
+          ></v-select>
+          <TextInput
+            v-model="condition.data"
+            :hideDetails="true"
+            :placeholder="$t('search.enter_condition')"
+            :name="condition.criteria"
           />
-
-          <v-btn @click="deleteSearchField(index)" icon>
-            <v-icon>mdi-delete-circle</v-icon>
-          </v-btn>
         </div>
-
-        <v-text-field
-          v-model="condition.data"
-          class="mt-1"
-          clearable
-          outlined
-          :placeholder="$t('search.enter_condition')"
-          :rules="dataRules"
-        ></v-text-field>
       </div>
 
-      <div
-        class="d-flex flex-xl-row flex-lg-row flex-md-column search-card__btn"
-      >
-        <div @click="addSearchField">
+      <div class="d-flex search-card__btn">
+        <div class="d-flex align-center" @click="addSearchField">
           <v-icon>mdi-plus</v-icon>
-
           <span class="ml-1 caption">{{
             $t("search.add_search_condition")
           }}</span>
         </div>
-
-        <v-btn
-          class="mt-md-2 mt-lg-0 mt-xl-0"
-          color="primary"
-          depressed
-          @click="onSearch"
-        >
+        <v-btn color="primary" depressed @click="onSearch">
           {{ $t("raw_text.search") }}
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
@@ -61,23 +51,22 @@
 </template>
 
 <script>
-import SelectList from "./SelectList";
+import TextInput from "./forms/TextInput";
 
 export default {
   name: "search-card",
 
   components: {
-    SelectList,
+    TextInput,
   },
 
   props: {
-    searchCriteria: Array,
+    fields: Array,
+    onSearch: Function,
   },
 
   data() {
     return {
-      dataRules: [val => !!val || this.$t("search.required_field")],
-      conditionRules: [val => !!val || this.$t("search.required_field")],
       conditions: [
         {
           data: null,
@@ -89,15 +78,11 @@ export default {
 
   methods: {
     addSearchField() {
-      if (this.conditions.length == this.searchCriteria.length) {
+      if (this.conditions.length == this.fields.length) {
         this.$emit("conditionOutOfBounds", true);
       } else {
         this.conditions.push({ data: null, criteria: null });
       }
-    },
-
-    onSelected(item, index) {
-      this.conditions[index].criteria = item;
     },
 
     deleteSearchField(index) {
@@ -111,20 +96,6 @@ export default {
     isUniqueArr(arr) {
       return arr.length === new Set(arr).size;
     },
-
-    onSearch() {
-      const criterias = Array.from(this.conditions).map(
-        condition => condition.criteria,
-      );
-      const isDuplicateCriteria = true;
-      if (this.$refs.form.validate()) {
-        if (criterias && this.isUniqueArr(criterias)) {
-          this.$emit("onSearch", !isDuplicateCriteria, this.conditions);
-        } else {
-          this.$emit("onSearch", isDuplicateCriteria);
-        }
-      }
-    },
   },
 };
 </script>
@@ -133,15 +104,17 @@ export default {
 $action-color: #12c7a6;
 $text-color: #999999;
 $text-field--min-height: 0;
+$text-font-size: 14px;
 
 .search-card {
   padding: 18px;
-  height: 625px;
+  max-height: 625px;
   overflow: auto;
-  border-radius: 4px;
+  min-width: 295px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
 
   &__title {
-    font-size: 14px;
+    font-size: $text-font-size;
     font-weight: bold;
     color: #444444;
     padding: 0;
@@ -171,17 +144,10 @@ $text-field--min-height: 0;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    margin-top: 0 !important;
-  }
-}
+    margin-top: 5px !important;
 
-.v-input ::v-deep {
-  & .v-text-field__details {
-    margin-bottom: 0 !important;
-    min-height: $text-field--min-height;
-
-    & .v-messages {
-      min-height: $text-field--min-height;
+    & i {
+      color: $action-color;
     }
   }
 }
