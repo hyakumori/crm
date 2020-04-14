@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "behaviors.apps.BehaviorsConfig",
     "guardian",
+    "django_filters",
     # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
     "hyakumori_crm.crm",
     "hyakumori_crm.users",
@@ -180,11 +181,11 @@ AUTHENTICATION_BACKENDS = (
 
 # Djoser
 DJOSER = {
-    "PASSWORD_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL")
+    "PASSWORD_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL", "")
     + "/auth/reset_password/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL")
+    "USERNAME_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL", "")
     + "/auth/reset_username/{uid}/{token}",
-    "ACTIVATION_URL": os.getenv("FRONTEND_URL") + "/auth/activate/{uid}/{token}",
+    "ACTIVATION_URL": os.getenv("FRONTEND_URL", "") + "/auth/activate/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": False,
     "SEND_CONFIRMATION_EMAIL": False,
     "SERIALIZERS": {
@@ -202,7 +203,7 @@ DJOSER = {
 
 # Simple JWT
 SIMPLE_JWT = {
-    "AUTH_HEADER_TYPES": ("JWT",),
+    "AUTH_HEADER_TYPES": ("JWT", "Bearer"),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": False,
