@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "behaviors.apps.BehaviorsConfig",
     "guardian",
     # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
+    "hyakumori_crm.crm",
     "hyakumori_crm.users",
     "hyakumori_crm.customer",
     "hyakumori_crm.forest",
