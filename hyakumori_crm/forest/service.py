@@ -27,6 +27,13 @@ def get_forests_by_condition(
     return forests, total
 
 
+def update(forest: Forest, forest_in: dict):
+    forest.cadastral = forest_in["cadastral"]
+    forest.contracts = forest_in["contracts"]
+    forest.save()
+    return forest
+
+
 # def get(pk):
 #     try:
 #         return Forest.objects.get(pk=pk)

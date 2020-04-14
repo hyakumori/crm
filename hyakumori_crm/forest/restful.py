@@ -1,12 +1,16 @@
+from uuid import UUID
+from django.http import Http404
 from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_typed_views import typed_action
-
+from rest_framework.request import Request
+from rest_typed_views import typed_action, typed_api_view, Body
+from hyakumori_crm.core.models import HyakumoriDanticModel
 from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
+from .schemas import ForestInput
+from .service import update
 
 
 class ForestViewSets(viewsets.ModelViewSet):
@@ -21,7 +25,9 @@ class ForestViewSets(viewsets.ModelViewSet):
         obj = self.get_object()
 
         paginator = default_paginator()
-        paged_list = paginator.paginate_queryset(request=request, queryset=obj.forestcustomer_set.all(), view=self)
+        paged_list = paginator.paginate_queryset(
+            request=request, queryset=obj.forestcustomer_set.all(), view=self
+        )
 
         customers = []
         for forest_customer in paged_list:
@@ -34,3 +40,13 @@ class ForestViewSets(viewsets.ModelViewSet):
     @typed_action(detail=True, methods=["GET"])
     def related_archives(self, request):
         return Response()
+
+
+@typed_api_view(methods=["PUT", "PATCH"])
+def update_forest(pk: UUID, forest_in: ForestInput = Body()):
+    try:
+        forest = Forest.objects.get(pk=pk)
+    except Forest.DoesNotExist:
+        raise Http404
+    update(forest, forest_in)
+    return Response({"id": forest.id})
