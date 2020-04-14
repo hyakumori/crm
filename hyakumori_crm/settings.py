@@ -180,11 +180,11 @@ AUTHENTICATION_BACKENDS = (
 
 # Djoser
 DJOSER = {
-    "PASSWORD_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL")
+    "PASSWORD_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL", "")
     + "/auth/reset_password/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL")
+    "USERNAME_RESET_CONFIRM_URL": os.getenv("FRONTEND_URL", "")
     + "/auth/reset_username/{uid}/{token}",
-    "ACTIVATION_URL": os.getenv("FRONTEND_URL") + "/auth/activate/{uid}/{token}",
+    "ACTIVATION_URL": os.getenv("FRONTEND_URL", "") + "/auth/activate/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": False,
     "SEND_CONFIRMATION_EMAIL": False,
     "SERIALIZERS": {
