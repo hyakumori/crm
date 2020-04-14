@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "behaviors.apps.BehaviorsConfig",
     "guardian",
+    "django_filters",
     # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
     "hyakumori_crm.crm",
     "hyakumori_crm.users",
