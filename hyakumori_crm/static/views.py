@@ -38,6 +38,3 @@ else:
 def test_view(request):
     return HttpResponse("OK", content_type="text/plain")
 
-
-def notfound_view(request):
-    return HttpResponseNotFound()

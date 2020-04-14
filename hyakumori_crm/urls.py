@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from hyakumori_crm.customer.restful import CustomerViewSets
 from hyakumori_crm.forest.restful import ForestViewSets
 from hyakumori_crm.graphql import view as graphql_view
-from hyakumori_crm.static.views import index_view, notfound_view, test_view
+from hyakumori_crm.static.views import index_view, test_view
+from hyakumori_crm.core.http import notfound_view
 
 router = DefaultRouter()
 router.register("customers", CustomerViewSets, basename="customer")
