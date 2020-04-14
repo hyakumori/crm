@@ -16,7 +16,6 @@ def get_forests_by_condition(
     order_by: Union[Iterator, None] = None,
     filters: Union[ForestFilter, None] = None,
 ):
-    print(page_num, per_page, pre_per_page, order_by)
     offset = (pre_per_page or per_page) * (page_num - 1)
     if not order_by:
         order_by = []
