@@ -6,10 +6,9 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from .views import TokenObtainPairView
 
 router = SimpleRouter(trailing_slash=False)
-api_urls = router.urls
-
 router.register("users", UserViewSet, basename="user")
 
+api_urls = router.urls
 api_urls += [
     path("token/create/", TokenObtainPairView.as_view(), name="jwt-create"),
     path("token/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),

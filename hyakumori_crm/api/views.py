@@ -4,4 +4,4 @@ from rest_framework.decorators import api_view
 
 @api_view()
 def notfound_view(request):
-    return Http404()
+    raise Http404()
