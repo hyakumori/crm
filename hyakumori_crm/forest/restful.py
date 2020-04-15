@@ -1,17 +1,18 @@
 from uuid import UUID
 from django.http import Http404
 from django.core.exceptions import ValidationError
+
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_typed_views import typed_action, typed_api_view, Body
-from hyakumori_crm.core.models import HyakumoriDanticModel
+from rest_typed_views import typed_action, Body
+
 from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
 from .schemas import ForestInput, OwnerPksInput, ForestOwnerContractInput
 from .service import update, update_owners, set_forest_owner_contact
+from ..api.decorators import typed_api_view
 
 
 class ForestViewSets(viewsets.ModelViewSet):
@@ -58,7 +59,7 @@ def update_owners_view(request, pk, owner_pks_in: OwnerPksInput = Body()):
         forest = Forest.objects.get(pk=pk)
     except (ValidationError, Forest.DoesNotExist):
         raise Http404
-    update_owners(request.user, forest, owner_pks_in.dict())
+    update_owners(forest, owner_pks_in.dict())
     return Response({"id": forest.pk})
 
 
@@ -66,7 +67,5 @@ def update_owners_view(request, pk, owner_pks_in: OwnerPksInput = Body()):
 def set_contact_to_owner_view(
     request, pk, forest_owner_contact_in: ForestOwnerContractInput = Body()
 ):
-    set_forest_owner_contact(
-        request.user, forest_owner_contact_in.forest, forest_owner_contact_in
-    )
+    set_forest_owner_contact(forest_owner_contact_in.forest, forest_owner_contact_in)
     return Response({"id": forest_owner_contact_in.forest.id})

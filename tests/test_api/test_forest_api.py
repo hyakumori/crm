@@ -24,8 +24,6 @@ def forest(admin_user):
     return Forest.objects.create(
         cadastral={"prefecture": "foo", "municipality": "foo", "sector": "foo"},
         contracts=[{"type": ContractType.long_term}],
-        author_id=admin_user.id,
-        editor_id=admin_user.id,
     )
 
 
@@ -67,42 +65,26 @@ def test_update_forest_basic_info(api_rf, admin_user, forest):
 
 @pytest.mark.django_db
 def test_update_owners_view(api_rf, admin_user, forest):
-    customer1 = Customer(author=admin_user, editor=admin_user)
-    customer2 = Customer(author=admin_user, editor=admin_user)
+    customer1 = Customer()
+    customer2 = Customer()
     Customer.objects.bulk_create([customer1, customer2])
     contact_customer1 = Contact(
         name_kanji=dict(first_name="foo", last_name="bar"),
         name_kana=dict(first_name="foo", last_name="bar"),
-        author=admin_user,
-        editor=admin_user,
     )
     contact_customer2 = Contact(
         name_kanji=dict(first_name="yam", last_name="bar"),
         name_kana=dict(first_name="yam", last_name="bar"),
-        author=admin_user,
-        editor=admin_user,
     )
     Contact.objects.bulk_create([contact_customer1, contact_customer2])
     CustomerContact.objects.create(
-        customer=customer1,
-        contact=contact_customer1,
-        is_basic=True,
-        author=admin_user,
-        editor=admin_user,
+        customer=customer1, contact=contact_customer1, is_basic=True,
     )
     CustomerContact.objects.create(
-        customer=customer2,
-        contact=contact_customer2,
-        is_basic=True,
-        author=admin_user,
-        editor=admin_user,
+        customer=customer2, contact=contact_customer2, is_basic=True,
     )
     ForestCustomer.objects.create(
-        forest=forest,
-        customer=customer1,
-        contact=contact_customer1,
-        author=admin_user,
-        editor=admin_user,
+        forest=forest, customer=customer1, contact=contact_customer1,
     )
 
     req = api_rf.put(
@@ -119,42 +101,26 @@ def test_update_owners_view(api_rf, admin_user, forest):
 
 @pytest.mark.django_db
 def test_set_contact_to_owner_view(api_rf, admin_user, forest):
-    customer1 = Customer(author=admin_user, editor=admin_user)
-    customer2 = Customer(author=admin_user, editor=admin_user)
+    customer1 = Customer()
+    customer2 = Customer()
     Customer.objects.bulk_create([customer1, customer2])
     contact_customer1 = Contact(
         name_kanji=dict(first_name="foo", last_name="bar"),
         name_kana=dict(first_name="foo", last_name="bar"),
-        author=admin_user,
-        editor=admin_user,
     )
     contact_customer2 = Contact(
         name_kanji=dict(first_name="yam", last_name="bar"),
         name_kana=dict(first_name="yam", last_name="bar"),
-        author=admin_user,
-        editor=admin_user,
     )
     Contact.objects.bulk_create([contact_customer1, contact_customer2])
     CustomerContact.objects.create(
-        customer=customer1,
-        contact=contact_customer1,
-        is_basic=True,
-        author=admin_user,
-        editor=admin_user,
+        customer=customer1, contact=contact_customer1, is_basic=True,
     )
     CustomerContact.objects.create(
-        customer=customer2,
-        contact=contact_customer2,
-        is_basic=True,
-        author=admin_user,
-        editor=admin_user,
+        customer=customer2, contact=contact_customer2, is_basic=True,
     )
     ForestCustomer.objects.create(
-        forest=forest,
-        customer=customer1,
-        contact=contact_customer1,
-        author=admin_user,
-        editor=admin_user,
+        forest=forest, customer=customer1, contact=contact_customer1,
     )
     req = api_rf.put(
         f"/api/v1/forests/{forest.pk}/customers/set-contact",
