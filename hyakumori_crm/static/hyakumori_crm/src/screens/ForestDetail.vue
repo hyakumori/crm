@@ -9,7 +9,7 @@
           @update="val => (isUpdate.basicInfo = val)"
         />
         <div class="my-4">
-          <forest-basic-info :info="getInfo" :isUpdate="isUpdate.basicInfo" />
+          <basic-info :infos="getBasicInfo" :isUpdate="isUpdate.basicInfo" />
           <update-button
             class="mt-n3 mb-12"
             v-if="isUpdate.basicInfo"
@@ -128,6 +128,7 @@
 
 <script>
 import MainSection from "../components/MainSection";
+import ScreenMixin from "./ScreenMixin";
 import ContentHeader from "../components/detail/ContentHeader";
 import ContactTab from "../components/detail/ContactTab";
 import info from "../assets/dump/forest_detail.json";
@@ -138,11 +139,13 @@ import HistoryDiscussion from "../components/detail/HistoryDiscussionCard";
 import LogCard from "../components/detail/LogCard";
 import UpdateButton from "../components/detail/UpdateButton";
 import AdditionButton from "../components/AdditionButton";
-import ForestBasicInfo from "../components/detail/ForestBasicInfo";
+import BasicInfo from "../components/detail/BasicInfo";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 
 export default {
   name: "forest-detail",
+
+  mixins: [ScreenMixin],
 
   components: {
     MainSection,
@@ -152,12 +155,15 @@ export default {
     LogCard,
     UpdateButton,
     AdditionButton,
-    ForestBasicInfo,
+    BasicInfo,
     ForestAttributeTable,
   },
 
   data() {
     return {
+      pageIcon: this.$t("icon.forest_icon"),
+      backBtnContent: this.$t("page_header.customer_list"),
+      headerTagColor: "#FFC83B",
       isExpand: false,
       isUpdate: {
         basicInfo: false,
@@ -168,6 +174,18 @@ export default {
     };
   },
 
+  mounted() {
+    const forestInfo = this.getInfo;
+    if (forestInfo) {
+      const headerInfo = {
+        title: forestInfo.internal_id,
+        subTitle: forestInfo.owner.name_kanji,
+        tag: forestInfo.tag.danchi,
+      };
+      this.$store.dispatch("setHeaderInfo", headerInfo);
+    }
+  },
+
   methods: {
     expandDiscussionList() {
       this.isExpand = !this.isExpand;
@@ -175,6 +193,23 @@ export default {
 
     cancel(val) {
       this.isUpdate[val] = false;
+    },
+
+    forestContractDateRange(info) {
+      const longTermContract = info.contracts[0];
+      if (longTermContract) {
+        if (longTermContract.start_date) {
+          if (longTermContract.end_date) {
+            return `${longTermContract.start_date} - ${longTermContract.end_date}`;
+          } else {
+            return `${longTermContract.start_date} - `;
+          }
+        } else {
+          return "";
+        }
+      } else {
+        return "";
+      }
     },
   },
 
@@ -194,6 +229,23 @@ export default {
 
     getInfo() {
       return info;
+    },
+
+    getBasicInfo() {
+      return [
+        {
+          label: "住所",
+          value: info.cadastral.prefecture + info.cadastral.municipality,
+        },
+        {
+          label: "契約期間",
+          value: this.forestContractDateRange(info),
+        },
+        {
+          label: "地番",
+          value: info.cadastral.subsector,
+        },
+      ];
     },
 
     getActionLogs() {
