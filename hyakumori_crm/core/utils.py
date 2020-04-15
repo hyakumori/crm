@@ -39,8 +39,10 @@ def default_paginator():
 
 
 def make_error_json(message: str):
-    return JsonResponse(status=HttpResponseBadRequest.status_code, data=dict(detail=message), safe=False)
+    return JsonResponse(
+        status=HttpResponseBadRequest.status_code, data=dict(detail=message)
+    )
 
 
 def make_success_json(data: any):
-    return JsonResponse(data=data, safe=False)
+    return JsonResponse(data=data)

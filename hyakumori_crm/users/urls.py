@@ -1,9 +1,8 @@
-from django.urls import include, path
+from django.urls import path
 from rest_framework.routers import SimpleRouter
-from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import TokenObtainPairView, CustomUserViewSet
+from .views import CustomUserViewSet, TokenObtainPairView
 
 router = SimpleRouter(trailing_slash=False)
 router.register("users", CustomUserViewSet, basename="user")

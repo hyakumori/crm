@@ -5,7 +5,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AbstractUser, Group
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Model
-from guardian.shortcuts import assign_perm, get_user_perms, remove_perm, get_objects_for_user
+from guardian.shortcuts import (
+    assign_perm,
+    get_user_perms,
+    remove_perm,
+    get_objects_for_user,
+)
 
 from hyakumori_crm.core.utils import model_to_dict
 from hyakumori_crm.crm.models import Customer
@@ -14,9 +19,17 @@ from hyakumori_crm.crm.models import Customer
 class PermissionService:
     @classmethod
     def get_app_permissions(cls, app_label):
-        crm_content_types = ContentType.objects.filter(app_label=app_label).all().values_list('id')
-        permissions = [model_to_dict(permission) for permission in
-                       Permission.objects.filter(content_type_id__in=crm_content_types).all().iterator()]
+        crm_content_types = (
+            ContentType.objects.filter(app_label=app_label).all().values_list("id")
+        )
+        permissions = [
+            model_to_dict(permission)
+            for permission in Permission.objects.filter(
+                content_type_id__in=crm_content_types
+            )
+            .all()
+            .iterator()
+        ]
 
         return permissions
 
@@ -36,9 +49,7 @@ class PermissionService:
 
         user_groups = [model_to_dict(group) for group in user.groups.all().iterator()]
         results = dict(
-            is_admin=user.is_superuser,
-            is_staff=user.is_staff,
-            groups=user_groups,
+            is_admin=user.is_superuser, is_staff=user.is_staff, groups=user_groups,
         )
 
         return results
@@ -66,8 +77,9 @@ class PermissionService:
         return [model_to_dict(group) for group in user.groups.all()]
 
     @classmethod
-    def assign_object_permissions(cls, user_id: UUID, object_id: UUID, object_type_id,
-                                  permission_ids: List[int]):
+    def assign_object_permissions(
+        cls, user_id: UUID, object_id: UUID, object_type_id, permission_ids: List[int]
+    ):
         user = get_user_model().objects.get(pk=user_id)
         content_type = ContentType.objects.get_for_id(object_type_id)
         content_type_model = content_type.model_class()
@@ -80,8 +92,9 @@ class PermissionService:
         return get_user_perms(user, model_instance)
 
     @classmethod
-    def unassign_object_permissions(cls, user_id: UUID, object_id: UUID, object_type_id,
-                                    permission_ids: List[int]):
+    def unassign_object_permissions(
+        cls, user_id: UUID, object_id: UUID, object_type_id, permission_ids: List[int]
+    ):
         user = get_user_model().objects.get(pk=user_id)
         content_type = ContentType.objects.get_for_id(object_type_id)
         content_type_model = content_type.model_class()
@@ -92,3 +105,18 @@ class PermissionService:
             remove_perm(permission.codename, user, model_instance)
 
         return get_user_perms(user, model_instance)
+
+    @classmethod
+    def setup_groups(cls, user: AbstractUser):
+        if user.is_superuser:
+            admin_group, _ = Group.objects.get_or_create(name="admin")
+            admin_group.user_set.add(user)
+            admin_group.save()
+
+            # create member group
+            member_group, _ = Group.objects.get_or_create(name="member")
+
+            # create normaluser group
+            normal_user_group, _ = Group.objects.get_or_create(name="normal_user")
+
+        return [model_to_dict(group) for group in Group.objects.all().iterator()]
