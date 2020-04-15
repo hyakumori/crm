@@ -1,13 +1,14 @@
 from typing import Optional, List
 from datetime import date
-
+from uuid import UUID
+from django.utils.translation import gettext_lazy as _
 from django_filters import FilterSet, CharFilter, DateFilter
 from pydantic import BaseModel, validator
 
 from hyakumori_crm.core.models import HyakumoriDanticModel
 from hyakumori_crm.crm.schemas.contract import ContractType
 from ..core.models import Paginator
-from ..crm.models import Forest
+from ..crm.models import Forest, ForestCustomer, Customer
 
 
 class ForestFilter(FilterSet):
@@ -84,3 +85,29 @@ class Contract(HyakumoriDanticModel):
 class ForestInput(HyakumoriDanticModel):
     cadastral: Cadastral
     contracts: List[Contract]
+
+
+class OwnerPksInput(HyakumoriDanticModel):
+    forest_pk: UUID
+    added: List[UUID] = []
+    deleted: List[UUID] = []
+
+    @validator("deleted")
+    def check_deleted(cls, v):
+        owner_pks = ForestCustomer.objects.filter(customer_id__in=v).values_list(
+            "customer_id"
+        )
+        invalid_pks = set(v) - set(owner_pks)
+        if len(invalid_pks) > 0:
+            v = list(invalid_pks)
+            raise ValueError(_(f"Customer Id {v} not found"))
+        return v
+
+    @validator("added")
+    def check_added(cls, v):
+        owner_pks = Customer.objects.filter(id__in=v).values_list("id")
+        invalid_pks = set(v) - set(owner_pks)
+        if len(invalid_pks) > 0:
+            v = list(invalid_pks)
+            raise ValueError(_(f"Customer Id {v} not found"))
+        return v

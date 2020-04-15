@@ -9,8 +9,8 @@ from hyakumori_crm.core.models import HyakumoriDanticModel
 from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
-from .schemas import ForestInput
-from .service import update
+from .schemas import ForestInput, OwnerPksInput
+from .service import update, update_owners
 
 
 class ForestViewSets(viewsets.ModelViewSet):
@@ -43,10 +43,20 @@ class ForestViewSets(viewsets.ModelViewSet):
 
 
 @typed_api_view(methods=["PUT", "PATCH"])
-def update_forest(pk: UUID, forest_in: ForestInput = Body()):
+def update_view(pk: UUID, forest_in: ForestInput = Body()):
     try:
         forest = Forest.objects.get(pk=pk)
     except Forest.DoesNotExist:
         raise Http404
     update(forest, forest_in)
-    return Response({"id": forest.id})
+    return Response({"id": forest.pk})
+
+
+@typed_api_view(methods=["PUT", "PATCH"])
+def update_owners_view(pk: UUID, owner_pks_in: OwnerPksInput = Body()):
+    try:
+        forest = Forest.objects.get(pk=pk)
+    except Forest.DoesNotExist:
+        raise Http404
+    update_owners(forest, owner_pks_in)
+    return Response({"id": forest.pk})

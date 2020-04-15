@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import connections
 from django.db.utils import OperationalError
 
-from ..crm.models.forest import Forest
+from ..crm.models import Forest, ForestCustomer, Customer
 from .schemas import ForestFilter
 
 
@@ -32,6 +32,33 @@ def update(forest: Forest, forest_in: dict):
     forest.contracts = forest_in["contracts"]
     forest.save()
     return forest
+
+
+def update_owners(forest: Forest, owner_pks_in: dict):
+    ForestCustomer.objects.filter(
+        customer_id__in=owner_pks_in["deleted"], forest_id=forest.pk
+    ).delete()
+    added_forest_customers = []
+    customers = (
+        Customer.objects.basic_info()
+        .filter(pk__in=owner_pks_in["added"])
+        .values_list("id", "basic_contact_id")
+    )
+    customers_map = {c[0]: c[1] for c in customers}
+    for added_owner_pk in owner_pks_in["added"]:
+        forest_customer = ForestCustomer(
+            customer_id=added_owner_pk,
+            forest_id=forest.pk,
+            contact_id=customers_map[added_owner_pk],
+        )
+        added_forest_customers.append(forest_customer)
+    ForestCustomer.objects.bulk_create(added_forest_customers)
+    forest.save(update_fields=["updated_at"])
+    return forest
+
+
+def delete_archives(forest: Forest, archive_pks_in: list):
+    pass
 
 
 # def get(pk):
