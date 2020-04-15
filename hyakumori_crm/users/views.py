@@ -3,10 +3,12 @@ from uuid import UUID
 
 from django.contrib.auth.models import Group
 from djoser.views import UserViewSet
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_typed_views import Body, typed_action
 
