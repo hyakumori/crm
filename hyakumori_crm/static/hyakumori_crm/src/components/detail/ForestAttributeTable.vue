@@ -47,10 +47,6 @@ export default {
 $font-weight: 500;
 
 .attribute-table ::v-deep {
-<<<<<<< HEAD
-=======
-
->>>>>>> modify attr table
   th {
     font-size: 14px;
     font-weight: bold;

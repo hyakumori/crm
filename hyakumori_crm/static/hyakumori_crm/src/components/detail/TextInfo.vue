@@ -1,14 +1,8 @@
 <template>
   <div class="text-info">
-<<<<<<< HEAD
     <h5>{{ label }}</h5>
     <text-input v-if="isUpdate" :value="value" />
     <p v-else>{{ value }}</p>
-=======
-    <h5>{{ title }}</h5>
-    <text-input v-if="isUpdate" :value="info"/>
-    <p v-else>{{ info }}</p>
->>>>>>> modify attr table
   </div>
 </template>
 

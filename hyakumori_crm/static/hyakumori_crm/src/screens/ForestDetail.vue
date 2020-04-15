@@ -57,7 +57,6 @@
             :discussions="getDiscussionsNotExpand"
           />
         </template>
-<<<<<<< HEAD
         <addition-button
           class="mb-3"
           v-if="isUpdate.discussion"
@@ -70,11 +69,6 @@
         <p class="forest-detail__expand" @click="expandDiscussionList">
           すべて表示する
         </p>
-=======
-        <addition-button class="mb-3" v-if="isUpdate.discussion" content="協議履歴を追加" />
-        <update-button v-if="isUpdate.discussion" :cancel="cancel.bind(this, 'discussion')" />
-        <p class="forest-detail__expand" @click="expandDiscussionList">すべて表示する</p>
->>>>>>> modify attr table
 
         <content-header
           content="書類郵送記録"
@@ -88,7 +82,6 @@
           :discussions="getDiscussionsNotExpand"
           :isUpdate="isUpdate.archive"
         />
-<<<<<<< HEAD
         <addition-button
           class="mb-3"
           v-if="isUpdate.archive"
@@ -111,17 +104,6 @@
               <td class="forest-detail__header--text__data--color">
                 {{ header.data }}
               </td>
-=======
-        <addition-button class="mb-3" v-if="isUpdate.archive" content="協議履歴を追加" />
-        <update-button v-if="isUpdate.archive" :cancel="cancel.bind(this, 'archive')" />
-
-        <content-header class="mt-9" content="森林情報" :displayAdditionBtn="false" />
-        <v-row class="forest-detail__header d-flex mx-0 mt-5">
-          <template v-for="(header, index) in headerData">
-            <v-col class="forest-detail__header--text" cols="3" :key="index">
-              <td class="pr-2">{{header.name}}</td>
-              <td class="forest-detail__header--text__data--color">{{header.data}}</td>
->>>>>>> modify attr table
             </v-col>
           </template>
         </v-row>
@@ -132,7 +114,6 @@
     <template #right>
       <div class="forest-detail__log ml-6">
         <h4 class="mb-1">更新履歴</h4>
-<<<<<<< HEAD
         <log-card
           v-for="(log, index) in getActionLogs"
           :key="index"
@@ -140,11 +121,6 @@
           :date="log.date"
           :editor="log.editor"
         />
-=======
-        <log-card action="森に紐づく交渉履歴が更新されました" date="2020/2/31" />
-        <log-card action="人が追加されました。" date="2020/2/23" editor="山田太郎" />
-        <log-card action="顧客データが作成されました。" date="2020/2/23" editor="山田太郎" />
->>>>>>> modify attr table
       </div>
     </template>
   </main-section>
@@ -218,7 +194,6 @@ export default {
     cancel(val) {
       this.isUpdate[val] = false;
     },
-<<<<<<< HEAD
 
     forestContractDateRange(info) {
       const longTermContract = info.contracts[0];
@@ -236,8 +211,6 @@ export default {
         return "";
       }
     },
-=======
->>>>>>> modify attr table
   },
 
   computed: {
@@ -258,7 +231,6 @@ export default {
       return info;
     },
 
-<<<<<<< HEAD
     getBasicInfo() {
       return [
         {
@@ -280,8 +252,6 @@ export default {
       return actionLogs;
     },
 
-=======
->>>>>>> modify attr table
     headerData() {
       const attr = info.forest_attributes;
       return [
@@ -327,7 +297,6 @@ export default {
           first_area: attr["第1Area"],
           second_area: attr["第2Area"],
           third_area: attr["第3Area"],
-<<<<<<< HEAD
         },
         {
           area: "面積_ha",
@@ -344,24 +313,6 @@ export default {
           third_area: attr["第3立木本"],
         },
         {
-=======
-        },
-        {
-          area: "面積_ha",
-          unit: "",
-          first_area: attr["第1面積_ha"],
-          second_area: attr["第2面積_ha"],
-          third_area: attr["第3面積_ha"],
-        },
-        {
-          area: "立木本",
-          unit: "",
-          first_area: attr["第1立木本"],
-          second_area: attr["第2立木本"],
-          third_area: attr["第3立木本"],
-        },
-        {
->>>>>>> modify attr table
           area: "立木密",
           unit: "本/ha",
           first_area: attr["第1立木密"],
