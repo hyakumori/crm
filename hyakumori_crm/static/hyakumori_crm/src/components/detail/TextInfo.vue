@@ -1,7 +1,7 @@
 <template>
   <div class="text-info">
     <h5>{{ title }}</h5>
-    <text-input v-if="isUpdate" />
+    <text-input v-if="isUpdate" :value="info" />
     <p v-else>{{ info }}</p>
   </div>
 </template>
