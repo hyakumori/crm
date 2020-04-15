@@ -3,15 +3,14 @@ from uuid import UUID
 
 from django.contrib.auth.models import Group
 from djoser.views import UserViewSet
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_typed_views import Body, typed_action
 
+from .serializers import CustomTokenObtainPairSerializer
 from ..core.permissions import IsAdminOrSelf
 from ..core.utils import default_paginator, make_error_json, make_success_json
 from ..crm.restful.serializers import (
@@ -20,7 +19,6 @@ from ..crm.restful.serializers import (
     ForestSerializer,
 )
 from ..permissions.services import PermissionService
-from .serializers import CustomTokenObtainPairSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
