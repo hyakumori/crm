@@ -23,8 +23,6 @@ class ForestService:
         _forest.contracts = [contract.dict() for contract in forest.contracts]
         _forest.land_attributes = key_value_to_dict(forest.land_attributes)
         _forest.forest_attributes = key_value_to_dict(forest.forest_attributes)
-        _forest.author = author
-        _forest.editor = author
         _forest.save()
 
         return _forest
@@ -50,8 +48,6 @@ class ForestService:
         relation.forest = forest
         relation.customer = customer
         relation.contact = contact
-        relation.author = user
-        relation.editor = user
         relation.save()
 
         return relation

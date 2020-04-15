@@ -18,8 +18,6 @@ class CustomerService:
         _customer.address = customer.address.dict()
         _customer.banking = customer.banking.dict()
         _customer.tags = customer.tags
-        _customer.editor = author
-        _customer.author = author
         _customer.save()
 
         if link_contact is None:
@@ -33,8 +31,6 @@ class CustomerService:
             _contact.telephone = customer.basic_contact.telephone
             _contact.mobilephone = customer.basic_contact.mobilephone
             _contact.email = customer.basic_contact.email
-            _contact.editor = author
-            _contact.author = author
             _contact.save()
         else:
             _contact = link_contact
@@ -43,8 +39,6 @@ class CustomerService:
         _customer_contact.customer = _customer
         _customer_contact.contact = _contact
         _customer_contact.is_basic = is_basic
-        _customer_contact.author = author
-        _customer_contact.editor = author
         _customer_contact.save()
 
         return _customer
