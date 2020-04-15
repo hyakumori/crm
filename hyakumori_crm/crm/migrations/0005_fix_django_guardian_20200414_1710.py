@@ -6,6 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ('crm', '0004_permissions_20200414_0952'),
+        ('guardian', '0002_generic_permissions_index'),
     ]
 
     operations = [
