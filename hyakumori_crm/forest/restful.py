@@ -1,5 +1,6 @@
 from uuid import UUID
 from django.http import Http404
+from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,8 +10,8 @@ from hyakumori_crm.core.models import HyakumoriDanticModel
 from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
-from .schemas import ForestInput, OwnerPksInput
-from .service import update, update_owners
+from .schemas import ForestInput, OwnerPksInput, ForestOwnerContractInput
+from .service import update, update_owners, set_forest_owner_contact
 
 
 class ForestViewSets(viewsets.ModelViewSet):
@@ -41,22 +42,31 @@ class ForestViewSets(viewsets.ModelViewSet):
     def related_archives(self, request):
         return Response()
 
+    @typed_action(detail=True, methods=["PUT", "PATCH"])
+    def basic_info(self, request, pk: UUID, forest_in: ForestInput = Body()):
+        try:
+            forest = Forest.objects.get(pk=pk)
+        except (ValidationError, Forest.DoesNotExist):
+            raise Http404
+        update(forest, forest_in.dict())
+        return Response({"id": forest.pk})
+
 
 @typed_api_view(methods=["PUT", "PATCH"])
-def update_view(pk: UUID, forest_in: ForestInput = Body()):
+def update_owners_view(request, pk, owner_pks_in: OwnerPksInput = Body()):
     try:
         forest = Forest.objects.get(pk=pk)
-    except Forest.DoesNotExist:
+    except (ValidationError, Forest.DoesNotExist):
         raise Http404
-    update(forest, forest_in)
+    update_owners(request.user, forest, owner_pks_in.dict())
     return Response({"id": forest.pk})
 
 
 @typed_api_view(methods=["PUT", "PATCH"])
-def update_owners_view(pk: UUID, owner_pks_in: OwnerPksInput = Body()):
-    try:
-        forest = Forest.objects.get(pk=pk)
-    except Forest.DoesNotExist:
-        raise Http404
-    update_owners(forest, owner_pks_in)
-    return Response({"id": forest.pk})
+def set_contact_to_owner_view(
+    request, pk, forest_owner_contact_in: ForestOwnerContractInput = Body()
+):
+    set_forest_owner_contact(
+        request.user, forest_owner_contact_in.forest, forest_owner_contact_in
+    )
+    return Response({"id": forest_owner_contact_in.forest.id})

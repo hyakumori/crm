@@ -1,11 +1,13 @@
 from typing import Optional, List
 from datetime import date
 from uuid import UUID
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django_filters import FilterSet, CharFilter, DateFilter
-from pydantic import BaseModel, validator
+from pydantic import validator, root_validator
 
 from hyakumori_crm.core.models import HyakumoriDanticModel
+from hyakumori_crm.crm.models import Contact
 from hyakumori_crm.crm.schemas.contract import ContractType
 from ..core.models import Paginator
 from ..crm.models import Forest, ForestCustomer, Customer
@@ -105,9 +107,46 @@ class OwnerPksInput(HyakumoriDanticModel):
 
     @validator("added")
     def check_added(cls, v):
-        owner_pks = Customer.objects.filter(id__in=v).values_list("id")
+        owner_pks = Customer.objects.filter(id__in=v).values_list("id", flat=True)
         invalid_pks = set(v) - set(owner_pks)
         if len(invalid_pks) > 0:
             v = list(invalid_pks)
             raise ValueError(_(f"Customer Id {v} not found"))
         return v
+
+
+class ForestOwnerContractInput(HyakumoriDanticModel):
+    forest: Forest
+    customer: Customer
+    contact: Contact
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @root_validator(pre=True)
+    def prepare_objects(cls, values):
+        if not isinstance(values.get("forest"), Forest):
+            try:
+                values["forest"] = Forest.objects.get(pk=values.get("forest"))
+            except (Forest.DoesNotExist, ValidationError):
+                raise ValueError(_("Forest not found"))
+
+        if not isinstance(values.get("customer"), Customer):
+            try:
+                ForestCustomer.objects.get(
+                    customer_id=values.get("customer"), forest_id=values["forest"].id
+                )
+                values["customer"] = Customer.objects.get(pk=values.get("customer"))
+            except (
+                ForestCustomer.DoesNotExist,
+                Customer.DoesNotExist,
+                ValidationError,
+            ):
+                raise ValueError(_("Customer not found"))
+
+        if not isinstance(values.get("contact"), Contact):
+            try:
+                values["contact"] = Contact.objects.get(pk=values.get("contact"))
+            except (Forest.DoesNotExist, ValidationError):
+                raise ValueError(_("Contact not found"))
+        return values

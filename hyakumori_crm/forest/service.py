@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import connections
 from django.db.utils import OperationalError
 
-from ..crm.models import Forest, ForestCustomer, Customer
+from ..crm.models import Forest, ForestCustomer, Customer, CustomerContact
 from .schemas import ForestFilter
 
 
@@ -34,13 +34,13 @@ def update(forest: Forest, forest_in: dict):
     return forest
 
 
-def update_owners(forest: Forest, owner_pks_in: dict):
+def update_owners(user, forest: Forest, owner_pks_in: dict):
     ForestCustomer.objects.filter(
         customer_id__in=owner_pks_in["deleted"], forest_id=forest.pk
     ).delete()
     added_forest_customers = []
     customers = (
-        Customer.objects.basic_info()
+        Customer.objects.basic_contact_id()
         .filter(pk__in=owner_pks_in["added"])
         .values_list("id", "basic_contact_id")
     )
@@ -50,9 +50,32 @@ def update_owners(forest: Forest, owner_pks_in: dict):
             customer_id=added_owner_pk,
             forest_id=forest.pk,
             contact_id=customers_map[added_owner_pk],
+            author_id=user.id,
+            editor_id=user.id,
         )
         added_forest_customers.append(forest_customer)
     ForestCustomer.objects.bulk_create(added_forest_customers)
+    forest.save(update_fields=["updated_at"])
+    return forest
+
+
+def set_forest_owner_contact(user, forest: Forest, forest_owner_contact_in: dict):
+    customer = forest_owner_contact_in.customer
+    contact = forest_owner_contact_in.contact
+    CustomerContact.objects.get_or_create(
+        customer_id=customer.id,
+        contact_id=contact.id,
+        defaults={"author_id": user.id, "editor_id": user.id},
+    )
+    forest_customer = ForestCustomer.objects.get(
+        forest_id=forest.id,
+        customer_id=customer.id,
+        author_id=user.id,
+        editor_id=user.id,
+    )
+    forest_customer.contact_id = contact.id
+    forest_customer.save(update_fields=["contact_id", "updated_at"])
+    customer.save(update_fields=["updated_at"])
     forest.save(update_fields=["updated_at"])
     return forest
 

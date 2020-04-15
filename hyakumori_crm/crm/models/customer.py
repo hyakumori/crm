@@ -34,7 +34,7 @@ class DefaultContact:
 
 
 class CustomerQueryset(BaseQuerySet):
-    def basic_contact(self):
+    def basic_contact_id(self):
         cc = CustomerContact.objects.filter(customer=OuterRef("pk")).filter(
             is_basic=True
         )
