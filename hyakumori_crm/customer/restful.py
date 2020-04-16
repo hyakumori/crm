@@ -5,8 +5,12 @@ from rest_framework.response import Response
 from rest_typed_views import typed_action
 
 from hyakumori_crm.core.utils import default_paginator
-from hyakumori_crm.crm.models import Customer
-from hyakumori_crm.crm.restful.serializers import ContactSerializer, CustomerSerializer, ForestSerializer
+from hyakumori_crm.crm.models import Customer, ForestCustomer
+from hyakumori_crm.crm.restful.serializers import (
+    ContactSerializer,
+    CustomerSerializer,
+)
+from .schemas import ForestSerializer
 
 
 class CustomerViewSets(viewsets.ModelViewSet):
@@ -21,7 +25,9 @@ class CustomerViewSets(viewsets.ModelViewSet):
         obj = self.get_object()
 
         paginator = default_paginator()
-        paged_list = paginator.paginate_queryset(request=request, queryset=obj.customercontact_set.all(), view=self)
+        paged_list = paginator.paginate_queryset(
+            request=request, queryset=obj.customercontact_set.all(), view=self
+        )
 
         contacts = []
         for customer_contact in paged_list:
@@ -37,7 +43,13 @@ class CustomerViewSets(viewsets.ModelViewSet):
         obj = self.get_object()
 
         paginator = default_paginator()
-        paged_list = paginator.paginate_queryset(request=request, queryset=obj.forestcustomer_set.all(), view=self)
+        paged_list = paginator.paginate_queryset(
+            request=request,
+            queryset=ForestCustomer.objects.filter(customer_id=obj.pk).prefetch_related(
+                "forest", "forest__forestcustomer_set", "contact"
+            ),
+            view=self,
+        )
 
         forests = []
         for forest_customer in paged_list:
