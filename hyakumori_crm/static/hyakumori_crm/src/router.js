@@ -1,18 +1,20 @@
+import Archive from "./screens/Archive.vue";
+import AuthLayout from "./components/AuthLayout.vue";
+import Customer from "./screens/Customer.vue";
+import Forest from "./screens/Forest.vue";
+import ForestDetail from "./screens/ForestDetail";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import AuthLayout from "./components/AuthLayout.vue";
-import Forest from "./screens/Forest.vue";
-import Customer from "./screens/Customer.vue";
-import Archive from "./screens/Archive.vue";
-import ForestDetail from "./screens/ForestDetail";
 
 Vue.use(VueRouter);
 
-const UserProfileRoutes = [{
-  path: "/me",
-  name: "my-profile",
-  component: AuthLayout,
-}];
+const UserProfileRoutes = [
+  {
+    path: "/me",
+    name: "my-profile",
+    component: AuthLayout,
+  },
+];
 
 const AdminRoutes = [
   {
@@ -33,44 +35,46 @@ const AdminRoutes = [
   },
 ];
 
-const AuthRoutes = [{
-  path: "/auth",
-  component: AuthLayout,
-  children: [
-    {
-      path: "login",
-      name: "auth-login",
-      meta: {
-        isPublic: true,
+const AuthRoutes = [
+  {
+    path: "/auth",
+    component: AuthLayout,
+    children: [
+      {
+        path: "login",
+        name: "auth-login",
+        meta: {
+          isPublic: true,
+        },
+        component: () => import("./screens/AuthLogin.vue"),
       },
-      component: () => import("./screens/AuthLogin.vue"),
-    },
-    {
-      path: "reset_password",
-      name: "auth-reset-password",
-      meta: {
-        isPublic: true,
+      {
+        path: "forgot-password",
+        name: "auth-forgot-password",
+        meta: {
+          isPublic: true,
+        },
+        component: () => import("./screens/AuthResetPassword.vue"),
       },
-      component: () => import("./screens/AuthResetPassword.vue"),
-    },
-    {
-      path: "reset_password_confirm",
-      name: "auth-reset-password-confirm",
-      meta: {
-        isPublic: true,
+      {
+        path: "reset-password/:uid/:token",
+        name: "auth-reset-password",
+        meta: {
+          isPublic: true,
+        },
+        component: () => import("./screens/AuthResetPasswordConfirm.vue"),
       },
-      component: () => import("./screens/AuthResetPasswordConfirm.vue"),
-    },
-    {
-      path: "error-403",
-      name: "error-403",
-      meta: {
-        isPublic: true,
+      {
+        path: "no-permission",
+        name: "error-403",
+        meta: {
+          isPublic: true,
+        },
+        component: () => import("./screens/AuthInsufficientPermission.vue"),
       },
-      component: () => import("./screens/AuthInsufficientPermission.vue"),
-    },
-  ],
-}];
+    ],
+  },
+];
 
 const router = new VueRouter({
   mode: "history",
@@ -114,6 +118,11 @@ const router = new VueRouter({
     ...AdminRoutes,
     ...AuthRoutes,
     ...UserProfileRoutes,
+    {
+      path: "*",
+      name: "not-found",
+      component: () => import("./screens/PageNotFound.vue"),
+    },
   ],
 });
 

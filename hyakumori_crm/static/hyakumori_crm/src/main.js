@@ -1,11 +1,12 @@
-import Vue from "vue";
+import { flattenDeep, intersection, uniq } from "lodash";
+
 import App from "./App.vue";
-import router from "./router";
-import i18n from "./plugins/i18n";
-import vuetify from "./plugins/vuetify";
+import Vue from "vue";
 import { createProvider } from "./plugins/vue-apollo";
+import i18n from "./plugins/i18n";
+import router from "./router";
 import store from "./store";
-import { intersection } from "lodash";
+import vuetify from "./plugins/vuetify";
 
 Vue.config.productionTip = false;
 
@@ -21,36 +22,41 @@ const has_scope = scope => {
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.isPublic)) {
-    next();
-  } else if (localStorage.getItem("accessToken") == null) {
-    next({
+    return next();
+  }
+
+  if (localStorage.getItem("accessToken") == null) {
+    return next({
       path: "/auth/login",
       params: { nextUrl: to.fullPath },
     });
-  } else {
-    if (to.matched.some(record => record.meta.isAdmin)) {
-      if (has_scope("admin")) {
-        next();
-      } else {
-        next({ name: "error-403" });
-      }
-    } else {
-      next();
-    }
+  }
 
-    if (
-      to.matched.some(
-        record =>
-          record.meta.scopes &&
-          record.meta.scopes.length > 0 &&
-          intersection(record.meta.scopes, get_scopes()).length > 0,
-      )
-    ) {
-      next();
+  if (to.matched.some(record => record.meta.isAdmin)) {
+    if (has_scope("admin")) {
+      return next();
     } else {
-      next({ name: "error-403" });
+      return next({ name: "error-403" });
     }
   }
+
+  if (
+    to.matched.some(
+      record => record.meta.scopes && record.meta.scopes.length > 0,
+    )
+  ) {
+    const scopes = uniq(
+      flattenDeep(to.matched.map(record => record.meta.scopes)),
+    );
+
+    if (intersection(scopes, get_scopes()).length > 0) {
+      return next();
+    } else {
+      return next({ name: "error-403" });
+    }
+  }
+
+  next();
 });
 
 new Vue({
