@@ -57,7 +57,7 @@
           @update="val => (isUpdate.contactors = val)"
         />
         <v-row class="mt-4">
-          <template v-for="(contactor, index) in getContactors">
+          <template v-for="(contactor, index) in forestContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
@@ -125,7 +125,7 @@
           @update="val => (isUpdate.family = val)"
         />
         <v-row class="mt-4">
-          <template v-for="(contactor, index) in getContactors">
+          <template v-for="(contactor, index) in familyContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
@@ -160,7 +160,7 @@
           @update="val => (isUpdate.otherRelated = val)"
         />
         <v-row class="mt-4">
-          <template v-for="(contactor, index) in getContactors">
+          <template v-for="(contactor, index) in otherContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
@@ -195,6 +195,7 @@
         />
         <v-row class="mt-4">
           <template v-for="(ownerF, index) in getOwnersForest">
+            // TODO: remove this
             <v-col cols="6" :key="index">
               <contact-card
                 mode="forest"
@@ -252,6 +253,7 @@ import AdditionButton from "../components/AdditionButton";
 import HistoryDiscussion from "../components/detail/HistoryDiscussionCard";
 import LogCard from "../components/detail/LogCard";
 import axios from "../plugins/http";
+import { filter } from "lodash";
 
 export default {
   mixins: [ScreenMixin],
@@ -285,10 +287,13 @@ export default {
       },
       customer: null,
       customerLoading: true,
-      forests: null,
+      forests: [],
       forestsLoading: true,
       contacts: null,
       contactLoading: true,
+      contacts: [],
+      contactLoading: true,
+      selectedForestId: null,
     };
   },
 
@@ -328,23 +333,41 @@ export default {
 
   computed: {
     getOwnersForest() {
+      // TODO: remove this
       return ownersForest;
     },
 
-    getContactors() {
-      return contactors;
+    forestContacts() {
+      if (!this.selectedForestId)
+        return filter(contacts, { attributes: { relationship_type: "本人" } });
+      return filter(contacts, { forest_id: this.selectedForestId });
+    },
+
+    familyContacts() {
+      return filter(
+        contacts,
+        () =>
+          attributes &&
+          !["本人", "その他"].includes(attributes.relationship_type),
+      );
+    },
+    otherContacts() {
+      return filter(contacts, { attributes: { relationship_type: "その他" } });
     },
 
     getDiscussionsNotExpand() {
+      // TODO: remove this
       const discuss = discussions.slice(0, 3);
       return discuss;
     },
 
     getDiscussionsExpand() {
+      // TODO: remove this
       return discussions;
     },
 
     getActionLogs() {
+      // TODO: remove this
       return actionLogs;
     },
 
