@@ -9,7 +9,7 @@
           @update="val => (isUpdate.basicInfo = val)"
         />
         <div class="my-4">
-          <customer-basic-info :isUpdate="isUpdate.basicInfo" />
+          <basic-info :infos="getBasicInfo" :isUpdate="isUpdate.basicInfo" />
           <update-button
             class="mt-n3 mb-12"
             v-if="isUpdate.basicInfo"
@@ -208,7 +208,7 @@
           :update="isUpdate.accountInfo"
           @update="val => (isUpdate.accountInfo = val)"
         />
-        <account-info :isUpdate="isUpdate.accountInfo" />
+        <basic-info :infos="getAccountInfo" :isUpdate="isUpdate.accountInfo" />
         <update-button
           v-if="isUpdate.accountInfo"
           :cancel="cancel.bind(this, 'accountInfo')"
@@ -233,8 +233,9 @@
 
 <script>
 import MainSection from "../components/MainSection";
+import ScreenMixin from "./ScreenMixin";
 import ContentHeader from "../components/detail/ContentHeader";
-import CustomerBasicInfo from "../components/detail/CustomerBasicInfo";
+import BasicInfo from "../components/detail/BasicInfo";
 import UpdateButton from "../components/detail/UpdateButton";
 import ownersForest from "../assets/dump/owners_forest_info.json";
 import contactors from "../assets/dump/contact_card.json";
@@ -243,26 +244,29 @@ import actionLogs from "../assets/dump/action_log.json";
 import ContactCard from "../components/detail/ContactCard";
 import AdditionButton from "../components/AdditionButton";
 import HistoryDiscussion from "../components/detail/HistoryDiscussionCard";
-import AccountInfo from "../components/detail/AccountInfo";
 import LogCard from "../components/detail/LogCard";
 
 export default {
   name: "forest-detail",
 
+  mixins: [ScreenMixin],
+
   components: {
     MainSection,
     ContentHeader,
-    CustomerBasicInfo,
+    BasicInfo,
     UpdateButton,
     ContactCard,
     AdditionButton,
     HistoryDiscussion,
-    AccountInfo,
     LogCard,
   },
 
   data() {
     return {
+      pageIcon: this.$t("icon.customer_icon"),
+      backBtnContent: this.$t("page_header.customer_list"),
+      headerTagColor: "#12C7A6",
       isExpand: false,
       isUpdate: {
         basicInfo: false,
@@ -275,6 +279,15 @@ export default {
         accountInfo: false,
       },
     };
+  },
+
+  mounted() {
+    const headerInfo = {
+      title: "山田 太郎",
+      subTitle: "4件の森林を所有",
+      tag: "登録済",
+    };
+    this.$store.dispatch("setHeaderInfo", headerInfo);
   },
 
   methods: {
@@ -307,6 +320,60 @@ export default {
 
     getActionLogs() {
       return actionLogs;
+    },
+
+    getBasicInfo() {
+      return [
+        {
+          label: "郵便番号",
+          value: "100-1111",
+        },
+        {
+          label: "住所",
+          value: "ヤマダタロウ",
+        },
+        {
+          label: "電話番号",
+          value: "04-2555-000",
+        },
+        {
+          label: "住所",
+          value: "ヤマダタロウ",
+        },
+        {
+          label: "郵便番号",
+          value: "100-1111",
+        },
+      ];
+    },
+
+    getAccountInfo() {
+      return [
+        {
+          label: "口座指定者",
+          value: "山田 花子",
+        },
+        {
+          label: "銀行名|検索",
+          value: "三井住友銀行",
+        },
+        {
+          label: "支店名|検索",
+          value: "424-0023",
+        },
+        {
+          label: "預金種類|選択式",
+          value: "岡山県倉敷市大谷4-1-3",
+        },
+        {
+          label: "口座番号",
+          value: "090-1242-2122",
+        },
+        {
+          label: "口座名義",
+          value: "03-1212-4131",
+        },
+      ];
     },
   },
 };
