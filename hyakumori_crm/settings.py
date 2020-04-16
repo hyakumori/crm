@@ -181,8 +181,8 @@ AUTHENTICATION_BACKENDS = (
 
 # Djoser
 DJOSER = {
-    "PASSWORD_RESET_CONFIRM_URL": "auth/reset_password/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL": "auth/reset_username/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "auth/reset-password/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL": "auth/reset-username/{uid}/{token}",
     "ACTIVATION_URL": "auth/activate/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": True,
     "SEND_CONFIRMATION_EMAIL": True,
@@ -192,7 +192,7 @@ DJOSER = {
         "user_create": "hyakumori_crm.users.serializers.UserCreateSerializer",
     },
     "PERMISSIONS": {
-        "user_list": ["rest_framework.permissions.IsAdminUser", ],
+        "user_list": ["rest_framework.permissions.IsAdminUser",],
         # "user": ["rest_framework.permissions.IsAuthenticated",],
     },
     "LOGIN_FIELD": "email",
@@ -221,7 +221,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated", ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
