@@ -191,10 +191,7 @@ DJOSER = {
         "current_user": "hyakumori_crm.users.serializers.UserSerializer",
         "user_create": "hyakumori_crm.users.serializers.UserCreateSerializer",
     },
-    "PERMISSIONS": {
-        "user_list": ["rest_framework.permissions.IsAdminUser",],
-        # "user": ["rest_framework.permissions.IsAuthenticated",],
-    },
+    "PERMISSIONS": {"user_list": ["rest_framework.permissions.IsAdminUser"]},
     "LOGIN_FIELD": "email",
     "HIDE_USERS": True,
 }
@@ -221,7 +218,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",

@@ -7,9 +7,10 @@
           editBtnContent="所有地を追加・編集"
           :update="isUpdate.basicInfo"
           @update="val => (isUpdate.basicInfo = val)"
+          :loading="customerLoading"
         />
         <div class="my-4">
-          <basic-info :infos="getBasicInfo" :isUpdate="isUpdate.basicInfo" />
+          <basic-info :infos="basicInfo" :isUpdate="isUpdate.basicInfo" />
           <update-button
             class="mt-n3 mb-12"
             v-if="isUpdate.basicInfo"
@@ -22,15 +23,18 @@
           editBtnContent="フォレストの追加/編集"
           :update="isUpdate.ownersForest"
           @update="val => (isUpdate.ownersForest = val)"
+          :loading="forestsLoading"
         />
         <v-row class="mt-4">
-          <template v-for="(ownerF, index) in getOwnersForest">
+          <template v-for="(forest, index) in forests">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="forest"
-                :title="ownerF.title"
-                :subTitle="ownerF.sub_title"
-                :address="ownerF.address"
+                :title="forest.internal_id"
+                :subTitle="`${forest.customers_count}人の所有者`"
+                :address="
+                  `${forest.cadastral.subsector} ${forest.cadastral.sector} ${forest.cadastral.municipality} ${forest.cadastral.prefecture}`
+                "
               />
             </v-col>
           </template>
@@ -187,6 +191,7 @@
           class="mt-12"
           content="顧客連絡者登録 森林"
           :displayAdditionBtn="false"
+          :loading="false"
         />
         <v-row class="mt-4">
           <template v-for="(ownerF, index) in getOwnersForest">
@@ -207,8 +212,9 @@
           editBtnContent="アカウント情報の追加/編集"
           :update="isUpdate.accountInfo"
           @update="val => (isUpdate.accountInfo = val)"
+          :loading="customerLoading"
         />
-        <basic-info :infos="getAccountInfo" :isUpdate="isUpdate.accountInfo" />
+        <basic-info :infos="bankingInfo" :isUpdate="isUpdate.accountInfo" />
         <update-button
           v-if="isUpdate.accountInfo"
           :cancel="cancel.bind(this, 'accountInfo')"
@@ -245,10 +251,9 @@ import ContactCard from "../components/detail/ContactCard";
 import AdditionButton from "../components/AdditionButton";
 import HistoryDiscussion from "../components/detail/HistoryDiscussionCard";
 import LogCard from "../components/detail/LogCard";
+import axios from "../plugins/http";
 
 export default {
-  name: "forest-detail",
-
   mixins: [ScreenMixin],
 
   components: {
@@ -261,7 +266,7 @@ export default {
     HistoryDiscussion,
     LogCard,
   },
-
+  props: ["id"],
   data() {
     return {
       pageIcon: this.$t("icon.customer_icon"),
@@ -278,6 +283,12 @@ export default {
         registrationForest: false,
         accountInfo: false,
       },
+      customer: null,
+      customerLoading: true,
+      forests: null,
+      forestsLoading: true,
+      contacts: null,
+      contactLoading: true,
     };
   },
 
@@ -288,6 +299,21 @@ export default {
       tag: "登録済",
     };
     this.$store.dispatch("setHeaderInfo", headerInfo);
+    axios.get(`/customers/${this.id}`).then(data => {
+      this.customer = data;
+      this.customerLoading = false;
+    });
+    axios.get(`/customers/${this.id}/forests`).then(async data => {
+      let forests = data.results;
+      let next = data.next;
+      while (!!next) {
+        let nextForests = await axios.get(data.next);
+        forests.push(...nextForests.results);
+        next = nextForests.next;
+      }
+      this.forests = forests;
+      this.forestsLoading = false;
+    });
   },
 
   methods: {
@@ -322,56 +348,68 @@ export default {
       return actionLogs;
     },
 
-    getBasicInfo() {
+    basicInfo() {
       return [
         {
-          label: "郵便番号",
-          value: "100-1111",
+          label: "fullname_kana",
+          value: this.customer
+            ? `${this.customer.self_contact.name_kana.last_name} ${this.customer.self_contact.name_kana.first_name}`
+            : "",
         },
         {
-          label: "住所",
-          value: "ヤマダタロウ",
+          label: "fullname_kanji",
+          value: this.customer
+            ? `${this.customer.self_contact.name_kanji.last_name} ${this.customer.self_contact.name_kanji.first_name}`
+            : "",
         },
         {
-          label: "電話番号",
-          value: "04-2555-000",
+          label: "postal_code",
+          value: this.customer ? this.customer.self_contact.postal_code : "",
         },
         {
-          label: "住所",
-          value: "ヤマダタロウ",
+          label: "address",
+          value: this.customer ? this.customer.self_contact.address.sector : "",
         },
         {
-          label: "郵便番号",
-          value: "100-1111",
+          label: "telephone",
+          value: this.customer ? this.customer.self_contact.telephone : "",
+        },
+        {
+          label: "mobilephone",
+          value: this.customer ? this.customer.self_contact.mobilephone : "",
+        },
+        {
+          label: "email",
+          value: this.customer ? this.customer.self_contact.email : "",
         },
       ];
     },
 
-    getAccountInfo() {
+    bankingInfo() {
       return [
         {
           label: "口座指定者",
-          value: "山田 花子",
+          value: "",
         },
         {
-          label: "銀行名|検索",
-          value: "三井住友銀行",
+          label: "銀行名",
+          value: this.customer ? this.customer.banking.bank_name : "",
         },
         {
-          label: "支店名|検索",
-          value: "424-0023",
+          label: "支店名",
+          value: this.customer ? this.customer.banking.branch_name : "",
         },
         {
-          label: "預金種類|選択式",
-          value: "岡山県倉敷市大谷4-1-3",
+          label: "預金種類",
+          value: this.customer ? this.customer.banking.account_type : "",
         },
         {
           label: "口座番号",
-          value: "090-1242-2122",
+          value: this.customer ? this.customer.banking.account_number : "",
         },
         {
           label: "口座名義",
-          value: "03-1212-4131",
+          value: this.customer ? this.customer.banking.account_name : "",
         },
       ];
     },
