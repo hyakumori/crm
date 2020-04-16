@@ -71,20 +71,3 @@ def set_forest_owner_contact(forest: Forest, forest_owner_contact_in: dict):
     customer.save(update_fields=["updated_at"])
     forest.save(update_fields=["updated_at"])
     return forest
-
-
-def delete_archives(forest: Forest, archive_pks_in: list):
-    pass
-
-
-# def get(pk):
-#     try:
-#         return Forest.objects.get(pk=pk)
-#     except (Forest.DoesNotExist, ValidationError):
-#         return None
-
-
-# def create(data):
-#     forest = Forest(**data)
-#     forest.save()
-#     return forest

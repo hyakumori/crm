@@ -11,5 +11,5 @@ def api_rf():
 @pytest.fixture()
 def admin_user():
     return User.objects.create_superuser(
-        email="admin@hyakumori.com", password="testp4sswrd"
+        email="admin@example.com", password="testp4sswrd"
     )
