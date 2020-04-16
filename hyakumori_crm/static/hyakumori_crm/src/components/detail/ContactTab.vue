@@ -15,15 +15,16 @@
     <v-tab-item>
       <v-row>
         <template v-for="(contact, index) in ownerContacts">
-          <v-col :key="index">
+          <v-col cols="6" :key="index">
             <contact-card
               mode="customer"
-              :title="contact.name"
+              :customer_id="contact.customer_id"
+              :title="contact.title"
               :address="contact.address"
               :email="contact.email"
               :subTitle="contact.forest_count"
               :phone="contact.phone"
-              :cellphone="contact.cell_phone"
+              :cellphone="contact.cellphone"
               :isOwner="true"
               :isUpdate="isUpdate"
             />
@@ -35,15 +36,16 @@
     <v-tab-item>
       <v-row>
         <template v-for="(contact, index) in contactorContacts">
-          <v-col :key="index">
+          <v-col cols="6" :key="index">
             <contact-card
               mode="customer"
-              :title="contact.name"
+              :customer_id="contact.customer_id"
+              :title="contact.title"
               :address="contact.address"
               :email="contact.email"
               :subTitle="contact.forest_count"
               :phone="contact.phone"
-              :cellphone="contact.cell_phone"
+              :cellphone="contact.cellphone"
               :isContactor="true"
               :isUpdate="isUpdate"
             />

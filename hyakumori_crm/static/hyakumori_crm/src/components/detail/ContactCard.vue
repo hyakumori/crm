@@ -71,6 +71,7 @@ export default {
 
   props: {
     mode: String,
+    customer_id: String,
     title: String,
     subTitle: String,
     address: String,
