@@ -42,7 +42,7 @@ const AdminRoutes = [
         path: ":id",
         name: "user-management-detail",
         meta: {
-          title: "page_header.user_list",
+          title: "page_header.user_detail",
           isPublic: false,
           isAdmin: true,
         },
@@ -141,7 +141,7 @@ const router = new VueRouter({
           name: "forest-detail",
           component: ForestDetail,
           meta: {
-            title: "page_header.forest_list",
+            title: "page_header.forest_detail",
             isPublic: false,
             scopes: ["manage_forest", "view_forest", "admin"],
           },
@@ -161,7 +161,7 @@ const router = new VueRouter({
           name: "customer-detail",
           component: CustomerDetail,
           meta: {
-            title: "page_header.customer_list",
+            title: "page_header.customer_detail",
             isPublic: false,
             scopes: ["manage_customer", "view_customer", "admin"],
           },
@@ -181,7 +181,7 @@ const router = new VueRouter({
           name: "archive-detail",
           component: ArchiveDetail,
           meta: {
-            title: "page_header.archive_list",
+            title: "page_header.archive_detail",
             isPublic: false,
             scopes: ["manage_archive", "view_archive", "admin"],
           },

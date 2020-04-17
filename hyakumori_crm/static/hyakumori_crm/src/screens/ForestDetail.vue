@@ -164,7 +164,7 @@ export default {
       forestInfo: null,
       forestOwners: null,
       pageIcon: this.$t("icon.forest_icon"),
-      backBtnContent: this.$t("page_header.forest_list"),
+      backBtnContent: this.$t("page_header.forest_mgmt"),
       headerTagColor: "#FFC83B",
       isExpand: false,
       isUpdate: {

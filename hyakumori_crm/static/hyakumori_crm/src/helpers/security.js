@@ -4,7 +4,7 @@ const getScopes = () => {
 };
 
 const hasScope = scope => {
-  return getScopes().findIndex(scope) !== -1;
+  return getScopes().indexOf(scope) !== -1;
 };
 
 const isLoggedIn = () => {

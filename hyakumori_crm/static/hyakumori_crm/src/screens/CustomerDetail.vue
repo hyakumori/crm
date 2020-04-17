@@ -284,7 +284,7 @@ export default {
   data() {
     return {
       pageIcon: this.$t("icon.customer_icon"),
-      backBtnContent: this.$t("page_header.customer_list"),
+      backBtnContent: this.$t("page_header.customer_mgmt"),
       headerTagColor: "#12C7A6",
       isExpand: false,
       isUpdate: {

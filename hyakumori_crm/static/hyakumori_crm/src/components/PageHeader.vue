@@ -22,32 +22,28 @@
 
           <div class="menu caption pa-7">
             <router-link to="/forests">{{
-              $t("page_header.forest_info_list")
+              $t("page_header.forest_mgmt")
             }}</router-link>
 
             <router-link to="/customers" class="ml-4 mr-4">{{
-              $t("page_header.customer_list")
+              $t("page_header.customer_mgmt")
             }}</router-link>
 
             <router-link to="/archives" class="mr-4">{{
-              $t("page_header.archive_list")
+              $t("page_header.archive_mgmt")
             }}</router-link>
 
-            <router-link to="/settings" class="mr-4">{{
-              $t("page_header.setting")
-            }}</router-link>
-
-            <router-link to="/settings" class="mr-4">{{
+            <router-link to="/users" class="mr-4">{{
               $t("page_header.user_mgmt")
             }}</router-link>
 
             <router-link to="/me" class="me">
               <v-icon class="white--text">mdi-account-circle</v-icon>
-              {{ user && user.username }}
+              {{ userDisplayName }}
             </router-link>
 
-            <router-link to="/auth/logout" class="mr-4">
-              | {{ $t("page_header.logout") }}
+            <router-link to="/auth/logout" class="ml-2">
+              <span class="mr-2">|</span> {{ $t("page_header.logout") }}
             </router-link>
           </div>
         </div>
@@ -145,9 +141,21 @@ export default {
     headerTagColor() {
       return this.$store.state.headerTagColor;
     },
+
+    userDisplayName() {
+      if (!this.user || Object.keys(this.user).length == 0) {
+        return "";
+      }
+
+      if (this.user.first_name.length > 0 && this.user.last_name.length > 0) {
+        return `${this.user.last_name}\u3000${this.user.first_name}`;
+      }
+
+      return this.user.username;
+    },
   },
 
-  mounted() {
+  created() {
     try {
       this.user =
         localStorage.getItem("user") &&
