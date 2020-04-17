@@ -62,8 +62,9 @@
                   color="primary"
                   depressed
                   width="100%"
+                  :loading="loading"
                   @click="onSubmit"
-                  :disabled="invalid"
+                  :disabled="invalid || loading"
                   >{{ $t("page_header.login") }}
                 </v-btn>
               </v-col>
@@ -91,6 +92,7 @@ export default {
         password: "",
       },
       formError: "",
+      loading: false,
       success: false,
     };
   },
@@ -125,6 +127,8 @@ export default {
 
         if (response) {
           const { access, refresh } = response;
+          this.loading = true;
+
           localStorage.setItem("accessToken", access);
           localStorage.setItem("refreshToken", refresh);
 
@@ -132,11 +136,18 @@ export default {
 
           this.success = true;
           this.formError = "";
-          this.$router.replace("/");
+
+          setTimeout(() => {
+            this.loading = false;
+            this.$router.replace("/");
+          }, 500);
         }
       } catch (e) {
         this.formError = this.$t("login_form.errors.auth_failed");
         this.success = false;
+        setTimeout(() => {
+          this.loading = false;
+        }, 500);
       }
     },
   },

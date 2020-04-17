@@ -68,9 +68,10 @@
                 <v-icon class="icon-mode">{{ $store.state.pageIcon }}</v-icon>
                 <div class="white--text body-2 pl-2">
                   <p class="mb-0">
-                    {{ headerInfo.title }}<span
+                    {{ headerInfo.title
+                    }}<span
                       class="tag"
-                      :class="{'px-2 py-1': headerInfo.title}"
+                      :class="{ 'px-2 py-1': headerInfo.title }"
                       :style="{ backgroundColor: headerTagColor }"
                       >{{ headerInfo.tag }}</span
                     >
@@ -148,7 +149,7 @@ export default {
       }
 
       if (this.user.first_name.length > 0 && this.user.last_name.length > 0) {
-        return `${this.user.last_name}\u3000${this.user.first_name}`;
+        return `${this.user.last_name} ${this.user.first_name}`;
       }
 
       return this.user.username;

@@ -160,6 +160,7 @@ const router = new VueRouter({
           path: "/customers/:id",
           name: "customer-detail",
           component: CustomerDetail,
+          props: true,
           meta: {
             title: "page_header.customer_detail",
             isPublic: false,
