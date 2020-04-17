@@ -21,21 +21,21 @@
           </div>
 
           <div class="menu caption pa-7">
-            <router-link to="/forests">{{
-              $t("page_header.forest_info_list")
-            }}</router-link>
+            <router-link to="/forests">
+              {{ $t("page_header.forest_info_list") }}
+            </router-link>
 
-            <router-link to="/customers" class="ml-4 mr-4">{{
-              $t("page_header.customer_list")
-            }}</router-link>
+            <router-link to="/customers" class="ml-4 mr-4">
+              {{ $t("page_header.customer_list") }}
+            </router-link>
 
-            <router-link to="/archives" class="mr-4">{{
-              $t("page_header.archive_list")
-            }}</router-link>
+            <router-link to="/archives" class="mr-4">
+              {{ $t("page_header.archive_list") }}
+            </router-link>
 
-            <router-link to="/settings">{{
-              $t("page_header.setting")
-            }}</router-link>
+            <router-link to="/settings">
+              {{ $t("page_header.setting") }}
+            </router-link>
           </div>
         </div>
 
@@ -52,30 +52,34 @@
                 color="white"
                 small
                 @click="onBack"
-                ><v-icon small>mdi-arrow-left</v-icon
-                >{{ $store.state.backBtnContent }}</v-btn
               >
+                <v-icon small>mdi-arrow-left</v-icon>
+                {{ $store.state.backBtnContent }}
+              </v-btn>
               <div class="d-flex align-center">
                 <v-icon class="icon-mode">{{ $store.state.pageIcon }}</v-icon>
-                <div class="white--text body-2 pl-2">
-                  <p class="mb-0">
-                    {{ headerInfo.title }}<span
+                <div class="white--text page-header__detail__data">
+                  <p class="mb-0 page-header__detail__data__title">
+                    {{ headerInfo.title }}
+                    <span
                       class="tag"
-                      :class="{'px-2 py-1': headerInfo.title}"
+                      :class="{ 'px-2': headerInfo.title }"
                       :style="{ backgroundColor: headerTagColor }"
                       >{{ headerInfo.tag }}</span
                     >
                   </p>
-                  <p class="mb-0 caption">{{ headerInfo.subTitle }}</p>
+                  <p class="mb-0 page-header__detail__data__sub-title">
+                    {{ headerInfo.subTitle }}
+                  </p>
                 </div>
               </div>
             </div>
             <template v-else>
               <v-icon class="icon-mode">{{ $store.state.pageIcon }}</v-icon>
             </template>
-            <span v-if="!isDetail" class="ml-3 white--text">{{
-              $store.state.pageHeader
-            }}</span>
+            <span v-if="!isDetail" class="ml-3 white--text">
+              {{ $store.state.pageHeader }}
+            </span>
           </div>
           <outline-round-btn
             class="align-self-center"
@@ -164,6 +168,7 @@ export default {
 
       .btn-back {
         width: fit-content;
+        font-size: 14px;
       }
 
       .icon-mode {
@@ -175,12 +180,31 @@ export default {
       }
 
       .tag {
+        position: absolute;
+        height: 20px;
+        width: fit-content;
         font-size: 10px;
-        font-weight: bold;
         border-radius: 2px;
-        margin-left: 8px;
-        margin-bottom: -4px;
+        margin-left: 9px;
+        font-weight: bold;
       }
+    }
+  }
+
+  &__detail__data {
+    height: 40px;
+    padding-left: 9px;
+
+    &__title {
+      position: relative;
+      font-size: 20px;
+      line-height: 20px;
+    }
+
+    &__sub-title {
+      font-size: 14px;
+      line-height: 14px;
+      margin-top: 5px;
     }
   }
 }
