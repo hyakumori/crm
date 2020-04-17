@@ -350,6 +350,9 @@ export default {
     cancel(val) {
       this.isUpdate[val] = false;
     },
+    getPersonFullname(nameObj) {
+      return nameObj ? `${nameObj.last_name}\u3000${nameObj.first_name}` : "";
+    },
   },
 
   computed: {
@@ -402,36 +405,32 @@ export default {
     basicInfo() {
       return [
         {
-          label: this.$t("forms.labels.customer.fullname_kana"),
-          value: this.customer
-            ? `${this.customer.self_contact.name_kana.last_name} ${this.customer.self_contact.name_kana.first_name}`
-            : "",
+          label: this.$t("forms.labels.customer.fullname_kanji"),
+          value: this.getPersonFullname(this.customer?.self_contact.name_kanji),
         },
         {
-          label: this.$t("forms.labels.customer.fullname_kanji"),
-          value: this.customer
-            ? `${this.customer.self_contact.name_kanji.last_name} ${this.customer.self_contact.name_kanji.first_name}`
-            : "",
+          label: this.$t("forms.labels.customer.fullname_kana"),
+          value: this.getPersonFullname(this.customer?.self_contact.name_kana),
         },
         {
           label: this.$t("forms.labels.customer.postal_code"),
-          value: this.customer ? this.customer.self_contact.postal_code : "",
+          value: this.customer?.self_contact.postal_code || "",
         },
         {
           label: this.$t("forms.labels.address"),
-          value: this.customer ? this.customer.self_contact.address.sector : "",
+          value: this.customer?.self_contact.address.sector || "",
         },
         {
           label: this.$t("forms.labels.customer.phone_number"),
-          value: this.customer ? this.customer.self_contact.telephone : "",
+          value: this.customer?.self_contact.telephone || "",
         },
         {
           label: this.$t("forms.labels.customer.mobile_number"),
-          value: this.customer ? this.customer.self_contact.mobilephone : "",
+          value: this.customer?.self_contact.mobilephone || "",
         },
         {
           label: this.$t("forms.labels.email"),
-          value: this.customer ? this.customer.self_contact.email : "",
+          value: this.customer?.self_contact.email || "",
         },
       ];
     },
