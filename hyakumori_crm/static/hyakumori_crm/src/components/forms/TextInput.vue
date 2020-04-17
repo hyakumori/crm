@@ -11,6 +11,7 @@
       single-line
       dense
       outlined
+      height="45"
       :hide-details="hideDetails"
       :type="type"
       :placeholder="placeholder"
