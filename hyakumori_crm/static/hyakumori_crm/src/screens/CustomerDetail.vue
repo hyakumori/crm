@@ -444,23 +444,23 @@ export default {
         },
         {
           label: "銀行名",
-          value: this.customer ? this.customer.banking.bank_name : "",
+          value: this.customer?.banking?.bank_name || "",
         },
         {
           label: "支店名",
-          value: this.customer ? this.customer.banking.branch_name : "",
+          value: this.customer?.banking?.branch_name || "",
         },
         {
           label: "預金種類",
-          value: this.customer ? this.customer.banking.account_type : "",
+          value: this.customer?.banking?.account_type || "",
         },
         {
           label: "口座番号",
-          value: this.customer ? this.customer.banking.account_number : "",
+          value: this.customer?.banking?.account_number || "",
         },
         {
           label: "口座名義",
-          value: this.customer ? this.customer.banking.account_name : "",
+          value: this.customer?.banking?.account_name || "",
         },
       ];
     },
