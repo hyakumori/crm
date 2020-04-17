@@ -20,7 +20,7 @@
               <text-input
                 v-model="form.email"
                 placeholder="abc@example.com"
-                hideDetails
+                hideDetails="auto"
                 name="login_form.email"
               />
             </v-col>

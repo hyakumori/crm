@@ -15,7 +15,8 @@
               <text-input
                 v-model="form.email"
                 placeholder="abc@example.com"
-                hideDetails
+                rules="required|email"
+                type="email"
                 name="login_form.email"
               />
             </v-col>
@@ -31,10 +32,11 @@
                 </router-link>
               </div>
               <text-input
-                v-model="form.email"
-                hideDetails
-                placeholder="●●●●●●●●"
-                name="login_form.email"
+                type="password"
+                v-model="form.password"
+                rules="required|min:8"
+                placeholder=" ◍ ◍ ◍ ◍ ◍ ◍ ◍ ◍ "
+                name="login_form.password"
               />
             </v-col>
           </v-row>

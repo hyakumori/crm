@@ -15,13 +15,14 @@
       :hide-details="hideDetails"
       :type="type"
       :placeholder="placeholder"
-      :error-messages="errors"
+      :error-messages="errors[0]"
     ></v-text-field>
   </ValidationProvider>
 </template>
 
 <script>
 import { ValidationProvider } from "vee-validate";
+
 export default {
   name: "text-input",
   components: {
@@ -49,8 +50,8 @@ export default {
       default: "",
     },
     hideDetails: {
-      type: Boolean,
-      default: false,
+      type: [String, Boolean],
+      default: "auto",
     },
     type: {
       type: String,
