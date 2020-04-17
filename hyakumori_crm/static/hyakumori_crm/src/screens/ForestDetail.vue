@@ -5,11 +5,12 @@
         <content-header
           content="基本情報 (登記情報)"
           editBtnContent="所有地を追加・編集"
+          :loading="basicInfo.length === 0"
           :update="isUpdate.basicInfo"
           @update="val => (isUpdate.basicInfo = val)"
         />
         <div class="my-4">
-          <basic-info :infos="getBasicInfo" :isUpdate="isUpdate.basicInfo" />
+          <basic-info :infos="basicInfo" :isUpdate="isUpdate.basicInfo" />
           <update-button
             class="mb-12"
             v-if="isUpdate.basicInfo"
@@ -20,12 +21,13 @@
         <content-header
           content="所有林情報"
           editBtnContent="所有者を追加・編集"
+          :loading="ownerContacts.length === 0"
           :update="isUpdate.contact"
           @update="val => (isUpdate.contact = val)"
         />
         <contact-tab
           class="mt-5"
-          :class="{ 'mb-9': !isUpdate.contact }"
+          :class="{ 'mb-10': !isUpdate.contact }"
           :ownerContacts="ownerContacts"
           :isUpdate="isUpdate.contact"
         />
@@ -106,7 +108,10 @@
             </v-col>
           </template>
         </v-row>
-        <forest-attribute-table :attributes="generateForestAttributeData" />
+        <forest-attribute-table
+          :attributes="forrestAttributes"
+          :isLoading="forrestAttributes.length === 0"
+        />
       </div>
     </template>
 
@@ -230,12 +235,21 @@ export default {
         mode: "customer",
         contact_id: info.id,
         customer_id: info.customer_id,
-        title: info.name_kanji.first_name + info.name_kanji.last_name,
+        title:
+          this.fallbackText(info.name_kanji.first_name) +
+          this.fallbackText(info.name_kanji.last_name),
         phone: info.telephone,
         cellphone: info.mobilephone,
-        address: `${info.postal_code} ${addr.prefecture}${addr.municipality}${addr.sector}`,
+        address: `${this.fallbackText(info.postal_code)} 
+          ${this.fallbackText(addr.prefecture)}
+          ${this.fallbackText(addr.municipality)}
+          ${this.fallbackText(addr.sector)}`,
         email: info.email,
       };
+    },
+
+    fallbackText(text) {
+      return text || "";
     },
   },
 
@@ -257,7 +271,7 @@ export default {
       return discussions;
     },
 
-    getBasicInfo() {
+    basicInfo() {
       let basicInfo = [];
       const forestInfo = this.forestInfo;
       if (forestInfo) {
@@ -311,8 +325,8 @@ export default {
       return headerData;
     },
 
-    generateForestAttributeData() {
-      let attributes;
+    forrestAttributes() {
+      let attributes = [];
       const forestInfo = this.forestInfo;
       if (forestInfo) {
         const attr = forestInfo.forest_attributes;
