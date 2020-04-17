@@ -1,3 +1,4 @@
+from django.db.models import F
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -29,7 +30,7 @@ class CustomerViewSets(viewsets.ModelViewSet):
             request=request,
             queryset=Contact.objects.filter(
                 customercontact__customer_id=obj.id, customercontact__is_basic=False
-            ),
+            ).annotate(forest_id=F("forestcustomer__forest_id")),
             view=self,
         )
 

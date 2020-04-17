@@ -1,9 +1,11 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, UUIDField
 
 from ..models import Customer, Contact, Forest
 
 
 class ContactSerializer(ModelSerializer):
+    forest_id = UUIDField(read_only=True)
+
     class Meta:
         model = Contact
         exclude = ["contact_info", "deleted"]

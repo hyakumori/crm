@@ -55,18 +55,23 @@
           editBtnContent="連絡者を追加・編集"
           :update="isUpdate.contactors"
           @update="val => (isUpdate.contactors = val)"
+          :loading="contactsLoading"
         />
         <v-row class="mt-4">
           <template v-for="(contactor, index) in forestContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
-                :title="contactor.name"
-                :address="contactor.address"
+                :title="
+                  `${contactor.name_kanji.last_name} ${contactor.name_kanji.first_name}`
+                "
+                :address="
+                  `${contactor.postal_code} ${contactor.address.sector}`
+                "
                 :email="contactor.email"
-                :subTitle="contactor.forest_count"
-                :phone="contactor.phone"
-                :cellphone="contactor.cell_phone"
+                subTitle=""
+                :phone="contactor.telephone"
+                :cellphone="contactor.mobilephone"
                 :isUpdate="isUpdate.contactors"
                 :isCustomer="true"
               />
@@ -89,6 +94,7 @@
           editBtnContent="家族を追加・編集"
           :update="isUpdate.archive"
           @update="val => (isUpdate.archive = val)"
+          :loading="false"
         />
         <template v-if="isExpand">
           <history-discussion
@@ -123,20 +129,24 @@
           editBtnContent="連絡者を追加・編集"
           :update="isUpdate.family"
           @update="val => (isUpdate.family = val)"
+          :loading="contactsLoading"
         />
         <v-row class="mt-4">
           <template v-for="(contactor, index) in familyContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
-                :title="contactor.name"
-                :address="contactor.address"
+                :title="
+                  `${contactor.name_kanji.last_name} ${contactor.name_kanji.first_name}`
+                "
+                :address="
+                  `${contactor.postal_code} ${contactor.address.sector}`
+                "
                 :email="contactor.email"
-                :subTitle="contactor.forest_count"
-                :phone="contactor.phone"
-                :relationship="contactor.relationship"
-                :cellphone="contactor.cell_phone"
-                :isUpdate="isUpdate.family"
+                subTitle=""
+                :phone="contactor.telephone"
+                :cellphone="contactor.mobilephone"
+                :isUpdate="isUpdate.contactors"
                 :isCustomer="true"
               />
             </v-col>
@@ -158,20 +168,24 @@
           editBtnContent="その他関係者を追加・編集"
           :update="isUpdate.otherRelated"
           @update="val => (isUpdate.otherRelated = val)"
+          :loading="contactsLoading"
         />
         <v-row class="mt-4">
           <template v-for="(contactor, index) in otherContacts">
             <v-col cols="6" :key="index">
               <contact-card
                 mode="customer"
-                :title="contactor.name"
-                :address="contactor.address"
+                :title="
+                  `${contactor.name_kanji.last_name} ${contactor.name_kanji.first_name}`
+                "
+                :address="
+                  `${contactor.postal_code} ${contactor.address.sector}`
+                "
                 :email="contactor.email"
-                :subTitle="contactor.forest_count"
-                :phone="contactor.phone"
-                :relationship="contactor.relationship"
-                :cellphone="contactor.cell_phone"
-                :isUpdate="isUpdate.otherRelated"
+                subTitle=""
+                :phone="contactor.telephone"
+                :cellphone="contactor.mobilephone"
+                :isUpdate="isUpdate.contactors"
                 :isCustomer="true"
               />
             </v-col>
@@ -195,7 +209,6 @@
         />
         <v-row class="mt-4">
           <template v-for="(ownerF, index) in getOwnersForest">
-            // TODO: remove this
             <v-col cols="6" :key="index">
               <contact-card
                 mode="forest"
@@ -245,7 +258,6 @@ import ContentHeader from "../components/detail/ContentHeader";
 import BasicInfo from "../components/detail/BasicInfo";
 import UpdateButton from "../components/detail/UpdateButton";
 import ownersForest from "../assets/dump/owners_forest_info.json";
-import contactors from "../assets/dump/contact_card.json";
 import discussions from "../assets/dump/history_discussion.json";
 import actionLogs from "../assets/dump/action_log.json";
 import ContactCard from "../components/detail/ContactCard";
@@ -289,10 +301,8 @@ export default {
       customerLoading: true,
       forests: [],
       forestsLoading: true,
-      contacts: null,
-      contactLoading: true,
       contacts: [],
-      contactLoading: true,
+      contactsLoading: true,
       selectedForestId: null,
     };
   },
@@ -319,6 +329,17 @@ export default {
       this.forests = forests;
       this.forestsLoading = false;
     });
+    axios.get(`/customers/${this.id}/contacts`).then(async data => {
+      let contacts = data.results;
+      let next = data.next;
+      while (!!next) {
+        let nextContacts = await axios.get(data.next);
+        contacts.push(...nextContacts.results);
+        next = nextContacts.next;
+      }
+      this.contacts = contacts;
+      this.contactsLoading = false;
+    });
   },
 
   methods: {
@@ -339,20 +360,27 @@ export default {
 
     forestContacts() {
       if (!this.selectedForestId)
-        return filter(contacts, { attributes: { relationship_type: "本人" } });
-      return filter(contacts, { forest_id: this.selectedForestId });
+        return filter(
+          this.contacts,
+          c =>
+            c.forest_id ||
+            (c.attributes && c.attributes.relationship_type === "本人"),
+        );
+      return filter(this.contacts, { forest_id: this.selectedForestId });
     },
 
     familyContacts() {
       return filter(
-        contacts,
+        this.contacts,
         () =>
           attributes &&
           !["本人", "その他"].includes(attributes.relationship_type),
       );
     },
     otherContacts() {
-      return filter(contacts, { attributes: { relationship_type: "その他" } });
+      return filter(this.contacts, {
+        attributes: { relationship_type: "その他" },
+      });
     },
 
     getDiscussionsNotExpand() {
@@ -374,35 +402,35 @@ export default {
     basicInfo() {
       return [
         {
-          label: "fullname_kana",
+          label: this.$t("forms.labels.customer.fullname_kana"),
           value: this.customer
             ? `${this.customer.self_contact.name_kana.last_name} ${this.customer.self_contact.name_kana.first_name}`
             : "",
         },
         {
-          label: "fullname_kanji",
+          label: this.$t("forms.labels.customer.fullname_kanji"),
           value: this.customer
             ? `${this.customer.self_contact.name_kanji.last_name} ${this.customer.self_contact.name_kanji.first_name}`
             : "",
         },
         {
-          label: "postal_code",
+          label: this.$t("forms.labels.customer.postal_code"),
           value: this.customer ? this.customer.self_contact.postal_code : "",
         },
         {
-          label: "address",
+          label: this.$t("forms.labels.address"),
           value: this.customer ? this.customer.self_contact.address.sector : "",
         },
         {
-          label: "telephone",
+          label: this.$t("forms.labels.customer.phone_number"),
           value: this.customer ? this.customer.self_contact.telephone : "",
         },
         {
-          label: "mobilephone",
+          label: this.$t("forms.labels.customer.mobile_number"),
           value: this.customer ? this.customer.self_contact.mobilephone : "",
         },
         {
-          label: "email",
+          label: this.$t("forms.labels.email"),
           value: this.customer ? this.customer.self_contact.email : "",
         },
       ];
