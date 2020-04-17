@@ -7,8 +7,6 @@ import jpValidationMessages from "vee-validate/dist/locale/ja.json";
 
 Vue.use(VueI18n);
 
-console.log(jpValidationMessages);
-
 const messages = {
   jp: {
     ...jpMessages,

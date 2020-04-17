@@ -10,21 +10,34 @@
           <v-container fluid class="pa-0">
             <v-row no-gutters>
               <p class="grey--text text--darken-3">
-                {{ $t("messages.forgot_password_help_text") }}
+                {{ $t("messages.reset_password_confirm_help_text") }}
               </p>
             </v-row>
             <v-row no-gutters>
               <v-col cols="12">
                 <label class="font-weight-bold">{{
-                  $t("login_form.email")
+                  $t("reset_password_form.new_password")
                 }}</label>
                 <text-input
-                  v-model="form.email"
-                  placeholder="abc@example.com"
-                  hideDetails="auto"
-                  name="login_form.email"
-                  type="email"
-                  rules="required|email"
+                  type="password"
+                  v-model="form.password"
+                  rules="required|min:8"
+                  placeholder=" ◍ ◍ ◍ ◍ ◍ ◍ ◍ ◍ "
+                  name="reset_password_form.new_password"
+                />
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="mt-4">
+              <v-col cols="12" class="relative">
+                <label class="font-weight-bold">
+                  {{ $t("reset_password_form.new_password_retype") }}
+                </label>
+                <text-input
+                  type="password"
+                  v-model="form.password_retype"
+                  rules="required|min:8|password:@reset_password_form.new_password"
+                  placeholder=" ◍ ◍ ◍ ◍ ◍ ◍ ◍ ◍ "
+                  name="reset_password_form.new_password_retype"
                 />
               </v-col>
             </v-row>
@@ -38,18 +51,14 @@
                 <v-btn
                   color="primary"
                   depressed
-                  width="100%"
                   @click="onSubmit"
+                  width="100%"
                   :disabled="invalid"
                   >{{ $t("buttons.send") }}
                 </v-btn>
               </v-col>
             </v-row>
-            <v-row>
-              <div class="message ma-3 mb-0" v-if="mailSent">
-                {{ $t("messages.reset_password_url_sent") }}
-              </div>
-            </v-row>
+
             <v-row>
               <router-link
                 class="no-underline f14 pa-4 pt-6 pb-0"
@@ -66,7 +75,7 @@
 </template>
 
 <script>
-import { ValidationObserver } from "vee-validate";
+import { ValidationObserver, extend } from "vee-validate";
 import TextInput from "../forms/TextInput";
 
 export default {
@@ -77,29 +86,36 @@ export default {
   data() {
     return {
       form: {
-        email: "",
+        password: "",
+        password_retype: "",
       },
       formError: "",
+      showPassword: false,
       success: false,
     };
   },
   methods: {
     onSubmit() {},
   },
-  computed: {
-    mailSent: function() {
-      return this.success;
-    },
+  created() {
+    extend("password", {
+      params: ["target"],
+      validate(value, { target }) {
+        return value === target;
+      },
+      message: this.$t("reset_password_form.password_not_match"),
+    });
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.message {
-  border-radius: 4px;
-  padding: 15px 20px;
-  font-size: 14px;
-  background: #f5f5f5;
-  color: #444444;
+.forgot-password-hint {
+  position: absolute;
+  right: 0;
+  top: 0;
+  a {
+    text-decoration: none !important;
+  }
 }
 </style>

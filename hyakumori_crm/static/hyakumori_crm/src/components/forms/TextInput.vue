@@ -3,6 +3,7 @@
     :vid="vid"
     :rules="rules"
     :name="name || label"
+    mode="aggressive"
     v-slot="{ errors }"
     slim
   >

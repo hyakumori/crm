@@ -33,9 +33,22 @@
               $t("page_header.archive_list")
             }}</router-link>
 
-            <router-link to="/settings">{{
+            <router-link to="/settings" class="mr-4">{{
               $t("page_header.setting")
             }}</router-link>
+
+            <router-link to="/settings" class="mr-4">{{
+              $t("page_header.user_mgmt")
+            }}</router-link>
+
+            <router-link to="/me" class="me">
+              <v-icon class="white--text">mdi-account-circle</v-icon>
+              {{ user && user.username }}
+            </router-link>
+
+            <router-link to="/auth/logout" class="mr-4">
+              | {{ $t("page_header.logout") }}
+            </router-link>
           </div>
         </div>
 
@@ -104,6 +117,12 @@ export default {
     OutlineRoundBtn,
   },
 
+  data() {
+    return {
+      user: null,
+    };
+  },
+
   methods: {
     onBack() {
       this.$router.go(-1);
@@ -126,6 +145,16 @@ export default {
     headerTagColor() {
       return this.$store.state.headerTagColor;
     },
+  },
+
+  mounted() {
+    try {
+      this.user =
+        localStorage.getItem("user") &&
+        JSON.parse(localStorage.getItem("user"));
+    } catch {
+      this.user = null;
+    }
   },
 };
 </script>

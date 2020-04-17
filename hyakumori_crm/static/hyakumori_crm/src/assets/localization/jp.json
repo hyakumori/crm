@@ -6,7 +6,7 @@
     "save": "保存",
     "login": "ログイン",
     "send": "送信",
-    "back": "ログイン画面に戻る"
+    "back": "立ち返る"
   },
   "detail": {
     "tabs": {
@@ -70,14 +70,11 @@
     "activation_guide": "An activation email will be sent to your registered email address.</br> Click the URL in the email to complete registration.",
     "email": "メールアドレス",
     "errors": {
-      "auth_failed": "Authentication failed! Please try again.",
-      "passwords_do_not_match": "Passwords do not match",
-      "please_accept_terms_of_service": "Please accept term of service before continueing"
+      "auth_failed": "入力した認証情報でログインできませんでした"
     },
     "forgot_password_hint": "パスワードを忘れた方はこちら",
-    "go_to_login": "Go to login",
+    "go_to_login": "ログイン画面に戻る",
     "go_to_register": "Don't have an account?",
-    "invalid_password_min_length": "Please enter at least {minLength} characters",
     "password": "パスワード",
     "password_confirmation": "Password confirmation",
     "please_login": "Please login to continue",
@@ -89,10 +86,18 @@
     "username": "Username",
     "validation_match_error": "The username and password you entered don't match"
   },
+  "reset_password_form": {
+    "new_password": "新しいパスワード",
+    "new_password_retype": "新しいパスワード（確認）",
+    "password_not_match": "パスワードの確認が一致しません"
+  },
   "messages": {
     "no_permission": "分な許可がありません",
     "forgot_password_help_text": "パスワードを再発行するには、メールアドレスを入力し、届いたメールのURLをクリックしてください",
-    "reset_password_url_sent": "再発行用のURLをご登録のメールアドレス宛てに送信しました。"
+    "reset_password_url_sent": "再発行用のURLをご登録のメールアドレス宛てに送信しました。",
+    "reset_password_confirm_help_text": "パスワードを再発行するには、新しいパスワードを2ド入力してください。",
+    "not_found_text": "そのページは見つかりませんでした",
+    "logging_out": "あなたをログアウト. . ."
   },
   "page_header": {
     "archive_list": "交渉履歴一覧",
@@ -103,11 +108,14 @@
     "forest_info_list": "森林情報一覧",
     "forest_list": "森林一覧",
     "forest_mgmt": "森林管理",
+    "user_mgmt": "ユーザー管理",
     "forgot_password": "パスワードの再発行",
     "login": "ログイン",
     "negotiate_mgm": "ユーザー管理",
     "no_permission": "十無許可",
-    "setting": "設定"
+    "setting": "設定",
+    "not_found": "見つかりません",
+    "logout": "ログアウト"
   },
   "raw_text": {
     "agree": "同意する",

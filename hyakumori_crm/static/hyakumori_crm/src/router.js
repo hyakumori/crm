@@ -8,7 +8,6 @@ import ForestDetail from "./screens/ForestDetail";
 import MainLayout from "./layouts/MainLayout";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import i18n from "./plugins/i18n";
 
 Vue.use(VueRouter);
 
@@ -74,6 +73,15 @@ const AuthRoutes = [
         component: () => import("./screens/AuthLogin.vue"),
       },
       {
+        path: "logout",
+        name: "auth-logout",
+        meta: {
+          title: "page_header.logout",
+          isPublic: false,
+        },
+        component: () => import("./screens/AuthLogout.vue"),
+      },
+      {
         path: "forgot-password",
         name: "auth-forgot-password",
         meta: {
@@ -96,7 +104,7 @@ const AuthRoutes = [
         name: "error-403",
         meta: {
           title: "page_header.no_permission",
-          isPublic: true,
+          isPublic: false,
         },
         component: () => import("./screens/AuthInsufficientPermission.vue"),
       },

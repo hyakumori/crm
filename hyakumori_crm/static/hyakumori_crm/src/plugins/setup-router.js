@@ -3,7 +3,7 @@ import { getScopes, hasScope } from "../helpers/security";
 
 import { makeTitle } from "../helpers/document";
 
-const updateDocumentTitle = (to, from) => {
+const updateDocumentTitle = to => {
   // eg. if we have /some/deep/nested/route and /some, /deep, and /nested have titles, nested's will be chosen.
   const nearestWithTitle = to.matched
     .slice()
@@ -45,8 +45,9 @@ const setupRouter = router => {
       const scopes = uniq(
         flattenDeep(to.matched.map(record => record.meta.scopes)),
       );
+      const matchedScopes = intersection(scopes, getScopes());
 
-      if (intersection(scopes, getScopes()).length > 0) {
+      if (matchedScopes && matchedScopes.length > 0) {
         return next();
       } else {
         return next({ name: "error-403" });

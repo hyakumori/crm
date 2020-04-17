@@ -11,5 +11,11 @@ import LoginForm from "../components/forms/LoginForm";
 
 export default {
   components: { LoginForm },
+  mounted() {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && accessToken !== "undefined") {
+      this.$router.replace("/");
+    }
+  },
 };
 </script>

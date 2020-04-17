@@ -1,7 +1,6 @@
 const getScopes = () => {
   let scopes = localStorage.getItem("scopes") || "";
-  scopes = scopes.split(",");
-  return scopes;
+  return (scopes && scopes.split(",")) || [];
 };
 
 const hasScope = scope => {

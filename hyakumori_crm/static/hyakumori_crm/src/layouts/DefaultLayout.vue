@@ -14,7 +14,7 @@
           />
         </div>
 
-        <router-view></router-view>
+        <router-view class="main-content"></router-view>
       </v-container>
     </v-content>
   </v-app>
@@ -51,5 +51,11 @@ export default {};
   max-width: 430px;
   position: relative;
   z-index: 2;
+}
+.main-content {
+  .v-card__title:first-child {
+    font-weight: bold;
+    font-size: 17px;
+  }
 }
 </style>
