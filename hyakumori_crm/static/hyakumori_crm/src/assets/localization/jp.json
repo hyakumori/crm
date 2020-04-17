@@ -114,7 +114,8 @@
     "no_permission": "十無許可",
     "setting": "設定",
     "not_found": "見つかりません",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "user_profile": "ユーザープロファイル"
   },
   "raw_text": {
     "agree": "同意する",
