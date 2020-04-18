@@ -154,7 +154,6 @@ import AdditionButton from "../components/AdditionButton";
 import BasicInfo from "../components/detail/BasicInfo";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 import { fetchBasicInfo, fetchForestOwner } from "../api/forest";
-import axios from "../plugins/http";
 
 export default {
   name: "forest-detail",
@@ -192,10 +191,10 @@ export default {
   },
 
   mounted() {
-    axios
+    this.$rest
       .all([fetchBasicInfo(this.forestId), fetchForestOwner(this.forestId)])
       .then(
-        axios.spread((basicInfo, owners) => {
+        this.$rest.spread((basicInfo, owners) => {
           this.forestInfo = basicInfo;
           this.forestOwners = owners.results;
           this.setHeaderInfo(basicInfo);

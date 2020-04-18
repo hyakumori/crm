@@ -286,7 +286,6 @@ import ContactCard from "../components/detail/ContactCard";
 import AdditionButton from "../components/AdditionButton";
 import HistoryDiscussion from "../components/detail/HistoryDiscussionCard";
 import LogCard from "../components/detail/LogCard";
-import axios from "../plugins/http";
 import { filter } from "lodash";
 
 export default {
@@ -336,28 +335,28 @@ export default {
   },
 
   mounted() {
-    axios.get(`/customers/${this.id}`).then(data => {
+    this.$rest.get(`/customers/${this.id}`).then(data => {
       this.customer = data;
       this.customerLoading = false;
     });
-    axios.get(`/customers/${this.id}/forests`).then(async data => {
+    this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
       let forests = data.results;
       let next = data.next;
       //TODO: implement UI pagination
       while (!!next) {
-        let nextForests = await axios.get(data.next);
+        let nextForests = await this.$rest.get(data.next);
         forests.push(...nextForests.results);
         next = nextForests.next;
       }
       this.forests = forests;
       this.forestsLoading = false;
     });
-    axios.get(`/customers/${this.id}/contacts`).then(async data => {
+    this.$rest.get(`/customers/${this.id}/contacts`).then(async data => {
       let contacts = data.results;
       let next = data.next;
       //TODO: implement UI pagination
       while (!!next) {
-        let nextContacts = await axios.get(data.next);
+        let nextContacts = await this.$rest.get(data.next);
         contacts.push(...nextContacts.results);
         next = nextContacts.next;
       }
