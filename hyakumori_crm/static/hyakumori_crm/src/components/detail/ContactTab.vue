@@ -28,7 +28,7 @@
           <v-col cols="6" :key="index">
             <contact-card
               mode="customer"
-              :customer_id="contact.customer_id"
+              :card_id="contact.customer_id"
               :title="contact.title"
               :address="contact.address"
               :email="contact.email"
@@ -49,7 +49,7 @@
           <v-col cols="6" :key="index">
             <contact-card
               mode="customer"
-              :customer_id="contact.customer_id"
+              :card_id="contact.customer_id"
               :title="contact.title"
               :address="contact.address"
               :email="contact.email"

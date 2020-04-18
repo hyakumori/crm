@@ -2,6 +2,7 @@
   <v-card
     class="contact-card d-flex d-hover"
     outlined
+    :ripple="false"
     @click.self="onClickCard"
   >
     <v-icon class="contact-card__icon">{{ iconMode }}</v-icon>
@@ -72,7 +73,7 @@ export default {
 
   props: {
     mode: String,
-    customer_id: String,
+    card_id: String,
     title: String,
     subTitle: String,
     address: String,
@@ -110,12 +111,21 @@ export default {
 
   methods: {
     onClick() {
-      // this.$emit("onClick", this.id);
+      // Do click card
+      if (this.mode === "customer" && this.card_id) {
+        this.$router.push({
+          name: "customer-detail",
+          params: { id: this.card_id },
+        });
+      } else if (this.mode === "forest" && this.card_id) {
+        this.$router.push({
+          name: "forest-detail",
+          params: { id: this.card_id },
+        });
+      }
     },
 
-    onClickCard() {
-      // Do click card
-    },
+    onClickCard() {},
 
     selectedRelationship(val) {
       this.innerRelationship = val;

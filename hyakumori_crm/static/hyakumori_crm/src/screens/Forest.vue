@@ -133,6 +133,7 @@ export default {
     selectedRow(val) {
       this.tableSelectedRow = val;
     },
+
     onSearch() {
       this.filter = { ...this.filter, filters: this.$refs.filter.conditions };
       this.$apollo.queries.forestsInfo.refetch();
@@ -209,6 +210,7 @@ export default {
     getSearchCriteria() {
       return Array.from(this.getHeaders).map(header => header.text);
     },
+
     filterFields() {
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))

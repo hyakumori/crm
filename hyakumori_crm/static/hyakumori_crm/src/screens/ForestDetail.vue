@@ -2,116 +2,126 @@
   <main-section class="forest-detail">
     <template #section>
       <div class="forest-detail__section px-7">
-        <content-header
-          content="基本情報 (登記情報)"
-          editBtnContent="所有地を追加・編集"
-          :loading="basicInfo.length === 0"
-          :update="isUpdate.basicInfo"
-          @update="val => (isUpdate.basicInfo = val)"
-        />
-        <div class="my-4">
-          <basic-info :infos="basicInfo" :isUpdate="isUpdate.basicInfo" />
+        <div id="basic-info">
+          <content-header
+            content="基本情報 (登記情報)"
+            editBtnContent="所有地を追加・編集"
+            :loading="basicInfo.length === 0"
+            :update="isUpdate.basicInfo"
+            @update="val => (isUpdate.basicInfo = val)"
+          />
+          <div class="my-4">
+            <basic-info :infos="basicInfo" :isUpdate="isUpdate.basicInfo" />
+            <update-button
+              class="mb-12"
+              v-if="isUpdate.basicInfo"
+              :cancel="cancel.bind(this, 'basicInfo')"
+            />
+          </div>
+        </div>
+
+        <div id="contacts">
+          <content-header
+            content="所有林情報"
+            editBtnContent="所有者を追加・編集"
+            :loading="ownerContacts.length === 0"
+            :update="isUpdate.contact"
+            @update="val => (isUpdate.contact = val)"
+          />
+          <contact-tab
+            class="mt-5"
+            :class="{ 'mb-10': !isUpdate.contact }"
+            :ownerContacts="ownerContacts"
+            :isUpdate="isUpdate.contact"
+          />
+          <addition-button v-if="isUpdate.contact" content="連絡者を追加" />
           <update-button
-            class="mb-12"
-            v-if="isUpdate.basicInfo"
-            :cancel="cancel.bind(this, 'basicInfo')"
+            class="mb-9 mt-2"
+            v-if="isUpdate.contact"
+            :cancel="cancel.bind(this, 'contact')"
           />
         </div>
 
-        <content-header
-          content="所有林情報"
-          editBtnContent="所有者を追加・編集"
-          :loading="ownerContacts.length === 0"
-          :update="isUpdate.contact"
-          @update="val => (isUpdate.contact = val)"
-        />
-        <contact-tab
-          class="mt-5"
-          :class="{ 'mb-10': !isUpdate.contact }"
-          :ownerContacts="ownerContacts"
-          :isUpdate="isUpdate.contact"
-        />
-        <addition-button v-if="isUpdate.contact" content="連絡者を追加" />
-        <update-button
-          class="mb-9 mt-2"
-          v-if="isUpdate.contact"
-          :cancel="cancel.bind(this, 'contact')"
-        />
-
-        <content-header
-          content="協議履歴"
-          editBtnContent="協議記録を追加・編集"
-          :update="isUpdate.discussion"
-          @update="val => (isUpdate.discussion = val)"
-        />
-        <template v-if="isExpand">
-          <history-discussion
-            class="mt-4"
-            :isUpdate="isUpdate.discussion"
-            :discussions="getDiscussionsExpand"
+        <div id="archives">
+          <content-header
+            content="協議履歴"
+            editBtnContent="協議記録を追加・編集"
+            :update="isUpdate.discussion"
+            @update="val => (isUpdate.discussion = val)"
           />
-        </template>
-        <template v-else>
-          <history-discussion
-            class="mt-4"
-            :isUpdate="isUpdate.discussion"
-            :discussions="getDiscussionsNotExpand"
-          />
-        </template>
-        <addition-button
-          class="mb-3"
-          v-if="isUpdate.discussion"
-          content="協議履歴を追加"
-        />
-        <update-button
-          v-if="isUpdate.discussion"
-          :cancel="cancel.bind(this, 'discussion')"
-        />
-        <p class="forest-detail__expand" @click="expandDiscussionList">
-          {{ isExpand ? "一部表示する" : "すべて表示する" }}
-        </p>
-
-        <content-header
-          content="書類郵送記録"
-          editBtnContent="書類郵送記録を追加・編集"
-          :update="isUpdate.archive"
-          @update="val => (isUpdate.archive = val)"
-        />
-        <history-discussion
-          class="mt-4"
-          :class="{ 'pb-9': !isUpdate.archive }"
-          :discussions="getDiscussionsNotExpand"
-          :isUpdate="isUpdate.archive"
-        />
-        <addition-button
-          class="mb-3"
-          v-if="isUpdate.archive"
-          content="協議履歴を追加"
-        />
-        <update-button
-          v-if="isUpdate.archive"
-          :cancel="cancel.bind(this, 'archive')"
-        />
-
-        <content-header
-          class="mt-9"
-          content="森林情報"
-          :displayAdditionBtn="false"
-        />
-        <v-row class="forest-detail__header d-flex mx-0 mt-5">
-          <template v-for="(header, index) in headerData">
-            <v-col class="forest-detail__header--text" cols="3" :key="index">
-              <td class="pr-2">{{ header.name }}</td>
-              <td class="forest-detail__header--text__data--color">
-                {{ header.data }}
-              </td>
-            </v-col>
+          <template v-if="isExpand">
+            <history-discussion
+              class="mt-4"
+              :isUpdate="isUpdate.discussion"
+              :discussions="getDiscussionsExpand"
+            />
           </template>
-        </v-row>
-        <forest-attribute-table
-          :attributes="forrestAttributes"
-          :isLoading="forrestAttributes.length === 0"
-        />
+          <template v-else>
+            <history-discussion
+              class="mt-4"
+              :isUpdate="isUpdate.discussion"
+              :discussions="getDiscussionsNotExpand"
+            />
+          </template>
+          <addition-button
+            class="mb-3"
+            v-if="isUpdate.discussion"
+            content="協議履歴を追加"
+          />
+          <update-button
+            v-if="isUpdate.discussion"
+            :cancel="cancel.bind(this, 'discussion')"
+          />
+          <p class="forest-detail__expand" @click="expandDiscussionList">
+            {{ isExpand ? "一部表示する" : "すべて表示する" }}
+          </p>
+        </div>
+
+        <div id="postal">
+          <content-header
+            content="書類郵送記録"
+            editBtnContent="書類郵送記録を追加・編集"
+            :update="isUpdate.archive"
+            @update="val => (isUpdate.archive = val)"
+          />
+          <history-discussion
+            class="mt-4"
+            :class="{ 'pb-9': !isUpdate.archive }"
+            :discussions="getDiscussionsNotExpand"
+            :isUpdate="isUpdate.archive"
+          />
+          <addition-button
+            class="mb-3"
+            v-if="isUpdate.archive"
+            content="協議履歴を追加"
+          />
+          <update-button
+            v-if="isUpdate.archive"
+            :cancel="cancel.bind(this, 'archive')"
+          />
+        </div>
+
+        <div id="forest-attributes">
+          <content-header
+            class="mt-9"
+            content="森林情報"
+            :displayAdditionBtn="false"
+          />
+          <v-row class="forest-detail__header d-flex mx-0 mt-5">
+            <template v-for="(header, index) in headerData">
+              <v-col class="forest-detail__header--text" cols="3" :key="index">
+                <td class="pr-2">{{ header.name }}</td>
+                <td class="forest-detail__header--text__data--color">
+                  {{ header.data }}
+                </td>
+              </v-col>
+            </template>
+          </v-row>
+          <forest-attribute-table
+            :attributes="forrestAttributes"
+            :isLoading="forrestAttributes.length === 0"
+          />
+        </div>
       </div>
     </template>
 
@@ -208,6 +218,7 @@ export default {
         title: info.internal_id,
         subTitle: info.owner.name_kanji,
         tag: [info.tag.danchi],
+        backUrl: { name: "forests" },
       };
       this.$store.dispatch("setHeaderInfo", headerInfo);
     },

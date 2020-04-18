@@ -26,11 +26,12 @@
               $t("page_header.archive_mgmt")
             }}</router-link>
 
-            <router-link to="/users" class="mr-4">{{
+            <router-link to="/users" class="mr-2">{{
               $t("page_header.user_mgmt")
             }}</router-link>
 
             <router-link to="/me" class="me">
+              <span class="mr-2">|</span>
               <v-icon class="white--text">mdi-account-circle</v-icon>
               {{ userDisplayName }}
             </router-link>
@@ -121,7 +122,7 @@ export default {
 
   methods: {
     onBack() {
-      this.$router.go(-1);
+      this.$router.push(this.$store.state.headerInfo.backUrl || -1);
     },
   },
 

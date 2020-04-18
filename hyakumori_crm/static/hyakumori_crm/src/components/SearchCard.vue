@@ -1,8 +1,11 @@
 <template>
   <v-card class="search-card">
-    <v-card-title class="search-card__title">{{
-      $t("search.search_condition")
-    }}</v-card-title>
+    <v-card-title class="search-card__title d-flex justify-space-between">
+      {{ $t("search.search_condition") }}
+      <v-btn dense small text @click="resetSearch">
+        {{ $t("buttons.reset") }}
+      </v-btn>
+    </v-card-title>
 
     <v-form ref="form">
       <div
@@ -25,13 +28,14 @@
             @click="deleteSearchField(index)"
             icon
           >
-            <v-icon>mdi-delete-circle</v-icon>
+            <v-icon class="grey--text lighten-5">mdi-backspace</v-icon>
           </v-btn>
         </div>
 
         <v-text-field
           v-model="condition.keyword"
           class="mt-1"
+          height="45"
           clearable
           outlined
           dense
@@ -106,7 +110,7 @@ export default {
     },
   },
   watch: {
-    searchCriteria(val, old) {
+    searchCriteria(val) {
       this.conditions[0].fields = [...val];
     },
     usedFields(val) {
@@ -122,6 +126,22 @@ export default {
     },
   },
   methods: {
+    resetSearch() {
+      this.conditions = [
+        {
+          fields: [...this.searchCriteria],
+          criteria: null,
+          keyword: null,
+        },
+      ];
+
+      if (this.onSearch) {
+        this.onSearch();
+      }
+
+      this.$emit("resetSearch");
+    },
+
     addSearchField() {
       if (this.conditions.length == this.searchCriteria.length) {
         this.$emit("conditionOutOfBounds", true);
