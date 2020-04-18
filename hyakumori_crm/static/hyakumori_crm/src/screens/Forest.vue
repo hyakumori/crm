@@ -26,6 +26,7 @@
           :options.sync="options"
           @rowData="rowData"
           @selectedRow="selectedRow"
+          :autoHeaders="false"
         ></data-list>
       </div>
 
@@ -134,7 +135,7 @@ export default {
     },
     onSearch() {
       this.filter = { ...this.filter, filters: this.$refs.filter.conditions };
-      this.$apollo.queries.result.refetch();
+      this.$apollo.queries.forestsInfo.refetch();
     },
   },
 

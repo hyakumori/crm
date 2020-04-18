@@ -19,14 +19,6 @@ from hyakumori_crm.forest.restful import (
 )
 
 
-@pytest.fixture
-def forest(admin_user):
-    return Forest.objects.create(
-        cadastral={"prefecture": "foo", "municipality": "foo", "sector": "foo"},
-        contracts=[{"type": ContractType.long_term}],
-    )
-
-
 def test_get_customers_of_forest_unauthorize(api_rf):
     pk = uuid4()
     req = api_rf.get(f"/api/v1/forests/{pk}/customers")

@@ -14,6 +14,7 @@ from ..crm.models import Forest, ForestCustomer, Customer
 
 
 class ForestFilter(FilterSet):
+    internal_id = CharFilter(lookup_expr="icontains", method="icontains_filter")
     cadastral__prefecture = CharFilter(
         lookup_expr="icontains", method="icontains_filter"
     )
@@ -61,7 +62,7 @@ class ForestFilter(FilterSet):
 
     class Meta:
         model = Forest
-        fields = {"internal_id": ["icontains"]}
+        fields = []
 
 
 class ForestPaginator(Paginator):

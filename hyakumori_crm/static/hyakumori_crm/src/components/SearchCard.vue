@@ -86,7 +86,7 @@ export default {
       usedFields: new Set(),
       conditions: [
         {
-          fields: [],
+          fields: [...this.searchCriteria],
           criteria: null,
           keyword: null,
         },
@@ -107,8 +107,7 @@ export default {
   },
   watch: {
     searchCriteria(val, old) {
-      if (old.length === 0) this.conditions[0].fields = [...val];
-      else return;
+      this.conditions[0].fields = [...val];
     },
     usedFields(val) {
       for (let con of this.conditions) {

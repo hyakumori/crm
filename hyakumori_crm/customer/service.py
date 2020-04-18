@@ -1,5 +1,5 @@
 from typing import Dict, Iterator, Union
-
+from uuid import UUID
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.db.models import (
@@ -18,8 +18,7 @@ from django.db.models.functions import Concat
 from querybuilder.query import Expression, Query
 
 from hyakumori_crm.core.models import RawSQLField
-from hyakumori_crm.crm.models.customer import Contact, Customer
-from hyakumori_crm.crm.models.relations import CustomerContact
+from hyakumori_crm.crm.models import Contact, Customer, CustomerContact, ForestCustomer
 from hyakumori_crm.users.models import User
 
 from .schemas import CustomerInputSchema
@@ -32,6 +31,31 @@ def get(pk):
     # except (Customer.DoesNotExist, ValidationError):
     #     return None
     return None
+
+
+def get_customer_contacts(pk: UUID):
+    q = Contact.objects.raw(
+        "select crm_contact.*, crm_forestcustomer.forest_id as forest_id "
+        "from crm_contact "
+        "inner join crm_customercontact "
+        "on crm_contact.id = crm_customercontact.contact_id "
+        "left outer join crm_forestcustomer "
+        "on crm_forestcustomer.contact_id = crm_contact.id "
+        "where crm_customercontact.customer_id = %(pk)s "
+        "and crm_customercontact.is_basic = false "
+        "and crm_forestcustomer.customer_id != %(pk)s "
+        "and crm_contact.deleted is null "
+        "and crm_forestcustomer.deleted is null",
+        {"pk": pk},
+    )
+    print(q.query)
+    return q
+
+
+def get_customer_forest_relations(pk: UUID):
+    return ForestCustomer.objects.filter(customer_id=pk).prefetch_related(
+        "forest", "forest__forestcustomer_set", "contact"
+    )
 
 
 def get_customer_tags_keys():

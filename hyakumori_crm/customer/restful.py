@@ -12,6 +12,7 @@ from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
 )
 from .schemas import ForestSerializer
+from .service import get_customer_contacts, get_customer_forest_relations
 
 
 class CustomerViewSets(viewsets.ModelViewSet):
@@ -27,11 +28,7 @@ class CustomerViewSets(viewsets.ModelViewSet):
 
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
-            request=request,
-            queryset=Contact.objects.filter(
-                customercontact__customer_id=obj.id, customercontact__is_basic=False
-            ).annotate(forest_id=F("forestcustomer__forest_id")),
-            view=self,
+            request=request, queryset=get_customer_contacts(obj.pk), view=self,
         )
 
         contacts = ContactSerializer(paged_list, many=True)
@@ -43,11 +40,7 @@ class CustomerViewSets(viewsets.ModelViewSet):
 
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
-            request=request,
-            queryset=ForestCustomer.objects.filter(customer_id=obj.pk).prefetch_related(
-                "forest", "forest__forestcustomer_set", "contact"
-            ),
-            view=self,
+            request=request, queryset=get_customer_forest_relations(obj.pk), view=self,
         )
 
         forests = []
