@@ -1,6 +1,7 @@
 <template>
   <div class="page-header">
-    <v-img :src="getAppBar" :height="isDetail ? 169 : 151"></v-img>
+    <v-img src="../assets/img/app-bar.png" height="151" v-if="!isDetail" />
+    <v-img src="../assets/img/app-bar-detail.jpg" height="169" v-else />
 
     <div class="page-header__content">
       <div class="page-header__content--center">
@@ -102,8 +103,6 @@
 
 <script>
 import CustomerCreateForm from "./CustomerCreateForm";
-import AppBarImg from "../assets/img/app-bar.webp";
-import AppBarDetailImg from "../assets/img/app-bar-detail.webp";
 import OutlineRoundBtn from "./OutlineRoundBtn";
 
 export default {
@@ -129,10 +128,6 @@ export default {
   computed: {
     isDetail() {
       return this.$route.name && this.$route.name.includes("detail");
-    },
-
-    getAppBar() {
-      return this.isDetail ? AppBarDetailImg : AppBarImg;
     },
 
     headerInfo() {
