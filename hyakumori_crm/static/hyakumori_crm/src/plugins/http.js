@@ -32,7 +32,7 @@ const setupRestClient = options => {
   axios.interceptors.response.use(
     response => response && response.data,
     error => {
-      if (error.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         eventBus.$emit("auth:relogin");
       }
 

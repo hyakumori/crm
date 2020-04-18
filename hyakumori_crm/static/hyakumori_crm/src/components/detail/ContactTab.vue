@@ -23,7 +23,7 @@
     ></v-switch>
 
     <v-tab-item>
-      <v-row no-gutters>
+      <v-row dense>
         <template v-for="(contact, index) in ownerContacts">
           <v-col cols="6" :key="index">
             <contact-card

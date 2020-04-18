@@ -26,7 +26,7 @@
           :loading="forestsLoading"
         />
 
-        <v-row class="mt-4">
+        <v-row class="mt-4" dense>
           <template v-for="(forest, index) in forests">
             <v-col cols="6" :key="index">
               <contact-card
@@ -104,7 +104,7 @@
             :loading="contactsLoading"
           />
 
-          <v-row class="mt-4">
+          <v-row class="mt-4" dense>
             <template v-for="(contactor, index) in forestContacts">
               <v-col cols="6" :key="index">
                 <contact-card
@@ -136,6 +136,7 @@
             :cancel="cancel.bind(this, 'contactors')"
           />
         </div>
+
         <div id="family-contacts">
           <content-header
             class="mt-12"
@@ -145,8 +146,7 @@
             @update="val => (isUpdate.family = val)"
             :loading="contactsLoading"
           />
-
-          <v-row class="mt-4">
+          <v-row class="mt-4" dense>
             <template v-for="(contactor, index) in familyContacts">
               <v-col cols="6" :key="index">
                 <contact-card
@@ -226,7 +226,7 @@
             :displayAdditionBtn="false"
             :loading="false"
           />
-          <v-row class="mt-4">
+          <v-row class="mt-4" dense>
             <template v-for="(ownerF, index) in getOwnersForest">
               <v-col cols="6" :key="index">
                 <contact-card
