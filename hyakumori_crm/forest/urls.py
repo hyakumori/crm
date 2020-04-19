@@ -12,7 +12,7 @@ api_urls = [
         name="forests-customers-update",
     ),
     path(
-        "forests/<uuid:pk>/customers/set-contact",
+        "forests/<uuid:pk>/customers/<uuid:customer_pk>/set-contact",
         view=set_contact_to_owner_view,
         name="forests-customer-set-contact",
     ),

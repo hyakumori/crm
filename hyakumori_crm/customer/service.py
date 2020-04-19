@@ -3,7 +3,6 @@ from uuid import UUID
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.db.models import (
-    Case,
     CharField,
     F,
     OuterRef,
@@ -12,10 +11,10 @@ from django.db.models import (
     Subquery,
 )
 from django.db.models import Value as V
-from django.db.models import When
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
 from querybuilder.query import Expression, Query
+from django.utils.translation import gettext_lazy as _
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import Contact, Customer, CustomerContact, ForestCustomer
@@ -31,6 +30,13 @@ def get(pk):
     # except (Customer.DoesNotExist, ValidationError):
     #     return None
     return None
+
+
+def get_customer_by_pk(pk):
+    try:
+        return Customer.objects.get(pk=pk)
+    except (Customer.DoesNotExist, ValidationError):
+        raise ValueError(_("Customer not found"))
 
 
 def get_customer_contacts(pk: UUID):

@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import pytest
+from django.utils.translation import gettext_lazy as _
 from rest_framework.test import force_authenticate
 
 from hyakumori_crm.crm.models import (
@@ -50,9 +51,20 @@ def test_update_forest_basic_info(api_rf, admin_user, forest):
     view = ForestViewSets.as_view({"put": "basic_info"})
     force_authenticate(req, user=admin_user)
     resp = view(req, pk=forest.pk)
+    assert resp.status_code == 200
     forest.refresh_from_db()
     assert forest.cadastral["sector"] == "bar"
-    assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_update_forest_basic_info_not_found(api_rf, admin_user):
+    pk = uuid4()
+    req = api_rf.put(f"/api/v1/forests/{pk}", {}, format="json",)
+    view = ForestViewSets.as_view({"put": "basic_info"})
+    force_authenticate(req, user=admin_user)
+    resp = view(req, pk=pk)
+    assert resp.status_code == 404
+    assert resp.render().data["detail"] == _("Forest not found")
 
 
 @pytest.mark.django_db
@@ -81,7 +93,7 @@ def test_update_owners_view(api_rf, admin_user, forest):
 
     req = api_rf.put(
         f"/api/v1/forests/{forest.pk}/customers",
-        {"forest_pk": str(forest.id), "added": [customer2.pk], "deleted": []},
+        {"added": [customer2.pk], "deleted": []},
         format="json",
     )
     force_authenticate(req, user=admin_user)
@@ -115,16 +127,12 @@ def test_set_contact_to_owner_view(api_rf, admin_user, forest):
         forest=forest, customer=customer1, contact=contact_customer1,
     )
     req = api_rf.put(
-        f"/api/v1/forests/{forest.pk}/customers/set-contact",
-        {
-            "forest": str(forest.pk),
-            "customer": str(customer1.pk),
-            "contact": str(contact_customer2.pk),
-        },
+        f"/api/v1/forests/{forest.pk}/customers/{customer1.pk}/set-contact",
+        {"contact": str(contact_customer2.pk)},
         format="json",
     )
     force_authenticate(req, user=admin_user)
-    resp = set_contact_to_owner_view(req, pk=forest.pk)
+    resp = set_contact_to_owner_view(req, pk=forest.pk, customer_pk=customer1.pk)
     forest.refresh_from_db()
     assert resp.status_code == 200
     assert (

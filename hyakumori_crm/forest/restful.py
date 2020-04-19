@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_typed_views import typed_action, Body
 
@@ -11,8 +12,14 @@ from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
 from .schemas import ForestInput, OwnerPksInput, ForestOwnerContractInput
-from .service import update, update_owners, set_forest_owner_contact
-from ..api.decorators import typed_api_view
+from .service import (
+    update,
+    update_owners,
+    set_forest_owner_contact,
+    get_forest_by_pk,
+    get_customer_of_forest,
+)
+from ..api.decorators import typed_api_view, api_validate_model, get_or_404
 
 
 class ForestViewSets(viewsets.ModelViewSet):
@@ -43,29 +50,30 @@ class ForestViewSets(viewsets.ModelViewSet):
     def related_archives(self, request):
         return Response()
 
-    @typed_action(detail=True, methods=["PUT", "PATCH"])
-    def basic_info(self, request, pk: UUID, forest_in: ForestInput = Body()):
-        try:
-            forest = Forest.objects.get(pk=pk)
-        except (ValidationError, Forest.DoesNotExist):
-            raise Http404
-        update(forest, forest_in.dict())
-        return Response({"id": forest.pk})
+    @action(detail=True, methods=["PUT", "PATCH"])
+    @get_or_404(get_func=get_forest_by_pk, to_name="forest", remove=True)
+    @api_validate_model(ForestInput, "forest_in")
+    def basic_info(self, request, *, forest_in: ForestInput):
+        update(forest_in.forest, forest_in.dict())
+        return Response({"id": forest_in.forest.pk})
 
 
-@typed_api_view(methods=["PUT", "PATCH"])
-def update_owners_view(request, pk, owner_pks_in: OwnerPksInput = Body()):
-    try:
-        forest = Forest.objects.get(pk=pk)
-    except (ValidationError, Forest.DoesNotExist):
-        raise Http404
-    update_owners(forest, owner_pks_in.dict())
-    return Response({"id": forest.pk})
+@api_view(["PUT", "PATCH"])
+@permission_classes([IsAuthenticated])
+@get_or_404(get_func=get_forest_by_pk, to_name="forest", remove=True)
+@api_validate_model(OwnerPksInput, "owner_pks_in")
+def update_owners_view(request, *, owner_pks_in: OwnerPksInput):
+    update_owners(owner_pks_in)
+    return Response({"id": owner_pks_in.forest.pk})
 
 
-@typed_api_view(methods=["PUT", "PATCH"])
-def set_contact_to_owner_view(
-    request, pk, forest_owner_contact_in: ForestOwnerContractInput = Body()
-):
-    set_forest_owner_contact(forest_owner_contact_in.forest, forest_owner_contact_in)
-    return Response({"id": forest_owner_contact_in.forest.id})
+@api_view(["PUT", "PATCH"])
+@permission_classes([IsAuthenticated])
+@get_or_404(get_func=get_forest_by_pk, to_name="forest")
+@get_or_404(
+    get_func=get_customer_of_forest, to_name="customer", remove=True,
+)
+@api_validate_model(ForestOwnerContractInput)
+def set_contact_to_owner_view(request, *, data: ForestOwnerContractInput = None):
+    set_forest_owner_contact(data.forest, data)
+    return Response({"id": data.forest.id})
