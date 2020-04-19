@@ -5,6 +5,7 @@ from django.db import connection, IntegrityError
 from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 from querybuilder.query import Expression, Query
+from django.utils.translation import gettext_lazy as _
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import (
