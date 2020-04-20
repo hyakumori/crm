@@ -1,13 +1,15 @@
 import inspect
 import logging
 from functools import wraps
-from rest_framework.exceptions import NotFound
+from typing import Callable
+
+from pydantic import ValidationError
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_typed_views.decorators import prevalidate, transform_view_params
 from rest_typed_views.utils import find_request
-from pydantic import ValidationError
 
 from hyakumori_crm.core.decorators import errors_wrapper
 
@@ -37,13 +39,20 @@ def typed_api_view(methods, permissions_classes=None):
     return wrap_validate_and_render
 
 
-def get_or_404(get_func, to_name=None, msg=None, remove=False):
+def get_or_404(
+    get_func: Callable, to_name: str = None, msg: str = None, remove: bool = False
+):
+    """Get model instance base on kwargs passed from url and inject into `request.data`.
+    Raise Http404 if not found.
+    If `remove`, url params will be removed from kwargs pass to view function."""
+
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             if len(args) == 1:
                 request = args[0]
             elif len(args) == 2:
+                # in case of class method , `self` is first arg
                 request = args[1]
             else:
                 raise TypeError(
@@ -59,6 +68,7 @@ def get_or_404(get_func, to_name=None, msg=None, remove=False):
             except ValueError as e:
                 raise NotFound(msg or str(e))
 
+            # currently only work if content-type is application/json
             request.data[to_name] = obj
 
             if remove:
@@ -79,6 +89,7 @@ def api_validate_model(input_model, arg_name="data"):
             if len(args) == 1:
                 request = args[0]
             elif len(args) == 2:
+                # in case of class method , `self` is first arg
                 request = args[1]
             else:
                 raise TypeError(

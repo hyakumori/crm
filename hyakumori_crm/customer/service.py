@@ -1,5 +1,6 @@
 from typing import Dict, Iterator, Union
 from uuid import UUID
+
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.db.models import (
@@ -13,15 +14,15 @@ from django.db.models import (
 from django.db.models import Value as V
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
-from querybuilder.query import Expression, Query
 from django.utils.translation import gettext_lazy as _
+from querybuilder.query import Expression, Query
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import Contact, Customer, CustomerContact, ForestCustomer
 from hyakumori_crm.users.models import User
 
-from .schemas import CustomerInputSchema
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
+from .schemas import CustomerInputSchema
 
 
 def get(pk):
@@ -54,7 +55,6 @@ def get_customer_contacts(pk: UUID):
         "and crm_forestcustomer.deleted is null",
         {"pk": pk},
     )
-    print(q.query)
     return q
 
 
