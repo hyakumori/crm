@@ -6,11 +6,9 @@ from rest_framework.response import Response
 from rest_typed_views import typed_action
 
 from hyakumori_crm.core.utils import default_paginator
-from hyakumori_crm.crm.models import Customer, ForestCustomer, Contact
-from hyakumori_crm.crm.restful.serializers import (
-    ContactSerializer,
-    CustomerSerializer,
-)
+from hyakumori_crm.crm.models import Contact, Customer, ForestCustomer
+from hyakumori_crm.crm.restful.serializers import ContactSerializer, CustomerSerializer
+
 from .schemas import ForestSerializer
 from .service import get_customer_contacts, get_customer_forest_relations
 
