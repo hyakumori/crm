@@ -86,14 +86,21 @@ class Contract(HyakumoriDanticModel):
 
 
 class ForestInput(HyakumoriDanticModel):
+    forest: Forest
     cadastral: Cadastral
     contracts: List[Contract]
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class OwnerPksInput(HyakumoriDanticModel):
-    forest_pk: UUID
+    forest: Forest
     added: List[UUID] = []
     deleted: List[UUID] = []
+
+    class Config:
+        arbitrary_types_allowed = True
 
     @validator("deleted")
     def check_deleted(cls, v):
@@ -124,30 +131,11 @@ class ForestOwnerContractInput(HyakumoriDanticModel):
     class Config:
         arbitrary_types_allowed = True
 
-    @root_validator(pre=True)
-    def prepare_objects(cls, values):
-        if not isinstance(values.get("forest"), Forest):
+    @validator("contact", pre=True)
+    def prepare_contact(cls, v):
+        if not isinstance(v, Contact):
             try:
-                values["forest"] = Forest.objects.get(pk=values.get("forest"))
-            except (Forest.DoesNotExist, ValidationError):
-                raise ValueError(_("Forest not found"))
-
-        if not isinstance(values.get("customer"), Customer):
-            try:
-                ForestCustomer.objects.get(
-                    customer_id=values.get("customer"), forest_id=values["forest"].id
-                )
-                values["customer"] = Customer.objects.get(pk=values.get("customer"))
-            except (
-                ForestCustomer.DoesNotExist,
-                Customer.DoesNotExist,
-                ValidationError,
-            ):
-                raise ValueError(_("Customer not found"))
-
-        if not isinstance(values.get("contact"), Contact):
-            try:
-                values["contact"] = Contact.objects.get(pk=values.get("contact"))
-            except (Forest.DoesNotExist, ValidationError):
+                return Contact.objects.get(pk=v)
+            except (Contact.DoesNotExist, ValidationError):
                 raise ValueError(_("Contact not found"))
-        return values
+        return v
