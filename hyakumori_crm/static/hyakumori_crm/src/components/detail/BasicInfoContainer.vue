@@ -8,7 +8,12 @@
       @update="val => (isUpdate = val)"
     />
     <div class="my-4">
-      <basic-info :infos="info" :isUpdate="isUpdate" />
+      <basic-info
+        :infos="info"
+        :isUpdate="isUpdate"
+        :isSave="isSave"
+        @updateInfo="updateData"
+      />
       <update-button
         class="mb-12"
         v-if="isUpdate"
@@ -23,6 +28,8 @@ import BasicInfo from "./BasicInfo";
 import ContentHeader from "./ContentHeader";
 import UpdateButton from "./UpdateButton";
 import ContainerMixin from "./ContainerMixin";
+import { updateBasicInfo } from "../../api/forest";
+import { zipObjectDeep } from "lodash";
 
 export default {
   name: "basic-info-container",
@@ -36,13 +43,28 @@ export default {
   },
 
   props: {
+    id: String,
     info: Array,
   },
 
   data() {
     return {
       isUpdate: false,
+      isSave: false,
     };
+  },
+
+  methods: {
+    save() {
+      this.isSave = true;
+    },
+
+    updateData(updateInfo) {
+      const key = updateInfo.map(info => info.attr);
+      const val = updateInfo.map(info => info.value);
+      const info = zipObjectDeep(key, val);
+      updateBasicInfo(this.id, info);
+    },
   },
 };
 </script>

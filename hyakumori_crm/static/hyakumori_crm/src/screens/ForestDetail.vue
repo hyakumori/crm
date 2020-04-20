@@ -5,6 +5,7 @@
         <basic-info-container
           headerContent="基本情報 (登記情報)"
           editBtnContent="所有地を追加・編集"
+          :id="forestId"
           :isLoading="basicInfo.length === 0"
           :info="basicInfo"
         />
@@ -54,8 +55,8 @@
             :isLoading="forrestAttributes.length === 0"
           />
         </div>
-      </div>
-    </template>moduleName
+      </div> </template
+    >moduleName
     <template #right>
       <div class="forest-detail__log ml-6">
         <h4 class="mb-1">更新履歴</h4>
@@ -176,16 +177,29 @@ export default {
         const cadas = forestInfo.cadastral;
         basicInfo = [
           {
-            label: "住所",
-            value: cadas.prefecture + cadas.municipality + cadas.sector,
+            attr: "cadastral.prefecture",
+            label: "都道府県",
+            value: cadas.prefecture,
           },
           {
-            label: "契約期間",
-            value: this.forestContractDateRange(forestInfo),
+            attr: "cadastral.municipality",
+            label: "市町村",
+            value: cadas.municipality,
           },
           {
+            attr: "cadastral.sector",
+            label: "大字",
+            value: cadas.sector,
+          },
+          {
+            attr: "cadastral.subsector",
             label: "地番",
             value: cadas.subsector,
+          },
+          {
+            attr: "contracts[0]",
+            label: "契約期間",
+            value: this.forestContractDateRange(forestInfo),
           },
         ];
       }
