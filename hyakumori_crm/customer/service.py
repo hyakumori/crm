@@ -1,5 +1,6 @@
 from typing import Dict, Iterator, Union
 from uuid import UUID
+
 from django.core.exceptions import ValidationError
 from django.db import connection, IntegrityError
 from django.db.models import F, Q
