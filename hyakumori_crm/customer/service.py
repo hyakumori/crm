@@ -195,3 +195,22 @@ def create(customer_in: CustomerInputSchema):
 def update(customer, data):
     # do update...
     return customer
+
+
+def contacts_list_with_search(search_str: str = None):
+    queryset = Contact.objects.all()
+    if search_str:
+        queryset = queryset.filter(
+            Q(name_kanji__first_name__icontains=search_str)
+            | Q(name_kanji__last_name__icontains=search_str)
+            | Q(name_kana__first_name__icontains=search_str)
+            | Q(name_kana__last_name__icontains=search_str)
+            | Q(postal_code__icontains=search_str)
+            | Q(telephone__icontains=search_str)
+            | Q(mobilephone__icontains=search_str)
+            | Q(email__icontains=search_str)
+            | Q(address__sector__icontains=search_str)
+            | Q(address__prefecture__icontains=search_str)
+            | Q(address__municipality__icontains=search_str)
+        )
+    return queryset
