@@ -16,7 +16,6 @@ from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from querybuilder.query import Expression, Query
-from django.utils.translation import gettext_lazy as _
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import Contact, Customer, CustomerContact, ForestCustomer
