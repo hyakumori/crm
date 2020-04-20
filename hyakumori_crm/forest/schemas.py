@@ -135,9 +135,10 @@ class RelationshipType(str, Enum):
     other = "その他"
 
 
-class ContactInput(HyakumoriDanticModel):
+class SingleSelectContactInput(HyakumoriDanticModel):
     contact: Contact
     relationship_type: RelationshipType
+    set_forest: bool = False
 
     class Config:
         arbitrary_types_allowed = True
@@ -155,7 +156,7 @@ class ContactInput(HyakumoriDanticModel):
 class ForestOwnerContactsInput(HyakumoriDanticModel):
     forest: Forest
     customer: Customer
-    contacts: List[ContactInput]
+    contacts: List[SingleSelectContactInput]
 
     class Config:
         arbitrary_types_allowed = True
@@ -171,47 +172,3 @@ class ForestOwnerContactsInput(HyakumoriDanticModel):
         if len(set(pks)) < len(pks):
             raise ValueError(_("Duplicate contacts"))
         return values
-
-
-class ForestOwnerContactsDeleteInput(HyakumoriDanticModel):
-    forest: Forest
-    customer: Customer
-    contacts: List[Contact]
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    @root_validator
-    def prepare_contacts(cls, values):
-        forest = values.get("forest")
-        customer = values.get("customer")
-        contacts = values.get("contacts")
-        if not forest or not customer or not contacts:
-            return values
-        pks = list(map(lambda c: str(c.pk), contacts))
-        if len(set(pks)) < len(pks):
-            raise ValueError(_("Duplicate contacts"))
-        contact_instances = Contact.objects.filter(
-            customercontact__customer_id=customer.id,
-            customercontact__is_basic=False,
-            forestcustomer__forest_id=forest.id,
-            forestcustomer__contact_id__in=pks,
-        )
-        db_pks = set(map(lambda c: str(c.pk), contact_instances))
-        notfound_pks = set(pks) - set(db_pks)
-        if len(notfound_pks) > 0:
-            raise ValueError(
-                _("Contact {c} not belong to forest and customer").format(
-                    c=", ".join(notfound_pks)
-                )
-            )
-        return values
-
-    @validator("contacts", each_item=True, pre=True)
-    def check_contact(cls, v):
-        if not isinstance(v, Contact):
-            try:
-                return Contact.objects.get(pk=v)
-            except (Contact.DoesNotExist, DjValidationError):
-                raise ValueError(_("Contact {pk} not found").format(pk=v))
-        return v

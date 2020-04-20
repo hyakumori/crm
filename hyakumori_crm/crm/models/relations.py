@@ -4,11 +4,14 @@ from ...core.models import BaseRelationModel
 
 
 class CustomerContact(BaseRelationModel):
-    customer = models.ForeignKey("Customer", on_delete=models.DO_NOTHING)
-    contact = models.ForeignKey("Contact", on_delete=models.DO_NOTHING)
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
+    contact = models.ForeignKey("Contact", on_delete=models.PROTECT)
     is_basic = models.BooleanField(
         default=False
     )  # if True, will show in the list of Owners for select direct owners
+    forestcustomer = models.ForeignKey(
+        "ForestCustomer", null=True, on_delete=models.SET_NULL
+    )
 
     class Meta:
         permissions = [
@@ -32,9 +35,8 @@ class CustomerContact(BaseRelationModel):
 
 
 class ForestCustomer(BaseRelationModel):
-    forest = models.ForeignKey("Forest", on_delete=models.DO_NOTHING)
-    customer = models.ForeignKey("Customer", on_delete=models.DO_NOTHING)
-    contact = models.ForeignKey("Contact", on_delete=models.DO_NOTHING)
+    forest = models.ForeignKey("Forest", on_delete=models.PROTECT)
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
 
     class Meta:
         permissions = [

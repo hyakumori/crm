@@ -47,16 +47,12 @@ def prepare_data():
     Forest.objects.bulk_create([forest1, forest2])
 
     # create forest-customer relations
-    customer1_rel1 = ForestCustomer(
-        forest=forest1, customer=customer1, contact=self_contact1
-    )
-    customer1_rel2 = ForestCustomer(
-        forest=forest2, customer=customer1, contact=self_contact2
-    )
-    customer2_rel1 = ForestCustomer(
-        forest=forest1, customer=customer2, contact=self_contact2
-    )
+    customer1_rel1 = ForestCustomer(forest=forest1, customer=customer1)
+    customer1_rel2 = ForestCustomer(forest=forest2, customer=customer1)
+    customer2_rel1 = ForestCustomer(forest=forest1, customer=customer2)
     ForestCustomer.objects.bulk_create([customer1_rel1, customer1_rel2, customer2_rel1])
+    contact_rel1_to_2.forestcustomer_id = customer1_rel2
+    contact_rel1_to_2.save(update_fields=["forestcustomer_id"])
     return customer1, customer2, self_contact1, self_contact2, forest1, forest2
 
 
@@ -81,8 +77,8 @@ def test_customer_contacts(admin_user, api_rf):
     assert len(resp_data["results"]) == 1
     # check forest1's contact is customer2's contact
     assert resp_data["results"][0]["id"] == str(self_contact2.id)
-    # check customer2's contact has forest1
-    assert resp_data["results"][0]["forest_id"] == str(forest1.id)
+    # check customer2's contact has forest2
+    assert resp_data["results"][0]["forest_id"] == str(forest2.id)
 
 
 @pytest.mark.django_db
@@ -105,9 +101,9 @@ def test_customer_forests(admin_user, api_rf):
     resp_data = orjson.loads(resp.content)
     assert resp_data["count"] == 2
     assert len(resp_data["results"]) == 2
-    # check forest1's contact is customer2's contact
+
     assert resp_data["results"][0]["id"] == str(forest1.id)
     assert resp_data["results"][0]["customers_count"] == 2
-    # check customer2's contact has forest1
+
     assert resp_data["results"][1]["id"] == str(forest2.id)
     assert resp_data["results"][1]["customers_count"] == 1

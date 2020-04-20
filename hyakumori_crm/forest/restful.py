@@ -16,14 +16,12 @@ from ..api.decorators import api_validate_model, get_or_404, typed_api_view
 from .schemas import (
     ForestInput,
     ForestOwnerContactsInput,
-    ForestOwnerContactsDeleteInput,
     OwnerPksInput,
 )
 from .service import (
     get_customer_of_forest,
     get_forest_by_pk,
     set_forest_owner_contacts,
-    delete_forest_owner_contacts,
     update,
     update_owners,
 )
@@ -83,18 +81,4 @@ def update_owners_view(request, *, owner_pks_in: OwnerPksInput):
 @api_validate_model(ForestOwnerContactsInput)
 def set_contacts_to_owner_view(request, *, data: ForestOwnerContactsInput = None):
     set_forest_owner_contacts(data.forest, data)
-    return Response({"id": data.forest.id})
-
-
-@api_view(["PUT", "PATCH"])
-@permission_classes([IsAuthenticated])
-@get_or_404(get_func=get_forest_by_pk, to_name="forest")
-@get_or_404(
-    get_func=get_customer_of_forest, to_name="customer", remove=True,
-)
-@api_validate_model(ForestOwnerContactsDeleteInput)
-def delete_contacts_to_owner_view(
-    request, *, data: ForestOwnerContactsDeleteInput = None
-):
-    delete_forest_owner_contacts(data.forest, data)
     return Response({"id": data.forest.id})
