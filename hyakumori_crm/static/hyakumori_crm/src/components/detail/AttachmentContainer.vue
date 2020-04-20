@@ -7,10 +7,10 @@
       @update="val => (isUpdate = val)"
     />
     <template v-if="isExpand">
-      <attach-card class="mt-4" :isUpdate="isUpdate" :attaches="attachExpand" />
+      <attachment-card class="mt-4" :isUpdate="isUpdate" :attaches="attachExpand" />
     </template>
     <template v-else>
-      <attach-card
+      <attachment-card
         class="mt-4"
         :isUpdate="isUpdate"
         :attaches="attachCollapse"
@@ -28,11 +28,11 @@
 import ContentHeader from "./ContentHeader";
 import UpdateButton from "./UpdateButton";
 import ContainerMixin from "./ContainerMixin";
-import AttachCard from "./AttachCard";
+import AttachmentCard from "./AttachmentCard";
 import AdditionButton from "../AdditionButton";
 
 export default {
-  name: "attach-container",
+  name: "attachment-container",
 
   mixins: [ContainerMixin],
 
@@ -40,7 +40,7 @@ export default {
     ContentHeader,
     UpdateButton,
     AdditionButton,
-    AttachCard,
+    AttachmentCard,
   },
 
   props: {

@@ -9,14 +9,14 @@
           :info="basicInfo"
         />
 
-        <forest-contact-container
+        <forest-contact-tab-container
           headerContent="所有林情報"
           editBtnContent="所有者を追加・編集"
           addBtnContent="連絡者を追加"
           :ownerContacts="ownerContacts"
         />
 
-        <attach-container
+        <attachment-container
           class="consultation-history"
           headerContent="協議履歴"
           editBtnContent="協議記録を追加・編集"
@@ -24,7 +24,7 @@
           :attaches="attaches"
         />
 
-        <attach-container
+        <attachment-container
           class="document-mailing-record"
           headerContent="書類郵送記録"
           editBtnContent="書類郵送記録を追加・編集"
@@ -55,8 +55,7 @@
           />
         </div>
       </div>
-    </template>
-
+    </template>moduleName
     <template #right>
       <div class="forest-detail__log ml-6">
         <h4 class="mb-1">更新履歴</h4>
@@ -79,9 +78,9 @@ import ContentHeader from "../components/detail/ContentHeader";
 import discussions from "../assets/dump/history_discussion.json";
 import actionLogs from "../assets/dump/action_log.json";
 import LogCard from "../components/detail/LogCard";
-import ForestContactContainer from "../components/detail/ForestContactContainer";
+import ForestContactTabContainer from "../components/detail/ForestContactTabContainer";
 import BasicInfoContainer from "../components/detail/BasicInfoContainer";
-import AttachContainer from "../components/detail/AttachContainer";
+import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 import { fetchBasicInfo, fetchForestOwner } from "../api/forest";
 
@@ -94,10 +93,10 @@ export default {
     MainSection,
     ContentHeader,
     LogCard,
-    ForestContactContainer,
     ForestAttributeTable,
     BasicInfoContainer,
-    AttachContainer,
+    AttachmentContainer,
+    ForestContactTabContainer,
   },
 
   data() {

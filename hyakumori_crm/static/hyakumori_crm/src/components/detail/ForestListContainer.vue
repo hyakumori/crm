@@ -9,7 +9,7 @@
       @update="val => (isUpdate = val)"
     />
 
-    <forest-contact-list class="mt-4" :forests="forests" :isUpdate="isUpdate" />
+    <forest-info-list class="mt-4" :forests="forests" :isUpdate="isUpdate" />
     <addition-button class="my-2" v-if="isUpdate" :content="addBtnContent" />
     <update-button v-if="isUpdate" :cancel="cancel.bind(this)" />
   </div>
@@ -18,7 +18,7 @@
 <script>
 import ContainerMixin from "./ContainerMixin";
 import ContentHeader from "./ContentHeader";
-import ForestContactList from "./ForestContactList";
+import ForestInfoList from "./ForestInfoList";
 import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 
@@ -29,7 +29,7 @@ export default {
 
   components: {
     ContentHeader,
-    ForestContactList,
+    ForestInfoList,
     UpdateButton,
     AdditionButton,
   },

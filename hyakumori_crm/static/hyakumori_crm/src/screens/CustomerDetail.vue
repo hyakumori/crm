@@ -26,7 +26,7 @@
           :isLoading="contactsLoading"
         />
 
-        <attach-container
+        <attachment-container
           class="consultation-history mt-12"
           headerContent="協議履歴"
           editBtnContent="協議記録を追加・編集"
@@ -62,7 +62,7 @@
           :forests="[]"
         />
 
-        <basic-info-container
+        <banking-info-container
           class="banking-info mt-12"
           headerContent="口座情報"
           editBtnContent="アカウント情報の追加/編集"
@@ -95,7 +95,8 @@ import discussions from "../assets/dump/history_discussion.json";
 import actionLogs from "../assets/dump/action_log.json";
 import LogCard from "../components/detail/LogCard";
 import BasicInfoContainer from "../components/detail/BasicInfoContainer";
-import AttachContainer from "../components/detail/AttachContainer";
+import BankingInfoContainer from '../components/detail/BankingInfoContainer';
+import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestListContainer from "../components/detail/ForestListContainer";
 import CustomerListContainer from "../components/detail/CustomerListContainer";
 import { filter } from "lodash";
@@ -107,9 +108,10 @@ export default {
     MainSection,
     LogCard,
     BasicInfoContainer,
-    AttachContainer,
+    AttachmentContainer,
     ForestListContainer,
     CustomerListContainer,
+    BankingInfoContainer,
   },
   props: ["id"],
   data() {

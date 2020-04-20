@@ -1,15 +1,15 @@
 <template>
   <v-card
-    class="forest-contact-card d-flex d-hover"
+    class="forest-info-card d-flex d-hover"
     outlined
     :ripple="false"
     @click.self="onClickCard"
   >
-    <v-icon class="forest-contact-card__icon">{{
+    <v-icon class="forest-info-card__icon">{{
       $t("icon.forest_icon")
     }}</v-icon>
 
-    <div class="forest-contact-card__name d-flex ml-4 flex-column">
+    <div class="forest-info-card__name d-flex ml-4 flex-column">
       <div v-if="forestId" class="d-flex justify-space-between">
         <h4 class="body-2">
           {{ forestId }}
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-  name: "forest-contact-card",
+  name: "forest-info-card",
 
   props: {
     card_id: String,
@@ -72,11 +72,11 @@ export default {
 $border-radius: 8px;
 $background-color: #f5f5f5;
 
-.forest-contact-card::before {
+.forest-info-card::before {
   border-radius: $border-radius;
 }
 
-.forest-contact-card {
+.forest-info-card {
   width: 100%;
   height: 100%;
   padding: 10px;

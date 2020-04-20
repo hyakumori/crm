@@ -13,7 +13,7 @@
       <div v-if="fullname" class="d-flex justify-space-between">
         <h4 class="body-2">
           {{ fullname }}
-          <span class="caption">{{ forestCount }} 件の森林</span>
+          <span class="caption">{{ forestCount || 0 }} 件の森林</span>
         </h4>
 
         <p class="green--text mb-0 ml-2 caption">{{ getRelationship }}</p>

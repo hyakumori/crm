@@ -2,7 +2,7 @@
   <v-row dense>
     <template v-for="(forest, index) in forests">
       <v-col cols="6" :key="index">
-        <forest-contact-card
+        <forest-info-card
           :card_id="forest.id"
           :forestId="forest.internal_id"
           :customerCount="forest.customers_count"
@@ -17,13 +17,13 @@
 </template>
 
 <script>
-import ForestContactCard from "./ForestContactCard";
+import ForestInfoCard from "./ForestInfoCard";
 
 export default {
-  name: "forest-contact-list",
+  name: "forest-info-list",
 
   components: {
-    ForestContactCard,
+    ForestInfoCard,
   },
 
   props: {

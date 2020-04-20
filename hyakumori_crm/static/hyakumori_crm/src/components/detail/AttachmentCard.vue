@@ -38,7 +38,7 @@
 
 <script>
 export default {
-  name: "attach-card",
+  name: "attachment-card",
 
   props: {
     attaches: Array,

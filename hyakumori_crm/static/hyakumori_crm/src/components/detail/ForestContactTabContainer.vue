@@ -1,5 +1,5 @@
 <template>
-  <div class="forest-contact">
+  <div class="forest-info">
     <content-header
       :content="headerContent"
       :editBtnContent="editBtnContent"
@@ -28,7 +28,7 @@ import AdditionButton from "../AdditionButton";
 import ContainerMixin from "./ContainerMixin";
 
 export default {
-  name: "forest-contact-container",
+  name: "forest-contact-tab-container",
 
   mixins: [ContainerMixin],
 

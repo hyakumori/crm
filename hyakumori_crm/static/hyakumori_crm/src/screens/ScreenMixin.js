@@ -19,7 +19,6 @@ export default {
           this.fallbackText(info.name_kanji.first_name),
         telephone: info.telephone,
         mobilephone: info.mobilephone,
-        forest_count: 0,
         address: `${this.fallbackText(info.postal_code)}
           ${this.fallbackText(addr.prefecture)}
           ${this.fallbackText(addr.municipality)}
