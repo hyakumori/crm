@@ -51,7 +51,7 @@ class ForestViewSets(viewsets.ModelViewSet):
     def related_archives(self, request):
         return Response()
 
-    @action(detail=True, methods=["PUT", "PATCH"])
+    @action(detail=True, methods=["PUT", "PATCH"], url_path="basic-info")
     @get_or_404(get_func=get_forest_by_pk, to_name="forest", remove=True)
     @api_validate_model(ForestInput, "forest_in")
     def basic_info(self, request, *, forest_in: ForestInput):

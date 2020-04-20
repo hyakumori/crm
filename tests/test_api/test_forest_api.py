@@ -41,7 +41,7 @@ def test_get_customers_of_forest(api_rf, admin_user):
 @pytest.mark.django_db
 def test_update_forest_basic_info(api_rf, admin_user, forest):
     req = api_rf.put(
-        f"/api/v1/forests/{forest.pk}",
+        f"/api/v1/forests/{forest.pk}/basic-info",
         {
             "cadastral": {"prefecture": "foo", "municipality": "foo", "sector": "bar"},
             "contracts": [{"type": ContractType.long_term.value}],
@@ -59,7 +59,7 @@ def test_update_forest_basic_info(api_rf, admin_user, forest):
 @pytest.mark.django_db
 def test_update_forest_basic_info_not_found(api_rf, admin_user):
     pk = uuid4()
-    req = api_rf.put(f"/api/v1/forests/{pk}", {}, format="json",)
+    req = api_rf.put(f"/api/v1/forests/{pk}/basic-info", {}, format="json",)
     view = ForestViewSets.as_view({"put": "basic_info"})
     force_authenticate(req, user=admin_user)
     resp = view(req, pk=pk)
