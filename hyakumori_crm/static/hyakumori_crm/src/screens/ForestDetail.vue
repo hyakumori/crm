@@ -2,12 +2,11 @@
   <main-section class="forest-detail">
     <template #section>
       <div class="forest-detail__section px-7">
-        <basic-info-container
+        <forest-basic-info-container
           headerContent="基本情報 (登記情報)"
           editBtnContent="所有地を追加・編集"
-          :id="forestId"
-          :isLoading="basicInfo.length === 0"
-          :info="basicInfo"
+          :isLoading="!forestInfo"
+          :info="forestInfo"
         />
 
         <forest-contact-tab-container
@@ -55,8 +54,8 @@
             :isLoading="forrestAttributes.length === 0"
           />
         </div>
-      </div> </template
-    >moduleName
+      </div>
+    </template>
     <template #right>
       <div class="forest-detail__log ml-6">
         <h4 class="mb-1">更新履歴</h4>
@@ -80,7 +79,7 @@ import discussions from "../assets/dump/history_discussion.json";
 import actionLogs from "../assets/dump/action_log.json";
 import LogCard from "../components/detail/LogCard";
 import ForestContactTabContainer from "../components/detail/ForestContactTabContainer";
-import BasicInfoContainer from "../components/detail/BasicInfoContainer";
+import ForestBasicInfoContainer from "../components/detail/ForestBasicInfoContainer";
 import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 import { fetchBasicInfo, fetchForestOwner } from "../api/forest";
@@ -95,7 +94,7 @@ export default {
     ContentHeader,
     LogCard,
     ForestAttributeTable,
-    BasicInfoContainer,
+    ForestBasicInfoContainer,
     AttachmentContainer,
     ForestContactTabContainer,
   },
@@ -121,7 +120,7 @@ export default {
           this.setHeaderInfo(basicInfo);
         }),
       )
-      .catch(() => this.$router.push({ name: "not-found" }));
+      // .catch(() => this.$router.push({ name: "not-found" }));
   },
 
   methods: {
@@ -133,23 +132,6 @@ export default {
         backUrl: { name: "forests" },
       };
       this.$store.dispatch("setHeaderInfo", headerInfo);
-    },
-
-    forestContractDateRange(info) {
-      const longTermContract = info.contracts[0];
-      if (longTermContract) {
-        if (longTermContract.start_date) {
-          if (longTermContract.end_date) {
-            return `${longTermContract.start_date} - ${longTermContract.end_date}`;
-          } else {
-            return `${longTermContract.start_date} - `;
-          }
-        } else {
-          return "";
-        }
-      } else {
-        return "";
-      }
     },
 
     fallbackText(text) {
@@ -168,42 +150,6 @@ export default {
 
     attaches() {
       return discussions;
-    },
-
-    basicInfo() {
-      let basicInfo = [];
-      const forestInfo = this.forestInfo;
-      if (forestInfo) {
-        const cadas = forestInfo.cadastral;
-        basicInfo = [
-          {
-            attr: "cadastral.prefecture",
-            label: "都道府県",
-            value: cadas.prefecture,
-          },
-          {
-            attr: "cadastral.municipality",
-            label: "市町村",
-            value: cadas.municipality,
-          },
-          {
-            attr: "cadastral.sector",
-            label: "大字",
-            value: cadas.sector,
-          },
-          {
-            attr: "cadastral.subsector",
-            label: "地番",
-            value: cadas.subsector,
-          },
-          {
-            attr: "contracts[0]",
-            label: "契約期間",
-            value: this.forestContractDateRange(forestInfo),
-          },
-        ];
-      }
-      return basicInfo;
     },
 
     getActionLogs() {

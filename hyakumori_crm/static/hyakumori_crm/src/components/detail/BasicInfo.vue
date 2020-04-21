@@ -24,7 +24,7 @@ export default {
 
   props: {
     isUpdate: Boolean,
-    isSave: isSave,
+    isSave: Boolean,
     infos: Array,
   },
 
