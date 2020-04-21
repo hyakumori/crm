@@ -2,23 +2,19 @@ from typing import Dict, Iterator, Union
 from uuid import UUID
 
 from django.core.exceptions import ValidationError
-from django.db import connection
-from django.db.models import (
-    CharField,
-    F,
-    OuterRef,
-    PositiveSmallIntegerField,
-    Q,
-    Subquery,
-)
-from django.db.models import Value as V
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import Concat
+from django.db import connection, IntegrityError
+from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 from querybuilder.query import Expression, Query
 
 from hyakumori_crm.core.models import RawSQLField
-from hyakumori_crm.crm.models import Contact, Customer, CustomerContact, ForestCustomer
+from hyakumori_crm.crm.models import (
+    Contact,
+    Customer,
+    CustomerContact,
+    ForestCustomer,
+    Forest,
+)
 from hyakumori_crm.users.models import User
 
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
@@ -41,26 +37,25 @@ def get_customer_by_pk(pk):
 
 
 def get_customer_contacts(pk: UUID):
-    q = Contact.objects.raw(
-        "select crm_contact.*, crm_forestcustomer.forest_id as forest_id "
-        "from crm_contact "
-        "inner join crm_customercontact "
-        "on crm_contact.id = crm_customercontact.contact_id "
-        "left outer join crm_forestcustomer "
-        "on crm_forestcustomer.contact_id = crm_contact.id "
-        "where crm_customercontact.customer_id = %(pk)s "
-        "and crm_customercontact.is_basic = false "
-        "and crm_forestcustomer.customer_id != %(pk)s "
-        "and crm_contact.deleted is null "
-        "and crm_forestcustomer.deleted is null",
-        {"pk": pk},
+    q = (
+        Contact.objects.filter(
+            customercontact__customer_id=pk, customercontact__is_basic=False,
+        )
+        .annotate(
+            forest_id=F(
+                "customercontact__forestcustomercontact__forestcustomer__forest_id"
+            )
+        )
+        .order_by("created_at")
     )
     return q
 
 
-def get_customer_forest_relations(pk: UUID):
-    return ForestCustomer.objects.filter(customer_id=pk).prefetch_related(
-        "forest", "forest__forestcustomer_set", "contact"
+def get_customer_forests(pk: UUID):
+    return (
+        Forest.objects.filter(forestcustomer__customer_id=pk)
+        .prefetch_related("forestcustomer_set")
+        .order_by("created_at")
     )
 
 
@@ -194,4 +189,39 @@ def create(customer_in: CustomerInputSchema):
 
 def update(customer, data):
     # do update...
+    return customer
+
+
+def contacts_list_with_search(search_str: str = None):
+    queryset = Contact.objects.all()
+    if search_str:
+        queryset = queryset.filter(
+            Q(name_kanji__first_name__icontains=search_str)
+            | Q(name_kanji__last_name__icontains=search_str)
+            | Q(name_kana__first_name__icontains=search_str)
+            | Q(name_kana__last_name__icontains=search_str)
+            | Q(postal_code__icontains=search_str)
+            | Q(telephone__icontains=search_str)
+            | Q(mobilephone__icontains=search_str)
+            | Q(email__icontains=search_str)
+            | Q(address__sector__icontains=search_str)
+            | Q(address__prefecture__icontains=search_str)
+            | Q(address__municipality__icontains=search_str)
+        )
+    return queryset
+
+
+def delete_customer_contacts(contacts_delete_in: dict):
+    customer = contacts_delete_in.customer
+    contacts = contacts_delete_in.contacts
+    customer_contact = CustomerContact.filter(
+        customer_id=customer.pk, contact_id__in=map(lambda c: c.pk, contacts)
+    ).delete()
+    # should we really delete contact or just relation to customer?
+    for contact in contacts:
+        try:
+            contact.delete()
+        except IntegrityError:
+            pass
+    customer.save(update_fields=["updated_at"])
     return customer

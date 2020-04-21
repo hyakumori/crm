@@ -13,11 +13,15 @@ from hyakumori_crm.crm.models import Forest
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, ForestSerializer
 
 from ..api.decorators import api_validate_model, get_or_404, typed_api_view
-from .schemas import ForestInput, ForestOwnerContractInput, OwnerPksInput
+from .schemas import (
+    ForestInput,
+    ForestOwnerContactsInput,
+    OwnerPksInput,
+)
 from .service import (
     get_customer_of_forest,
     get_forest_by_pk,
-    set_forest_owner_contact,
+    set_forest_owner_contacts,
     update,
     update_owners,
 )
@@ -74,7 +78,7 @@ def update_owners_view(request, *, owner_pks_in: OwnerPksInput):
 @get_or_404(
     get_func=get_customer_of_forest, to_name="customer", remove=True,
 )
-@api_validate_model(ForestOwnerContractInput)
-def set_contact_to_owner_view(request, *, data: ForestOwnerContractInput = None):
-    set_forest_owner_contact(data.forest, data)
+@api_validate_model(ForestOwnerContactsInput)
+def set_contacts_to_owner_view(request, *, data: ForestOwnerContactsInput = None):
+    set_forest_owner_contacts(data.forest, data)
     return Response({"id": data.forest.id})

@@ -12,10 +12,11 @@ from hyakumori_crm.crm.models import (
     ForestCustomer,
 )
 from hyakumori_crm.crm.schemas.contract import ContractType
+from hyakumori_crm.forest.schemas import RelationshipType
 from hyakumori_crm.forest.restful import (
     update,
     update_owners_view,
-    set_contact_to_owner_view,
+    set_contacts_to_owner_view,
     ForestViewSets,
 )
 
@@ -87,9 +88,7 @@ def test_update_owners_view(api_rf, admin_user, forest):
     CustomerContact.objects.create(
         customer=customer2, contact=contact_customer2, is_basic=True,
     )
-    ForestCustomer.objects.create(
-        forest=forest, customer=customer1, contact=contact_customer1,
-    )
+    ForestCustomer.objects.create(forest=forest, customer=customer1)
 
     req = api_rf.put(
         f"/api/v1/forests/{forest.pk}/customers",
@@ -123,27 +122,24 @@ def test_set_contact_to_owner_view(api_rf, admin_user, forest):
     CustomerContact.objects.create(
         customer=customer2, contact=contact_customer2, is_basic=True,
     )
-    ForestCustomer.objects.create(
-        forest=forest, customer=customer1, contact=contact_customer1,
-    )
+    ForestCustomer.objects.create(forest=forest, customer=customer1)
     req = api_rf.put(
         f"/api/v1/forests/{forest.pk}/customers/{customer1.pk}/set-contact",
-        {"contact": str(contact_customer2.pk)},
+        {
+            "contacts": [
+                {
+                    "contact": str(contact_customer2.pk),
+                    "relationship_type": RelationshipType.self,
+                }
+            ]
+        },
         format="json",
     )
     force_authenticate(req, user=admin_user)
-    resp = set_contact_to_owner_view(req, pk=forest.pk, customer_pk=customer1.pk)
-    forest.refresh_from_db()
+    resp = set_contacts_to_owner_view(req, pk=forest.pk, customer_pk=customer1.pk)
     assert resp.status_code == 200
+    forest.refresh_from_db()
+    assert ForestCustomer.objects.filter(forest=forest, customer=customer1).count() == 1
     assert (
-        ForestCustomer.objects.filter(
-            forest=forest, customer=customer1, contact=contact_customer2,
-        ).count()
-        == 1
-    )
-    assert (
-        ForestCustomer.objects.filter(
-            forest=forest, customer=customer1, contact=contact_customer1,
-        ).count()
-        == 0
+        CustomerContact.objects.filter(customer=customer1, is_basic=False).count() == 1
     )
