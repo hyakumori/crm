@@ -9,7 +9,7 @@
 
       <div class="ml-7 forest__data-section">
         <table-action
-          class="mb-4"
+          class="forest__data-section__table-action mb-4"
           v-if="tableSelectedRow.length > 0"
           :selectedCount="tableSelectedRow.length"
         />
@@ -225,6 +225,13 @@ export default {
   &__data-section {
     width: 100%;
     overflow: hidden;
+
+    &__table-action ::v-deep {
+      .table-action__select {
+        height: 100%;
+        top: 20%;
+      }
+    }
   }
 }
 </style>
