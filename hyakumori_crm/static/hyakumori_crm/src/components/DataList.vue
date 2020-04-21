@@ -1,12 +1,12 @@
 <template>
   <v-layout v-resize="onResize">
     <v-data-table
-      dense
-      light
-      :fixed-header="true"
-      :height="tableHeight"
       ref="dataTable"
       v-model="selected"
+      dense
+      light
+      :height="tableHeight"
+      :fixed-header="true"
       :mobile-breakpoint="0"
       :item-key="itemKey"
       :multi-sort="multiSort"
