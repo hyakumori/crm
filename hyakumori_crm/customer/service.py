@@ -39,12 +39,14 @@ def get_customer_by_pk(pk):
 def get_customer_contacts(pk: UUID):
     q = (
         Contact.objects.filter(
-            customercontact__customer_id=pk,
-            customercontact__is_basic=False,
-            customercontact__forestcustomer__customer_id=pk,
+            customercontact__customer_id=pk, customercontact__is_basic=False,
         )
-        .annotate(forest_id=F("customercontact__forestcustomer__forest_id"))
-        .order_by("id")
+        .annotate(
+            forest_id=F(
+                "customercontact__forestcustomercontact__forestcustomer__forest_id"
+            )
+        )
+        .order_by("created_at")
     )
     return q
 

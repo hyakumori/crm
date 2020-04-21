@@ -9,9 +9,6 @@ class CustomerContact(BaseRelationModel):
     is_basic = models.BooleanField(
         default=False
     )  # if True, will show in the list of Owners for select direct owners
-    forestcustomer = models.ForeignKey(
-        "ForestCustomer", null=True, on_delete=models.SET_NULL
-    )
 
     class Meta:
         permissions = [
@@ -42,6 +39,11 @@ class ForestCustomer(BaseRelationModel):
         permissions = [
             ("manage_forestcustomer", "All permissions for forest customer"),
         ]
+
+
+class ForestCustomerContact(BaseRelationModel):
+    forestcustomer = models.ForeignKey("ForestCustomer", on_delete=models.CASCADE)
+    customercontact = models.ForeignKey("CustomerContact", on_delete=models.CASCADE)
 
 
 class ArchiveForest(BaseRelationModel):

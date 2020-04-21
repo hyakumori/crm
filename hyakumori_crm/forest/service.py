@@ -6,7 +6,13 @@ from django.db import IntegrityError
 from django.db import connections
 from django.db.utils import OperationalError
 
-from ..crm.models import Forest, ForestCustomer, Customer, CustomerContact
+from ..crm.models import (
+    Forest,
+    ForestCustomer,
+    Customer,
+    CustomerContact,
+    ForestCustomerContact,
+)
 from .schemas import ForestFilter
 
 
@@ -81,16 +87,15 @@ def set_forest_owner_contacts(forest: Forest, forest_owner_contact_in: dict):
         customer_contact, _ = CustomerContact.objects.get_or_create(
             customer_id=customer.id, contact_id=contact.contact.pk
         )
-        customer_contact.forestcustomer_id = (
-            forestcustomer.id if contact.set_forest else None
-        )
+        if contact.set_forest:
+            ForestCustomerContact.objects.get_or_create(
+                forestcustomer=forestcustomer, customercontact=customer_contact
+            )
         customer_contact.attributes = {
             **(customer_contact.attributes or {}),
             "relationship_type": contact.relationship_type,
         }
-        customer_contact.save(
-            update_fields=["forestcustomer_id", "attributes", "updated_at"]
-        )
+        customer_contact.save(update_fields=["attributes", "updated_at"])
     customer.save(update_fields=["updated_at"])
     forest.save(update_fields=["updated_at"])
     return forest
