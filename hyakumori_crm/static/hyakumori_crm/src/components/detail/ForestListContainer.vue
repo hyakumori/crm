@@ -8,9 +8,15 @@
       :displayAdditionBtn="displayAdditionBtn"
       @update="val => (isUpdate = val)"
     />
-
     <forest-info-list class="mt-4" :forests="forests" :isUpdate="isUpdate" />
-    <addition-button class="my-2" v-if="isUpdate" :content="addBtnContent" />
+    <SelectListModal activator="#forestAdd" title="Foo" submitBtnText="Add" />
+    <addition-button
+      ref="addBtn"
+      class="my-2"
+      id="forestAdd"
+      v-if="isUpdate"
+      :content="addBtnContent"
+    />
     <update-button v-if="isUpdate" :cancel="cancel.bind(this)" />
   </div>
 </template>
@@ -21,6 +27,7 @@ import ContentHeader from "./ContentHeader";
 import ForestInfoList from "./ForestInfoList";
 import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
+import SelectListModal from "../SelectListModal";
 
 export default {
   name: "forest-list-container",
@@ -32,12 +39,17 @@ export default {
     ForestInfoList,
     UpdateButton,
     AdditionButton,
+    SelectListModal,
   },
 
   props: {
     forests: Array,
-    isUpdate: Boolean,
     displayAdditionBtn: Boolean,
+  },
+  data() {
+    return {
+      isUpdate: false,
+    };
   },
 };
 </script>

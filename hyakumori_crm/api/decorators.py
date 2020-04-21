@@ -99,7 +99,7 @@ def api_validate_model(input_model, arg_name="data"):
                 validated_input = input_model(**request.data)
                 kwargs[arg_name] = validated_input
             except ValidationError as e:
-                return Response({"errors": errors_wrapper(e.errors())}, status=404)
+                return Response({"errors": errors_wrapper(e.errors())}, status=400)
 
             try:
                 return f(*args, **kwargs)

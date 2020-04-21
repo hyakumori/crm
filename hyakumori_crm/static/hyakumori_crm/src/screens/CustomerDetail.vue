@@ -7,14 +7,24 @@
           editBtnContent="所有地を追加・編集"
           :isLoading="customerLoading"
           :info="basicInfo"
-        />
+          :pk="id"
+        >
+          <template #form="props"
+            ><ContactForm
+              :pk="id"
+              :form="selfContactFormData"
+              :toggleEditing="props.toggleEditing"
+          /></template>
+        </basic-info-container>
 
         <forest-list-container
           headerContent="所有林情報"
           editBtnContent="フォレストの追加/編集"
           addBtnContent="所有地情報を追加"
+          :displayAdditionBtn="true"
           :isLoading="forestsLoading"
           :forests="forests"
+          v-if="id"
         />
 
         <customer-list-container
@@ -24,6 +34,7 @@
           addBtnContent="連絡者を追加"
           :contacts="forestContacts"
           :isLoading="contactsLoading"
+          v-if="id"
         />
 
         <attachment-container
@@ -33,6 +44,7 @@
           addBtnContent="協議履歴を追加"
           :attaches="[]"
           :isLoading="false"
+          v-if="id"
         />
 
         <customer-list-container
@@ -42,6 +54,7 @@
           addBtnContent="連絡者を追加"
           :contacts="familyContacts"
           :isLoading="contactsLoading"
+          v-if="id"
         />
 
         <customer-list-container
@@ -51,6 +64,7 @@
           addBtnContent="連絡者を追加"
           :contacts="otherContacts"
           :isLoading="contactsLoading"
+          v-if="id"
         />
 
         <forest-list-container
@@ -60,6 +74,7 @@
           :displayAdditionBtn="false"
           :isLoading="false"
           :forests="[]"
+          v-if="id"
         />
 
         <banking-info-container
@@ -68,6 +83,7 @@
           editBtnContent="アカウント情報の追加/編集"
           :isLoading="customerLoading"
           :info="bankingInfo"
+          v-if="id"
         />
       </div>
     </template>
@@ -99,6 +115,7 @@ import BankingInfoContainer from "../components/detail/BankingInfoContainer";
 import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestListContainer from "../components/detail/ForestListContainer";
 import CustomerListContainer from "../components/detail/CustomerListContainer";
+import ContactForm from "../components/forms/ContactForm";
 import { filter } from "lodash";
 
 export default {
@@ -112,6 +129,7 @@ export default {
     ForestListContainer,
     CustomerListContainer,
     BankingInfoContainer,
+    ContactForm,
   },
   props: ["id"],
   data() {
@@ -137,44 +155,46 @@ export default {
         bankingInfo: false,
       },
       customer: null,
-      customerLoading: true,
+      customerLoading: this.id ? true : false,
       forests: [],
-      forestsLoading: true,
+      forestsLoading: this.id ? true : false,
       contacts: [],
-      contactsLoading: true,
+      contactsLoading: this.id ? true : false,
       selectedForestId: null,
     };
   },
 
   mounted() {
-    this.$rest.get(`/customers/${this.id}`).then(data => {
-      this.customer = data;
-      this.customerLoading = false;
-    });
-    this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
-      let forests = data.results;
-      let next = data.next;
-      //TODO: implement UI pagination
-      while (!!next) {
-        let nextForests = await this.$rest.get(data.next);
-        forests.push(...nextForests.results);
-        next = nextForests.next;
-      }
-      this.forests = forests;
-      this.forestsLoading = false;
-    });
-    this.$rest.get(`/customers/${this.id}/contacts`).then(async data => {
-      let contacts = data.results;
-      let next = data.next;
-      //TODO: implement UI pagination
-      while (!!next) {
-        let nextContacts = await this.$rest.get(data.next);
-        contacts.push(...nextContacts.results);
-        next = nextContacts.next;
-      }
-      this.contacts = contacts;
-      this.contactsLoading = false;
-    });
+    if (this.id) {
+      this.$rest.get(`/customers/${this.id}`).then(data => {
+        this.customer = data;
+        this.customerLoading = false;
+      });
+      this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
+        let forests = data.results;
+        let next = data.next;
+        //TODO: implement UI pagination
+        while (!!next) {
+          let nextForests = await this.$rest.get(data.next);
+          forests.push(...nextForests.results);
+          next = nextForests.next;
+        }
+        this.forests = forests;
+        this.forestsLoading = false;
+      });
+      this.$rest.get(`/customers/${this.id}/contacts`).then(async data => {
+        let contacts = data.results;
+        let next = data.next;
+        //TODO: implement UI pagination
+        while (!!next) {
+          let nextContacts = await this.$rest.get(data.next);
+          contacts.push(...nextContacts.results);
+          next = nextContacts.next;
+        }
+        this.contacts = contacts;
+        this.contactsLoading = false;
+      });
+    }
   },
 
   methods: {
@@ -240,7 +260,22 @@ export default {
       // TODO: remove this
       return actionLogs;
     },
-
+    selfContactFormData() {
+      return {
+        last_name_kanji: this.customer?.self_contact.name_kanji.last_name || "",
+        first_name_kanji:
+          this.customer?.self_contact.name_kanji.first_name || "",
+        last_name_kana: this.customer?.self_contact.name_kana.last_name || "",
+        first_name_kana: this.customer?.self_contact.name_kana.first_name || "",
+        postal_code: this.customer?.self_contact.postal_code || "",
+        sector: this.customer?.self_contact.address.sector || "",
+        prefecture: this.customer?.self_contact.address.prefecture || "",
+        municipality: this.customer?.self_contact.address.municipality || "",
+        telephone: this.customer?.self_contact.telephone || "",
+        mobilephone: this.customer?.self_contact.mobilephone || "",
+        email: this.customer?.self_contact.email || "",
+      };
+    },
     basicInfo() {
       return [
         {

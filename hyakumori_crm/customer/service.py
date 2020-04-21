@@ -162,7 +162,6 @@ def get_list(
 
 
 def create(customer_in: CustomerInputSchema):
-    admin = User.objects.filter(is_superuser=True, is_active=True).first()
     customer = Customer()
     contacts = []
     customer_contacts = []

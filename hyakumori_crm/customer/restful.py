@@ -10,13 +10,14 @@ from hyakumori_crm.crm.models import Contact, Customer, ForestCustomer
 from hyakumori_crm.crm.restful.serializers import ContactSerializer, CustomerSerializer
 
 from ..api.decorators import api_validate_model, get_or_404
-from .schemas import ForestSerializer, CustomerContactsDeleteInput
+from .schemas import ForestSerializer, CustomerContactsDeleteInput, CustomerInputSchema
 from .service import (
     get_customer_contacts,
     get_customer_forests,
     contacts_list_with_search,
     delete_customer_contacts,
     get_customer_by_pk,
+    create,
 )
 
 
@@ -26,6 +27,11 @@ class CustomerViewSets(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Customer.objects.all()
+
+    @api_validate_model(CustomerInputSchema)
+    def create(self, request, data: dict = None):
+        customer = create(data)
+        return Response({"id": customer.id}, status=201)
 
     @typed_action(detail=True, methods=["GET"], permission_classes=[IsAuthenticated])
     def contacts(self, request):

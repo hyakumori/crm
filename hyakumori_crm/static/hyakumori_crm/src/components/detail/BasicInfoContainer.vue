@@ -8,17 +8,16 @@
       @update="val => (isUpdate = val)"
     />
     <div class="my-4">
-      <basic-info
-        :infos="info"
-        :isUpdate="isUpdate"
-        :isSave="isSave"
-        @updateInfo="updateData"
-      />
-      <update-button
-        class="mb-12"
-        v-if="isUpdate"
-        :cancel="cancel.bind(this)"
-      />
+      <slot
+        v-if="isUpdate || !pk"
+        name="form"
+        :toggleEditing="
+          () => {
+            isUpdate = !isUpdate;
+          }
+        "
+      ></slot>
+      <basic-info v-if="!!pk && !isUpdate" :infos="info" />
     </div>
   </div>
 </template>
@@ -26,7 +25,6 @@
 <script>
 import BasicInfo from "./BasicInfo";
 import ContentHeader from "./ContentHeader";
-import UpdateButton from "./UpdateButton";
 import ContainerMixin from "./ContainerMixin";
 import { updateBasicInfo } from "../../api/forest";
 import { zipObjectDeep } from "lodash";
@@ -39,14 +37,12 @@ export default {
   components: {
     ContentHeader,
     BasicInfo,
-    UpdateButton,
   },
-
   props: {
     id: String,
     info: Array,
+    pk: String,
   },
-
   data() {
     return {
       isUpdate: false,

@@ -31,6 +31,8 @@
   },
   "forms": {
     "labels": {
+      "prefecture": "都道府県",
+      "municipality": "市町村",
       "address": "住所",
       "customer": {
         "add_more_info": "より詳細な情報を表示",
@@ -56,7 +58,9 @@
         "last_name_kanji": "例）山田",
         "mobile_number": "電話番号を入力",
         "phone_number": "電話番号を入力",
-        "postal_code": "郵便番号を入力（数字7桁）"
+        "postal_code": "郵便番号を入力（数字7桁）",
+        "prefecture": "県に入ります",
+        "municipality": "自治体に入る"
       }
     },
     "titles": {
