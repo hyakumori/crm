@@ -64,3 +64,8 @@ class ArchiveCustomer(BaseRelationModel):
 class ArchiveCustomerContact(BaseRelationModel):
     archivecustomer = models.ForeignKey("ArchiveCustomer", on_delete=models.CASCADE)
     customercontact = models.ForeignKey("CustomerContact", on_delete=models.CASCADE)
+
+
+class ArchiveUser(BaseRelationModel):
+    archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
+    user = models.ForeignKey("users.User", on_delete=models.PROTECT)
