@@ -1,16 +1,15 @@
 from typing import Optional, List
 from datetime import date
 from uuid import UUID
-from django.core.exceptions import ValidationError
+from enum import Enum
+from django.core.exceptions import ValidationError as DjValidationError
 from django.utils.translation import gettext_lazy as _
 from django_filters import FilterSet, CharFilter, DateFilter
 from pydantic import validator, root_validator
 
-from hyakumori_crm.core.models import HyakumoriDanticModel
-from hyakumori_crm.crm.models import Contact
+from hyakumori_crm.core.models import HyakumoriDanticModel, Paginator
+from hyakumori_crm.crm.models import Contact, Forest, ForestCustomer, Customer
 from hyakumori_crm.crm.schemas.contract import ContractType
-from ..core.models import Paginator
-from ..crm.models import Forest, ForestCustomer, Customer
 
 
 class ForestFilter(FilterSet):
@@ -123,10 +122,23 @@ class OwnerPksInput(HyakumoriDanticModel):
         return v
 
 
-class ForestOwnerContractInput(HyakumoriDanticModel):
-    forest: Forest
-    customer: Customer
+class RelationshipType(str, Enum):
+    self = "本人"
+    parents = "両親"
+    husband = "夫"
+    wife = "妻"
+    son = "息子"
+    daughter = "娘"
+    grandchild = "孫"
+    friend = "友人"
+    relative = "その他親族"
+    other = "その他"
+
+
+class SingleSelectContactInput(HyakumoriDanticModel):
     contact: Contact
+    relationship_type: RelationshipType
+    set_forest: bool = False
 
     class Config:
         arbitrary_types_allowed = True
@@ -136,6 +148,27 @@ class ForestOwnerContractInput(HyakumoriDanticModel):
         if not isinstance(v, Contact):
             try:
                 return Contact.objects.get(pk=v)
-            except (Contact.DoesNotExist, ValidationError):
+            except (Contact.DoesNotExist, DjValidationError):
                 raise ValueError(_("Contact not found"))
         return v
+
+
+class ForestOwnerContactsInput(HyakumoriDanticModel):
+    forest: Forest
+    customer: Customer
+    contacts: List[SingleSelectContactInput]
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @root_validator
+    def prepare_contacts(cls, values):
+        forest = values.get("forest")
+        customer = values.get("customer")
+        contacts = values.get("contacts")
+        if not forest or not customer or not contacts:
+            return values
+        pks = list(map(lambda c: str(c.contact.pk), contacts))
+        if len(set(pks)) < len(pks):
+            raise ValueError(_("Duplicate contacts"))
+        return values
