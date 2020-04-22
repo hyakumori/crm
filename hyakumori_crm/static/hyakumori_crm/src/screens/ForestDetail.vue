@@ -34,18 +34,12 @@
         />
 
         <div id="forest-attributes">
-          <content-header
-            class="mt-9"
-            content="森林情報"
-            :displayAdditionBtn="false"
-          />
+          <content-header class="mt-9" content="森林情報" :displayAdditionBtn="false" />
           <v-row class="forest-detail__header d-flex mx-0 mt-5">
             <template v-for="(header, index) in headerData">
               <v-col class="forest-detail__header--text" cols="3" :key="index">
                 <td class="pr-2">{{ header.name }}</td>
-                <td class="forest-detail__header--text__data--color">
-                  {{ header.data }}
-                </td>
+                <td class="forest-detail__header--text__data--color">{{ header.data }}</td>
               </v-col>
             </template>
           </v-row>
@@ -119,8 +113,8 @@ export default {
           this.forestOwners = owners.results;
           this.setHeaderInfo(basicInfo);
         }),
-      )
-      // .catch(() => this.$router.push({ name: "not-found" }));
+      );
+    // .catch(() => this.$router.push({ name: "not-found" }));
   },
 
   methods: {
@@ -136,6 +130,26 @@ export default {
 
     fallbackText(text) {
       return text || "";
+    },
+
+    mapContact(info) {
+      const self_contact = info.self_contact;
+      const addr = self_contact.address;
+      const kanji_name = self_contact.name_kanji;
+      return {
+        customer_id: info.id,
+        fullname:
+          this.fallbackText(kanji_name.last_name) +
+          this.fallbackText(kanji_name.first_name),
+        telephone: self_contact.telephone,
+        mobilephone: self_contact.mobilephone,
+        forest_count: info.forests_count,
+        address: `${this.fallbackText(self_contact.postal_code)}
+          ${this.fallbackText(addr.prefecture)}
+          ${this.fallbackText(addr.municipality)}
+          ${this.fallbackText(addr.sector)}`,
+        email: self_contact.email,
+      };
     },
   },
 

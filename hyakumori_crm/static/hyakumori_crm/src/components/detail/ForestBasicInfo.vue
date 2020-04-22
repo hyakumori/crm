@@ -68,7 +68,7 @@ export default {
     },
 
     formatDate(date) {
-      return date.replace(new RegExp("-", "g"), "/");
+      return date && date.replace(new RegExp("-", "g"), "/");
     },
   },
 
@@ -99,14 +99,14 @@ export default {
       let fullDate = "";
       const contract = this.contract;
       if (contract) {
-        fullDate = `${this.formatDate(contract.start_date)} - 
-        ${this.formatDate(contract.end_date) || ""}`;
+        fullDate = `${this.formatDate(contract.start_date) || ''} ${contract.start_date ? '-' : ''} 
+        ${this.formatDate(contract.end_date) || '未入力'}`;
       }
       return fullDate;
     },
 
     dates() {
-      return [this.contract.start_date, this.contract.end_date || ""];
+      return [this.contract.start_date || "", this.contract.end_date || ""];
     },
   },
 

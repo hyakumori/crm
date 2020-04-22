@@ -9,7 +9,7 @@
     />
     <div class="mt-4">
       <forest-basic-info
-        :info="innerInfo"
+        :info="mutableInfo"
         :isUpdate="isUpdate"
         :isSave="isSave"
         @updateInfo="updateData"
@@ -53,6 +53,7 @@ export default {
       isUpdate: false,
       isSave: false,
       immutableInfo: {},
+      mutableInfo: null,
     };
   },
 
@@ -62,19 +63,19 @@ export default {
     },
 
     cancel() {
-      this.innerInfo = this.immutableInfo;
+      this.mutableInfo = this.immutableInfo;
       this.isUpdate = false;
     },
 
     setUpdate(val) {
       this.isUpdate = val;
-      this.immutableInfo = cloneDeep(this.info);
+      this.immutableInfo = cloneDeep(this.mutableInfo);
     },
 
     updateData(updateInfo) {
       updateBasicInfo(this.info.id, updateInfo)
         .then(res => {
-          this.innerInfo = res;
+          this.mutableInfo = res;
           this.isSave = false;
           this.isUpdate = false;
         })
@@ -84,14 +85,9 @@ export default {
     },
   },
 
-  computed: {
-    innerInfo: {
-      get: function() {
-        return this.info;
-      },
-      set: function(val) {
-        this.info = val;
-      },
+  watch: {
+    info(val) {
+      this.mutableInfo = val;
     },
   },
 };
