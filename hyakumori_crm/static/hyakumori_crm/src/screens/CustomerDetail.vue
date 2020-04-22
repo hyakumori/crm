@@ -26,6 +26,7 @@
           :isLoading="forestsLoading"
           :forests="forests"
           :id="id"
+          @saved="getForests"
         />
 
         <customer-list-container
@@ -171,18 +172,7 @@ export default {
         this.customer = data;
         this.customerLoading = false;
       });
-      this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
-        let forests = data.results;
-        let next = data.next;
-        //TODO: implement UI pagination
-        while (!!next) {
-          let nextForests = await this.$rest.get(data.next);
-          forests.push(...nextForests.results);
-          next = nextForests.next;
-        }
-        this.forests = forests;
-        this.forestsLoading = false;
-      });
+      this.getForests();
       this.$rest.get(`/customers/${this.id}/contacts`).then(async data => {
         let contacts = data.results;
         let next = data.next;
@@ -212,6 +202,20 @@ export default {
       }
 
       return (nameObj && (nameObj.last_name || nameObj.first_name)) || "";
+    },
+    getForests() {
+      this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
+        let forests = data.results;
+        let next = data.next;
+        //TODO: implement UI pagination
+        while (!!next) {
+          let nextForests = await this.$rest.get(data.next);
+          forests.push(...nextForests.results);
+          next = nextForests.next;
+        }
+        this.forests = forests;
+        this.forestsLoading = false;
+      });
     },
   },
 

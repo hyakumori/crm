@@ -6,9 +6,10 @@
       elevation="0"
       class="mr-2"
       @click.stop="save"
+      :loading="saving"
       >{{ $t("buttons.save") }}</v-btn
     >
-    <v-btn class="update-btn__cancel" text @click="onCancel">{{
+    <v-btn class="update-btn__cancel" text @click="cancel">{{
       $t("buttons.cancel")
     }}</v-btn>
   </div>
@@ -17,25 +18,11 @@
 <script>
 export default {
   name: "update-button",
-
   props: {
     save: Function,
     cancel: Function,
     saveDisabled: Boolean,
-  },
-
-  methods: {
-    onCancel() {
-      if (this.cancel) {
-        this.cancel();
-      }
-    },
-
-    onSave() {
-      if (this.save) {
-        this.save();
-      }
-    },
+    saving: Boolean,
   },
 };
 </script>

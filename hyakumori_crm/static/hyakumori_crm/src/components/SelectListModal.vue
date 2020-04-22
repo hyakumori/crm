@@ -1,12 +1,12 @@
 <template>
-  <v-dialog v-model="shown_" scrollable width="400" height="480">
+  <v-dialog eager v-model="shown_" scrollable width="400" height="480">
     <v-card>
       <v-card-title class="px-4 py-2">
         <TextInput @input="val => $emit('search', val)" />
       </v-card-title>
       <v-divider></v-divider>
       <v-progress-linear v-if="loading" height="2" indeterminate />
-      <v-card-text style="height:228px" class="pa-0">
+      <v-card-text ref="listContent" style="height:228px" class="pa-0">
         <slot name="list"></slot>
       </v-card-text>
 
@@ -43,6 +43,9 @@ export default {
       shown_: false,
     };
   },
+  mounted() {
+    this.$refs.listContent.addEventListener("scroll", this.needLoadOnNearEnd);
+  },
   watch: {
     shown(val) {
       this.shown_ = val;
@@ -52,6 +55,21 @@ export default {
         this.$emit("update:shown", val);
       }
     },
+  },
+  methods: {
+    needLoadOnNearEnd(event) {
+      const el = event.target;
+      if (el.scrollHeight - el.scrollTop === el.clientHeight) {
+        this.$emit("needToLoad");
+      }
+    },
+  },
+  beforeDestroy() {
+    this.$refs.listContent.removeEventListener(
+      "scroll",
+      this.needLoadOnNearEnd,
+    );
+    console.log("hey");
   },
 };
 </script>

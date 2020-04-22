@@ -1,7 +1,7 @@
 <template>
   <v-card
     class="forest-info-card d-flex d-hover"
-    :class="{ flat: flat }"
+    :class="{ flat: flat, deleted: deleted, added: added }"
     outlined
     :ripple="false"
     @click="$emit('selected', card_id, index)"
@@ -21,8 +21,16 @@
         <span class="ml-1 caption">{{ address }}</span>
       </div>
     </div>
+    <v-btn
+      v-if="deleted"
+      class="align-self-center"
+      icon
+      @click.stop="$emit('undoDeleteForest')"
+    >
+      <v-icon>mdi-undo</v-icon>
+    </v-btn>
     <router-link
-      v-if="showAction"
+      v-if="showAction && !deleted"
       :to="{ name: 'forest-detail', params: { id: card_id } }"
       v-slot="{ href }"
     >
@@ -50,6 +58,8 @@ export default {
     isUpdate: Boolean,
     showAction: { type: Boolean, default: true },
     flat: { type: Boolean, default: false },
+    deleted: { type: Boolean, default: false },
+    added: { type: Boolean, default: false },
     index: Number,
     handleDeleteClick: Function,
   },
@@ -73,6 +83,14 @@ $background-color: #f5f5f5;
   border: none !important;
   border-radius: 0 !important;
   border-bottom: 1px solid #e1e1e1 !important;
+}
+
+.forest-info-card.deleted {
+  border: 1px solid #ff5252 !important;
+}
+
+.forest-info-card.added {
+  border: 1px solid #2196f3 !important;
 }
 
 .forest-info-card {

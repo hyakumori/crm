@@ -1,5 +1,5 @@
 <template>
-  <v-row dense v-on="$listeners">
+  <v-row>
     <template v-for="(forest, index) in forests">
       <v-col cols="6" :key="index">
         <forest-info-card
@@ -13,6 +13,9 @@
           :isUpdate="isUpdate"
           :index="index"
           @deleteForest="$emit('deleteForest', forest)"
+          @undoDeleteForest="$emit('undoDeleteForest', forest)"
+          :added="forest.added"
+          :deleted="forest.deleted"
         />
       </v-col>
     </template>

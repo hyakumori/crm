@@ -13,6 +13,7 @@
       :forests="tempForests"
       :isUpdate="isUpdate"
       @deleteForest="handleDelete"
+      @undoDeleteForest="handleUndoDelete"
     />
     <addition-button
       ref="addBtn"
@@ -27,6 +28,7 @@
       submitBtnText="Add"
       submitBtnIcon="mdi-plus"
       :handleSubmitClick="handleAdd"
+      @needToLoad="handleLoadMore"
     >
       <template #list>
         <ForestInfoCard
@@ -54,6 +56,7 @@
       v-if="isUpdate"
       :cancel="cancel"
       :save="handleSave"
+      :saving="saving"
       :saveDisabled="saveDisabled"
     />
   </div>
@@ -67,6 +70,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import ForestInfoCard from "../detail/ForestInfoCard";
+import { reject } from "lodash";
 
 export default {
   name: "forest-list-container",
@@ -97,14 +101,15 @@ export default {
       forestsToAdd: [],
       forestsToDelete: [],
       selectingForestIndex: null,
+      saving: false,
     };
   },
   computed: {
     tempForests() {
-      return [
-        ...this.forests.filter(f => !this.forestIdsToDelete.includes(f.id)),
-        ...this.forestsToAdd,
-      ];
+      return [...this.forests, ...this.forestsToAdd];
+    },
+    forestIdsMap() {
+      return Object.fromEntries(this.tempForests.map(f => [f.id, true]));
     },
     forestIdsToAdd() {
       return this.forestsToAdd.map(f => f.id);
@@ -124,37 +129,71 @@ export default {
         this.selectingForestIndex,
         1,
       )[0];
+      forestItem.added = true;
       this.forestsToAdd.push(forestItem);
       this.selectingForestIndex = null;
       this.selectingForestId = null;
     },
     handleDelete(forest) {
-      this.forestsToDelete.push(forest);
+      if (forest.added) {
+        delete forest.added;
+        this.forestsToAdd = reject(this.forestsToAdd, { id: forest.id });
+      } else {
+        this.$set(forest, "deleted", true);
+        this.forestsToDelete.push(forest);
+      }
+    },
+    handleUndoDelete(forest) {
+      this.$set(forest, "deleted", undefined);
+      this.forestsToDelete = reject(this.forestsToDelete, { id: forest.id });
     },
     async handleSave() {
-      console.log("hey");
       try {
+        this.saving = true;
         await this.$rest.put(`/customers/${this.id}/forests`, {
           added: this.forestIdsToAdd,
           deleted: this.forestIdsToDelete,
         });
-      } catch (error) {
-        console.log(error);
-      }
+        this.$emit("saved");
+        this.saving = false;
+        this.forestsToDelete = [];
+        this.forestsToAdd = [];
+      } catch (error) {}
+    },
+    async handleLoadMore() {
+      this.loadForests = true;
+      const resp = await this.$rest.get(this.forestitems.next);
+      this.forestitems = {
+        next: resp.next,
+        previous: resp.previous,
+        results: [
+          ...this.forestitems.results,
+          ...reject(resp.results, f => !!this.forestIdsMap[f.id]),
+        ],
+      };
+      this.loadForests = false;
     },
   },
   watch: {
     async showSelect(val) {
-      if (val) {
+      if (val && !this.forestitems.next) {
         this.loadForests = true;
-        this.forestitems = await this.$rest.get("/forests");
+        const resp = await this.$rest.get("/forests");
+        this.forestitems = {
+          next: resp.next,
+          previous: resp.previous,
+          results: reject(resp.results, f => !!this.forestIdsMap[f.id]),
+        };
         this.loadForests = false;
       }
     },
     isUpdate(val) {
       if (!val) {
-        this.forestsToAdd = [];
-        this.forestsToDelete = [];
+        this.forestsToAdd.length > 0 && (this.forestsToAdd = []);
+        for (let forestToDelete of this.forestsToDelete) {
+          this.$set(forestToDelete, "deleted", undefined);
+        }
+        this.forestsToDelete && (this.forestsToDelete = []);
       }
     },
   },
