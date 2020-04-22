@@ -10,9 +10,6 @@ default:
 test-frontend:
   stage: test
   image: node:12-alpine
-  only:
-    changes:
-      - $CI_PROJECT_DIR/hyakumori_crm/static/**/*
   rules:
     - if: $CI_COMMIT_BRANCH == 'develop'
     - if: $CI_MERGE_REQUEST_ID
@@ -31,10 +28,6 @@ test-frontend:
 test-backend:
   stage: test
   image: python:3.7
-  except:
-    changes:
-      - $CI_PROJECT_DIR/hyakumori_crm/static/**/*
-      - $CI_PROJECT_DIR/data-import/**/*
   rules:
     - if: $CI_COMMIT_BRANCH == 'develop'
     - if: $CI_MERGE_REQUEST_ID
