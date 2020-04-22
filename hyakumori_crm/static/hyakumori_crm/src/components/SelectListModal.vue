@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="shown" scrollable max-width="720" :activator="activator">
+  <v-dialog v-model="shown_" scrollable max-width="720">
     <v-card>
       <v-card-title class="pa-0">
         <TextInput />
@@ -12,10 +12,11 @@
 
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn color="primary" @click="submit"
+        <v-btn text @click="cancelClick">{{ $t("buttons.cancel") }}</v-btn>
+        <v-spacer />
+        <v-btn color="primary"
           ><v-icon v-if="submitBtnIcon"></v-icon>{{ submitBtnText }}</v-btn
         >
-        <v-btn text @click="shown = false">{{ $t("buttons.cancel") }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -27,13 +28,12 @@ import TextInput from "./forms/TextInput";
 export default {
   components: { TextInput },
   props: [
-    "title",
-    "submit",
+    "submitHandler",
     "submitBtnText",
     "submitBtnIcon",
     "itemComponent",
     "items",
-    "activator",
+    "shown",
   ],
   beforeMount() {
     if (this.itemComponent)
@@ -41,8 +41,19 @@ export default {
   },
   data() {
     return {
-      shown: false,
+      shown_: false,
     };
+  },
+  methods: {
+    cancelClick() {
+      this.shown_ = false;
+      this.$emit("update:shown", false);
+    },
+  },
+  watch: {
+    shown(val) {
+      this.shown_ = val;
+    },
   },
 };
 </script>

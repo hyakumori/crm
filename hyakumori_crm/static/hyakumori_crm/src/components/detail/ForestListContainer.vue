@@ -9,14 +9,14 @@
       @update="val => (isUpdate = val)"
     />
     <forest-info-list class="mt-4" :forests="forests" :isUpdate="isUpdate" />
-    <SelectListModal activator="#forestAdd" title="Foo" submitBtnText="Add" />
     <addition-button
       ref="addBtn"
       class="my-2"
-      id="forestAdd"
       v-if="isUpdate"
       :content="addBtnContent"
+      :click="() => (showSelect = true)"
     />
+    <SelectListModal :shown.sync="showSelect" submitBtnText="Add" />
     <update-button v-if="isUpdate" :cancel="cancel.bind(this)" />
   </div>
 </template>
@@ -49,6 +49,7 @@ export default {
   data() {
     return {
       isUpdate: false,
+      showSelect: false,
     };
   },
 };
