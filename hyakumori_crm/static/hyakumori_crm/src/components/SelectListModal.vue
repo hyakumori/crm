@@ -1,18 +1,16 @@
 <template>
-  <v-dialog v-model="shown_" scrollable max-width="720">
+  <v-dialog v-model="shown_" scrollable width="480">
     <v-card>
       <v-card-title class="pa-0">
         <TextInput />
       </v-card-title>
       <v-divider></v-divider>
 
-      <v-card-text style="min-height: 300px;" class="px-6 py-5">
-        <!-- <ItemComponent v-for="item in items" :key="item.id" /> -->
-      </v-card-text>
+      <slot name="list"></slot>
 
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn text @click="cancelClick">{{ $t("buttons.cancel") }}</v-btn>
+        <v-btn text @click="shown_ = false">{{ $t("buttons.cancel") }}</v-btn>
         <v-spacer />
         <v-btn color="primary"
           ><v-icon v-if="submitBtnIcon"></v-icon>{{ submitBtnText }}</v-btn
@@ -32,27 +30,21 @@ export default {
     "submitBtnText",
     "submitBtnIcon",
     "itemComponent",
-    "items",
     "shown",
   ],
-  beforeMount() {
-    if (this.itemComponent)
-      this.$options.components.ItemComponent = this.itemComponent;
-  },
   data() {
     return {
       shown_: false,
     };
   },
-  methods: {
-    cancelClick() {
-      this.shown_ = false;
-      this.$emit("update:shown", false);
-    },
-  },
   watch: {
     shown(val) {
       this.shown_ = val;
+    },
+    shown_(val) {
+      if (val != this.shown) {
+        this.$emit("update:shown", val);
+      }
     },
   },
 };
