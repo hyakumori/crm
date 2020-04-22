@@ -132,7 +132,7 @@ export default {
         this.redirectInterval = setInterval(() => {
           if (this.redirectCount == 0) {
             clearInterval(this.redirectInterval);
-            this.$router.push({ name: "auth-login" });
+            return this.$router.push({ name: "auth-login" });
           }
           this.redirectCount -= 1;
         }, 1000);
