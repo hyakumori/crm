@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot name="top">
-      <page-header></page-header>
+      <page-header />
     </slot>
 
     <v-container fluid class="app-width d-flex px-7 pt-5" v-if="!singleColumn">
