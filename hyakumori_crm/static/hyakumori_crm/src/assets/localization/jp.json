@@ -9,7 +9,8 @@
     "reset": "リセット",
     "save": "保存",
     "send": "送信",
-    "activate": "アクティブ"
+    "activate": "アクティブ",
+    "continue": "継続する"
   },
   "detail": {
     "tabs": {

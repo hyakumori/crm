@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List, Optional, Union
+from uuid import UUID
 
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError as DjValidationError
@@ -10,7 +11,7 @@ from rest_framework.serializers import ModelSerializer
 from ..core.models import HyakumoriDanticModel, HyakumoriDanticUpdateModel, Paginator
 from ..crm.common import regexes
 from ..crm.common.constants import DEFAULT_EMAIL, EMPTY, UNKNOWN
-from ..crm.models import Customer, Forest
+from ..crm.models import Customer, Forest, ForestCustomer
 
 
 class Name(HyakumoriDanticModel):
@@ -138,4 +139,31 @@ class CustomerContactsDeleteInput(HyakumoriDanticModel):
                 return Contact.objects.get(pk=v)
             except (Contact.DoesNotExist, DjValidationError):
                 raise ValueError(_("Contact {pk} not found").format(pk=v))
+        return v
+
+
+class ForestPksInput(HyakumoriDanticModel):
+    customer: Customer
+    added: List[UUID] = []
+    deleted: List[UUID] = []
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @validator("deleted")
+    def check_deleted(cls, v):
+        forest_pks = ForestCustomer.objects.filter(forest_id__in=v).values_list(
+            "forest_id", flat=True
+        )
+        invalid_pks = set(v) - set(forest_pks)
+        if len(invalid_pks) > 0:
+            raise ValueError(_("Forest Id {} not found").format(", ".join(invalid_pks)))
+        return v
+
+    @validator("added")
+    def check_added(cls, v):
+        forest_pks = Forest.objects.filter(id__in=v).values_list("id", flat=True)
+        invalid_pks = set(v) - set(forest_pks)
+        if len(invalid_pks) > 0:
+            raise ValueError(_("Forest Id {} not found").format(", ".join(invalid_pks)))
         return v

@@ -185,9 +185,11 @@ export default {
             depressed
             color="primary"
             :loading="submiting"
-            >{{ pk ? "Save" : "Continue" }}</v-btn
+            >{{ pk ? $t("buttons.save") : $t("buttons.continue") }}</v-btn
           >
-          <v-btn @click="toggleEditing" text>Cancel</v-btn>
+          <v-btn @click="toggleEditing" text color="#999999">{{
+            $t("buttons.cancel")
+          }}</v-btn>
         </v-col>
       </v-row>
     </v-form>

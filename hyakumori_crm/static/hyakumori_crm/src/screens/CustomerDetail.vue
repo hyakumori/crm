@@ -18,13 +18,14 @@
         </basic-info-container>
 
         <forest-list-container
+          v-if="id"
           headerContent="所有林情報"
           editBtnContent="フォレストの追加/編集"
           addBtnContent="所有地情報を追加"
           :displayAdditionBtn="true"
           :isLoading="forestsLoading"
           :forests="forests"
-          v-if="id"
+          :id="id"
         />
 
         <customer-list-container

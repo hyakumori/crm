@@ -104,12 +104,13 @@ class OwnerPksInput(HyakumoriDanticModel):
     @validator("deleted")
     def check_deleted(cls, v):
         owner_pks = ForestCustomer.objects.filter(customer_id__in=v).values_list(
-            "customer_id"
+            "customer_id", flat=True
         )
         invalid_pks = set(v) - set(owner_pks)
         if len(invalid_pks) > 0:
-            v = list(invalid_pks)
-            raise ValueError(_(f"Customer Id {v} not found"))
+            raise ValueError(
+                _("Customer Id {} not found").format(", ".join(invalid_pks))
+            )
         return v
 
     @validator("added")
@@ -117,8 +118,9 @@ class OwnerPksInput(HyakumoriDanticModel):
         owner_pks = Customer.objects.filter(id__in=v).values_list("id", flat=True)
         invalid_pks = set(v) - set(owner_pks)
         if len(invalid_pks) > 0:
-            v = list(invalid_pks)
-            raise ValueError(_(f"Customer Id {v} not found"))
+            raise ValueError(
+                _("Customer Id {} not found").format(", ".join(invalid_pks))
+            )
         return v
 
 

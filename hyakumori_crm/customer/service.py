@@ -223,3 +223,19 @@ def delete_customer_contacts(contacts_delete_in: dict):
             pass
     customer.save(update_fields=["updated_at"])
     return customer
+
+
+def update_forests(data):
+    customer = data.customer
+    ForestCustomer.objects.filter(
+        forest_id__in=data.deleted, customer_id=customer.pk
+    ).delete()
+    added_forest_customers = []
+    for added_forest_pk in data.added:
+        forest_customer = ForestCustomer(
+            customer_id=customer.id, forest_id=added_forest_pk,
+        )
+        added_forest_customers.append(forest_customer)
+    ForestCustomer.objects.bulk_create(added_forest_customers)
+    customer.save(update_fields=["updated_at"])
+    return customer

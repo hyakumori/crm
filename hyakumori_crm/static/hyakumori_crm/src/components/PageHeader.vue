@@ -90,21 +90,8 @@
               {{ $store.state.pageHeader }}
             </span>
           </div>
-<<<<<<< HEAD
 
           <slot name="bottom-right"></slot>
-=======
-          <v-btn
-            class="align-self-center"
-            v-if="$route.name === 'customers'"
-            rounded
-            dark
-            outlined
-            @click="$router.push({ name: 'customer-new' })"
-            ><v-icon>{{ $t("icon.add") }}</v-icon>
-            {{ $t("buttons.add_customer") }}</v-btn
-          >
->>>>>>> 14906b3... init
         </v-container>
       </div>
     </div>
@@ -112,19 +99,11 @@
 </template>
 
 <script>
-<<<<<<< HEAD
 import busEvent from "../BusEvent";
 
 export default {
   name: "page-header",
 
-=======
-export default {
-  name: "page-header",
-
-  components: {},
-
->>>>>>> 14906b3... init
   data() {
     return {
       user: null,
