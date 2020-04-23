@@ -98,6 +98,8 @@
 </template>
 
 <script>
+import busEvent from "../BusEvent";
+
 export default {
   name: "page-header",
 
@@ -110,6 +112,16 @@ export default {
   methods: {
     onBack() {
       this.$router.push(this.$store.state.headerInfo.backUrl || -1);
+    },
+
+    getUserInfo() {
+      try {
+        this.user =
+          localStorage.getItem("user") &&
+          JSON.parse(localStorage.getItem("user"));
+      } catch {
+        this.user = null;
+      }
     },
   },
 
@@ -143,13 +155,9 @@ export default {
   },
 
   created() {
-    try {
-      this.user =
-        localStorage.getItem("user") &&
-        JSON.parse(localStorage.getItem("user"));
-    } catch {
-      this.user = null;
-    }
+    this.getUserInfo();
+    busEvent.$off("profile:refresh");
+    busEvent.$on("profile:refresh", () => this.getUserInfo());
   },
 };
 </script>
