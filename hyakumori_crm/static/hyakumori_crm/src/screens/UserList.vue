@@ -1,12 +1,12 @@
 <template>
-  <main-section class="forest" single-column>
+  <main-section class="forest">
     <template slot="top">
       <page-header> </page-header>
     </template>
 
-    <template slot="center">
+    <template slot="section">
       <v-content>
-        <v-container grid-list-xs class="main-container mt-2">
+        <v-container grid-list-xs class="main-container">
           <data-list
             itemKey="id"
             :dense="false"

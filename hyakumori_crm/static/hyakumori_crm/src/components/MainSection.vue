@@ -4,12 +4,10 @@
       <page-header />
     </slot>
 
-    <v-container fluid class="app-width d-flex px-7 pt-5" v-if="!singleColumn">
+    <v-container fluid class="app-width d-flex px-7 pt-5">
       <slot name="section"></slot>
       <slot name="right"></slot>
     </v-container>
-
-    <slot name="center"></slot>
   </div>
 </template>
 
@@ -19,9 +17,6 @@ import PageHeader from "./PageHeader";
 export default {
   name: "main-section",
   components: { PageHeader },
-  props: {
-    singleColumn: { type: Boolean, default: false },
-  },
 };
 </script>
 
