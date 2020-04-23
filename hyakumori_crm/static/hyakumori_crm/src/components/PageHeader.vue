@@ -55,12 +55,13 @@
                 text
                 color="white"
                 small
+                v-if="hasBackBtn"
                 @click="onBack"
               >
                 <v-icon small>mdi-arrow-left</v-icon>
                 {{ $store.state.backBtnContent }}
               </v-btn>
-              <div class="d-flex align-center">
+              <div class="d-flex align-center" :class="{ 'mt-3': !hasBackBtn }">
                 <v-icon class="icon-mode">{{ $store.state.pageIcon }}</v-icon>
                 <div class="white--text page-header__detail__data">
                   <p class="mb-0 page-header__detail__data__title">
@@ -151,6 +152,13 @@ export default {
       }
 
       return this.user.username;
+    },
+
+    hasBackBtn() {
+      return (
+        this.$store.state.backBtnContent &&
+        this.$store.state.backBtnContent.length > 0
+      );
     },
   },
 

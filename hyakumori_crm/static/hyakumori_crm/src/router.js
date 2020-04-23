@@ -23,6 +23,7 @@ const UserProfileRoutes = [
         meta: {
           title: "page_header.user_profile",
           isPublic: false,
+          detail: true,
         },
         component: () => import("./screens/AccountProfile.vue"),
       },

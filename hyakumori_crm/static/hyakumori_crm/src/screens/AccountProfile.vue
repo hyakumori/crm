@@ -217,7 +217,6 @@ export default {
 
     setHeaderInfo() {
       const fromNowText = fromNow(this.userInfo.last_login);
-
       const info = {
         title: this.userInfo.username,
         subTitle:
@@ -225,10 +224,9 @@ export default {
           `${this.$t(
             "user_management.tables.headers.last_login",
           )} ${fromNowText}`,
-        backUrl: "/users",
       };
-
       this.$store.dispatch("setHeaderInfo", info);
+      this.$store.dispatch("setBackBtnContent", "");
     },
 
     fallbackText(text) {
