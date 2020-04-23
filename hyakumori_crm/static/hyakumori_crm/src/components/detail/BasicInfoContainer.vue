@@ -41,7 +41,6 @@ export default {
   props: {
     id: String,
     info: Array,
-    id: String,
   },
   data() {
     return {

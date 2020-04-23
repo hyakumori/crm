@@ -29,7 +29,7 @@ class ContactInput(HyakumoriDanticModel):
     name_kanji: Name
     name_kana: Name
     postal_code: constr(regex=regexes.POSTAL_CODE, strip_whitespace=True)
-    address: Optional[Address] = Address
+    address: Optional[Address]
     telephone: Optional[constr(regex=regexes.TELEPHONE_NUMBER, strip_whitespace=True)]
     mobilephone: Optional[
         constr(regex=regexes.MOBILEPHONE_NUMBER, strip_whitespace=True)
@@ -56,7 +56,7 @@ class CustomerInputSchema(HyakumoriDanticModel):
 
 
 class CustomerUpdateSchema(CustomerInputSchema):
-    customer = Customer
+    customer: Customer
 
     class Config:
         arbitrary_types_allowed = True
@@ -225,10 +225,10 @@ class ContactsInput(HyakumoriDanticModel):
     def preparing(cls, values):
         customer = values.get("customer")
         cls.customer_forest_pks = customer.forestcustomer_set.all().values_list(
-            "id", flat=True
+            "forest_id", flat=True
         )
         cls.customer_contact_pks = customer.customercontact_set.all().values_list(
-            "id", flat=True
+            "contact_id", flat=True
         )
         return values
 

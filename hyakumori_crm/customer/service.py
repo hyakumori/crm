@@ -190,11 +190,13 @@ def create(customer_in: CustomerInputSchema):
 
 def update_basic_info(data):
     customer = data.customer
-    self_contact = CustomerContact.objects.get(customer_id=customer.id, is_basic=True)
-    self_contact.name_kanji = data.basic_contact.name_kanji
-    self_contact.name_kana = data.basic_contact.name_kana
+    self_contact = CustomerContact.objects.get(
+        customer_id=customer.id, is_basic=True
+    ).contact
+    self_contact.name_kanji = data.basic_contact.name_kanji.dict()
+    self_contact.name_kana = data.basic_contact.name_kana.dict()
     self_contact.postal_code = data.basic_contact.postal_code
-    self_contact.address = data.basic_contact.address
+    self_contact.address = data.basic_contact.address.dict()
     self_contact.telephone = data.basic_contact.telephone
     self_contact.mobilephone = data.basic_contact.mobilephone
     self_contact.email = data.basic_contact.email
@@ -293,4 +295,10 @@ def update_contacts(contacts_in: dict):
             ] = contact_data.relationship_type.value
         customer_contact.save(update_fields=["attributes", "updated_at"])
     customer.save(update_fields=["updated_at"])
+    return customer
+
+
+def update_banking_info(customer, banking_in):
+    customer.banking = banking_in.dict()
+    customer.save(update_fields=["banking", "updated_at"])
     return customer

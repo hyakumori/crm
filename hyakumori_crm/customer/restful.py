@@ -47,14 +47,14 @@ class CustomerViewSets(viewsets.ModelViewSet):
         customer = create(data)
         return Response({"id": customer.id}, status=201)
 
-    @get_or_404(get_customer_by_pk, to_name="customer")
+    @get_or_404(get_customer_by_pk, to_name="customer", remove=True)
     @api_validate_model(CustomerUpdateSchema)
     def update(self, request, customer=None, data: dict = None):
         customer = update_basic_info(data)
         return Response({"id": customer.id})
 
     @action(["PUT", "PATCH"], detail=True, url_path="bank")
-    @get_or_404(get_customer_by_pk, to_name="customer")
+    @get_or_404(get_customer_by_pk, to_name="customer", pass_to="kwargs", remove=True)
     @api_validate_model(BankingInput)
     def update_customer_bank(self, request, customer=None, data: dict = None):
         customer = update_banking_info(customer, data)

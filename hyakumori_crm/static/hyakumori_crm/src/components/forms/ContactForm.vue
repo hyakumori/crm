@@ -1,8 +1,6 @@
 <script>
 import { ValidationObserver, setInteractionMode } from "vee-validate";
-import gql from "graphql-tag";
 import TextInput from "./TextInput";
-import BusEvent from "../../BusEvent";
 
 setInteractionMode("eager");
 
@@ -43,9 +41,22 @@ export default {
       };
       this.submiting = true;
       try {
-        const data = await this.$rest.post("/customers", customerInput);
-        this.submiting = false;
-        this.$router.push({ name: "customer-detail", params: { id: data.id } });
+        if (!this.id) {
+          const data = await this.$rest.post("/customers", customerInput);
+          this.submiting = false;
+          this.$router.push({
+            name: "customer-detail",
+            params: { id: data.id },
+          });
+        } else {
+          const data = await this.$rest.put(
+            `/customers/${this.id}`,
+            customerInput,
+          );
+          this.submiting = false;
+          this.$emit("updated");
+          this.toggleEditing();
+        }
       } catch (error) {
         this.submiting = false;
         if (error.response) {
@@ -58,7 +69,7 @@ export default {
 </script>
 
 <template>
-  <ValidationObserver ref="form">
+  <ValidationObserver ref="form" v-slot="{ dirty, invalid }">
     <v-form>
       <v-row>
         <v-col class="">
@@ -185,6 +196,7 @@ export default {
             depressed
             class="mr-2"
             color="primary"
+            :disabled="!dirty || invalid"
             :loading="submiting"
             >{{ id ? $t("buttons.save") : $t("buttons.continue") }}</v-btn
           >

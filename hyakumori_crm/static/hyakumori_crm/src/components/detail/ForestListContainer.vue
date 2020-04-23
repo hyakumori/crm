@@ -14,10 +14,10 @@
       :isUpdate="isUpdate"
       @deleteForest="handleDelete"
       @undoDeleteForest="handleUndoDelete"
-      :selectedId="selectingForestId"
+      :selectedId="selectingForestId_"
       @selected="
         (fId, ind) => {
-          selectingForestId = selectingForestId === fId ? null : fId;
+          selectingForestId_ = selectingForestId_ === fId ? null : fId;
         }
       "
     />
@@ -35,6 +35,7 @@
       submitBtnIcon="mdi-plus"
       :handleSubmitClick="handleAdd"
       @needToLoad="handleLoadMore"
+      @search="debounceLoadInitForests"
     >
       <template #list>
         <ForestInfoCard
@@ -77,7 +78,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import ForestInfoCard from "../detail/ForestInfoCard";
-import { reject } from "lodash";
+import { reject, debounce } from "lodash";
 
 export default {
   name: "forest-list-container",
@@ -97,6 +98,7 @@ export default {
     id: String,
     forests: Array,
     displayAdditionBtn: Boolean,
+    selectingForestId: String,
   },
   data() {
     return {
@@ -104,13 +106,16 @@ export default {
       showSelect: false,
       loadForests: false,
       forestitems: {},
+      selectingForestId_: null,
       modalSelectingForestId: null,
-      selectingForestId: null,
       modalSelectingForestIndex: null,
       forestsToAdd: [],
       forestsToDelete: [],
       saving: false,
     };
+  },
+  created() {
+    this.debounceLoadInitForests = debounce(this.loadInitForests, 500);
   },
   computed: {
     tempForests() {
@@ -171,6 +176,7 @@ export default {
       }
     },
     async handleLoadMore() {
+      if (!this.forestitems.next) return;
       this.loadForests = true;
       const resp = await this.$rest.get(this.forestitems.next);
       this.forestitems = {
@@ -183,18 +189,28 @@ export default {
       };
       this.loadForests = false;
     },
+    async loadInitForests(keyword) {
+      this.loadForests = true;
+      const resp = await this.$rest.get("/forests/minimal", {
+        params: {
+          search: keyword || "",
+        },
+      });
+      this.forestitems = {
+        next: resp.next,
+        previous: resp.previous,
+        results: reject(resp.results, f => !!this.forestIdsMap[f.id]),
+      };
+      this.loadForests = false;
+    },
   },
   watch: {
+    selectingForestId_(val) {
+      this.$emit("update:selectingForestId", val);
+    },
     async showSelect(val) {
       if (val && !this.forestitems.next) {
-        this.loadForests = true;
-        const resp = await this.$rest.get("/forests");
-        this.forestitems = {
-          next: resp.next,
-          previous: resp.previous,
-          results: reject(resp.results, f => !!this.forestIdsMap[f.id]),
-        };
-        this.loadForests = false;
+        await this.loadInitForests();
       }
     },
     isUpdate(val) {

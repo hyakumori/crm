@@ -24,10 +24,11 @@
     <SelectListModal
       :loading="loadContacts"
       :shown.sync="showSelect"
-      submitBtnText="Add"
+      :submitBtnText="$t('buttons.add')"
       submitBtnIcon="mdi-plus"
       :handleSubmitClick="handleAdd"
       @needToLoad="handleLoadMore"
+      @search="debounceLoadInitContacts"
     >
       <template #list>
         <CustomerContactCard
@@ -74,7 +75,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import CustomerContactCard from "../detail/CustomerContactCard";
-import { reject } from "lodash";
+import { reject, debounce } from "lodash";
 
 export default {
   name: "customer-list-container",
@@ -95,8 +96,11 @@ export default {
     selectingForestId: { type: String, default: null },
     id: String,
     customer: Object,
+    contactType: String,
   },
-
+  created() {
+    this.debounceLoadInitContacts = debounce(this.loadInitContacts, 500);
+  },
   data() {
     return {
       isUpdate: false,
@@ -146,7 +150,7 @@ export default {
       )[0];
       contactItem.added = true;
       contactItem.forest_id = this.selectingForestId;
-      contactItem.contact_type = "FOREST";
+      contactItem.contact_type = this.contactType;
       this.contactsToAdd.push(contactItem);
       this.modalSelectingContactIndex = null;
       this.modalSelectingForestId = null;
@@ -180,6 +184,7 @@ export default {
       } catch (error) {}
     },
     async handleLoadMore() {
+      if (!this.contactitems.next) return;
       this.loadContacts = true;
       const resp = await this.$rest.get(this.contactitems.next);
       this.contactitems = {
@@ -197,23 +202,30 @@ export default {
       };
       this.loadContacts = false;
     },
+    async loadInitContacts(keyword) {
+      this.loadContacts = true;
+      const resp = await this.$rest.get("/contacts", {
+        params: {
+          search: keyword,
+        },
+      });
+      this.contactitems = {
+        next: resp.next,
+        previous: resp.previous,
+        results: reject(
+          resp.results,
+          f =>
+            !!this.contactIdsMap[f.id] ||
+            f.id === this.customer.self_contact.id,
+        ),
+      };
+      this.loadContacts = false;
+    },
   },
   watch: {
     async showSelect(val) {
       if (val && !this.contactitems.next) {
-        this.loadContacts = true;
-        const resp = await this.$rest.get("/contacts");
-        this.contactitems = {
-          next: resp.next,
-          previous: resp.previous,
-          results: reject(
-            resp.results,
-            f =>
-              !!this.contactIdsMap[f.id] ||
-              f.id === this.customer.self_contact.id,
-          ),
-        };
-        this.loadContacts = false;
+        await this.loadInitContacts("");
       }
     },
     isUpdate(val) {

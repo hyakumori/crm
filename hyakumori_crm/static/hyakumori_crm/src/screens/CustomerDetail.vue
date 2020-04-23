@@ -14,6 +14,7 @@
               :id="id"
               :form="selfContactFormData"
               :toggleEditing="props.toggleEditing"
+              @updated="fetchCustomer"
           /></template>
         </basic-info-container>
 
@@ -27,6 +28,7 @@
           :forests="forests"
           :id="id"
           @saved="fetchForests"
+          :selectingForestId.sync="selectingForestId"
         />
 
         <customer-list-container
@@ -41,6 +43,7 @@
           :customer="customer"
           @saved="fetchContacts"
           contactType="FOREST"
+          :selectingForestId="selectingForestId"
         />
 
         <attachment-container
@@ -91,14 +94,22 @@
           v-if="id"
         />
 
-        <banking-info-container
-          class="banking-info mt-12"
+        <basic-info-container
+          v-if="id"
           headerContent="口座情報"
           editBtnContent="アカウント情報の追加/編集"
           :isLoading="customerLoading"
           :info="bankingInfo"
-          v-if="id"
-        />
+          :id="id"
+        >
+          <template #form="props"
+            ><BankingInfoForm
+              :id="id"
+              :form="bankingInfoFormData"
+              :toggleEditing="props.toggleEditing"
+              @updated="fetchCustomer"
+          /></template>
+        </basic-info-container>
       </div>
     </template>
 
@@ -125,11 +136,12 @@ import discussions from "../assets/dump/history_discussion.json";
 import actionLogs from "../assets/dump/action_log.json";
 import LogCard from "../components/detail/LogCard";
 import BasicInfoContainer from "../components/detail/BasicInfoContainer";
-import BankingInfoContainer from "../components/detail/BankingInfoContainer";
+// import BankingInfoContainer from "../components/detail/BankingInfoContainer";
 import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestListContainer from "../components/detail/ForestListContainer";
 import CustomerListContainer from "../components/detail/CustomerListContainer";
 import ContactForm from "../components/forms/ContactForm";
+import BankingInfoForm from "../components/forms/BankingInfoForm";
 import { filter } from "lodash";
 
 export default {
@@ -142,8 +154,9 @@ export default {
     AttachmentContainer,
     ForestListContainer,
     CustomerListContainer,
-    BankingInfoContainer,
+    // BankingInfoContainer,
     ContactForm,
+    BankingInfoForm,
   },
   props: ["id"],
   data() {
@@ -168,13 +181,13 @@ export default {
         registrationForest: false,
         bankingInfo: false,
       },
+      selectingForestId: null,
       customer: null,
       customerLoading: this.id ? true : false,
       forests: [],
       forestsLoading: this.id ? true : false,
       contacts: [],
       contactsLoading: this.id ? true : false,
-      selectedForestId: null,
     };
   },
 
@@ -249,23 +262,22 @@ export default {
     },
 
     forestContacts() {
-      if (!this.selectedForestId)
+      if (!this.selectingForestId)
         return filter(
           this.contacts,
           c => c.forest_id || c.cc_attrs.contact_type === "FOREST",
         );
-      return filter(this.contacts, { forest_id: this.selectedForestId });
+      return filter(this.contacts, { forest_id: this.selectingForestId });
     },
 
     familyContacts() {
-      return filter(
-        this.contacts,
-        c => !["本人", "その他"].includes(c.relationship_type),
-      );
+      return filter(this.contacts, {
+        cc_attrs: { contact_type: "FAMILY" },
+      });
     },
     otherContacts() {
       return filter(this.contacts, {
-        cc_attrs: { relationship_type: "その他" },
+        cc_attrs: { contact_type: "OTHERS" },
       });
     },
 
@@ -298,6 +310,15 @@ export default {
         telephone: this.customer?.self_contact.telephone || "",
         mobilephone: this.customer?.self_contact.mobilephone || "",
         email: this.customer?.self_contact.email || "",
+      };
+    },
+    bankingInfoFormData() {
+      return {
+        bank_name: this.customer?.banking?.bank_name || "",
+        branch_name: this.customer?.banking?.branch_name || "",
+        account_type: this.customer?.banking?.account_type || "",
+        account_number: this.customer?.banking?.account_number || "",
+        account_name: this.customer?.banking?.account_name || "",
       };
     },
     basicInfo() {

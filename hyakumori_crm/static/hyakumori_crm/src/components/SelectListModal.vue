@@ -2,7 +2,10 @@
   <v-dialog eager v-model="shown_" scrollable width="400" height="480">
     <v-card>
       <v-card-title class="px-4 py-2">
-        <TextInput @input="val => $emit('search', val)" />
+        <TextInput
+          @input="val => $emit('search', val)"
+          placeholder="姓、名、キーワード"
+        />
       </v-card-title>
       <v-divider></v-divider>
       <v-progress-linear v-if="loading" height="2" indeterminate />
@@ -13,9 +16,16 @@
       <v-divider></v-divider>
 
       <v-card-actions>
-        <v-btn text @click="shown_ = false">{{ $t("buttons.cancel") }}</v-btn>
+        <v-btn text rounded @click="shown_ = false">{{
+          $t("buttons.cancel")
+        }}</v-btn>
         <v-spacer />
-        <v-btn height="36" outlined color="primary" @click="handleSubmitClick"
+        <v-btn
+          rounded
+          height="36"
+          outlined
+          color="primary"
+          @click="handleSubmitClick"
           ><v-icon v-if="submitBtnIcon">{{ submitBtnIcon }}</v-icon
           >{{ submitBtnText }}</v-btn
         >
@@ -68,7 +78,6 @@ export default {
       "scroll",
       this.needLoadOnNearEnd,
     );
-    console.log("hey");
   },
 };
 </script>
