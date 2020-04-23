@@ -4,6 +4,7 @@ from uuid import UUID
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AbstractUser, Group
 from django.contrib.contenttypes.models import ContentType
+from django.utils.module_loading import import_string
 from guardian.shortcuts import (
     assign_perm,
     get_user_perms,
@@ -26,8 +27,8 @@ class PermissionService:
             for permission in Permission.objects.filter(
                 content_type_id__in=crm_content_types
             )
-                .all()
-                .iterator()
+            .all()
+            .iterator()
         ]
 
         return permissions
