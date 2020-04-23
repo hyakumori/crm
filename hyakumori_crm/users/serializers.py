@@ -123,7 +123,7 @@ class UserSerializer(DjUserSerializer):
     def update(self, instance, validated_data):
         request = self.context.get("request")
 
-        if _only_admin(request, instance):
+        if _only_admin(request):
             errors = dict()
             self.update_email(request, instance, errors)
             self.update_username(request, instance, errors)
