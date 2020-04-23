@@ -1,4 +1,4 @@
-import os
+import os,uuid
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -28,7 +28,7 @@ class Attachment(BaseResourceModel):
     objects = AttachmentManager()
 
     content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField(default=uuid.uuid4, editable=False)
     content_object = GenericForeignKey("content_type", "object_id")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
