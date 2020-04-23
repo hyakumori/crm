@@ -17,6 +17,8 @@ class Archive(BaseResourceModel):
         related_name="created_archives",
         verbose_name="creator",
         on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True
     )
 
     class Meta:
