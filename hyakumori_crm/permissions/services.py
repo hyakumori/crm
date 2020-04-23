@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AbstractUser, Group
 from django.contrib.contenttypes.models import ContentType
 from django.utils.module_loading import import_string
+
 from guardian.shortcuts import (
     assign_perm,
     get_user_perms,
@@ -14,24 +15,27 @@ from guardian.shortcuts import (
 
 from hyakumori_crm.core.utils import model_to_dict
 from hyakumori_crm.permissions.enums import SystemGroups
+from hyakumori_crm.permissions.serializers import GroupSerializer, PermissionSerializer
 
 
 class PermissionService:
     @classmethod
-    def get_app_permissions(cls, app_label):
+    def serialize_groups(cls, qs):
+        serializer = GroupSerializer(qs, many=True)
+        return serializer.data
+
+    @classmethod
+    def get_app_permissions(cls, app_label, serialize=True):
         crm_content_types = (
             ContentType.objects.filter(app_label=app_label).all().values_list("id")
         )
-        permissions = [
-            model_to_dict(permission)
-            for permission in Permission.objects.filter(
-                content_type_id__in=crm_content_types
-            )
-            .all()
-            .iterator()
-        ]
+        qs = Permission.objects.filter(content_type_id__in=crm_content_types).all()
 
-        return permissions
+        if serialize:
+            permissions = PermissionSerializer(qs, many=True)
+            return permissions.data
+
+        return qs
 
     @classmethod
     def get_user_manage_resource(cls, user_id: UUID, app: str, resource_name: str):
@@ -46,15 +50,10 @@ class PermissionService:
     @classmethod
     def get_user_permissions(cls, user_id: UUID):
         user = get_user_model().objects.get(pk=user_id)
-
-        user_groups = [
-            model_to_dict(group, exclude="permissions")
-            for group in user.groups.all().iterator()
-        ]
+        user_groups = cls.serialize_groups(user.groups.all())
         results = dict(
             is_admin=user.is_superuser, is_staff=user.is_staff, groups=user_groups,
         )
-
         return results
 
     @classmethod
@@ -73,9 +72,7 @@ class PermissionService:
             group.user_set.add(user)
             group.save()
 
-        return [
-            model_to_dict(group, exclude="permissions") for group in user.groups.all()
-        ]
+        return cls.serialize_groups(user.groups.all())
 
     @classmethod
     def unassign_user_from_group(cls, user_id: UUID, group_ids: List[int]):
@@ -86,9 +83,7 @@ class PermissionService:
             group.user_set.remove(user)
             group.save()
 
-        return [
-            model_to_dict(group, exclude="permissions") for group in user.groups.all()
-        ]
+        return cls.serialize_groups(user.groups.all())
 
     @classmethod
     def assign_object_permissions(
@@ -124,6 +119,17 @@ class PermissionService:
     def setup_groups(cls, user: AbstractUser):
         if user.is_superuser:
             admin_group, _ = Group.objects.get_or_create(name=SystemGroups.GROUP_ADMIN)
+            admin_group_permissions = Permission.objects.filter(
+                codename__in=[
+                    "manage_forest",
+                    "manage_customer",
+                    "manage_archive",
+                    "view_user",
+                    "add_user",
+                    "change_user",
+                ]
+            ).all()
+            admin_group.permissions.add(*admin_group_permissions)
             admin_group.user_set.add(user)
             admin_group.save()
 
@@ -131,16 +137,23 @@ class PermissionService:
             member_group, _ = Group.objects.get_or_create(
                 name=SystemGroups.GROUP_NORMAL_USER
             )
+            member_group_permissions = Permission.objects.filter(
+                codename__in=["manage_forest", "manage_customer", "manage_archive"]
+            ).all()
+            member_group.permissions.add(*member_group_permissions)
+            member_group.save()
 
             # create limited user group
             normal_user_group, _ = Group.objects.get_or_create(
                 name=SystemGroups.GROUP_LIMITED_USER
             )
+            normal_user_group_permissions = Permission.objects.filter(
+                codename__in=["view_forest"]
+            ).all()
+            normal_user_group.permissions.add(*normal_user_group_permissions)
+            normal_user_group.save()
 
-        return [
-            model_to_dict(group, exclude="permissions")
-            for group in Group.objects.all().iterator()
-        ]
+        return cls.serialize_groups(Group.objects.all())
 
     @classmethod
     def add_to_default_group(cls, user: AbstractUser):
@@ -164,3 +177,7 @@ class PermissionService:
         check_results = all(result is True for _, result in policies_to_check.items())
 
         return check_results
+
+    @classmethod
+    def get_groups(cls):
+        return cls.serialize_groups(Group.objects.all())
