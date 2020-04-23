@@ -90,7 +90,7 @@
             </span>
           </div>
 
-          <slot name="top-right-buttons"></slot>
+          <slot name="bottom-right"></slot>
         </v-container>
       </div>
     </div>

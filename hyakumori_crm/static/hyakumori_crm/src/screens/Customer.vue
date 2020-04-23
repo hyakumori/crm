@@ -2,7 +2,7 @@
   <main-section class="customer">
     <template #top>
       <page-header>
-        <template #top-right-buttons>
+        <template #bottom-right>
           <customer-create-form />
         </template>
       </page-header>
