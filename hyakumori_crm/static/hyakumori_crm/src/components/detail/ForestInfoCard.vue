@@ -1,5 +1,6 @@
 <template>
   <v-card
+    :color="selected ? '#f5f5f5' : undefined"
     class="forest-info-card d-flex d-hover"
     :class="{ flat: flat, deleted: deleted, added: added }"
     outlined
@@ -60,12 +61,16 @@ export default {
     flat: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
+    selectedId: String,
     index: Number,
     handleDeleteClick: Function,
   },
   computed: {
     actionIcon() {
       return this.isUpdate ? "mdi-close" : "mdi-chevron-right";
+    },
+    selected() {
+      return this.selectedId === this.card_id;
     },
   },
 };
@@ -100,6 +105,10 @@ $background-color: #f5f5f5;
   border-radius: $border-radius !important;
   border: 1px solid #e1e1e1 !important;
   position: relative;
+
+  &:focus::before {
+    opacity: 0 !important;
+  }
 
   &__icon {
     padding: 10px;

@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row dense>
     <template v-for="(forest, index) in forests">
       <v-col cols="6" :key="index">
         <forest-info-card
@@ -16,6 +16,8 @@
           @undoDeleteForest="$emit('undoDeleteForest', forest)"
           :added="forest.added"
           :deleted="forest.deleted"
+          :selectedId="selectedId"
+          @selected="(fId, inx) => $emit('selected', fId, inx)"
         />
       </v-col>
     </template>
@@ -35,6 +37,7 @@ export default {
   props: {
     forests: Array,
     isUpdate: Boolean,
+    selectedId: String,
   },
 };
 </script>

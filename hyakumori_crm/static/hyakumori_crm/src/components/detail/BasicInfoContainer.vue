@@ -9,7 +9,7 @@
     />
     <div class="my-4">
       <slot
-        v-if="isUpdate || !pk"
+        v-if="isUpdate || !id"
         name="form"
         :toggleEditing="
           () => {
@@ -17,7 +17,7 @@
           }
         "
       ></slot>
-      <basic-info v-if="!!pk && !isUpdate" :infos="info" />
+      <basic-info v-if="!!id && !isUpdate" :infos="info" />
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@ export default {
   props: {
     id: String,
     info: Array,
-    pk: String,
+    id: String,
   },
   data() {
     return {

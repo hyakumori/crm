@@ -33,7 +33,6 @@ export default {
     "submitHandler",
     "submitBtnText",
     "submitBtnIcon",
-    "itemComponent",
     "shown",
     "loading",
     "handleSubmitClick",

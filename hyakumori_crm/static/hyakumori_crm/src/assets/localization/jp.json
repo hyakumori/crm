@@ -10,7 +10,8 @@
     "save": "保存",
     "send": "送信",
     "activate": "アクティブ",
-    "continue": "継続する"
+    "continue": "継続する",
+    "add": "追加"
   },
   "detail": {
     "tabs": {

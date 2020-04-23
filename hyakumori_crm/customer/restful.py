@@ -17,6 +17,9 @@ from .schemas import (
     CustomerContactsDeleteInput,
     CustomerInputSchema,
     ForestPksInput,
+    ContactsInput,
+    CustomerUpdateSchema,
+    BankingInput,
 )
 from .service import (
     get_customer_contacts,
@@ -26,6 +29,9 @@ from .service import (
     get_customer_by_pk,
     create,
     update_forests,
+    update_contacts,
+    update_basic_info,
+    update_banking_info,
 )
 
 
@@ -41,17 +47,40 @@ class CustomerViewSets(viewsets.ModelViewSet):
         customer = create(data)
         return Response({"id": customer.id}, status=201)
 
-    @typed_action(detail=True, methods=["GET"], permission_classes=[IsAuthenticated])
-    def contacts(self, request):
-        obj = self.get_object()
+    @get_or_404(get_customer_by_pk, to_name="customer")
+    @api_validate_model(CustomerUpdateSchema)
+    def update(self, request, customer=None, data: dict = None):
+        customer = update_basic_info(data)
+        return Response({"id": customer.id})
 
-        paginator = default_paginator()
-        paged_list = paginator.paginate_queryset(
-            request=request, queryset=get_customer_contacts(obj.pk), view=self,
-        )
+    @action(["PUT", "PATCH"], detail=True, url_path="bank")
+    @get_or_404(get_customer_by_pk, to_name="customer")
+    @api_validate_model(BankingInput)
+    def update_customer_bank(self, request, customer=None, data: dict = None):
+        customer = update_banking_info(customer, data)
+        return Response({"id": customer.id})
 
-        contacts = ContactSerializer(paged_list, many=True).data
-        return paginator.get_paginated_response(contacts)
+    @action(detail=True, methods=["GET", "PUT", "PATCH"])
+    @get_or_404(
+        get_func=get_customer_by_pk,
+        to_name="customer",
+        pass_to=["request", "kwargs"],
+        remove=True,
+    )
+    @api_validate_model(ContactsInput)
+    def contacts(self, request, *, customer=None, data=None):
+        if request.method == "GET":
+            obj = customer
+            paginator = default_paginator()
+            paged_list = paginator.paginate_queryset(
+                request=request, queryset=get_customer_contacts(obj.pk), view=self,
+            )
+
+            contacts = ContactSerializer(paged_list, many=True).data
+            return paginator.get_paginated_response(contacts)
+        else:
+            update_contacts(data)
+            return Response({"id": data.customer.id})
 
     @action(detail=True, methods=["GET", "PUT", "PATCH"])
     @get_or_404(

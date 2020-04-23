@@ -11,7 +11,7 @@ export default {
     ValidationObserver,
     TextInput,
   },
-  props: ["form", "pk", "toggleEditing"],
+  props: ["form", "id", "toggleEditing"],
   data() {
     return {
       shown: false,
@@ -183,9 +183,10 @@ export default {
           <v-btn
             @click="submit"
             depressed
+            class="mr-2"
             color="primary"
             :loading="submiting"
-            >{{ pk ? $t("buttons.save") : $t("buttons.continue") }}</v-btn
+            >{{ id ? $t("buttons.save") : $t("buttons.continue") }}</v-btn
           >
           <v-btn @click="toggleEditing" text color="#999999">{{
             $t("buttons.cancel")

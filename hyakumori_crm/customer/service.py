@@ -13,11 +13,12 @@ from hyakumori_crm.crm.models import (
     CustomerContact,
     ForestCustomer,
     Forest,
+    ForestCustomerContact,
 )
 from hyakumori_crm.users.models import User
 
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
-from .schemas import CustomerInputSchema
+from .schemas import CustomerInputSchema, ContactType
 
 
 def get(pk):
@@ -45,6 +46,7 @@ def get_customer_contacts(pk: UUID):
                 "customercontact__forestcustomercontact__forestcustomer__forest_id"
             )
         )
+        .annotate(cc_attrs=F("customercontact__attributes"))
         .order_by("created_at")
     )
     return q
@@ -106,6 +108,7 @@ def get_list(
         .order_by(
             "attributes->>'default'", table="contact_rel", desc=True, nulls_last=True
         )
+        .limit(1)
     )
 
     tags_fields = get_tag_fields_for_query()
@@ -185,8 +188,25 @@ def create(customer_in: CustomerInputSchema):
     return customer
 
 
-def update(customer, data):
-    # do update...
+def update_basic_info(data):
+    customer = data.customer
+    self_contact = CustomerContact.objects.get(customer_id=customer.id, is_basic=True)
+    self_contact.name_kanji = data.basic_contact.name_kanji
+    self_contact.name_kana = data.basic_contact.name_kana
+    self_contact.postal_code = data.basic_contact.postal_code
+    self_contact.address = data.basic_contact.address
+    self_contact.telephone = data.basic_contact.telephone
+    self_contact.mobilephone = data.basic_contact.mobilephone
+    self_contact.email = data.basic_contact.email
+    self_contact.save()
+    customer.save(update_fields=["updated_at"])
+    return customer
+
+
+def update_banking(data):
+    customer = data.customer
+    customer.banking = data.banking
+    customer.save(update_fields=["banking", "updated_at"])
     return customer
 
 
@@ -237,5 +257,40 @@ def update_forests(data):
         )
         added_forest_customers.append(forest_customer)
     ForestCustomer.objects.bulk_create(added_forest_customers)
+    customer.save(update_fields=["updated_at"])
+    return customer
+
+
+def update_contacts(contacts_in: dict):
+    customer = contacts_in.customer
+    adding = contacts_in.adding
+    CustomerContact.objects.filter(
+        contact_id__in=contacts_in.deleting, customer_id=customer.id
+    ).delete()
+    for contact_data in adding:
+        customer_contact, _ = CustomerContact.objects.get_or_create(
+            customer_id=customer.id, contact_id=contact_data.contact.pk
+        )
+        if contact_data.forest_id:
+            forestcustomer = next(
+                filter(
+                    lambda fc: fc.forest_id == contact_data.forest_id,
+                    customer.forestcustomer_set.all(),
+                )
+            )
+            ForestCustomerContact.objects.get_or_create(
+                forestcustomer=forestcustomer, customercontact=customer_contact
+            )
+        customer_contact.attributes = {
+            **(customer_contact.attributes or {}),
+            "contact_type": ContactType.forest.value
+            if contact_data.forest_id
+            else contact_data.contact_type.value,
+        }
+        if contact_data.relationship_type:
+            customer_contact.attributes[
+                "relationship_type"
+            ] = contact_data.relationship_type.value
+        customer_contact.save(update_fields=["attributes", "updated_at"])
     customer.save(update_fields=["updated_at"])
     return customer

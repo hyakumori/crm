@@ -14,6 +14,12 @@
       :isUpdate="isUpdate"
       @deleteForest="handleDelete"
       @undoDeleteForest="handleUndoDelete"
+      :selectedId="selectingForestId"
+      @selected="
+        (fId, ind) => {
+          selectingForestId = selectingForestId === fId ? null : fId;
+        }
+      "
     />
     <addition-button
       ref="addBtn"
@@ -25,7 +31,7 @@
     <SelectListModal
       :loading="loadForests"
       :shown.sync="showSelect"
-      submitBtnText="Add"
+      :submitBtnText="$t('buttons.add')"
       submitBtnIcon="mdi-plus"
       :handleSubmitClick="handleAdd"
       @needToLoad="handleLoadMore"
@@ -34,8 +40,8 @@
         <ForestInfoCard
           @selected="
             (fId, inx) => {
-              selectingForestId = fId;
-              selectingForestIndex = inx;
+              modalSelectingForestId = fId;
+              modalSelectingForestIndex = inx;
             }
           "
           v-for="(item, indx) in forestitems.results || []"
@@ -48,6 +54,7 @@
           "
           :showAction="false"
           :index="indx"
+          :selectedId="modalSelectingForestId"
           flat
         />
       </template>
@@ -97,10 +104,11 @@ export default {
       showSelect: false,
       loadForests: false,
       forestitems: {},
+      modalSelectingForestId: null,
       selectingForestId: null,
+      modalSelectingForestIndex: null,
       forestsToAdd: [],
       forestsToDelete: [],
-      selectingForestIndex: null,
       saving: false,
     };
   },
@@ -126,13 +134,13 @@ export default {
   methods: {
     handleAdd() {
       const forestItem = this.forestitems.results.splice(
-        this.selectingForestIndex,
+        this.modalSelectingForestIndex,
         1,
       )[0];
       forestItem.added = true;
       this.forestsToAdd.push(forestItem);
-      this.selectingForestIndex = null;
-      this.selectingForestId = null;
+      this.modalSelectingForestIndex = null;
+      this.modalSelectingForestId = null;
     },
     handleDelete(forest) {
       if (forest.added) {
@@ -158,7 +166,9 @@ export default {
         this.saving = false;
         this.forestsToDelete = [];
         this.forestsToAdd = [];
-      } catch (error) {}
+      } catch (error) {
+        this.saving = false;
+      }
     },
     async handleLoadMore() {
       this.loadForests = true;
