@@ -2,7 +2,7 @@
   <main-section class="forest" single-column>
     <template #top>
       <page-header>
-        <template #top-right-buttons>
+        <template #bottom-right>
           <outline-round-btn
             :icon="$t('icon.add')"
             :content="$t('buttons.add_user')"
@@ -20,7 +20,7 @@
 
     <template slot="section">
       <v-content>
-        <v-container grid-list-xs class="main-container mt-2">
+        <v-container grid-list-xs class="main-container">
           <data-list
             itemKey="id"
             :dense="false"
