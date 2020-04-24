@@ -26,10 +26,7 @@ class PermissionService:
 
     @classmethod
     def get_app_permissions(cls, app_label, serialize=True):
-        crm_content_types = (
-            ContentType.objects.filter(app_label=app_label).all().values_list("id")
-        )
-        qs = Permission.objects.filter(content_type_id__in=crm_content_types).all()
+        qs = Permission.objects.filter(content_type__app_label=app_label).all()
 
         if serialize:
             permissions = PermissionSerializer(qs, many=True)
