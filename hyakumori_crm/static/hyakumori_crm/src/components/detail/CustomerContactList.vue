@@ -4,9 +4,7 @@
       <v-col cols="6" :key="index">
         <customer-contact-card
           :card_id="contact.id"
-          :fullname="
-            `${contact.name_kanji.last_name} ${contact.name_kanji.first_name}`
-          "
+          :fullname="getFullname(contact)"
           :address="contact.address.sector"
           :email="contact.email"
           :forestsCount="contact.forests_count"
@@ -39,6 +37,16 @@ export default {
     contacts: Array,
     isUpdate: Boolean,
     isOwner: Boolean,
+  },
+
+  methods: {
+    getFullname(contact) {
+      if (contact.name_kanji) {
+        return `${contact.name_kanji.last_name} ${contact.name_kanji.first_name}`;
+      } else {
+        return "";
+      }
+    },
   },
 };
 </script>
