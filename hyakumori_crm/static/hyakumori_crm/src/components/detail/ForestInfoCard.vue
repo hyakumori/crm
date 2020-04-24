@@ -118,9 +118,9 @@ $background-color: #f5f5f5;
   }
 
   &__name {
-    height: inherit;
     width: 100%;
     max-width: 234px;
+    align-self: center;
 
     span {
       color: #999999;
