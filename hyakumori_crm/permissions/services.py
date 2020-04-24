@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AbstractUser, Group
 from django.contrib.contenttypes.models import ContentType
 from django.utils.module_loading import import_string
-
 from guardian.shortcuts import (
     assign_perm,
     get_user_perms,
@@ -13,7 +12,6 @@ from guardian.shortcuts import (
     get_objects_for_user,
 )
 
-from hyakumori_crm.core.utils import model_to_dict
 from hyakumori_crm.permissions.enums import SystemGroups
 from hyakumori_crm.permissions.serializers import GroupSerializer, PermissionSerializer
 
