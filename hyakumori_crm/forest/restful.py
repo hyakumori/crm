@@ -14,7 +14,12 @@ from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest, Customer
 from hyakumori_crm.crm.restful.serializers import CustomerSerializer, ForestSerializer
 
-from ..api.decorators import api_validate_model, get_or_404, typed_api_view
+from ..api.decorators import (
+    api_validate_model,
+    get_or_404,
+    typed_api_view,
+    action_login_required,
+)
 from .schemas import (
     ForestInput,
     OwnerPksInput,
@@ -57,8 +62,11 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
         )
         return paginator.get_paginated_response(paged_list)
 
-    @typed_action(detail=True, methods=["GET"])
-    def customers(self, request):
+    @action(detail=True, methods=["GET"], permission_classes=[IsAuthenticated])
+    @action_login_required(
+        with_policies=["can_view_forest_customer"]
+    )  # TODO: implement policies check
+    def customers(self, request, **kwargs):
         obj = self.get_object()
 
         paginator = default_paginator()
