@@ -95,7 +95,7 @@ $background-color: #f5f5f5;
 }
 
 .forest-info-card.added {
-  border: 1px solid #2196f3 !important;
+  border: 1px solid #12c7a6 !important;
 }
 
 .forest-info-card {
