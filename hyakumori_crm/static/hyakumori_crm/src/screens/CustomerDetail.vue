@@ -21,7 +21,7 @@
         <forest-list-container
           v-if="id"
           headerContent="所有林情報"
-          editBtnContent="フォレストの追加/編集"
+          editBtnContent=" 所有林情報の追加・編集"
           addBtnContent="所有地情報を追加"
           :displayAdditionBtn="true"
           :isLoading="forestsLoading"
@@ -97,7 +97,7 @@
         <basic-info-container
           v-if="id"
           headerContent="口座情報"
-          editBtnContent="アカウント情報の追加/編集"
+          editBtnContent="口座情報を編集"
           :isLoading="customerLoading"
           :info="bankingInfo"
           :id="id"
