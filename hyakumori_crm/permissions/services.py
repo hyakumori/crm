@@ -147,3 +147,20 @@ class PermissionService:
         group, _ = Group.objects.get_or_create(name=SystemGroups.GROUP_LIMITED_USER)
         group.user_set.add(user)
         group.save()
+
+    @classmethod
+    def check_policies(cls, request, user, policies):
+        policies_to_check = dict()
+        for policy in policies:
+            try:
+                policy_method = import_string(
+                    f"hyakumori_crm.permissions.policies.{policy}"
+                )
+                policies_to_check[policy] = policy_method(request, user)
+            except ImportError:
+                policies_to_check[policy] = False
+                continue
+
+        check_results = all(result is True for _, result in policies_to_check.items())
+
+        return check_results
