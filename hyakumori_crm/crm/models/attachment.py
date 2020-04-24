@@ -1,8 +1,10 @@
 import os
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from ...core.models import BaseResourceModel
@@ -14,7 +16,7 @@ def attachment_upload(instance, filename):
         app=instance.content_object._meta.app_label,
         model=instance.content_object._meta.object_name.lower(),
         pk=instance.content_object.pk,
-        filename=filename,
+        filename=f"${uuid4()}${filename}",
     )
 
 
@@ -28,7 +30,7 @@ class Attachment(BaseResourceModel):
     objects = AttachmentManager()
 
     content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
-    object_id = models.PositiveIntegerField()
+    object_id = models.CharField(max_length=255)
     content_object = GenericForeignKey("content_type", "object_id")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,

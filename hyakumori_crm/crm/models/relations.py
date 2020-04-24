@@ -59,6 +59,9 @@ class ArchiveForest(BaseRelationModel):
 class ArchiveCustomer(BaseRelationModel):
     archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
     customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
+    is_author = models.BooleanField(default=False)
+    is_our_participant = models.BooleanField(default=False)
+    is_their_participant = models.BooleanField(default=False)
 
 
 class ArchiveCustomerContact(BaseRelationModel):
