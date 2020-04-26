@@ -5,17 +5,18 @@
         <forest-basic-info-container
           headerContent="基本情報 (登記情報)"
           editBtnContent="所有地を追加・編集"
-          @forest:basic-info-updated="getForestInfo"
-          :isLoading="!forestInfo"
-          :info="forestInfo"
+          @forest:basic-info-updated="$store.dispatch('forest/getForest', id)"
+          :isLoading="$store.state.forest.forestLoading"
+          :info="$store.state.forest.forest"
         />
 
         <forest-contact-tab-container
           v-acl-only="['manage_customer', 'view_customer']"
           headerContent="所有林情報"
-          editBtnContent="所有者を追加・編集"
+          toggleEditBtnContent="所有者を追加・編集"
           addBtnContent="連絡者を追加"
-          :ownerContacts="ownerContacts"
+          :customers="ownerContacts"
+          :isLoading="$store.state.forest.customersLoading"
         />
 
         <attachment-container
@@ -102,10 +103,11 @@ export default {
     AttachmentContainer,
     ForestContactTabContainer,
   },
-
+  props: {
+    id: String,
+  },
   data() {
     return {
-      forestId: this.$route.params.id,
       forestInfo: null,
       forestOwners: null,
       pageIcon: this.$t("icon.forest_icon"),
@@ -113,34 +115,15 @@ export default {
       headerTagColor: "#FFC83B",
     };
   },
-
-  async mounted() {
-    await this.getForestInfo();
+  created() {
+    this.$store.dispatch("forest/getForest", this.id);
+    this.$store.dispatch("forest/getCustomers", this.id);
+    this.$store.dispatch(
+      "setHeaderInfo",
+      this.$store.getters["forest/headerInfo"],
+    );
   },
-
   methods: {
-    getForestInfo() {
-      this.$rest
-        .all([fetchBasicInfo(this.forestId), fetchForestOwner(this.forestId)])
-        .then(
-          this.$rest.spread((basicInfo, owners) => {
-            this.forestInfo = basicInfo;
-            this.forestOwners = owners.results;
-            this.setHeaderInfo(basicInfo);
-          }),
-        );
-      // .catch(() => this.$router.push({ name: "not-found" }));
-    },
-    setHeaderInfo(info) {
-      const headerInfo = {
-        title: info.internal_id,
-        subTitle: info.owner.name_kanji,
-        tag: [info.tag.danchi],
-        backUrl: { name: "forests" },
-      };
-      this.$store.dispatch("setHeaderInfo", headerInfo);
-    },
-
     fallbackText(text) {
       return text || "";
     },
@@ -168,11 +151,9 @@ export default {
 
   computed: {
     ownerContacts() {
-      let owners = [];
-      if (this.forestOwners) {
-        return this.forestOwners.map(owner => this.mapContact(owner));
-      }
-      return owners;
+      return this.$store.state.forest.customers.map(owner =>
+        this.mapContact(owner),
+      );
     },
 
     attaches() {
@@ -185,7 +166,7 @@ export default {
 
     headerData() {
       let headerData = [];
-      const forestInfo = this.forestInfo;
+      const forestInfo = this.$store.state.forest.forest;
       if (forestInfo) {
         const attr = forestInfo.forest_attributes;
         return [
@@ -212,7 +193,7 @@ export default {
 
     forrestAttributes() {
       let attributes = [];
-      const forestInfo = this.forestInfo;
+      const forestInfo = this.$store.state.forest.forest;
       if (forestInfo) {
         const attr = forestInfo.forest_attributes;
         return [

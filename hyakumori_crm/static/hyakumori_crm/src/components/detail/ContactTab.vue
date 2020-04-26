@@ -25,16 +25,16 @@
 
     <v-tab-item>
       <customer-contact-list
-        :contacts="ownerContacts"
-        :isUpdate="isUpdate"
+        :contacts="customers"
+        :isUpdate="isEditing"
         :isOwner="true"
       />
     </v-tab-item>
 
     <v-tab-item>
       <customer-contact-list
-        :contacts="contactorContacts"
-        :isUpdate="isUpdate"
+        :contacts="customerContacts"
+        :isUpdate="isEditing"
         :isContactor="true"
       />
     </v-tab-item>
@@ -58,9 +58,9 @@ export default {
   },
 
   props: {
-    ownerContacts: Array,
-    contactorContacts: Array,
-    isUpdate: Boolean,
+    customers: Array,
+    customerContacts: Array,
+    isEditing: Boolean,
   },
 
   methods: {

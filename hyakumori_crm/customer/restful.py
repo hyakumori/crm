@@ -43,7 +43,11 @@ class CustomerViewSets(
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Customer.objects.all()
+        return (
+            Customer.objects.forests_count()
+            .prefetch_related("customercontact_set")
+            .all()
+        )
 
     @api_validate_model(CustomerInputSchema)
     def create(self, request, data: dict = None):

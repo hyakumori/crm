@@ -6,15 +6,8 @@
       :loading="isLoading"
       :update="isUpdate"
       @update="setUpdate"
-    >
-      <template v-slot:right="{ click, editBtnContent }">
-        <addition-button
-          v-acl-only="['manage_forest']"
-          :content="editBtnContent"
-          :click="click"
-        />
-      </template>
-    </content-header>
+      :permissions="['manage_forest']"
+    />
 
     <div class="mt-4">
       <forest-basic-info
@@ -52,7 +45,6 @@ export default {
     ContentHeader,
     ForestBasicInfo,
     UpdateButton,
-    AdditionButton,
   },
 
   props: {
