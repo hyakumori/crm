@@ -5,10 +5,10 @@ from ...core.models import BaseResourceModel
 
 class Archive(BaseResourceModel):
     title = models.CharField(max_length=255, blank=True)
-    content = models.TextField(blank=True)
-    archive_date = models.DateField(blank=True)
-    location = models.CharField(max_length=255, blank=True)
-    future_response = models.CharField(max_length=255, blank=True)
+    content = models.TextField(null=True)
+    archive_date = models.DateTimeField(null=True)
+    location = models.CharField(max_length=255, null=True)
+    future_response = models.CharField(max_length=255, null=True)
 
     class Meta:
         permissions = [

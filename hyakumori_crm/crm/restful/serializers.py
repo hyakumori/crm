@@ -7,6 +7,9 @@ from rest_framework.serializers import (
 )
 
 from ..models import Customer, Contact, Forest, Attachment, Archive
+from ..models.relations import ArchiveUser
+from ...users.models import User
+from ...users.serializers import UserSerializer
 
 
 class ContactSerializer(ModelSerializer):
@@ -42,8 +45,6 @@ class ForestSerializer(ModelSerializer):
 
 
 class AttachmentSerialize(ModelSerializer):
-    attachment_file = SerializerMethodField()
-
     class Meta:
         model = Attachment
         fields = [
@@ -51,15 +52,13 @@ class AttachmentSerialize(ModelSerializer):
             "object_id",
             "content_type",
             "creator",
-            "attachment_file",
+            "filename",
         ]
-
-    def get_attachment_file(self, obj):
-        return obj.attachment_file.name
 
 
 class ArchiveSerializer(ModelSerializer):
-    attachments = list(AttachmentSerialize())
+    attachments = SerializerMethodField()
+    author = SerializerMethodField()
 
     class Meta:
         model = Archive
@@ -70,5 +69,16 @@ class ArchiveSerializer(ModelSerializer):
             "location",
             "future_response",
             "archive_date",
+            "author",
             "attachments"
         ]
+
+    def get_attachments(self, obj):
+        try:
+            return AttachmentSerialize(Attachment.objects.filter(object_id=obj.id), many=True).data
+        except Attachment.DoesNotExist:
+            return []
+
+    def get_author(self, obj):
+        archive_user = ArchiveUser.objects.get(archive_id=obj.id)
+        return UserSerializer(User.objects.get(id=archive_user.user_id)).data
