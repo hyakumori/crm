@@ -97,17 +97,17 @@ def delete_attachment_file(archive_pk, attachment_pk):
 
 
 def get_related_forests(archive_pk):
-    return Forest.objects.filter(archiveforest__archive__id=archive_pk)
+    return Forest.objects.filter(archiveforest__archive__id=archive_pk, archiveforest__deleted=None)
 
 
 def is_forest_exist(archive_pk, forest_pk):
-    archive_forest = ArchiveForest.objects.filter(archive__id=archive_pk, forest__id=forest_pk)
+    archive_forest = ArchiveForest.objects.filter(archive__id=archive_pk, forest__id=forest_pk, deleted=None)
     return True if len(archive_forest) == 1 else False
 
 
 def add_related_forest(archive_pk, data):
     archive = get_archive_by_pk(pk=archive_pk)
-    forest_id_list = set(data.get("id"))
+    forest_id_list = set(data.get("ids"))
     forests = []
     if forest_id_list and len(forest_id_list) > 0:
         for forest_id in forest_id_list:
@@ -126,18 +126,35 @@ def add_related_forest(archive_pk, data):
         return None
 
 
+def delete_related_forest(archive_pk, data):
+    archive = get_archive_by_pk(archive_pk)
+    forest_id_list = set(data.get("ids"))
+    if forest_id_list and len(forest_id_list) > 0:
+        for forest_id in forest_id_list:
+            forest = get_forest_by_pk(forest_id)
+            print(forest.deleted)
+            if is_forest_exist(archive.id, forest_id):
+                archive_forest = ArchiveForest.objects.get(archive_id=archive.id, forest_id=forest.id)
+                archive_forest.delete()
+            else:
+                continue
+        return True
+    else:
+        return False
+
+
 def is_customer_exist(archive_pk, customer_pk):
-    archive_customer = ArchiveCustomer.objects.filter(archive__id=archive_pk, customer__id=customer_pk)
+    archive_customer = ArchiveCustomer.objects.filter(archive__id=archive_pk, customer__id=customer_pk, deleted=None)
     return True if len(archive_customer) == 1 else False
 
 
 def get_related_customer(archive_pk):
-    return Customer.objects.filter(archivecustomer__archive__id=archive_pk)
+    return Customer.objects.filter(archivecustomer__archive__id=archive_pk, archivecustomer__deleted=None)
 
 
 def add_related_customer(archive_pk, data):
     archive = get_archive_by_pk(pk=archive_pk)
-    customer_id_list = set(data.get("id"))
+    customer_id_list = set(data.get("ids"))
     customers = []
     if customer_id_list and len(customer_id_list) > 0:
         for customer_id in customer_id_list:
@@ -153,3 +170,19 @@ def add_related_customer(archive_pk, data):
         return customers
     else:
         return None
+
+
+def delete_related_customer(archive_pk, data):
+    archive = get_archive_by_pk(archive_pk)
+    customer_id_list = set(data.get("ids"))
+    if customer_id_list and len(customer_id_list) > 0:
+        for customer_id in customer_id_list:
+            customer = get_customer_by_pk(customer_id)
+            if is_customer_exist(archive.id, customer_id):
+                archive_customer = ArchiveCustomer.objects.get(archive_id=archive.id, customer_id=customer.id)
+                archive_customer.delete()
+            else:
+                continue
+        return True
+    else:
+        return False
