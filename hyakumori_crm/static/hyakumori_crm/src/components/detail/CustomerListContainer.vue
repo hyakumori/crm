@@ -46,7 +46,7 @@
           "
           :address="item.address.sector"
           :email="item.email"
-          :forestCount="item.forest_count"
+          :forestCount="item.forests_count"
           :phone="item.telephone"
           :cellphone="item.mobilephone"
           :isOwner="item.is_basic"

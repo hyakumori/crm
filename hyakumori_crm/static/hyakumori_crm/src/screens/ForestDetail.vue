@@ -15,7 +15,8 @@
           headerContent="所有林情報"
           toggleEditBtnContent="所有者を追加・編集"
           addBtnContent="連絡者を追加"
-          :customers="ownerContacts"
+          :customers="customers"
+          :customersContacts="customersContacts"
           :isLoading="$store.state.forest.customersLoading"
         />
 
@@ -118,6 +119,7 @@ export default {
   created() {
     this.$store.dispatch("forest/getForest", this.id);
     this.$store.dispatch("forest/getCustomers", this.id);
+    this.$store.dispatch("forest/getCustomersContacts", this.id);
     this.$store.dispatch(
       "setHeaderInfo",
       this.$store.getters["forest/headerInfo"],
@@ -133,26 +135,33 @@ export default {
       const addr = self_contact.address;
       const kanji_name = self_contact.name_kanji;
       return {
+        id: info.id,
         customer_id: info.id,
         fullname:
           this.fallbackText(kanji_name.last_name) +
           this.fallbackText(kanji_name.first_name),
         telephone: self_contact.telephone,
         mobilephone: self_contact.mobilephone,
-        forest_count: info.forests_count,
-        address: `${this.fallbackText(self_contact.postal_code)}
-          ${this.fallbackText(addr.prefecture)}
-          ${this.fallbackText(addr.municipality)}
-          ${this.fallbackText(addr.sector)}`,
+        forests_count: info.forests_count,
+        address: `${this.fallbackText(
+          self_contact.postal_code,
+        )} ${this.fallbackText(addr.prefecture)} ${this.fallbackText(
+          addr.municipality,
+        )} ${this.fallbackText(addr.sector)}`,
         email: self_contact.email,
       };
     },
   },
 
   computed: {
-    ownerContacts() {
+    customers() {
       return this.$store.state.forest.customers.map(owner =>
         this.mapContact(owner),
+      );
+    },
+    customersContacts() {
+      return this.$store.state.forest.customersContacts.map(c =>
+        this.mapContact(c),
       );
     },
 

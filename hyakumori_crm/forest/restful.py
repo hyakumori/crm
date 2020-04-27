@@ -8,7 +8,16 @@ from rest_typed_views import typed_action
 
 from hyakumori_crm.core.utils import default_paginator
 from hyakumori_crm.crm.models import Forest, Customer
-from hyakumori_crm.crm.restful.serializers import CustomerSerializer, ForestSerializer
+from hyakumori_crm.crm.restful.serializers import (
+    CustomerSerializer,
+    ForestSerializer,
+    ContactSerializer,
+)
+from ..api.decorators import (
+    api_validate_model,
+    get_or_404,
+    action_login_required,
+)
 from .schemas import (
     ForestInput,
     OwnerPksInput,
@@ -17,11 +26,8 @@ from .service import (
     get_forest_by_pk,
     update,
     update_owners,
-)
-from ..api.decorators import (
-    api_validate_model,
-    get_or_404,
-    action_login_required,
+    get_customers,
+    get_customer_contacts_of_forest,
 )
 
 
@@ -64,12 +70,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
 
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
-            request=request,
-            queryset=Customer.objects.filter(forestcustomer__forest_id=obj.pk)
-            .forests_count()
-            .prefetch_related("customercontact_set__contact")
-            .order_by("id"),
-            view=self,
+            request=request, queryset=get_customers(obj.pk), view=self,
         )
 
         return paginator.get_paginated_response(
@@ -86,6 +87,18 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     def basic_info(self, request, *, forest_in: ForestInput):
         update(forest_in.forest, forest_in.dict())
         return Response({"id": forest_in.forest.pk})
+
+    @action(detail=True, methods=["GET"], url_path="customers-forest-contacts")
+    @get_or_404(get_forest_by_pk, to_name="forest", pass_to="kwargs", remove=True)
+    def customers_forest_contacts(self, request, *, forest: Forest):
+        contacts = get_customer_contacts_of_forest(forest.pk)
+        paginator = default_paginator()
+        paged_list = paginator.paginate_queryset(
+            request=request, queryset=contacts, view=self
+        )
+        return paginator.get_paginated_response(
+            ContactSerializer(paged_list, many=True).data
+        )
 
 
 @api_view(["PUT", "PATCH"])

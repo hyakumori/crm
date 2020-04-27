@@ -52,7 +52,7 @@
       </div>
 
       <v-select
-        v-if="isUpdate"
+        v-if="isUpdate && showRelationshipSelect"
         class="customer-contact-card__select-relationship mt-2"
         outlined
         dense
@@ -119,6 +119,7 @@ export default {
     handleDeleteClick: Function,
     forestId: { type: String, default: null },
     mode: { type: String, default: "view" },
+    showRelationshipSelect: { type: Boolean, default: true },
   },
 
   data() {

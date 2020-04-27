@@ -28,6 +28,13 @@
         :contacts="customers"
         :isUpdate="isEditing"
         :isOwner="true"
+        :showRelationshipSelect="false"
+        @deleteContact="
+          (customer, index) => $emit('deleteCustomer', customer, index)
+        "
+        @undoDeleteContact="
+          (customer, index) => $emit('undoDeleteCustomer', customer, index)
+        "
       />
     </v-tab-item>
 
@@ -36,6 +43,7 @@
         :contacts="customerContacts"
         :isUpdate="isEditing"
         :isContactor="true"
+        :showRelationshipSelect="false"
       />
     </v-tab-item>
   </v-tabs>

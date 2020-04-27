@@ -2,9 +2,7 @@ from typing import Iterator, Union
 
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
-from django.db import connections
-from django.db.utils import OperationalError
+from django.db.models import F
 
 from ..crm.models import (
     Forest,
@@ -12,6 +10,7 @@ from ..crm.models import (
     Customer,
     CustomerContact,
     ForestCustomerContact,
+    Contact,
 )
 from .schemas import ForestFilter
 
@@ -77,3 +76,30 @@ def update_owners(owner_pks_in):
     ForestCustomer.objects.bulk_create(added_forest_customers)
     forest.save(update_fields=["updated_at"])
     return forest
+
+
+def get_customers(pk):
+    return Customer.objects.raw(
+        """
+    select crm_customer.*, count(A0.id) as forests_count
+    from crm_customer
+    join crm_forestcustomer
+    on crm_customer.id = crm_forestcustomer.customer_id
+    left outer join crm_forestcustomer A0
+    on crm_customer.id = A0.customer_id
+    where crm_forestcustomer.forest_id = %(pk)s
+    group by crm_customer.id
+    """,
+        {"pk": pk},
+    ).prefetch_related("customercontact_set__contact")
+
+
+def get_customer_contacts_of_forest(pk):
+    return (
+        Contact.objects.filter(
+            customercontact__attributes__contact_type="FOREST",
+            customercontact__forestcustomercontact__forestcustomer__forest_id=pk,
+        )
+        .annotate(is_basic=F("customercontact__is_basic"))
+        .annotate(customer_id=F("customercontact__customer_id"))
+    )

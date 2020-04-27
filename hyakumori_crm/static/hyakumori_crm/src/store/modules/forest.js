@@ -5,8 +5,8 @@ const state = {
   forestLoading: false,
   customers: [],
   customersLoading: false,
-  customerContacts: [],
-  customerContactsLoading: false,
+  customersContacts: [],
+  customersContactsLoading: false,
   archives: [],
   archivesLoading: false,
 };
@@ -36,6 +36,12 @@ const actions = {
     commit("setCustomers", customers);
     commit("customersLoadingOff");
   },
+  async getCustomersContacts({ commit }, id) {
+    commit("customersContactsLoadingOn");
+    const contacts = await forestApi.fetchCustomersContacts(id);
+    commit("setCustomersContacts", contacts);
+    commit("customersContactsLoadingOff");
+  },
 };
 
 const mutations = {
@@ -56,6 +62,15 @@ const mutations = {
   },
   customersLoadingOff() {
     state.customersLoading = false;
+  },
+  setCustomersContacts(state, contacts) {
+    state.customersContacts = contacts;
+  },
+  customersContactsLoadingOn() {
+    state.customersContactsLoading = true;
+  },
+  customersContactsLoadingOff() {
+    state.customersContactsLoading = false;
   },
 };
 

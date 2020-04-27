@@ -13,10 +13,11 @@
           :isOwner="contact.is_basic"
           :isUpdate="isUpdate"
           :index="index"
-          @deleteContact="$emit('deleteContact', contact)"
-          @undoDeleteContact="$emit('undoDeleteContact', contact)"
+          @deleteContact="$emit('deleteContact', contact, index)"
+          @undoDeleteContact="$emit('undoDeleteContact', contact, index)"
           :added="contact.added"
           :deleted="contact.deleted"
+          :showRelationshipSelect="showRelationshipSelect"
         />
       </v-col>
     </template>
@@ -37,6 +38,7 @@ export default {
     contacts: Array,
     isUpdate: Boolean,
     isOwner: Boolean,
+    showRelationshipSelect: { type: Boolean, default: true },
   },
 
   methods: {

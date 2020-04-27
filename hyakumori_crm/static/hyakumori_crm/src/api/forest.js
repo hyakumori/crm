@@ -15,6 +15,17 @@ export async function fetchForestOwners(forestId) {
   return customers;
 }
 
+export async function fetchCustomersContacts(forestId) {
+  const contacts = [];
+  let data = await axios.get(`forests/${forestId}/customers-forest-contacts`);
+  contacts.push(...data.results);
+  while (data.next) {
+    data = await axios.get(data.next);
+    contacts.push(...data.results);
+  }
+  return contacts;
+}
+
 export function updateBasicInfo(forestId, info) {
   return axios.put(`forests/${forestId}/basic-info`, info);
 }

@@ -4,8 +4,7 @@
       :content="headerContent"
       :editBtnContent="editBtnContent"
       :loading="isLoading"
-      :update="isUpdate"
-      @update="setUpdate"
+      @toggleEdit="setUpdate"
       :permissions="['manage_forest']"
     />
 

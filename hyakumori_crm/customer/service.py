@@ -36,6 +36,86 @@ def get_customer_by_pk(pk):
         raise ValueError(_("Customer not found"))
 
 
+class RawQuerysetWrapper:
+    def __init__(
+        self,
+        base_queryset,
+        sql: str,
+        params: dict = None,
+        prefetch_related=None,
+        select_related=None,
+    ):
+        self.base_queryset = base_queryset
+        self.sql = sql
+        if params is None:
+            self.params = {}
+        else:
+            self.params = params
+        self.prefetch_related = prefetch_related
+        self.select_related = select_related
+
+    @property
+    def _queryset(self):
+        sql = self.sql.format(where_clause="")
+        return self.base_queryset.raw(sql, self.params)
+
+    def __len__(self):
+        return len(self._queryset)
+
+    def get(self, **kwargs):
+        db_table = self.base_queryset.model._meta.db_table
+        if kwargs.get("pk"):
+            kwargs["id"] = kwargs["pk"]
+            del kwargs["pk"]
+        where_clause = "and "
+        where_clause += " and".join(
+            [
+                "{col} = %({key})s".format(col="%s.%s" % (db_table, k), key=k)
+                for k in kwargs.keys()
+            ]
+        )
+        sql = self.sql.format(where_clause=where_clause) + " limit 1"
+        params = {**self.params, **kwargs}
+        return self.base_queryset.raw(sql, params)[0]
+
+    def __getitem__(self, key):
+        offset = None
+        limit = None
+        if isinstance(key, slice):
+            offset = key.start
+            limit = key.stop - (offset if offset else 0)
+        else:
+            return self._queryset.__getitem__(key)
+        sql = self.sql.format(where_clause="")
+        params = dict(self.params)
+        if limit is not None:
+            sql += " limit %(limit)s"
+            params["limit"] = limit
+        if offset is not None:
+            sql += " offset %(offset)s"
+            params["offset"] = offset
+        qs = self.base_queryset.raw(sql, params)
+        if self.prefetch_related:
+            qs = qs.prefetch_related(*self.prefetch_related)
+        if self.select_related:
+            qs = qs.select_related(*self.select_related)
+        return qs
+
+
+def get_customers():
+    return RawQuerysetWrapper(
+        Customer.objects,
+        """select crm_customer.*, count(A0.id) as forests_count
+from crm_customer
+left outer join crm_forestcustomer A0
+on crm_customer.id = A0.customer_id
+where crm_customer.deleted is null {where_clause}
+group by crm_customer.id
+""",
+        prefetch_related=["customercontact_set__contact"],
+    )
+
+
 def get_customer_contacts(pk: UUID):
     q = (
         Contact.objects.filter(

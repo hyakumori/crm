@@ -33,6 +33,7 @@ from .service import (
     update_contacts,
     update_basic_info,
     update_banking_info,
+    get_customers,
 )
 
 
@@ -43,11 +44,7 @@ class CustomerViewSets(
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return (
-            Customer.objects.forests_count()
-            .prefetch_related("customercontact_set")
-            .all()
-        )
+        return get_customers()
 
     @api_validate_model(CustomerInputSchema)
     def create(self, request, data: dict = None):
@@ -124,7 +121,7 @@ class CustomerViewSets(
         get_func=get_customer_by_pk, to_name="customer", remove=True,
     )
     @api_validate_model(CustomerContactsDeleteInput)
-    def delete_contacts(request, *, data: CustomerContactsDeleteInput = None):
+    def delete_contacts(self, request, *, data: CustomerContactsDeleteInput = None):
         delete_customer_contacts(data)
         return Response({"id": data.forest.id})
 

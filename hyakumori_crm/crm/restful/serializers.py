@@ -12,6 +12,7 @@ from ...users.serializers import UserSerializer
 
 class ContactSerializer(ModelSerializer):
     forest_id = UUIDField(read_only=True)
+    customer_id = UUIDField(read_only=True)
     cc_attrs = JSONField(read_only=True)
 
     class Meta:
