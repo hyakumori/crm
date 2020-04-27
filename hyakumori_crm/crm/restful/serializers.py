@@ -44,7 +44,7 @@ class ForestSerializer(ModelSerializer):
         exclude = ["deleted"]
 
 
-class AttachmentSerialize(ModelSerializer):
+class AttachmentSerializer(ModelSerializer):
     class Meta:
         model = Attachment
         fields = [

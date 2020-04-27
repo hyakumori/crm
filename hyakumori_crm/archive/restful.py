@@ -3,13 +3,19 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
+from .schemas import ArchiveInput
 from .service import *
+from ..api.decorators import (
+    api_validate_model,
+    get_or_404,
+)
 from ..core.utils import default_paginator
-from ..crm.restful.serializers import AttachmentSerialize, ArchiveSerializer, ForestSerializer, CustomerSerializer
+from ..crm.restful.serializers import AttachmentSerializer, ArchiveSerializer, ForestSerializer, CustomerSerializer
 
 
 @api_view(["GET", "POST"])
-def archives(req):
+@api_validate_model(ArchiveInput)
+def archives(req, data: dict = None):
     if req.method == 'GET':
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
@@ -18,80 +24,58 @@ def archives(req):
         )
         return paginator.get_paginated_response(ArchiveSerializer(paged_list, many=True).data)
     else:
-        try:
-            archive = create_archive(req.data)
-            if archive:
-                return Response(data=ArchiveSerializer(archive).data)
-            else:
-                return Response({"msg": "No permission"})
-        except ValueError:
-            raise Http404()
+        author = req.user
+        archive = create_archive(author, data)
+        return Response(data=ArchiveSerializer(archive).data)
 
 
 @api_view(["GET", "PUT", "PATCH"])
-def archive(req, pk):
+@api_validate_model(ArchiveInput)
+@get_or_404(get_archive_by_pk, to_name='archive', pass_to=["kwargs", "request"], remove=True)
+def archive(req, *, archive: Archive = None, data: dict = None):
     if req.method == 'GET':
-        try:
-            archive = get_archive_by_pk(pk)
-            return Response({"data": ArchiveSerializer(archive).data})
-        except ValueError:
-            raise Http404()
+        return Response({"data": ArchiveSerializer(archive).data})
     else:
-        updated_archive = edit_archive(pk, req.data)
+        updated_archive = edit_archive(req.data)
         return Response({"data": ArchiveSerializer(updated_archive).data})
 
 
-@parser_classes([MultiPartParser])
 @api_view(["GET", "POST"])
-def attachments(req, archive_pk):
+@parser_classes([MultiPartParser])
+@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
+def attachments(req, archive: Archive = None):
     # get list attachments
     if req.method == 'GET':
-        try:
-            Archive.objects.get(pk=archive_pk)
-            attachments = get_all_attachments_by_archive_pk(archive_pk)
-            return Response({"data": AttachmentSerialize(attachments, many=True).data})
-        except Archive.DoesNotExist:
-            raise Http404()
+        attachments = get_all_attachments_by_archive_pk(archive.id)
+        return Response({"data": AttachmentSerializer(attachments, many=True).data})
     else:
-        try:
-            archive = get_archive_by_pk(archive_pk)
-            new_attachment = create_attachment(archive, req)
-            return Response({"data": AttachmentSerialize(new_attachment, many=True).data})
-        except ValueError:
-            raise Http404()
+        new_attachment = create_attachment(archive, req)
+        return Response({"data": AttachmentSerializer(new_attachment, many=True).data})
 
 
 @api_view(["DELETE"])
-def attachment(req, archive_pk, attachment_pk):
-    try:
-        Archive.objects.get(pk=archive_pk)
-        try:
-            Attachment.objects.get(pk=attachment_pk)
-            is_deleted = delete_attachment_file(archive_pk, attachment_pk)
-            if is_deleted:
-                return Response({"msg": "OK"})
-            else:
-                raise Http404()
-        except Attachment.DoesNotExist:
-            raise Http404()
-    except Archive.DoesNotExist:
+@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
+@get_or_404(get_attachment_by_pk, to_name="attachment", pass_to=["kwargs"], remove=True)
+def attachment(request, archive: Archive = None, attachment: Attachment = None):
+    is_deleted = delete_attachment_file(archive, attachment)
+    if is_deleted:
+        return Response({"msg": "OK"})
+    else:
         raise Http404()
 
 
 @api_view(["GET", "POST", "DELETE"])
-def archive_forests(req, pk):
+@get_or_404(get_archive_by_pk, pass_to=["kwargs"], to_name="archive", remove=True)
+def archive_forests(req, archive: Archive = None):
     if req.method == 'GET':
-        forests = get_related_forests(pk)
+        forests = get_related_forests(archive)
         return Response({"data": ForestSerializer(forests, many=True).data})
     elif req.method == 'POST':
-        try:
-            forests = add_related_forest(pk, req.data)
-            return Response({"data": ForestSerializer(forests, many=True).data})
-        except ValueError:
-            raise Http404()
+        forests = add_related_forest(archive, req.data)
+        return Response({"data": ForestSerializer(forests, many=True).data})
     else:
         try:
-            is_deleted = delete_related_forest(pk, req.data)
+            is_deleted = delete_related_forest(archive, req.data)
             if is_deleted:
                 return Response({"msg": "OK"})
             else:
@@ -101,19 +85,17 @@ def archive_forests(req, pk):
 
 
 @api_view(["GET", "POST", "DELETE"])
-def archive_customers(req, pk):
+@get_or_404(get_archive_by_pk, pass_to=["kwargs"], to_name="archive", remove=True)
+def archive_customers(req, archive: Archive = None):
     if req.method == 'GET':
-        customers = get_related_customer(pk)
+        customers = get_related_customer(archive)
         return Response({"data": CustomerSerializer(customers, many=True).data})
     elif req.method == 'POST':
-        try:
-            customers = add_related_customer(pk, req.data)
-            return Response({"data": CustomerSerializer(customers, many=True).data})
-        except ValueError:
-            raise Http404()
+        customers = add_related_customer(archive, req.data)
+        return Response({"data": CustomerSerializer(customers, many=True).data})
     else:
         try:
-            is_deleted = delete_related_customer(pk, req.data)
+            is_deleted = delete_related_customer(archive, req.data)
             if is_deleted:
                 return Response({"msg": "OK"})
             else:

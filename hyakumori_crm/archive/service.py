@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
 
@@ -7,8 +9,6 @@ from ..crm.models.forest import Forest
 from ..crm.models.relations import ArchiveUser, ArchiveForest, ArchiveCustomer
 from ..customer.service import get_customer_by_pk
 from ..forest.service import get_forest_by_pk
-from ..permissions.services import PermissionService
-from ..users.models import User
 
 
 def get_archive_by_pk(pk):
@@ -18,9 +18,9 @@ def get_archive_by_pk(pk):
         raise ValueError("Archive not found")
 
 
-def get_attachment_by_pk(pk):
+def get_attachment_by_pk(attachment_pk):
     try:
-        return Attachment.objects.get(pk=pk)
+        return Attachment.objects.get(pk=attachment_pk)
     except Attachment.DoesNotExist:
         raise ValueError(_("Attachment not found"))
 
@@ -31,73 +31,62 @@ def get_all_attachments_by_archive_pk(archive_pk):
 
 def get_attachment(archive_pk, attachment_pk):
     try:
-        return Attachment.objects.filter(object_id=archive_pk, id=attachment_pk)
+        return Attachment.objects.filter(object_id=archive_pk, id=attachment_pk, deleted=None)
     except(Attachment.DoesNotExist, ValidationError):
         return ValueError(_("Attachment not found"))
 
 
-def map_archive(archive, data):
-    archive.title = data.get("title")
-    archive.content = data.get("content")
-    archive.location = data.get("location")
-    archive.future_response = data.get("future_response")
-    archive.archive_date = data.get("archive_date")
+def create_archive(author, data):
+    archive = Archive()
+    archive_user = ArchiveUser()
+    archive_user.user_id = author.id
+    archive_user.archive_id = archive.id
+    archive.title = data.title
+    archive.content = data.content
+    archive.location = data.location
+    archive.future_response = data.future_response
+    archive.archive_date = datetime.now()
     archive.save()
+    archive_user.save()
+    return archive
 
 
-def create_archive(data):
-    try:
-        user = User.objects.get(pk=data.get("author_id"))
-        user_perms = PermissionService.get_user_permissions(user.id)
-        if len(user_perms["groups"]) == 0:
-            archive = Archive()
-            archive_user = ArchiveUser()
-            archive_user.user_id = user.id
-            archive_user.archive_id = archive.id
-            map_archive(archive, data)
-            archive_user.save()
-            return archive
-        else:
-            return None
-    except User.DoesNotExist:
-        raise ValueError(_("Creator not found"))
-
-
-def edit_archive(pk, data):
-    archive = get_archive_by_pk(pk)
-    map_archive(archive, data)
+def edit_archive(data):
+    archive = data["archive"]
+    archive.title = data["title"]
+    archive.content = data["content"]
+    archive.location = data["location"]
+    archive.future_response = data["future_response"]
+    archive.archive_date = data["archive_date"]
+    archive.save()
     return archive
 
 
 def create_attachment(archive, req):
     files = req.FILES.getlist("file")
-    try:
-        creator_id = req.data.get("creator")
-        creator = User.objects.get(pk=creator_id)
-        attachments = []
-        for file in files:
-            attachment = Attachment()
-            attachment.creator = creator
-            attachment.content_object = archive
-            attachment.attachment_file = file
-            attachment.save()
-            attachments.append(attachment)
-        return attachments
-    except User.DoesNotExist:
-        raise ValueError(_("Creator not found"))
+    creator = req.user
+    attachments = []
+    for file in files:
+        attachment = Attachment()
+        attachment.creator = creator
+        attachment.content_object = archive
+        attachment.attachment_file = file
+        attachment.save()
+        attachments.append(attachment)
+    return attachments
 
 
-def delete_attachment_file(archive_pk, attachment_pk):
+def delete_attachment_file(archive, attachment):
     try:
-        attachment = get_attachment(archive_pk, attachment_pk)
+        attachment = get_attachment(archive.id, attachment.id)
         attachment.delete()
         return True
     except Attachment.DoesNotExist:
         return False
 
 
-def get_related_forests(archive_pk):
-    return Forest.objects.filter(archiveforest__archive__id=archive_pk, archiveforest__deleted=None)
+def get_related_forests(archive):
+    return Forest.objects.filter(archiveforest__archive__id=archive.id, archiveforest__deleted=None)
 
 
 def is_forest_exist(archive_pk, forest_pk):
@@ -105,14 +94,13 @@ def is_forest_exist(archive_pk, forest_pk):
     return True if len(archive_forest) == 1 else False
 
 
-def add_related_forest(archive_pk, data):
-    archive = get_archive_by_pk(pk=archive_pk)
+def add_related_forest(archive, data):
     forest_id_list = set(data.get("ids"))
     forests = []
     if forest_id_list and len(forest_id_list) > 0:
         for forest_id in forest_id_list:
             forest = get_forest_by_pk(forest_id)
-            if is_forest_exist(archive_pk, forest_id):
+            if is_forest_exist(archive.id, forest_id):
                 forests.append(forest)
                 continue
             else:
@@ -126,15 +114,13 @@ def add_related_forest(archive_pk, data):
         return None
 
 
-def delete_related_forest(archive_pk, data):
-    archive = get_archive_by_pk(archive_pk)
+def delete_related_forest(archive, data):
     forest_id_list = set(data.get("ids"))
     if forest_id_list and len(forest_id_list) > 0:
         for forest_id in forest_id_list:
             forest = get_forest_by_pk(forest_id)
-            print(forest.deleted)
             if is_forest_exist(archive.id, forest_id):
-                archive_forest = ArchiveForest.objects.get(archive_id=archive.id, forest_id=forest.id)
+                archive_forest = ArchiveForest.objects.get(archive_id=archive.id, forest_id=forest.id, deleted=None)
                 archive_forest.delete()
             else:
                 continue
@@ -148,18 +134,17 @@ def is_customer_exist(archive_pk, customer_pk):
     return True if len(archive_customer) == 1 else False
 
 
-def get_related_customer(archive_pk):
-    return Customer.objects.filter(archivecustomer__archive__id=archive_pk, archivecustomer__deleted=None)
+def get_related_customer(archive):
+    return Customer.objects.filter(archivecustomer__archive__id=archive.id, archivecustomer__deleted=None)
 
 
-def add_related_customer(archive_pk, data):
-    archive = get_archive_by_pk(pk=archive_pk)
+def add_related_customer(archive, data):
     customer_id_list = set(data.get("ids"))
     customers = []
     if customer_id_list and len(customer_id_list) > 0:
         for customer_id in customer_id_list:
             customer = get_customer_by_pk(customer_id)
-            if is_customer_exist(archive_pk, customer_id):
+            if is_customer_exist(archive.id, customer_id):
                 customers.append(customer)
             else:
                 archive_customer = ArchiveCustomer()
@@ -172,14 +157,14 @@ def add_related_customer(archive_pk, data):
         return None
 
 
-def delete_related_customer(archive_pk, data):
-    archive = get_archive_by_pk(archive_pk)
+def delete_related_customer(archive, data):
     customer_id_list = set(data.get("ids"))
     if customer_id_list and len(customer_id_list) > 0:
         for customer_id in customer_id_list:
             customer = get_customer_by_pk(customer_id)
             if is_customer_exist(archive.id, customer_id):
-                archive_customer = ArchiveCustomer.objects.get(archive_id=archive.id, customer_id=customer.id)
+                archive_customer = ArchiveCustomer.objects.get(archive_id=archive.id, customer_id=customer.id,
+                                                               deleted=None)
                 archive_customer.delete()
             else:
                 continue
