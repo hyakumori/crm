@@ -190,7 +190,6 @@ export default {
 
 .page-header {
   position: relative;
-  min-width: 1400px;
 
   .page-header__content {
     position: absolute;
