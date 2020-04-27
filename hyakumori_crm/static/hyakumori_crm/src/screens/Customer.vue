@@ -3,7 +3,11 @@
     <template #top>
       <page-header>
         <template #bottom-right>
-          <customer-create-form />
+          <outline-round-btn
+            :icon="$t('icon.add')"
+            @click="$router.push({ name: 'customer-new' })"
+            :content="$t('buttons.add_customer')"
+          />
         </template>
       </page-header>
     </template>
@@ -36,9 +40,9 @@
 import gql from "graphql-tag";
 import MainSection from "../components/MainSection";
 import PageHeader from "../components/PageHeader";
-import CustomerCreateForm from "../components/CustomerCreateForm";
 import ScreenMixin from "./ScreenMixin";
 import SearchCard from "../components/SearchCard";
+import OutlineRoundBtn from "../components/OutlineRoundBtn";
 import DataList from "../components/DataList";
 import BusEvent from "../BusEvent";
 
@@ -48,7 +52,7 @@ export default {
     SearchCard,
     DataList,
     PageHeader,
-    CustomerCreateForm,
+    OutlineRoundBtn,
   },
   mixins: [ScreenMixin],
   data() {
