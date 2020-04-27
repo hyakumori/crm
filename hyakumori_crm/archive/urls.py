@@ -7,6 +7,6 @@ api_urls = [
     path("archives/<uuid:pk>", archive),
     path("archives/<uuid:pk>/forests", archive_forests),
     path("archives/<uuid:pk>/customers", archive_customers),
-    path("archives/<uuid:archive_pk>/attachments", attachments),
-    path("archives/<uuid:archive_pk>/attachments/<uuid:attachment_pk>", attachment)
+    path("archives/<uuid:pk>/attachments", attachments),
+    path("archives/<uuid:pk>/attachments/<uuid:attachment_pk>", attachment)
 ]
