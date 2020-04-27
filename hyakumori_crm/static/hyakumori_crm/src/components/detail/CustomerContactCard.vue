@@ -6,7 +6,7 @@
     outlined
     active-class="selected"
     :ripple="mode != 'view'"
-    @click="$emit('selected', card_id, index)"
+    @click="$emit('click', card_id, index)"
   >
     <v-icon class="customer-contact-card__icon">{{
       $t("icon.customer_icon")
@@ -87,8 +87,14 @@
     </router-link>
 
     <div
+      v-if="mode !== 'search'"
       class="customer-contact-card__tag"
-      v-bind:class="{ owner: isOwner, contactor: isContactor }"
+      v-bind:class="{
+        owner: isOwner,
+        contactor: isContactor,
+        default: is_default,
+      }"
+      @click.stop="is_default = !is_default"
     ></div>
   </v-card>
 </template>
@@ -96,15 +102,10 @@
 <script>
 export default {
   name: "customer-contact-card",
+  relationship: String,
 
   props: {
     card_id: String,
-    fullname: String,
-    forestsCount: Number,
-    address: String,
-    email: String,
-    phone: String,
-    cellphone: String,
     relationship: String,
     relatedInfo: String,
     isOwner: Boolean,
@@ -117,9 +118,9 @@ export default {
     selectedId: String,
     index: Number,
     handleDeleteClick: Function,
-    forestId: { type: String, default: null },
     mode: { type: String, default: "view" },
     showRelationshipSelect: { type: Boolean, default: true },
+    contact: Object,
   },
 
   data() {
@@ -137,6 +138,7 @@ export default {
         this.$t("detail.tabs.relationship.others"),
       ],
       innerRelationship: "",
+      is_default: false,
     };
   },
 
@@ -160,6 +162,36 @@ export default {
   },
 
   computed: {
+    contact_() {
+      return this.contact.self_contact
+        ? this.contact.self_contact
+        : this.contact;
+    },
+    fullname() {
+      return `${this.contact_.name_kanji.last_name} ${this.contact_.name_kanji.first_name}`;
+    },
+    address() {
+      return `${this.contact_.postal_code || ""} ${
+        this.contact_.address.sector
+      } ${this.contact_.address.municipality} ${
+        this.contact_.address.prefecture
+      }`;
+    },
+    email() {
+      return this.contact_.email;
+    },
+    phone() {
+      return this.contact_.telephone;
+    },
+    cellphone() {
+      return this.contact_.mobilephone;
+    },
+    forestId() {
+      return this.contact.forest_id;
+    },
+    forestsCount() {
+      return this.contact.forests_count;
+    },
     actionIcon() {
       return this.isUpdate ? "mdi-close" : "mdi-chevron-right";
     },
@@ -239,13 +271,20 @@ $background-color: #f5f5f5;
     border-radius: unset !important;
     border-top-right-radius: $border-radius !important;
     clip-path: polygon(0 0, 100% 100%, 100% 0);
+    background-color: #e1e1e1;
+    opacity: 0.45;
+    &:hover {
+      opacity: 1;
+    }
   }
 
-  & .owner {
+  & .owner.default {
     background-color: #12c7a6;
+    opacity: 1;
   }
 
-  & .contactor {
+  & .contactor.default {
+    opacity: 1;
     background-color: #f36c69;
   }
 

@@ -1,26 +1,21 @@
 <template>
   <v-row dense>
-    <template v-for="(contact, index) in contacts">
-      <v-col cols="6" :key="index">
-        <customer-contact-card
-          :card_id="contact.customer_id || contact.id"
-          :fullname="getFullname(contact)"
-          :address="getAddress(contact)"
-          :email="contact.email"
-          :forestsCount="contact.forests_count"
-          :phone="contact.telephone"
-          :cellphone="contact.mobilephone"
-          :isOwner="contact.is_basic"
-          :isUpdate="isUpdate"
-          :index="index"
-          @deleteContact="$emit('deleteContact', contact, index)"
-          @undoDeleteContact="$emit('undoDeleteContact', contact, index)"
-          :added="contact.added"
-          :deleted="contact.deleted"
-          :showRelationshipSelect="showRelationshipSelect"
-        />
-      </v-col>
-    </template>
+    <v-col v-for="(contact, index) in contacts" cols="6" :key="index">
+      <customer-contact-card
+        :card_id="contact.customer_id || contact.id"
+        :contact="contact"
+        :isOwner="isOwner"
+        :isUpdate="isUpdate"
+        :index="index"
+        @deleteContact="$emit('deleteContact', contact, index)"
+        @undoDeleteContact="$emit('undoDeleteContact', contact, index)"
+        :added="contact.added"
+        :deleted="contact.deleted"
+        :showRelationshipSelect="showRelationshipSelect"
+        @click="(card_id, indx) => isUpdate && $emit('selected', card_id, indx)"
+        :selectedId="selectingId"
+      />
+    </v-col>
   </v-row>
 </template>
 
@@ -39,25 +34,7 @@ export default {
     isUpdate: Boolean,
     isOwner: Boolean,
     showRelationshipSelect: { type: Boolean, default: true },
-  },
-
-  methods: {
-    getFullname(contact) {
-      if (contact.fullname) {
-        return contact.fullname;
-      }
-      if (contact.name_kanji) {
-        return `${contact.name_kanji.last_name} ${contact.name_kanji.first_name}`;
-      }
-      return "";
-    },
-    getAddress(contact) {
-      if (typeof contact.address === "object") {
-        return (contact.address && contact.address.sector) || "";
-      } else {
-        return contact.address;
-      }
-    },
+    selectingId: String,
   },
 };
 </script>

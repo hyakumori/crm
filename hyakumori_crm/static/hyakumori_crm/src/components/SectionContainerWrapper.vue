@@ -14,7 +14,13 @@
         :content="addBtnContent"
         :click="addBtnClickHandler"
       />
-      <update-button class="mb-9" :cancel="cancelEdit" />
+      <update-button
+        class="mb-9"
+        :cancel="cancelEdit"
+        :save="save"
+        :saving="saving"
+        :saveDisabled="saveDisabled"
+      />
     </template>
   </div>
 </template>
@@ -38,6 +44,8 @@ export default {
     permissions: Array,
     isLoading: Boolean,
     save: Function,
+    saving: Boolean,
+    saveDisabled: Boolean,
     isEditing: Boolean,
     cancelEdit: Function,
   },

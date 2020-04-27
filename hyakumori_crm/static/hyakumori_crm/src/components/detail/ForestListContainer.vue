@@ -3,10 +3,9 @@
     <content-header
       :content="headerContent"
       :editBtnContent="editBtnContent"
-      :update="isUpdate"
       :loading="isLoading"
       :displayAdditionBtn="displayAdditionBtn"
-      @update="val => (isUpdate = val)"
+      @toggleEdit="val => (isUpdate = val)"
     />
     <forest-info-list
       class="mt-4"
@@ -219,7 +218,7 @@ export default {
         for (let forestToDelete of this.forestsToDelete) {
           this.$set(forestToDelete, "deleted", undefined);
         }
-        this.forestsToDelete && (this.forestsToDelete = []);
+        this.forestsToDelete.length > 0 && (this.forestsToDelete = []);
       }
     },
   },

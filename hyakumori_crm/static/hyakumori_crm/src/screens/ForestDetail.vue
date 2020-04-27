@@ -15,9 +15,11 @@
           headerContent="所有林情報"
           toggleEditBtnContent="所有者を追加・編集"
           addBtnContent="連絡者を追加"
-          :customers="customers"
-          :customersContacts="customersContacts"
+          :customers="$store.state.forest.customers"
+          :customersContacts="$store.state.forest.customersContacts"
           :isLoading="$store.state.forest.customersLoading"
+          @saved="$store.dispatch('forest/getCustomers', id)"
+          :id="id"
         />
 
         <attachment-container
@@ -154,17 +156,6 @@ export default {
   },
 
   computed: {
-    customers() {
-      return this.$store.state.forest.customers.map(owner =>
-        this.mapContact(owner),
-      );
-    },
-    customersContacts() {
-      return this.$store.state.forest.customersContacts.map(c =>
-        this.mapContact(c),
-      );
-    },
-
     attaches() {
       return discussions;
     },

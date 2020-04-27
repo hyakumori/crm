@@ -17,6 +17,9 @@
         showSelect = true;
       }
     "
+    :saveDisabled="saveDisabled"
+    :save="handleSave"
+    :saving="saving"
   >
     <template>
       <contact-tab
@@ -27,6 +30,13 @@
         :isEditing="isEditing"
         @deleteCustomer="handleDelete"
         @undoDeleteCustomer="handleUndoDelete"
+        @customerSelected="
+          card_id =>
+            selectingCustomerId == card_id
+              ? (selectingCustomerId = null)
+              : (selectingCustomerId = card_id)
+        "
+        :selectingCustomerId="selectingCustomerId"
       />
       <SelectListModal
         :loading="customersForAddingLoading"
@@ -39,7 +49,7 @@
       >
         <template #list>
           <CustomerContactCard
-            @selected="
+            @click="
               (cId, inx) => {
                 modalSelectingCustomerId = cId;
                 modalSelectingCustomerIndex = inx;
@@ -48,14 +58,7 @@
             v-for="(item, indx) in customersForAdding.results || []"
             :key="item.id"
             :card_id="item.id"
-            :fullname="
-              `${item.self_contact.name_kanji.last_name} ${item.self_contact.name_kanji.first_name}`
-            "
-            :address="item.self_contact.address.sector"
-            :email="item.self_contact.email"
-            :forestsCount="item.forests_count"
-            :phone="item.self_contact.telephone"
-            :cellphone="item.self_contact.mobilephone"
+            :contact="item"
             :showAction="false"
             :index="indx"
             :selectedId="modalSelectingCustomerId"
@@ -94,11 +97,11 @@ export default {
     headerContent: String,
     toggleEditBtnContent: String,
     addBtnContent: String,
-    editBtnContent: String,
     customers: Array,
     customersContacts: Array,
     permissions: Array,
     isLoading: Boolean,
+    id: String,
   },
   data() {
     return {
@@ -110,6 +113,8 @@ export default {
       customersToDelete: [],
       modalSelectingCustomerId: null,
       modalSelectingCustomerIndex: null,
+      saving: false,
+      selectingCustomerId: null,
     };
   },
   created() {
@@ -124,6 +129,18 @@ export default {
     },
     customerIdsMap() {
       return Object.fromEntries(this.tempCustomers.map(c => [c.id, true]));
+    },
+    customerIdsToAdd() {
+      return this.customersToAdd.map(f => f.id);
+    },
+    customerIdsToDelete() {
+      return this.customersToDelete.map(f => f.id);
+    },
+    saveDisabled() {
+      return (
+        this.customerIdsToDelete.length === 0 &&
+        this.customerIdsToAdd.length === 0
+      );
     },
   },
   methods: {
@@ -142,12 +159,18 @@ export default {
         delete customer.added;
         this.customersToAdd = reject(this.customersToAdd, { id: customer.id });
       } else {
-        this.$set(customer, "deleted", true);
-        this.customersToDelete.push(customer);
+        const newCustomers = [...this.customers];
+        const c = newCustomers[index];
+        c.deleted = true;
+        this.$store.commit("forest/setCustomers", newCustomers);
+        this.customersToDelete.push(c);
       }
     },
     handleUndoDelete(customer, index) {
-      this.$set(customer, "deleted", undefined);
+      const newCustomers = [...this.customers];
+      const c = newCustomers[index];
+      delete c.deleted;
+      this.$store.commit("forest/setCustomers", newCustomers);
       this.customersToDelete = reject(this.customersToDelete, {
         id: customer.id,
       });
@@ -200,6 +223,17 @@ export default {
     async showSelect(val) {
       if (val && !this.customersForAdding.next) {
         await this.loadInitCustomersForAdding();
+      }
+    },
+    isEditing(val) {
+      if (!val) {
+        this.customersToAdd.length > 0 && (this.customersToAdd = []);
+        const newCustomers = [...this.customers];
+        for (let c of newCustomers) {
+          delete c.deleted;
+        }
+        this.$store.commit("forest/setCustomers", newCustomers);
+        this.customersToDelete.length > 0 && (this.customersToDelete = []);
       }
     },
   },

@@ -35,6 +35,8 @@
         @undoDeleteContact="
           (customer, index) => $emit('undoDeleteCustomer', customer, index)
         "
+        @selected="(card_id, indx) => $emit('customerSelected', card_id, indx)"
+        :selectingId="selectingCustomerId"
       />
     </v-tab-item>
 
@@ -69,6 +71,7 @@ export default {
     customers: Array,
     customerContacts: Array,
     isEditing: Boolean,
+    selectingCustomerId: String,
   },
 
   methods: {
