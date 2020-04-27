@@ -61,63 +61,62 @@ def attachments(req, archive_pk):
             raise Http404()
 
 
-@api_view(["PUT", "PATCH", "DELETE"])
+@api_view(["DELETE"])
 def attachment(req, archive_pk, attachment_pk):
-    if req.method == 'DELETE':
+    try:
+        Archive.objects.get(pk=archive_pk)
         try:
-            Archive.objects.get(pk=archive_pk)
-            try:
-                Attachment.objects.get(pk=attachment_pk)
-                is_deleted = delete_attachment_file(archive_pk, attachment_pk)
-                if is_deleted:
-                    return Response({"msg": "OK"})
-                else:
-                    raise Http404()
-            except Attachment.DoesNotExist:
+            Attachment.objects.get(pk=attachment_pk)
+            is_deleted = delete_attachment_file(archive_pk, attachment_pk)
+            if is_deleted:
+                return Response({"msg": "OK"})
+            else:
                 raise Http404()
-        except Archive.DoesNotExist:
+        except Attachment.DoesNotExist:
             raise Http404()
-    else:
-        print('Do put/patch')
+    except Archive.DoesNotExist:
+        raise Http404()
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def archive_forests(req, pk):
     if req.method == 'GET':
         forests = get_related_forests(pk)
         return Response({"data": ForestSerializer(forests, many=True).data})
-    else:
+    elif req.method == 'POST':
         try:
             forests = add_related_forest(pk, req.data)
             return Response({"data": ForestSerializer(forests, many=True).data})
         except ValueError:
             raise Http404()
-
-
-@api_view(["PUT", "PATCH", "DELETE"])
-def archive_forest(req, archive_pk, forest_pk):
-    if req.method == 'DELETE':
-        print('do delete')
     else:
-        print('do put/patch')
+        try:
+            is_deleted = delete_related_forest(pk, req.data)
+            if is_deleted:
+                return Response({"msg": "OK"})
+            else:
+                raise Http404()
+        except ValueError:
+            raise Http404()
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def archive_customers(req, pk):
     if req.method == 'GET':
         customers = get_related_customer(pk)
         return Response({"data": CustomerSerializer(customers, many=True).data})
-    else:
+    elif req.method == 'POST':
         try:
             customers = add_related_customer(pk, req.data)
             return Response({"data": CustomerSerializer(customers, many=True).data})
         except ValueError:
             raise Http404()
-
-
-@api_view(["PUT", "PATCH", "DELETE"])
-def archive_customer(req, archive_pk, customer_pk):
-    if req.method == 'DELETE':
-        print('do delete')
     else:
-        print('do put/patch')
+        try:
+            is_deleted = delete_related_customer(pk, req.data)
+            if is_deleted:
+                return Response({"msg": "OK"})
+            else:
+                raise Http404()
+        except ValueError:
+            raise Http404()
