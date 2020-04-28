@@ -2,50 +2,51 @@
   <v-row>
     <v-col cols="6">
       <range-date-picker
-        v-if="isUpdate"
-        label="協議日時|カレンダー"
         :dates="['2020-03-04', '']"
-      />
-      <text-info
-        v-else
         label="協議日時|カレンダー"
-        value="2020/3/4"
-        :isUpdate="isUpdate"
-        @input="input"
+        v-if="isUpdate || !isDetail"
       />
       <text-info
-        label="今後の対応"
-        value="害虫駆除の発注先を検討する"
         :isUpdate="isUpdate"
         @input="input"
+        label="協議日時|カレンダー"
+        v-else
+        :value="info.archive_date"
+      />
+      <text-info
+        :isUpdate="isUpdate || !isDetail"
+        @input="input"
+        label="今後の対応"
+        :value="info.future_response"
       />
     </v-col>
 
     <v-col cols="6">
       <text-info
-        label="場所"
-        value="岡山県倉敷市大谷4-1-3"
-        :isUpdate="isUpdate"
+        :isUpdate="isUpdate || !isDetail"
         @input="input"
+        label="場所"
+        :value="info.location"
       />
       <archive-participant-card
-        class="mt-3"
         :class="{ 'mt-6': isUpdate }"
         :isAuthor="true"
-        name="山田花子"
+        class="mt-3"
+        :name="info.author"
+        v-if="isUpdate || isDetail"
       />
     </v-col>
 
     <div class="pl-3 container content">
       <h5>協議内容</h5>
       <v-textarea
-        v-if="isUpdate"
+        :outlined="isUpdate || !isDetail"
         dense
-        value="害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。"
-        :outlined="isUpdate"
+        v-if="isUpdate || !isDetail"
+        :value="info.content"
       />
       <p v-else>
-        害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。害獣駆除の進め方について相談。
+        {{ info.content }}
       </p>
     </div>
   </v-row>
@@ -69,6 +70,7 @@ export default {
     info: Object,
     isUpdate: Boolean,
     isSave: Boolean,
+    isDetail: Boolean,
   },
 
   methods: {

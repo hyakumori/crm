@@ -36,8 +36,8 @@ def archives(request, data: ArchiveInput = None):
 @api_validate_model(ArchiveInput)
 @get_or_404(get_archive_by_pk, to_name='archive', pass_to=["kwargs", "request"], remove=True)
 @action_login_required(with_permissions=["view_archive", "change_archive"])
-def archive(request, *, archive: Archive = None, data: ArchiveInput):
-    if request.method == 'GET':
+def archive(req, *, archive: Archive = None, data: ArchiveInput = None):
+    if req.method == 'GET':
         return Response({"data": ArchiveSerializer(archive).data})
     else:
         updated_archive = edit_archive(archive, data)
