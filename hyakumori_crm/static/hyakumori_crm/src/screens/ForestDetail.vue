@@ -17,6 +17,7 @@
           addBtnContent="連絡者を追加"
           :customers="$store.state.forest.customers"
           :customersContacts="$store.state.forest.customersContacts"
+          :customerIdNameMap="$store.getters['forest/customerIdNameMap']"
           :isLoading="$store.state.forest.customersLoading"
           @saved="$store.dispatch('forest/getCustomers', id)"
           :id="id"

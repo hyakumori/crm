@@ -38,6 +38,8 @@
         "
         :selectingCustomerId="selectingCustomerId"
         @toggleDefault="handleToggleDefault"
+        @toggleContactDefault="handleToggleContactDefault"
+        :customerIdNameMap="customerIdNameMap"
       />
       <SelectListModal
         :loading="customersForAddingLoading"
@@ -103,6 +105,7 @@ export default {
     permissions: Array,
     isLoading: Boolean,
     id: String,
+    customerIdNameMap: Object,
   },
   data() {
     return {
@@ -223,6 +226,14 @@ export default {
       this.$store.dispatch("forest/toggleDefaultCustomer", {
         id: this.id,
         customer_id,
+        val,
+      });
+    },
+    handleToggleContactDefault(val, customer_id, contact_id) {
+      this.$store.dispatch("forest/toggleDefaultCustomerContact", {
+        id: this.id,
+        customer_id,
+        contact_id,
         val,
       });
     },

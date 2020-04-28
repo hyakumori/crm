@@ -64,6 +64,11 @@
       <p class="ma-0 pt-2 caption text-truncate" v-if="forestId">
         {{ forestId }}
       </p>
+      <p class="ma-0 pt-2 caption text-truncate" v-if="customerName">
+        <span style="background-color:#f5f5f5;color: black">{{
+          `${customerName}の関係連絡先`
+        }}</span>
+      </p>
     </div>
     <v-btn
       v-if="deleted"
@@ -129,6 +134,7 @@ export default {
     mode: { type: String, default: "view" },
     showRelationshipSelect: { type: Boolean, default: true },
     contact: Object,
+    customerName: String,
   },
 
   data() {
@@ -151,20 +157,18 @@ export default {
   },
 
   methods: {
-    onClick() {
-      // Do click card
-      if (this.card_id) {
-        this.$router.push({
-          name: "customer-detail",
-          params: { id: this.card_id },
-        });
-        window.scrollTo(0, 0);
-      }
-    },
     onTagClick() {
       if (!this.isUpdate) return;
       this.isDefault = !this.isDefault;
-      this.$emit("toggleDefault", this.isDefault, this.card_id);
+      if (this.isOwner)
+        this.$emit("toggleDefault", this.isDefault, this.card_id);
+      else if (this.isContactor)
+        this.$emit(
+          "toggleContactDefault",
+          this.isDefault,
+          this.contact.customer_id,
+          this.contact.id,
+        );
     },
     onClickCard() {},
 

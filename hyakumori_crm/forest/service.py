@@ -3,6 +3,7 @@ from typing import Iterator, Union
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
+from django.db.models.expressions import RawSQL
 
 from ..crm.models import (
     Forest,
@@ -12,7 +13,7 @@ from ..crm.models import (
     ForestCustomerContact,
     Contact,
 )
-from .schemas import ForestFilter, CustomerDefaultInput
+from .schemas import ForestFilter, CustomerDefaultInput, CustomerContactDefaultInput
 
 
 def get_forest_by_pk(pk):
@@ -100,14 +101,32 @@ def get_customer_contacts_of_forest(pk):
             customercontact__attributes__contact_type="FOREST",
             customercontact__forestcustomercontact__forestcustomer__forest_id=pk,
         )
-        .annotate(is_basic=F("customercontact__is_basic"))
+        .annotate(
+            is_basic=F("customercontact__is_basic")
+        )  # actualy its always False, why did we retrieve it?
         .annotate(customer_id=F("customercontact__customer_id"))
+        .annotate(
+            default=RawSQL(
+                "crm_forestcustomercontact.attributes->>'default'", params=[]
+            )
+        )
     )
 
 
 def set_default_customer(data: CustomerDefaultInput):
     fc = ForestCustomer.objects.filter(
         forest_id=data.forest.id, customer_id=data.customer_id
+    ).update(attributes={"default": data.default})
+    data.forest.save(update_fields=["updated_at"])
+    return data.forest
+
+
+def set_default_customer_contact(data: CustomerContactDefaultInput):
+    fc = ForestCustomerContact.objects.filter(
+        forestcustomer__forest_id=data.forest.id,
+        forestcustomer__customer_id=data.customer_id,
+        customercontact__customer_id=data.customer_id,
+        customercontact__contact_id=data.contact_id,
     ).update(attributes={"default": data.default})
     data.forest.save(update_fields=["updated_at"])
     return data.forest

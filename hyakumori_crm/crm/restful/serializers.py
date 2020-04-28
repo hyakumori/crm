@@ -15,6 +15,8 @@ class ContactSerializer(ModelSerializer):
     forest_id = UUIDField(read_only=True)
     customer_id = UUIDField(read_only=True)
     cc_attrs = JSONField(read_only=True)
+    # forest customer contact default
+    default = BooleanField(read_only=True)
 
     class Meta:
         model = Contact

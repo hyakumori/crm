@@ -36,19 +36,24 @@
           (customer, index) => $emit('undoDeleteCustomer', customer, index)
         "
         @selected="(card_id, indx) => $emit('customerSelected', card_id, indx)"
-        :selectingId="selectingCustomerId"
         @toggleDefault="
           (val, customer_id) => $emit('toggleDefault', val, customer_id)
         "
+        :selectingId="selectingCustomerId"
       />
     </v-tab-item>
 
     <v-tab-item>
       <customer-contact-list
-        :contacts="customerContacts"
+        :contacts="customersContacts"
         :isUpdate="isEditing"
         :isContactor="true"
         :showRelationshipSelect="false"
+        :customerIdNameMap="customerIdNameMap"
+        @toggleContactDefault="
+          (val, customer_id, contact_id) =>
+            $emit('toggleContactDefault', val, customer_id, contact_id)
+        "
       />
     </v-tab-item>
   </v-tabs>
@@ -72,9 +77,10 @@ export default {
 
   props: {
     customers: Array,
-    customerContacts: Array,
+    customersContacts: Array,
     isEditing: Boolean,
     selectingCustomerId: String,
+    customerIdNameMap: Object,
   },
 
   methods: {

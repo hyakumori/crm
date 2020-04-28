@@ -18,7 +18,12 @@ from ..api.decorators import (
     get_or_404,
     action_login_required,
 )
-from .schemas import ForestInput, OwnerPksInput, CustomerDefaultInput
+from .schemas import (
+    ForestInput,
+    OwnerPksInput,
+    CustomerDefaultInput,
+    CustomerContactDefaultInput,
+)
 from .service import (
     get_forest_by_pk,
     update,
@@ -26,6 +31,7 @@ from .service import (
     get_customers,
     get_customer_contacts_of_forest,
     set_default_customer,
+    set_default_customer_contact,
 )
 
 
@@ -112,4 +118,14 @@ def update_owners_view(request, *, owner_pks_in: OwnerPksInput):
 @api_validate_model(CustomerDefaultInput)
 def set_default_customer_view(request, *, data: CustomerDefaultInput = None):
     set_default_customer(data)
+    return Response({"id": data.forest.id})
+
+
+@api_view(["PUT", "PATCH"])
+@get_or_404(get_forest_by_pk, to_name="forest", remove=True)
+@api_validate_model(CustomerContactDefaultInput)
+def set_default_customer_contact_view(
+    request, *, data: CustomerContactDefaultInput = None
+):
+    set_default_customer_contact(data)
     return Response({"id": data.forest.id})

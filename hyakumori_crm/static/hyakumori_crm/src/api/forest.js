@@ -36,3 +36,11 @@ export function toggleDefaultCustomer(id, customer_id, val) {
     default: val,
   });
 }
+
+export function toggleDefaultCustomerContact(id, customer_id, contact_id, val) {
+  return axios.put(`forests/${id}/customers/set-default-contact`, {
+    customer_id,
+    contact_id,
+    default: val,
+  });
+}

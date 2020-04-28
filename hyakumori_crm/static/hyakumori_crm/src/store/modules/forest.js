@@ -22,6 +22,12 @@ const getters = {
       backUrl: { name: "forests" },
     };
   },
+  customerIdNameMap(state) {
+    if (state.customers.legnth === 0) return {};
+    return Object.fromEntries(
+      state.customers.map(c => [c.id, c.self_contact.name_kanji]),
+    );
+  },
 };
 
 const actions = {
@@ -49,6 +55,21 @@ const actions = {
     const c = find(newCustomers, { id: customer_id });
     c.default = val;
     commit("setCustomers", newCustomers);
+  },
+  async toggleDefaultCustomerContact(
+    { commit, state },
+    { id, customer_id, contact_id, val },
+  ) {
+    await forestApi.toggleDefaultCustomerContact(
+      id,
+      customer_id,
+      contact_id,
+      val,
+    );
+    const newCustomersContacts = [...state.customersContacts];
+    const c = find(newCustomersContacts, { id: contact_id });
+    c.default = val;
+    commit("setCustomersContacts", newCustomersContacts);
   },
 };
 
