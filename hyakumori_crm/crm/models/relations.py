@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from ...core.models import BaseRelationModel
@@ -59,8 +60,6 @@ class ArchiveForest(BaseRelationModel):
 class ArchiveCustomer(BaseRelationModel):
     archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
     customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
-    is_our_participant = models.BooleanField(default=False)
-    is_their_participant = models.BooleanField(default=False)
 
 
 class ArchiveCustomerContact(BaseRelationModel):
@@ -70,4 +69,4 @@ class ArchiveCustomerContact(BaseRelationModel):
 
 class ArchiveUser(BaseRelationModel):
     archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
-    user = models.ForeignKey("users.User", on_delete=models.PROTECT)
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)

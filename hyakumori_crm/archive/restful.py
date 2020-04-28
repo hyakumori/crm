@@ -3,19 +3,19 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
-from .schemas import ArchiveInput
 from .service import *
 from ..api.decorators import (
     api_validate_model,
     get_or_404,
 )
 from ..core.utils import default_paginator
-from ..crm.restful.serializers import AttachmentSerializer, ArchiveSerializer, ForestSerializer, CustomerSerializer
+from ..crm.restful.serializers import *
+from ..users.models import User
 
 
 @api_view(["GET", "POST"])
 @api_validate_model(ArchiveInput)
-def archives(req, data: dict = None):
+def archives(req, data: ArchiveInput = None):
     if req.method == 'GET':
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
@@ -32,11 +32,11 @@ def archives(req, data: dict = None):
 @api_view(["GET", "PUT", "PATCH"])
 @api_validate_model(ArchiveInput)
 @get_or_404(get_archive_by_pk, to_name='archive', pass_to=["kwargs", "request"], remove=True)
-def archive(req, *, archive: Archive = None, data: dict = None):
+def archive(req, *, archive: Archive = None, data: ArchiveInput):
     if req.method == 'GET':
         return Response({"data": ArchiveSerializer(archive).data})
     else:
-        updated_archive = edit_archive(req.data)
+        updated_archive = edit_archive(archive, data)
         return Response({"data": ArchiveSerializer(updated_archive).data})
 
 
@@ -101,4 +101,25 @@ def archive_customers(req, archive: Archive = None):
             else:
                 raise Http404()
         except ValueError:
+            raise Http404()
+
+
+@api_view(["GET", "POST", "DELETE"])
+@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
+def archive_users(req, archive: Archive = None):
+    if req.method == 'GET':
+        paginator = default_paginator()
+        paged_list = paginator.paginate_queryset(
+            request=req,
+            queryset=User.objects.filter(archiveuser__archive__id=archive.id, archiveuser__deleted=None)
+        )
+        return paginator.get_paginated_response(UserSerializer(paged_list, many=True).data)
+    elif req.method == 'POST':
+        users = add_related_user(archive, req.data)
+        return Response({"data": UserSerializer(users, many=True).data})
+    else:
+        is_deleted = delete_related_user(archive, req.data)
+        if is_deleted:
+            return Response({"msg": "OK"})
+        else:
             raise Http404()

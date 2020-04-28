@@ -8,5 +8,6 @@ class ArchiveInput(HyakumoriDanticModel):
     title: str
     content: Optional[str]
     location: Optional[str]
-    future_response: Optional[str]
+    future_action: Optional[str]
+    archive_date: Optional[datetime]
 
