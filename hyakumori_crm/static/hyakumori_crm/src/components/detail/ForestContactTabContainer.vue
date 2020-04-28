@@ -37,6 +37,7 @@
               : (selectingCustomerId = card_id)
         "
         :selectingCustomerId="selectingCustomerId"
+        @toggleDefault="handleToggleDefault"
       />
       <SelectListModal
         :loading="customersForAddingLoading"
@@ -217,6 +218,13 @@ export default {
         results: reject(resp.results, c => this.customerIdsMap[c.id]),
       };
       this.customersForAddingLoading = false;
+    },
+    handleToggleDefault(val, customer_id) {
+      this.$store.dispatch("forest/toggleDefaultCustomer", {
+        id: this.id,
+        customer_id,
+        val,
+      });
     },
   },
   watch: {

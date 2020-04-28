@@ -11,7 +11,8 @@
     "send": "送信",
     "activate": "アクティブ",
     "continue": "継続する",
-    "add": "追加"
+    "add": "追加",
+    "set_as_default": "デフォルトとして設定"
   },
   "detail": {
     "tabs": {

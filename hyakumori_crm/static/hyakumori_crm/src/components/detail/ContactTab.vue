@@ -37,6 +37,9 @@
         "
         @selected="(card_id, indx) => $emit('customerSelected', card_id, indx)"
         :selectingId="selectingCustomerId"
+        @toggleDefault="
+          (val, customer_id) => $emit('toggleDefault', val, customer_id)
+        "
       />
     </v-tab-item>
 

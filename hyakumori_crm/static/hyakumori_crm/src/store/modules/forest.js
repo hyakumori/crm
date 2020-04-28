@@ -1,4 +1,5 @@
 import * as forestApi from "../../api/forest";
+import { find } from "lodash";
 
 const state = {
   forest: null,
@@ -41,6 +42,13 @@ const actions = {
     const contacts = await forestApi.fetchCustomersContacts(id);
     commit("setCustomersContacts", contacts);
     commit("customersContactsLoadingOff");
+  },
+  async toggleDefaultCustomer({ commit, state }, { id, customer_id, val }) {
+    await forestApi.toggleDefaultCustomer(id, customer_id, val);
+    const newCustomers = [...state.customers];
+    const c = find(newCustomers, { id: customer_id });
+    c.default = val;
+    commit("setCustomers", newCustomers);
   },
 };
 

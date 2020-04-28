@@ -12,7 +12,7 @@ from ..crm.models import (
     ForestCustomerContact,
     Contact,
 )
-from .schemas import ForestFilter
+from .schemas import ForestFilter, CustomerDefaultInput
 
 
 def get_forest_by_pk(pk):
@@ -80,16 +80,16 @@ def update_owners(owner_pks_in):
 
 def get_customers(pk):
     return Customer.objects.raw(
-        """
-    select crm_customer.*, count(A0.id) as forests_count
-    from crm_customer
-    join crm_forestcustomer
-    on crm_customer.id = crm_forestcustomer.customer_id
-    left outer join crm_forestcustomer A0
-    on crm_customer.id = A0.customer_id
-    where crm_forestcustomer.forest_id = %(pk)s
-    group by crm_customer.id
-    """,
+        """select crm_customer.*,
+count(A0.id) as forests_count,
+crm_forestcustomer.attributes->>'default' as default
+from crm_customer
+join crm_forestcustomer
+on crm_customer.id = crm_forestcustomer.customer_id
+left outer join crm_forestcustomer A0
+on crm_customer.id = A0.customer_id
+where crm_forestcustomer.forest_id = %(pk)s
+group by crm_customer.id, crm_forestcustomer.attributes->>'default'""",
         {"pk": pk},
     ).prefetch_related("customercontact_set__contact")
 
@@ -103,3 +103,11 @@ def get_customer_contacts_of_forest(pk):
         .annotate(is_basic=F("customercontact__is_basic"))
         .annotate(customer_id=F("customercontact__customer_id"))
     )
+
+
+def set_default_customer(data: CustomerDefaultInput):
+    fc = ForestCustomer.objects.filter(
+        forest_id=data.forest.id, customer_id=data.customer_id
+    ).update(attributes={"default": data.default})
+    data.forest.save(update_fields=["updated_at"])
+    return data.forest

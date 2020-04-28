@@ -18,16 +18,14 @@ from ..api.decorators import (
     get_or_404,
     action_login_required,
 )
-from .schemas import (
-    ForestInput,
-    OwnerPksInput,
-)
+from .schemas import ForestInput, OwnerPksInput, CustomerDefaultInput
 from .service import (
     get_forest_by_pk,
     update,
     update_owners,
     get_customers,
     get_customer_contacts_of_forest,
+    set_default_customer,
 )
 
 
@@ -107,3 +105,11 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
 def update_owners_view(request, *, owner_pks_in: OwnerPksInput):
     update_owners(owner_pks_in)
     return Response({"id": owner_pks_in.forest.pk})
+
+
+@api_view(["PUT", "PATCH"])
+@get_or_404(get_forest_by_pk, to_name="forest", remove=True)
+@api_validate_model(CustomerDefaultInput)
+def set_default_customer_view(request, *, data: CustomerDefaultInput = None):
+    set_default_customer(data)
+    return Response({"id": data.forest.id})

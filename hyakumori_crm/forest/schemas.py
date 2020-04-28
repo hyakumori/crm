@@ -122,3 +122,24 @@ class OwnerPksInput(HyakumoriDanticModel):
                 _("Customer Id {} not found").format(", ".join(invalid_pks))
             )
         return v
+
+
+class CustomerDefaultInput(HyakumoriDanticModel):
+    forest: Forest
+    customer_id: UUID
+    default: bool
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @root_validator
+    def validate_customer_id(cls, values):
+        forest = values.get("forest")
+        customer_id = values.get("customer_id")
+        if not forest or not customer_id:
+            return values
+        try:
+            ForestCustomer.objects.get(forest_id=forest.id, customer_id=customer_id)
+        except ForestCustomer.DoesNotExist:
+            raise ValueError(_("Customer {v} not found").format(v=customer_id))
+        return values

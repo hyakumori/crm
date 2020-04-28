@@ -61,7 +61,9 @@
         :items="RELATIONSHIP"
         @change="selectedRelationship"
       ></v-select>
-      <p v-if="forestId">{{ forestId }}</p>
+      <p class="ma-0 pt-2 caption text-truncate" v-if="forestId">
+        {{ forestId }}
+      </p>
     </div>
     <v-btn
       v-if="deleted"
@@ -87,14 +89,20 @@
     </router-link>
 
     <div
-      v-if="mode !== 'search'"
+      v-if="
+        mode !== 'search' &&
+          !contact.added &&
+          !contact.deleted &&
+          (isUpdate || isDefault)
+      "
       class="customer-contact-card__tag"
+      :title="$t('buttons.set_as_default')"
       v-bind:class="{
         owner: isOwner,
         contactor: isContactor,
-        default: is_default,
+        default: isDefault,
       }"
-      @click.stop="is_default = !is_default"
+      @click.stop="onTagClick"
     ></div>
   </v-card>
 </template>
@@ -138,7 +146,7 @@ export default {
         this.$t("detail.tabs.relationship.others"),
       ],
       innerRelationship: "",
-      is_default: false,
+      isDefault: this.contact.default,
     };
   },
 
@@ -153,7 +161,11 @@ export default {
         window.scrollTo(0, 0);
       }
     },
-
+    onTagClick() {
+      if (!this.isUpdate) return;
+      this.isDefault = !this.isDefault;
+      this.$emit("toggleDefault", this.isDefault, this.card_id);
+    },
     onClickCard() {},
 
     selectedRelationship(val) {

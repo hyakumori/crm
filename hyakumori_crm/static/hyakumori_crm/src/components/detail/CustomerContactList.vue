@@ -14,6 +14,9 @@
         :showRelationshipSelect="showRelationshipSelect"
         @click="(card_id, indx) => isUpdate && $emit('selected', card_id, indx)"
         :selectedId="selectingId"
+        @toggleDefault="
+          (val, customer_id) => $emit('toggleDefault', val, customer_id)
+        "
       />
     </v-col>
   </v-row>

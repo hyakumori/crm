@@ -29,3 +29,10 @@ export async function fetchCustomersContacts(forestId) {
 export function updateBasicInfo(forestId, info) {
   return axios.put(`forests/${forestId}/basic-info`, info);
 }
+
+export function toggleDefaultCustomer(id, customer_id, val) {
+  return axios.put(`forests/${id}/customers/set-default`, {
+    customer_id,
+    default: val,
+  });
+}
