@@ -120,13 +120,14 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("forest/getForest", this.id);
+    this.$store.dispatch("forest/getForest", this.id).then(() => {
+      this.$store.dispatch(
+        "setHeaderInfo",
+        this.$store.getters["forest/headerInfo"],
+      );
+    });
     this.$store.dispatch("forest/getCustomers", this.id);
     this.$store.dispatch("forest/getCustomersContacts", this.id);
-    this.$store.dispatch(
-      "setHeaderInfo",
-      this.$store.getters["forest/headerInfo"],
-    );
   },
   methods: {
     fallbackText(text) {
