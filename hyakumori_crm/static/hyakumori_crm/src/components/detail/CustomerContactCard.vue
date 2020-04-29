@@ -96,16 +96,15 @@
     <div
       v-if="
         mode !== 'search' &&
-          !contact.added &&
           !contact.deleted &&
-          (isUpdate || isDefault)
+          (isUpdate || this.contact.default)
       "
       class="customer-contact-card__tag"
       :title="$t('buttons.set_as_default')"
       v-bind:class="{
         owner: isOwner,
         contactor: isContactor,
-        default: isDefault,
+        default: this.contact.default,
       }"
       @click.stop="onTagClick"
     ></div>
@@ -152,20 +151,18 @@ export default {
         this.$t("detail.tabs.relationship.others"),
       ],
       innerRelationship: "",
-      isDefault: this.contact.default,
     };
   },
 
   methods: {
     onTagClick() {
       if (!this.isUpdate) return;
-      this.isDefault = !this.isDefault;
       if (this.isOwner)
-        this.$emit("toggleDefault", this.isDefault, this.card_id);
+        this.$emit("toggleDefault", !this.contact.default, this.card_id);
       else if (this.isContactor)
         this.$emit(
           "toggleContactDefault",
-          this.isDefault,
+          !this.contact.default,
           this.contact.customer_id,
           this.contact.id,
         );

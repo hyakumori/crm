@@ -49,12 +49,21 @@ const actions = {
     commit("setCustomersContacts", contacts);
     commit("customersContactsLoadingOff");
   },
+  toggleDefaultCustomerLocal({ commit }, { customer_id, val }) {
+    commit("toggleDefaultCustomerLocal", { customer_id, val });
+  },
+  toggleDefaultCustomerContactLocal(
+    { commit },
+    { customer_id, contact_id, val },
+  ) {
+    commit("toggleDefaultCustomerContactLocal", {
+      customer_id,
+      contact_id,
+      val,
+    });
+  },
   async toggleDefaultCustomer({ commit, state }, { id, customer_id, val }) {
     await forestApi.toggleDefaultCustomer(id, customer_id, val);
-    const newCustomers = [...state.customers];
-    const c = find(newCustomers, { id: customer_id });
-    c.default = val;
-    commit("setCustomers", newCustomers);
   },
   async toggleDefaultCustomerContact(
     { commit, state },
@@ -66,10 +75,6 @@ const actions = {
       contact_id,
       val,
     );
-    const newCustomersContacts = [...state.customersContacts];
-    const c = find(newCustomersContacts, { id: contact_id });
-    c.default = val;
-    commit("setCustomersContacts", newCustomersContacts);
   },
 };
 
@@ -100,6 +105,22 @@ const mutations = {
   },
   customersContactsLoadingOff() {
     state.customersContactsLoading = false;
+  },
+  toggleDefaultCustomerLocal(state, { customer_id, val }) {
+    const newCustomers = [...state.customers];
+    const c = find(newCustomers, { id: customer_id });
+    c.default = val;
+    console.log(customer_id, val);
+    state.customers = newCustomers;
+  },
+  toggleDefaultCustomerContactLocal(state, { customer_id, contact_id, val }) {
+    const newCustomersContacts = [...state.customersContacts];
+    const c = find(newCustomersContacts, {
+      id: contact_id,
+      customer_id: customer_id,
+    });
+    c.default = val;
+    state.customersContacts = newCustomersContacts;
   },
 };
 
