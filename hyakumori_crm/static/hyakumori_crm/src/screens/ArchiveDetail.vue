@@ -7,13 +7,7 @@
           :id="id"
           editBtnContent="所有地を追加・編集"
           headerContent="協議情報"
-        >
-          <template v-if="!isDetail" #create-btn>
-            <v-btn color="primary">
-              {{ $t("buttons.continue") }}
-            </v-btn>
-          </template>
-        </archive-basic-info-container>
+        />
 
         <archive-document-container
           addBtnContent="さらに追加"
@@ -107,7 +101,6 @@ export default {
 
   data() {
     return {
-      id: this.$route.params.id,
       pageIcon: this.$t("icon.archive_icon"),
       backBtnContent: this.$t("page_header.archive_mgmt"),
       headerInfo: {
@@ -144,6 +137,10 @@ export default {
   },
 
   computed: {
+    id() {
+      return this.$route.params.id;
+    },
+
     getActionLogs() {
       return actionLogs;
     },

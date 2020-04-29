@@ -1,4 +1,4 @@
-import { formatDistanceToNow, parseISO } from "date-fns";
+import { formatDistanceToNow, parseISO, format } from "date-fns";
 
 import { ja } from "date-fns/locale";
 
@@ -10,4 +10,8 @@ export function fromNow(dateTimeString) {
     addSuffix: true,
     locale: ja,
   });
+}
+
+export function archiveDatetimeFormat(datetime) {
+  return format(new Date(datetime), "yyyy/MM/dd HH:mm");
 }
