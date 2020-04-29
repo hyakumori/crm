@@ -58,7 +58,16 @@
         "account_name": "口座名義",
         "account_number": "口座番号"
       },
-      "email": "メールアドレス"
+      "email": "メールアドレス",
+      "archive": {
+        "title": "タイトル",
+        "consultant_date_and_time": "協議日時|カレンダー",
+        "consultant_date": "相談日",
+        "consultant_time": "相談時間",
+        "location": "場所",
+        "content": "協議内容",
+        "future_action": "今後の対応"
+      }
     },
     "placeholders": {
       "customer": {

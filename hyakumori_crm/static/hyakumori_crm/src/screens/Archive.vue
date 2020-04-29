@@ -15,14 +15,14 @@
       <search-card :onSearch="fetchArchives" :search-criteria="headers" />
       <data-list
         :auto-headers="false"
+        :data="data"
         :headers="headers"
         :is-loading="isLoading"
         :showSelect="true"
-        :data="data"
         :tableRowIcon="pageIcon"
         @rowData="rowData"
-        iconRowValue="id"
         class="archives__data-section"
+        iconRowValue="id"
       />
     </template>
   </main-section>
@@ -36,6 +36,7 @@ import ScreenMixin from "./ScreenMixin";
 import archive_header from "../assets/dump/archive_header.json";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
+import { archiveDatetimeFormat } from "../helpers/datetime";
 
 export default {
   name: "archive",
@@ -71,7 +72,7 @@ export default {
         this.isLoading = false;
         return {
           id: data.id,
-          archive_date: data.archive_date,
+          archive_date: archiveDatetimeFormat(data.archive_date),
           title: data.title,
           content: data.content,
           author: data.author.full_name,

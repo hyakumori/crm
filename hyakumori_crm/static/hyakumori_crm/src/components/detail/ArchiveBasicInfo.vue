@@ -1,69 +1,98 @@
 <template>
-  <v-row>
-    <v-col cols="6">
-      <range-date-picker
-        :dates="['2020-03-04', '']"
-        label="協議日時|カレンダー"
-        v-if="isUpdate || !isDetail"
-      />
-      <text-info
-        :isUpdate="isUpdate"
-        @input="input"
-        label="協議日時|カレンダー"
-        v-else
-        :value="info.archive_date"
-      />
-      <text-info
-        :isUpdate="isUpdate || !isDetail"
-        @input="input"
-        label="今後の対応"
-        :value="info.future_response"
-      />
-    </v-col>
+  <ValidationObserver v-slot="{ invalid }">
+    <v-row>
+      <v-col cols="6">
+        <text-info
+          :isUpdate="!isDetail || isUpdate"
+          :label="$t('forms.labels.archive.title')"
+          :name="$t('forms.labels.archive.title')"
+          :value="info.title"
+          @input="val => (info.title = val)"
+          rules="required"
+          v-if="!isDetail || isUpdate"
+        />
+        <single-date-picker
+          :class="{ 'mt-6': !isDetail || isUpdate }"
+          :date="date"
+          :label="$t('forms.labels.archive.consultant_date')"
+          @newDate="val => (innerDate = val)"
+          v-if="isUpdate || !isDetail"
+        />
+        <text-info
+          :isUpdate="isUpdate"
+          :label="$t('forms.labels.archive.consultant_date_and_time')"
+          :value="info.archive_date"
+          v-else
+        />
+        <text-info
+          :isUpdate="isUpdate || !isDetail"
+          :label="$t('forms.labels.archive.future_action')"
+          :value="info.future_action"
+          @input="val => (info.future_action = val)"
+        />
+      </v-col>
 
-    <v-col cols="6">
-      <text-info
-        :isUpdate="isUpdate || !isDetail"
-        @input="input"
-        label="場所"
-        :value="info.location"
-      />
-      <archive-participant-card
-        :class="{ 'mt-6': isUpdate }"
-        :isAuthor="true"
-        class="mt-3"
-        :name="info.author"
-        v-if="isUpdate || isDetail"
-      />
-    </v-col>
+      <v-col cols="6">
+        <text-info
+          :isUpdate="isUpdate || !isDetail"
+          :label="$t('forms.labels.archive.location')"
+          :name="$t('forms.labels.archive.location')"
+          :value="info.location"
+          @input="val => (info.location = val)"
+          rules="required"
+        />
+        <time-picker
+          :class="{ 'mt-6': !isDetail || isUpdate }"
+          :label="$t('forms.labels.archive.consultant_time')"
+          :time="time"
+          @newTime="val => (innerTime = val)"
+          v-if="isUpdate || !isDetail"
+        />
+        <archive-participant-card
+          :isAuthor="true"
+          :name="info.author"
+          v-if="isUpdate || isDetail"
+        />
+      </v-col>
 
-    <div class="pl-3 container content">
-      <h5>協議内容</h5>
-      <v-textarea
-        :outlined="isUpdate || !isDetail"
-        dense
-        v-if="isUpdate || !isDetail"
-        :value="info.content"
-      />
-      <p v-else>
-        {{ info.content }}
-      </p>
-    </div>
-  </v-row>
+      <div class="pl-3 container content">
+        <h5>{{ $t("forms.labels.archive.content") }}</h5>
+        <v-textarea
+          :outlined="isUpdate || !isDetail"
+          :value="info.content"
+          dense
+          v-if="isUpdate || !isDetail"
+          v-model="info.content"
+        />
+        <p v-else>
+          {{ info.content }}
+        </p>
+      </div>
+    </v-row>
+    <slot
+      :info="info"
+      :invalid="invalid || datetimePickerInvalid"
+      name="create-btn"
+    ></slot>
+  </ValidationObserver>
 </template>
 
 <script>
 import TextInfo from "./TextInfo";
-import RangeDatePicker from "../RangeDatePicker";
+import SingleDatePicker from "../SingleDatePicker";
 import ArchiveParticipantCard from "./ArchiveParticipantCard";
+import TimePicker from "../TimePicker";
+import { ValidationObserver } from "vee-validate";
 
 export default {
   name: "archive-basic-info",
 
   components: {
     TextInfo,
-    RangeDatePicker,
     ArchiveParticipantCard,
+    SingleDatePicker,
+    TimePicker,
+    ValidationObserver,
   },
 
   props: {
@@ -73,9 +102,46 @@ export default {
     isDetail: Boolean,
   },
 
-  methods: {
-    input() {
-      // TODO: Handle input
+  data() {
+    return {
+      innerDate: "",
+      innerTime: "",
+    };
+  },
+
+  computed: {
+    date() {
+      if (this.isDetail) {
+        return this.info.archive_date
+          ? this.info.archive_date.split(" ")[0]
+          : "";
+      } else {
+        return this.innerDate;
+      }
+    },
+
+    time() {
+      if (this.isDetail) {
+        return this.info.archive_date
+          ? this.info.archive_date.split(" ")[1]
+          : "";
+      } else {
+        return this.innerTime;
+      }
+    },
+
+    archive_date() {
+      return `${this.date} ${this.time}`;
+    },
+
+    datetimePickerInvalid() {
+      return !this.date || !this.time;
+    },
+  },
+
+  watch: {
+    archive_date(val) {
+      this.info.archive_date = val;
     },
   },
 };

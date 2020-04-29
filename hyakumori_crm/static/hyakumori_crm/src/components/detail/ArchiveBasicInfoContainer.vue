@@ -3,7 +3,7 @@
     <content-header
       :content="headerContent"
       :editBtnContent="editBtnContent"
-      :loading="isLoading"
+      :loading="loading"
       @toggleEdit="val => (isUpdate = val)"
       :display-addition-btn="isDetail"
     />
@@ -12,8 +12,18 @@
       :isUpdate="isUpdate"
       :isDetail="isDetail"
       :info="info"
-    />
-    <slot name="create-btn"></slot>
+    >
+      <template v-if="!isDetail" v-slot:create-btn="props">
+        <v-btn
+          color="primary"
+          :disabled="props.invalid"
+          :loading="createLoading"
+          @click="submit(props.info)"
+        >
+          {{ $t("buttons.continue") }}
+        </v-btn>
+      </template>
+    </archive-basic-info>
     <update-button
       class="mb-12 mt-4"
       v-if="isUpdate"
@@ -27,6 +37,7 @@ import ContentHeader from "./ContentHeader";
 import ContainerMixin from "./ContainerMixin";
 import ArchiveBasicInfo from "./ArchiveBasicInfo";
 import UpdateButton from "./UpdateButton";
+import { archiveDatetimeFormat } from "../../helpers/datetime";
 
 export default {
   name: "archive-basic-info-container",
@@ -50,39 +61,53 @@ export default {
   data() {
     return {
       isUpdate: false,
-      loading: true,
-      info: {
-        id: "",
-        archive_date: "",
-        location: "",
-        future_response: "",
-        author: "",
-        content: "",
-      },
+      loading: false,
+      createLoading: false,
+      info: {},
     };
   },
 
   mounted() {
-    if (this.isDetail) {
+    if (this.isDetail && !this.info.author) {
       this.fetchBasicInfo();
     }
   },
 
   methods: {
+    dataMapping(basicInfo) {
+      this.info = {
+        id: basicInfo.id,
+        archive_date: archiveDatetimeFormat(basicInfo.archive_date),
+        location: basicInfo.location,
+        future_action: basicInfo.future_action,
+        author: basicInfo.author.full_name,
+        content: basicInfo.content,
+        title: basicInfo.title,
+      };
+    },
+
     async fetchBasicInfo() {
+      this.loading = true;
       const basicInfo = await this.$rest
         .get(`archives/${this.id}`)
-        .then(res => res.data);
+        .then(res => res.data)
+        .catch(() => []);
       if (basicInfo) {
         this.loading = false;
-        this.info = {
-          id: basicInfo.id,
-          archive_date: basicInfo.archive_date,
-          location: basicInfo.location,
-          future_response: basicInfo.future_response,
-          author: basicInfo.author.full_name,
-          content: basicInfo.content,
-        };
+        this.dataMapping(basicInfo);
+      }
+    },
+
+    async submit(data) {
+      this.createLoading = true;
+      const newData = await this.$rest
+        .post("/archives", data)
+        .then(res => res)
+        .catch();
+      if (newData) {
+        this.dataMapping(newData);
+        this.createLoading = false;
+        await this.$router.push(`/archives/${newData.id}`);
       }
     },
   },
