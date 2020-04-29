@@ -20,6 +20,9 @@
           :customerIdNameMap="$store.getters['forest/customerIdNameMap']"
           :isLoading="$store.state.forest.customersLoading"
           @saved="$store.dispatch('forest/getCustomers', id)"
+          @savedCustomersContacts="
+            $store.dispatch('forest/getCustomersContacts', id)
+          "
           :id="id"
         />
 

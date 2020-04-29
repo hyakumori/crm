@@ -200,7 +200,7 @@ export default {
           for (let [customer_id, val] of Object.entries(
             this.defaultCustomersEdit,
           )) {
-            this.$store.dispatch("forest/toggleDefaultCustomer", {
+            await this.$store.dispatch("forest/toggleDefaultCustomer", {
               id: this.id,
               customer_id,
               val,
@@ -212,20 +212,22 @@ export default {
             this.defaultCustomersContactsEdit,
           )) {
             const [customer_id, contact_id] = customercontact_id.split(",");
-            this.$store.dispatch("forest/toggleDefaultCustomerContact", {
+            await this.$store.dispatch("forest/toggleDefaultCustomerContact", {
               id: this.id,
               customer_id,
               contact_id,
               val,
             });
           }
+          this.$emit("savedCustomersContacts");
         }
         this.$emit("saved");
         this.saving = false;
         this.customersToDelete = [];
         this.customersToAdd = [];
+        this.defaultCustomersEdit = {};
+        this.defaultCustomersContactsEdit = {};
       } catch (error) {
-        console.log(error);
         this.saving = false;
       }
     },
