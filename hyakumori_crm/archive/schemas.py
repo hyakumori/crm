@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from ..core.models import HyakumoriDanticModel
@@ -9,5 +8,5 @@ class ArchiveInput(HyakumoriDanticModel):
     content: Optional[str]
     location: Optional[str]
     future_action: Optional[str]
-    archive_date: Optional[datetime]
+    archive_date: Optional[str]
 
