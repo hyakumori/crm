@@ -175,7 +175,7 @@ export default {
       }
     },
     async handleLoadMore() {
-      if (!this.forestitems.next) return;
+      if (!this.forestitems.next && this.loadForests) return;
       this.loadForests = true;
       const resp = await this.$rest.get(this.forestitems.next);
       this.forestitems = {
