@@ -54,6 +54,7 @@
           "
           :showAction="false"
           :index="indx"
+          mode="search"
           :selectedId="modalSelectingForestId"
           flat
         />
