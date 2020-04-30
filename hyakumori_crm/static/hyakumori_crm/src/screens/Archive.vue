@@ -36,7 +36,7 @@ import ScreenMixin from "./ScreenMixin";
 import archive_header from "../assets/dump/archive_header.json";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
-import { archiveDatetimeFormat } from "../helpers/datetime";
+import { commonDatetimeFormat } from "../helpers/datetime";
 
 export default {
   name: "archive",
@@ -72,7 +72,7 @@ export default {
         this.isLoading = false;
         return {
           id: data.id,
-          archive_date: archiveDatetimeFormat(data.archive_date),
+          archive_date: commonDatetimeFormat(data.archive_date),
           title: data.title,
           content: data.content,
           author: data.author.full_name,
