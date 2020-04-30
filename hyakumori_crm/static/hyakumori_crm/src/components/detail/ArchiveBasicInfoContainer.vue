@@ -4,7 +4,7 @@
       :content="headerContent"
       :editBtnContent="editBtnContent"
       :loading="loading"
-      @toggleEdit="val => (isUpdate = val)"
+      @toggleEdit="setUpdate"
       :display-addition-btn="isDetail"
     />
     <archive-basic-info
@@ -12,6 +12,10 @@
       :isUpdate="isUpdate"
       :isDetail="isDetail"
       :info="info"
+      :isSave="isSave"
+      @archive:save-disable="val => (saveDisabled = val)"
+      @archive:update-basic-info="updateBasicInfo"
+
     >
       <template v-if="!isDetail" v-slot:create-btn="props">
         <v-btn
@@ -27,7 +31,10 @@
     <update-button
       class="mb-12 mt-4"
       v-if="isUpdate"
+      :saving="updateLoading"
+      :save-disabled="saveDisabled"
       :cancel="cancel.bind(this)"
+      :save="save.bind(this)"
     />
   </div>
 </template>
@@ -37,7 +44,8 @@ import ContentHeader from "./ContentHeader";
 import ContainerMixin from "./ContainerMixin";
 import ArchiveBasicInfo from "./ArchiveBasicInfo";
 import UpdateButton from "./UpdateButton";
-import { archiveDatetimeFormat } from "../../helpers/datetime";
+import { commonDatetimeFormat, toUtcDatetime } from "../../helpers/datetime";
+import { cloneDeep } from "lodash";
 
 export default {
   name: "archive-basic-info-container",
@@ -61,9 +69,13 @@ export default {
   data() {
     return {
       isUpdate: false,
+      isSave: false,
       loading: false,
       createLoading: false,
+      updateLoading: false,
+      saveDisabled: false,
       info: {},
+      immutableInfo: {},
     };
   },
 
@@ -74,10 +86,21 @@ export default {
   },
 
   methods: {
+    cancel() {
+      this.isUpdate = false;
+      this.saveDisabled = false;
+      this.info = this.immutableInfo;
+    },
+
+    setUpdate(val) {
+      this.isUpdate = val;
+      this.immutableInfo = cloneDeep(this.info);
+    },
+
     dataMapping(basicInfo) {
       this.info = {
         id: basicInfo.id,
-        archive_date: archiveDatetimeFormat(basicInfo.archive_date),
+        archive_date: commonDatetimeFormat(basicInfo.archive_date),
         location: basicInfo.location,
         future_action: basicInfo.future_action,
         author: basicInfo.author.full_name,
@@ -108,6 +131,24 @@ export default {
         this.dataMapping(newData);
         this.createLoading = false;
         await this.$router.push(`/archives/${newData.id}`);
+      }
+    },
+
+    save() {
+      this.isSave = true;
+    },
+
+    updateBasicInfo(val) {
+      if (val) {
+        this.updateLoading = true;
+        // console.log(toUtcDatetime(val.archive_date))
+        // val.archive_date = toUtcDateTime(val.archive_date);
+        this.$rest.put(`/archives/${val.id}`, val).then(res => {
+          this.updateLoading = false;
+          this.dataMapping(res.data);
+          this.isUpdate = false;
+          this.isSave = false;
+        });
       }
     },
   },

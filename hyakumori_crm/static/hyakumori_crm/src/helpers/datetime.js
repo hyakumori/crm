@@ -12,6 +12,10 @@ export function fromNow(dateTimeString) {
   });
 }
 
-export function archiveDatetimeFormat(datetime) {
-  return format(new Date(datetime), "yyyy/MM/dd HH:mm");
+export function commonDatetimeFormat(datetime) {
+  return format(new Date(datetime), "yyyy-MM-dd HH:mm");
+}
+
+export function toUtcDatetime(datetime) {
+  return new Date(datetime).toISOString();
 }

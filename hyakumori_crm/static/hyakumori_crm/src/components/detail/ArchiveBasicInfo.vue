@@ -1,5 +1,5 @@
 <template>
-  <ValidationObserver v-slot="{ invalid }">
+  <ValidationObserver ref="observer" v-slot="{ invalid }">
     <v-row>
       <v-col cols="6">
         <text-info
@@ -111,7 +111,7 @@ export default {
 
   computed: {
     date() {
-      if (this.isDetail) {
+      if (this.isDetail || this.isUpdate) {
         return this.info.archive_date
           ? this.info.archive_date.split(" ")[0]
           : "";
@@ -121,7 +121,7 @@ export default {
     },
 
     time() {
-      if (this.isDetail) {
+      if (this.isDetail || this.isUpdate) {
         return this.info.archive_date
           ? this.info.archive_date.split(" ")[1]
           : "";
@@ -142,6 +142,24 @@ export default {
   watch: {
     archive_date(val) {
       this.info.archive_date = val;
+    },
+
+    info: {
+      deep: true,
+      async handler() {
+        const isValid = await this.$refs.observer.validate();
+        this.$emit("archive:save-disable", !isValid);
+      },
+    },
+
+    async isSave(val) {
+      const isValid = await this.$refs.observer.validate();
+      if (val && isValid) {
+        const date = this.innerDate === "" ? this.date : this.innerDate;
+        const time = this.innerTime === "" ? this.time : this.innerTime;
+        this.info.archive_date = `${date} ${time}`;
+        this.$emit("archive:update-basic-info", this.info);
+      }
     },
   },
 };
