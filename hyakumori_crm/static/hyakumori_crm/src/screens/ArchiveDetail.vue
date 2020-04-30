@@ -106,7 +106,14 @@ export default {
       participants: [
         {
           customer_id: "123",
-          fullname: "山田太郎",
+          name_kanji: {
+            last_name: "石原",
+            first_name: "正",
+          },
+          name_kana: {
+            last_name: "イシハラ",
+            first_name: "タダシ",
+          },
           address: "424-0023 岡山県倉敷市大谷4-1-3",
           email: "hanako.yamada@gmail.com",
           forest_count: 4,
@@ -115,7 +122,14 @@ export default {
         },
         {
           customer_id: "123",
-          fullname: "山田太郎",
+          name_kanji: {
+            last_name: "石原",
+            first_name: "正",
+          },
+          name_kana: {
+            last_name: "イシハラ",
+            first_name: "タダシ",
+          },
           address: "424-0023 岡山県倉敷市大谷4-1-3",
           email: "hanako.yamada@gmail.com",
           forest_count: 4,
