@@ -5,9 +5,11 @@ from hyakumori_crm.activity.constants import *
 from hyakumori_crm.activity.models import ActionLog
 from hyakumori_crm.core.utils import get_remote_ip
 from hyakumori_crm.crm.models.message_template import MessageTemplate
+import logging
 
 
 class ActivityService:
+    logger = logging.getLogger(__name__)
 
     @classmethod
     def import_message_templates(cls, for_type: str, action_class):
@@ -62,7 +64,8 @@ class ActivityService:
                 user=user,
                 remote_ip=remote_ip
             )
-        except MessageTemplate.DoesNotExist:
+        except Exception as e:
+            cls.logger.warning(f"Error while creating activity log for {action} {model_instance}", exc_info=e)
             return ActionLog.objects.none()
 
     @classmethod
