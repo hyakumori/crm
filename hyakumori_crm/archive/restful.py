@@ -24,7 +24,8 @@ def archives(request, data: ArchiveInput = None):
             request=request,
             queryset=Archive.objects.all()
         )
-        return paginator.get_paginated_response(ArchiveSerializer(paged_list, many=True).data)
+        return paginator.get_paginated_response(
+            ArchiveListingSerializer(paged_list, many=True).data)
     else:
         author = request.user
         archive = create_archive(author, data)
