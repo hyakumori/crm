@@ -75,7 +75,6 @@ export default {
           archive_date: commonDatetimeFormat(data.archive_date),
           title: data.title,
           content: data.content,
-          author: data.author.full_name,
           their_participants: "",
           our_participants: "",
           associated_forest: "",

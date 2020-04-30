@@ -23,7 +23,8 @@ def archives(req, data: ArchiveInput = None):
             request=req,
             queryset=Archive.objects.all()
         )
-        return paginator.get_paginated_response(ArchiveSerializer(paged_list, many=True).data)
+        return paginator.get_paginated_response(
+            ArchiveListingSerializer(paged_list, many=True).data)
     else:
         author = req.user
         archive = create_archive(author, data)
