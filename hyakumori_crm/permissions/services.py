@@ -200,10 +200,10 @@ class PermissionService:
                 action_name = permission_parts[0]
                 resource_name = permission_parts[1]
                 app_permission = f"{app_label}.{permission}"
-                if user.has_perms(f"{app_label}.manage_{resource_name}"):
+                if user.has_perm(f"{app_label}.manage_{resource_name}"):
                     app_permissions_to_check[permission] = True
                 else:
-                    app_permissions_to_check[permission] = user.has_perms(app_permission)
+                    app_permissions_to_check[permission] = user.has_perm(app_permission)
             except IndexError:
                 continue
 

@@ -145,6 +145,17 @@ def action_login_required(with_policies=None, with_permissions=None, is_detail=F
     if with_permissions is None:
         with_permissions = []
 
+    def _raise_exception(is_detail=False):
+        if is_detail:
+            raise PermissionDenied()
+        else:
+            return Response(dict(
+                count=0,
+                next=None,
+                previous=None,
+                results=[]
+            ))
+
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -157,12 +168,12 @@ def action_login_required(with_policies=None, with_permissions=None, is_detail=F
             if with_policies is not None and len(with_policies) > 0:
                 is_allowed_request = PermissionService.check_policies(request, user, with_policies)
                 if not is_allowed_request:
-                    raise PermissionDenied()
+                    return _raise_exception(is_detail)
 
             if with_permissions is not None and len(with_permissions) > 0:
                 is_allowed_request = PermissionService.check_permissions(request, user, with_permissions)
                 if not is_allowed_request:
-                    raise PermissionDenied()
+                    return _raise_exception(is_detail)
 
             return f(*args, **kwargs)
 

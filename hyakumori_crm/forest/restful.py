@@ -40,7 +40,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     serializer_class = ForestSerializer
 
     def get_queryset(self):
-        if PermissionService.check_permissions(self.request, self.request.user, ["view_customer"]):
+        if PermissionService.check_permissions(self.request, self.request.user, ["view_forest"]):
             return Forest.objects.all()
         else:
             return Forest.objects.none()
@@ -74,7 +74,8 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
 
     @action(detail=True, methods=["GET"], permission_classes=[IsAuthenticated])
     @action_login_required(
-        with_permissions=["view_customer"]
+        with_permissions=["view_customer"],
+        is_detail=False
     )
     def customers(self, request, **kwargs):
         obj = self.get_object()
