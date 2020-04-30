@@ -100,7 +100,7 @@ export default {
     dataMapping(basicInfo) {
       this.info = {
         id: basicInfo.id,
-        archive_date: commonDatetimeFormat(basicInfo.archive_date),
+        archive_date: basicInfo.archive_date,
         location: basicInfo.location,
         future_action: basicInfo.future_action,
         author: basicInfo.author.full_name,
@@ -123,6 +123,7 @@ export default {
 
     async submit(data) {
       this.createLoading = true;
+      data.archive_date = toUtcDatetime(data.archive_date)
       const newData = await this.$rest
         .post("/archives", data)
         .then(res => res)
@@ -141,8 +142,7 @@ export default {
     updateBasicInfo(val) {
       if (val) {
         this.updateLoading = true;
-        // console.log(toUtcDatetime(val.archive_date))
-        // val.archive_date = toUtcDateTime(val.archive_date);
+        val.archive_date = toUtcDatetime(val.archive_date);
         this.$rest.put(`/archives/${val.id}`, val).then(res => {
           this.updateLoading = false;
           this.dataMapping(res.data);

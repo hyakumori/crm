@@ -21,7 +21,7 @@
         <text-info
           :isUpdate="isUpdate"
           :label="$t('forms.labels.archive.consultant_date_and_time')"
-          :value="info.archive_date"
+          :value="displayDatetimeFormat"
           v-else
         />
         <text-info
@@ -83,6 +83,7 @@ import SingleDatePicker from "../SingleDatePicker";
 import ArchiveParticipantCard from "./ArchiveParticipantCard";
 import TimePicker from "../TimePicker";
 import { ValidationObserver } from "vee-validate";
+import { getDate, getTime, commonDatetimeFormat } from "../../helpers/datetime";
 
 export default {
   name: "archive-basic-info",
@@ -110,28 +111,24 @@ export default {
   },
 
   computed: {
+    displayDatetimeFormat() {
+      return commonDatetimeFormat(this.info.archive_date);
+    },
+
     date() {
       if (this.isDetail || this.isUpdate) {
-        return this.info.archive_date
-          ? this.info.archive_date.split(" ")[0]
-          : "";
+        return this.info.archive_date ? getDate(this.info.archive_date) : "";
       } else {
-        return this.innerDate;
+        return this.innerDate || "";
       }
     },
 
     time() {
       if (this.isDetail || this.isUpdate) {
-        return this.info.archive_date
-          ? this.info.archive_date.split(" ")[1]
-          : "";
+        return this.info.archive_date ? getTime(this.info.archive_date) : "";
       } else {
-        return this.innerTime;
+        return this.innerTime || "";
       }
-    },
-
-    archive_date() {
-      return `${this.date} ${this.time}`;
     },
 
     datetimePickerInvalid() {
@@ -140,16 +137,24 @@ export default {
   },
 
   watch: {
-    archive_date(val) {
-      this.info.archive_date = val;
-    },
-
     info: {
       deep: true,
       async handler() {
         const isValid = await this.$refs.observer.validate();
         this.$emit("archive:save-disable", !isValid);
       },
+    },
+
+    innerDate(val) {
+      if (!this.isDetail) {
+        this.info.archive_date = `${val} ${this.innerTime}`;
+      }
+    },
+
+    innerTime(val) {
+      if (!this.isDetail) {
+        this.info.archive_date = `${this.innerDate} ${val}`;
+      }
     },
 
     async isSave(val) {
