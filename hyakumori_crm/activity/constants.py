@@ -2,7 +2,6 @@ class ForestActions:
     created = ("forest.created", "森林情報が作成されました。", "mdi-image-filter-hdr")
     basic_info_updated = ("forest.basic_info_updated", "基本情報が更新されました。", "mdi-launch")
     customers_updated = ("forest.customers_updated", "所有者情報が更新されました。", "mdi-face")
-    archives_updated = ("forest.archives_updated", "協議履歴が更新されました。", "mdi-calendar-text")
     postal_info_updated = (
         "forest.postal_info_updated",
         "書類郵送記録が更新されました。",
@@ -18,20 +17,21 @@ class ForestActions:
 class CustomerActions:
     created = ("customer.created", "顧客データが作成されました。", "mdi-face")
     basic_info_updated = ("customer.basic_info_updated", "顧客情報が更新されました。", "mdi-launch")
+    banking_info_updated = ("customer.banking_info_updated", "顧客口座情報が更新されました。", "mdi-bank")
     customers_updated = (
         "customer.customers_updated",
         "所有林情報が更新されました。",
+        "mdi-account-group",
+    )
+    forests_updated = (
+        "customer.forests_updated",
+        "森林情報が更新されました。",
         "mdi-account-group",
     )
     direct_contacts_updated = (
         "customer.direct_contacts_updated",
         "連絡者情報が更新されました。",
         "mdi-contacts-outline",
-    )
-    archives_updated = (
-        "customer.archives_updated",
-        "協議履歴が更新されました。",
-        "mdi-calendar-text",
     )
     family_contacts_updated = (
         "customer.family_contacts_updated",
@@ -42,11 +42,6 @@ class CustomerActions:
         "customer.other_contacts_updated",
         "その他関係者情報が更新されました。",
         "mdi-contacts-outline",
-    )
-    direct_contacts_forest_list_updated = (
-        "customer.direct_contacts_forest_list_updated",
-        "顧客連絡者登録森林が更新されました。",
-        "mdi-pine-tree-box",
     )
     memo_info_updated = (
         "customer.memo_info_updated",
