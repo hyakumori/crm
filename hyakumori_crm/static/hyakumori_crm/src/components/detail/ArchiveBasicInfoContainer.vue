@@ -15,7 +15,6 @@
       :isSave="isSave"
       @archive:save-disable="val => (saveDisabled = val)"
       @archive:update-basic-info="updateBasicInfo"
-
     >
       <template v-if="!isDetail" v-slot:create-btn="props">
         <v-btn
@@ -44,8 +43,8 @@ import ContentHeader from "./ContentHeader";
 import ContainerMixin from "./ContainerMixin";
 import ArchiveBasicInfo from "./ArchiveBasicInfo";
 import UpdateButton from "./UpdateButton";
-import { commonDatetimeFormat, toUtcDatetime } from "../../helpers/datetime";
 import { cloneDeep } from "lodash";
+import { toUtcDatetime } from "../../helpers/datetime";
 
 export default {
   name: "archive-basic-info-container",
