@@ -1,4 +1,5 @@
 import { formatDistanceToNow, parseISO, format } from "date-fns";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 import { ja } from "date-fns/locale";
 
@@ -13,9 +14,18 @@ export function fromNow(dateTimeString) {
 }
 
 export function commonDatetimeFormat(datetime) {
-  return format(new Date(datetime), "yyyy-MM-dd HH:mm");
+  return datetime && format(new Date(datetime), "yyyy-MM-dd HH:mm");
 }
 
 export function toUtcDatetime(datetime) {
-  return new Date(datetime).toISOString();
+  const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return zonedTimeToUtc(datetime, currentTimezone).toISOString();
+}
+
+export function getTime(datetime) {
+  return format(new Date(datetime), "HH:mm");
+}
+
+export function getDate(datetime) {
+  return format(new Date(datetime), "yyyy-MM-dd");
 }
