@@ -20,7 +20,9 @@
         :is-loading="isLoading"
         :showSelect="true"
         :tableRowIcon="pageIcon"
+        :serverItemsLength="totalItems"
         @rowData="rowData"
+        @update:options="paginationHandler"
         class="archives__data-section"
         iconRowValue="id"
       />
@@ -51,24 +53,25 @@ export default {
     OutlineRoundBtn,
   },
 
-  mounted() {
-    this.fetchArchives();
-  },
-
   data() {
     return {
       pageIcon: this.$t("icon.archive_icon"),
       pageHeader: this.$t("page_header.archive_detail"),
       tableRowIcon: this.$t("icon.archive_icon"),
       data: [],
-      isLoading: true,
+      isLoading: false,
+      totalItems: 0,
     };
   },
 
   methods: {
-    async fetchArchives() {
-      const data = await this.$rest.get("/archives").then(res => res.results);
-      this.data = data.map(data => {
+    async fetchArchives(page, itemsPerPage) {
+      this.isLoading = true;
+      const data = await this.$rest
+        .get(`/archives?page=${page}&items_per_page=${itemsPerPage}`)
+        .then(res => res);
+      this.totalItems = data.count;
+      this.data = data.results.map(data => {
         this.isLoading = false;
         return {
           id: data.id,
@@ -84,6 +87,10 @@ export default {
 
     rowData(val) {
       this.$router.push(`/archives/${val}`);
+    },
+
+    paginationHandler(val) {
+      this.fetchArchives(val.page, val.itemsPerPage);
     },
   },
 

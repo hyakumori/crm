@@ -19,13 +19,15 @@ from ..users.models import User
 @action_login_required(with_permissions=["view_archive", "add_archive"])
 def archives(request, data: ArchiveInput = None):
     if request.method == 'GET':
-        paginator = default_paginator()
-        paged_list = paginator.paginate_queryset(
-            request=request,
-            queryset=Archive.objects.all()
-        )
-        return paginator.get_paginated_response(
-            ArchiveListingSerializer(paged_list, many=True).data)
+        page = int(request.GET.get('page'))
+        items_per_page = int(request.GET.get('items_per_page'))
+        from_items = (page - 1) * items_per_page
+        to_items = page * items_per_page
+        response_archives = Archive.objects.all()[from_items:to_items]
+        return Response({
+            "count": len(Archive.objects.all()),
+            "results": ArchiveListingSerializer(response_archives, many=True).data
+        })
     else:
         author = request.user
         archive = create_archive(author, data)
@@ -37,8 +39,8 @@ def archives(request, data: ArchiveInput = None):
 @api_validate_model(ArchiveInput)
 @get_or_404(get_archive_by_pk, to_name='archive', pass_to=["kwargs", "request"], remove=True)
 @action_login_required(with_permissions=["view_archive", "change_archive"])
-def archive(req, *, archive: Archive = None, data: ArchiveInput = None):
-    if req.method == 'GET':
+def archive(request, *, archive: Archive = None, data: ArchiveInput = None):
+    if request.method == 'GET':
         return Response({"data": ArchiveSerializer(archive).data})
     else:
         updated_archive = edit_archive(archive, data)
