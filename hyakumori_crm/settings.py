@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "behaviors.apps.BehaviorsConfig",
     "guardian",
     "django_filters",
+    "django_cleanup",
     # ─── HYAKUMORI APPS ─────────────────────────────────────────────────────────────
     "hyakumori_crm.crm",
     "hyakumori_crm.users",
