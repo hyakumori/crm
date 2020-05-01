@@ -93,7 +93,7 @@ export default {
     ArchiveBasicInfoContainer,
     ArchiveDocumentContainer,
     ArchiveParticipantContainer,
-    CustomerContactList,
+    // CustomerContactList,
     ArchiveParticipantList,
     ArchiveRelatedForestContainer,
     LogCard,

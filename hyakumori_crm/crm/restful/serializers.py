@@ -58,6 +58,8 @@ class AttachmentSerializer(ModelSerializer):
             "content_type",
             "creator",
             "filename",
+            "size",
+            "download_url",
         ]
 
 
