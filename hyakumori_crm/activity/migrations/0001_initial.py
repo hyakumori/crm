@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('template_data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='template rendering data')),
                 ('changes', django.contrib.postgres.fields.jsonb.JSONField(blank=True, verbose_name='change diff')),
                 ('remote_ip', models.GenericIPAddressField(blank=True, null=True, verbose_name='remote IP')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='created at')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
                 ('content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='contenttypes.ContentType', verbose_name='content type')),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='actionlogs', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],

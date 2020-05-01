@@ -33,7 +33,8 @@ class ActivityService:
     @classmethod
     def log(cls, action, model_instance, user=None,
             remote_ip=None, template_data=None, changes=None,
-            request=None):
+            request=None,
+            created_at=None):
         """
         Usage:
         >>> from hyakumori_crm.crm.models import Forest
@@ -54,16 +55,16 @@ class ActivityService:
             template_name = action[0] if isinstance(action, tuple) else action
             template = MessageTemplate.objects.get(name=template_name)
             content_type = ContentType.objects.get_for_model(model_instance)
-
-            return ActionLog.objects.create(
-                content_type=content_type,
-                object_pk=model_instance.pk,
-                template_name=template.name,
-                template_data=template_data,
-                changes=changes,
-                user=user,
-                remote_ip=remote_ip
-            )
+            log = ActionLog.objects.create(content_type=content_type,
+                            object_pk=model_instance.pk,
+                            template_name=template.name,
+                            template_data=template_data,
+                            changes=changes,
+                            user=user,
+                            remote_ip=remote_ip)
+            if created_at is not None:
+                log.created_at = created_at
+            return log.save(update_fields=["created_at"])
         except Exception as e:
             cls.logger.warning(f"Error while creating activity log for {action} {model_instance}", exc_info=e)
             return ActionLog.objects.none()
@@ -72,25 +73,32 @@ class ActivityService:
     def get_log_for_object(cls, lang_code, app_label, object_type, object_id):
         content_type = ContentType.objects.filter(app_label=app_label, model=object_type).first()
         action_content_type = ContentType.objects.get_for_model(ActionLog)
-
-        with connection.cursor() as cursor:
-            query = """
-                select
-                    al.object_pk,
-                    al.user_id, al.changes, al.created_at, al.remote_ip, al.template_data,
-                    cm.attributes, cm.template, uu.first_name, uu.last_name,
-                    uu.email, uu.username
-                from activity_actionlog al
-                join crm_messagetemplate cm on al.template_name = cm.name and cm.language=%s
-                join users_user uu on al.user_id = uu.id
-                where al.object_pk::uuid=%s::uuid and al.content_type_id=%s and cm.content_type_id=%s
-                order by al.created_at
-            """
-            cursor.execute(query, [lang_code, object_id, content_type.pk, action_content_type.pk])
-            columns = [col[0] for col in cursor.description]
-            results = [
-                dict(zip(columns, row))
-                for row in cursor.fetchall()
-            ]
-
-        return results
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                    select
+                        json_build_object(
+                            'id',           al.user_id,
+                            'first_name',   uu.first_name,
+                            'last_name',    uu.last_name,
+                            'email',        uu.email,
+                            'username',     uu.username
+                        ) as author,
+                        al.id, -- extra select must be after json_build_object
+                        al.changes, al.created_at, al.remote_ip, al.template_data,
+                        cm.attributes->>'icon' as icon, cm.template
+                    from activity_actionlog al
+                    join crm_messagetemplate cm on al.template_name = cm.name and cm.language=%s
+                    join users_user uu on al.user_id = uu.id
+                    where al.object_pk::uuid=%s::uuid and al.content_type_id=%s and cm.content_type_id=%s
+                    order by al.created_at
+                """
+                cursor.execute(query, [lang_code, object_id, content_type.pk, action_content_type.pk])
+                columns = [col[0] for col in cursor.description]
+                results = [
+                    dict(zip(columns, row))
+                    for row in cursor.fetchall()
+                ]
+            return results
+        except:
+            return []
