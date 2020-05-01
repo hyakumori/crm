@@ -13,7 +13,9 @@
       :isUpdating="isUpdate"
       :key="index"
       :fileName="doc.filename || doc.name"
-      :click="onCardClick.bind(this, index)"
+      :downloadUrl="doc.download_url"
+      :deleteClick="onDeleteClick.bind(this, index)"
+      :downloadClick="onDownloadClick.bind(this, index)"
     />
     <template v-if="isUpdate">
       <div class="attachments__addition-container">
@@ -106,11 +108,13 @@ export default {
       this.$refs.fileInput.click();
     },
 
-    onCardClick(index) {
-      if (this.isUpdate) {
-        this.deleteDocuments.push(this.documents[index]);
-        this.documents.splice(index, 1);
-      }
+    onDeleteClick(index) {
+      this.deleteDocuments.push(this.documents[index]);
+      this.documents.splice(index, 1);
+    },
+
+    onDownloadClick(index) {
+      document.getElementsByClassName("download")[index].click();
     },
 
     onFileChange(e) {
