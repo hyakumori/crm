@@ -60,6 +60,7 @@ class AttachmentSerializer(ModelSerializer):
             "filename",
             "attributes",
             "size",
+            "download_url",
         ]
 
 
