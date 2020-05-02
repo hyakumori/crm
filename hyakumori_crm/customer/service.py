@@ -348,3 +348,15 @@ def update_banking_info(customer, banking_in):
     customer.banking = banking_in.dict()
     customer.save(update_fields=["banking", "updated_at"])
     return customer
+
+
+def update_customer_memo(customer, memo):
+    _memo = customer.attributes.get("memo")
+    _updated = False
+
+    if _memo != memo:
+        customer.attributes["memo"] = memo
+        customer.save()
+        _updated = True
+
+    return customer, _updated

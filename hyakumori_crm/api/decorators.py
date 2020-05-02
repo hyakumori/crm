@@ -3,9 +3,10 @@ import logging
 from functools import wraps
 from typing import Callable
 
+from django.http import QueryDict
 from pydantic import ValidationError
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import NotFound, PermissionDenied, NotAuthenticated
+from rest_framework.exceptions import NotFound, PermissionDenied, NotAuthenticated, UnsupportedMediaType
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -48,9 +49,12 @@ def get_or_404(
     msg: str = None,
     remove: bool = False,
 ):
-    """Get model instance base on kwargs passed from url and inject into `request.data`.
+    """
+    Get model instance base on kwargs passed from url and inject into `request.data`.
     Raise Http404 if not found.
-    If `remove`, url params will be removed from kwargs pass to view function."""
+    If `remove`, url params will be removed from kwargs pass to view function.
+    Notice: when using with decorator `api_validate_model`, only allow `json` content type
+    """
 
     def decorator(f):
         @wraps(f)
@@ -83,9 +87,15 @@ def get_or_404(
                 "PUT",
                 "PATCH",
             ]:
-                # currently only work if content-type is application/json
-                request.data[to_name] = obj
-                obj_passed = True
+
+                obj_passed = False
+                _mutable_flag = getattr(request, request.method)
+                if _mutable_flag is not None:
+                    _mutable_flag._mutable = True
+                    request.data[to_name] = obj
+                    _mutable_flag._mutable = False
+                    obj_passed = True
+
             if pass_to == "kwargs" or "kwargs" in pass_to:
                 kwargs[to_name] = obj
                 obj_passed = True
@@ -121,7 +131,21 @@ def api_validate_model(input_model, arg_name="data"):
                 )
             if request.method in ["POST", "PUT", "PATCH"]:
                 try:
-                    validated_input = input_model(**request.data)
+                    if isinstance(request.data, QueryDict):
+                        """
+                            in case of QueryDict, the request is under form-data format
+                            hence it will be normalized into an array
+                            example inputs:
+                            key: value1
+                            key: value2
+                            -> request.data["key"] = ["value1", "value2"]
+                            calling request.data.dict() will omit others data
+                            validated_input = input_model(**request.data.dict())
+                            for simple use case, we only allow json content type
+                        """
+                        raise UnsupportedMediaType("form-data")
+                    else:
+                        validated_input = input_model(**request.data)
                     kwargs[arg_name] = validated_input
                 except ValidationError as e:
                     return Response({"errors": errors_wrapper(e.errors())}, status=400)
