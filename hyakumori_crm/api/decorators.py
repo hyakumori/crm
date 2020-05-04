@@ -53,11 +53,11 @@ def get_or_404(
     Get model instance base on kwargs passed from url and inject into `request.data` and/or other `kwargs`.
     Raise Http404 if not found.
     If `remove`, url params will be removed from kwargs pass to view function.
-    Notice: when using with decorator `api_validate_model`, only allow `json` content type
+    Only support `application/json` content-type
     :param get_func:
     :param to_name:
     :param pass_to: can be a str or list. By default inject into request.
-    Another possibilities are: `kwargs`, `kwargs_data`
+    Another possibilities are: `kwargs`, `kwargs_data` will pass request.data to `kwargs['_data']`
     :param msg:
     :param remove:
     """
@@ -94,12 +94,11 @@ def get_or_404(
                 "PUT",
                 "PATCH",
             ]:
-                _mutable_flag = getattr(request, "POST", None)
-                if _mutable_flag is not None:
-                    _mutable_flag._mutable = True
-                    request.data[to_name] = obj
-                    _mutable_flag._mutable = False
-                    obj_passed = True
+                if isinstance(request.data, QueryDict):
+                    raise UnsupportedMediaType("form-data")
+
+                request.data[to_name] = obj
+                obj_passed = True
 
             if pass_to == "kwargs" or "kwargs" in pass_to:
                 kwargs[to_name] = obj
