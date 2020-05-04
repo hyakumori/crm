@@ -70,10 +70,9 @@ class CustomerViewSets(ViewSet):
     @api_validate_model(BankingInput)
     @action_login_required(with_permissions=["change_customer"])
     def update_customer_bank(self, request, customer=None, data: dict = None):
-        customer = update_banking_info(customer, data)
-        ActivityService.log(
-            CustomerActions.banking_info_updated, customer, request=request
-        )
+        customer, has_changed = update_banking_info(customer, data)
+        if has_changed:
+            ActivityService.log(CustomerActions.banking_info_updated, customer, request=request)
         return Response({"id": customer.id})
 
     @action(detail=True, methods=["GET", "PUT", "PATCH"])
