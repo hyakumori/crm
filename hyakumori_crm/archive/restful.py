@@ -3,15 +3,24 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
-from .service import *
+from .schemas import ArchiveInput
+from .service import create_archive, get_archive_by_pk, edit_archive, get_all_attachments_by_archive_pk, \
+    create_attachment, get_attachment_by_pk, delete_attachment_file, get_related_forests, add_related_forest, \
+    delete_related_forest, get_related_customer, add_related_customer, delete_related_customer, add_related_user, \
+    delete_related_user
 from ..activity.services import ActivityService, ArchiveActions
 from ..api.decorators import (
     api_validate_model,
     get_or_404,
     action_login_required)
+
 from ..core.utils import default_paginator
-from ..crm.restful.serializers import *
+from ..crm.models import Archive, Attachment
+from ..crm.restful.paginations import ListingPagination
+from ..crm.restful.serializers import ArchiveListingSerializer, ArchiveSerializer, AttachmentSerializer, \
+    ForestSerializer, CustomerSerializer
 from ..users.models import User
+from ..users.serializers import UserSerializer
 
 
 @api_view(["GET", "POST"])
@@ -19,15 +28,12 @@ from ..users.models import User
 @action_login_required(with_permissions=["view_archive", "add_archive"])
 def archives(request, data: ArchiveInput = None):
     if request.method == 'GET':
-        page = int(request.GET.get('page'))
-        items_per_page = int(request.GET.get('items_per_page'))
-        from_items = (page - 1) * items_per_page
-        to_items = page * items_per_page
-        response_archives = Archive.objects.all()[from_items:to_items]
-        return Response({
-            "count": len(Archive.objects.all()),
-            "results": ArchiveListingSerializer(response_archives, many=True).data
-        })
+        paginator_listing = ListingPagination()
+        paged_list = paginator_listing.paginate_queryset(
+            request=request,
+            queryset=Archive.objects.all()
+        )
+        return paginator_listing.get_paginated_response(ArchiveListingSerializer(paged_list, many=True).data)
     else:
         author = request.user
         archive = create_archive(author, data)

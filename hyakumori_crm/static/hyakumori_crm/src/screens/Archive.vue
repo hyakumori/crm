@@ -61,16 +61,21 @@ export default {
       data: [],
       isLoading: false,
       totalItems: 0,
+      next: null,
+      previous: null,
+      currentPage: 1,
     };
   },
 
   methods: {
-    async fetchArchives(page, itemsPerPage) {
+    async fetchArchives(api_url) {
       this.isLoading = true;
       const data = await this.$rest
-        .get(`/archives?page=${page}&items_per_page=${itemsPerPage}`)
+        .get(api_url)
         .then(res => res);
       this.totalItems = data.count;
+      this.next = data.next;
+      this.previous = data.previous;
       this.data = data.results.map(data => {
         this.isLoading = false;
         return {
@@ -90,7 +95,16 @@ export default {
     },
 
     paginationHandler(val) {
-      this.fetchArchives(val.page, val.itemsPerPage);
+      if (val.page > this.currentPage) {
+        this.currentPage = val.page;
+        this.fetchArchives(this.next);
+      } else if (val.page < this.currentPage) {
+        this.currentPage = val.page;
+        this.fetchArchives(this.previous);
+      } else {
+        const api_url = `/archives?page_size=${val.itemsPerPage}`;
+        this.fetchArchives(api_url);
+      }
     },
   },
 
