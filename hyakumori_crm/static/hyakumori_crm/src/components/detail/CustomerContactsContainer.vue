@@ -26,8 +26,10 @@
         class="mt-4"
         :contacts="tempContacts"
         :isUpdate="isEditing"
+        :isContactor="true"
         @deleteContact="handleDelete"
         @undoDeleteContact="handleUndoDelete"
+        @relationshipChange="handleRelationshipChange"
       />
       <v-dialog v-model="showNewContactDialog" scrollable max-width="720">
         <v-card>
@@ -93,6 +95,7 @@ export default {
       defaultContactsContactsEdit: {},
       form: this.initForm(),
       formErrors: {},
+      relationshipChanges: [],
     };
   },
   computed: {
@@ -103,10 +106,26 @@ export default {
       return this.contactsToDelete.map(f => f.id);
     },
     saveDisabled() {
-      return this.contactIdsToDelete.length === 0;
+      return (
+        this.contactIdsToDelete.length === 0 &&
+        this.relationshipChanges.length === 0
+      );
+    },
+    contactsAddData() {
+      return this.relationshipChanges.map(i => ({
+        contact: i.contact,
+        relationship_type: i.val,
+        contact_type: this.contactType,
+      }));
     },
   },
   methods: {
+    handleRelationshipChange(contact_id, val) {
+      const others = reject(this.relationshipChanges, {
+        contact: contact_id,
+      });
+      this.relationshipChanges = [...others, { contact: contact_id, val }];
+    },
     handleDelete(contact) {
       if (contact.added) {
         delete contact.added;
@@ -132,8 +151,10 @@ export default {
         this.$emit("saved");
         this.saving = false;
         this.contactsToDelete = [];
-        this.contactsToAdd = [];
-      } catch (error) {}
+        this.relationshipChanges = [];
+      } catch (error) {
+        this.saving = false;
+      }
     },
     initForm() {
       return {
@@ -195,6 +216,7 @@ export default {
         this.contactsToDelete && (this.contactsToDelete = []);
         this.form = this.initForm();
         this.showNewContactDialog = false;
+        this.relationshipChanges = [];
       }
     },
   },

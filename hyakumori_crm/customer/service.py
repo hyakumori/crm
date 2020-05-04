@@ -329,8 +329,9 @@ def update_contacts(contacts_in: dict):
             ForestCustomerContact.objects.get_or_create(
                 forestcustomer=forestcustomer, customercontact=customer_contact
             )
+        current_attrs = customer_contact.attributes or {}
         customer_contact.attributes = {
-            **(customer_contact.attributes or {}),
+            **(current_attrs),
             "contact_type": ContactType.forest.value
             if contact_data.forest_id
             else contact_data.contact_type.value,
