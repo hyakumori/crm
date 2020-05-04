@@ -13,7 +13,7 @@
           :isUpdate="isUpdate"
           :index="index"
           @deleteForest="$emit('deleteForest', forest, index)"
-          @undoDeleteForest="$emit('undoDeleteForest', forest, index)"
+          @undoDeleteForest="$emit('undoDeleteForest', forest)"
           :added="forest.added"
           :deleted="forest.deleted"
           :selectedId="selectedId"

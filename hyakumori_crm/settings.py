@@ -247,7 +247,7 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "0.0.0.0")
 EMAIL_PORT = os.getenv("EMAIL_PORT", 1025)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-# EMAIL_USE_TLS = strtobool(os.getenv("EMAIL_USE_TLS", "no"))
+EMAIL_USE_TLS = strtobool(os.getenv("EMAIL_USE_TLS", "no"))
 
 LOGGING = {
     "version": 1,

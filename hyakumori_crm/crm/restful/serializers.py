@@ -49,6 +49,12 @@ class ForestSerializer(ModelSerializer):
         exclude = ["deleted"]
 
 
+class ForestListingSerializer(ModelSerializer):
+    class Meta:
+        model = Forest
+        fields = ["id", "internal_id", "cadastral", "customers_count"]
+
+
 class AttachmentSerializer(ModelSerializer):
     class Meta:
         model = Attachment

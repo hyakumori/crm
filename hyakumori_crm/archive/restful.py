@@ -106,11 +106,11 @@ def attachment(request, archive: Archive = None, attachment: Attachment = None):
 def archive_forests(request, archive: Archive = None):
     if request.method == 'GET':
         forests = get_related_forests(archive)
-        return Response({"data": ForestSerializer(forests, many=True).data})
+        return Response({"data": ForestListingSerializer(forests, many=True).data})
     elif request.method == 'POST':
         forests = add_related_forest(archive, request.data)
         ActivityService.log(ArchiveActions.forest_list_updated, archive, request=request)
-        return Response({"data": ForestSerializer(forests, many=True).data})
+        return Response({"data": ForestListingSerializer(forests, many=True).data})
     else:
         try:
             is_deleted = delete_related_forest(archive, request.data)
