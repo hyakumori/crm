@@ -58,7 +58,3 @@ class Attachment(BaseResourceModel):
     @property
     def size(self):
         return self.attachment_file.size
-
-    @property
-    def download_url(self):
-        return self.attachment_file.path

@@ -24,8 +24,13 @@
     >
       <v-icon size="24">mdi-close</v-icon>
     </v-btn>
-    <v-btn class="align-self-center ma-3" v-if="!isUpdating && !deleted && !added" icon @click="onDownload">
-      <a class="download" :href="downloadUrl" download target="_blank"></a>
+    <v-btn
+      class="align-self-center ma-3"
+      v-if="!isUpdating && !deleted && !added"
+      icon
+      :loading="loading"
+      @click="onDownload"
+    >
       <v-icon size="24">mdi-download</v-icon>
     </v-btn>
   </v-card>
@@ -40,7 +45,7 @@ export default {
     isUpdating: Boolean,
     deleteClick: Function,
     downloadClick: Function,
-    downloadUrl: String,
+    loading: Boolean,
     flat: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
