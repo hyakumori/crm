@@ -251,3 +251,20 @@ class CustomerMemoInput(HyakumoriDanticModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+class RequiredAddress(HyakumoriDanticModel):
+    prefecture: str
+    municipality: str
+    sector: str
+
+
+class RequiredContactInput(HyakumoriDanticModel):
+    name_kanji: Name
+    name_kana: Name
+    postal_code: constr(regex=regexes.POSTAL_CODE, strip_whitespace=True)
+    address: RequiredAddress
+    telephone: constr(regex=regexes.TELEPHONE_NUMBER, strip_whitespace=True)
+    mobilephone: constr(regex=regexes.MOBILEPHONE_NUMBER, strip_whitespace=True)
+    email: Optional[EmailStr] = DEFAULT_EMAIL
+    contact_type: ContactType
