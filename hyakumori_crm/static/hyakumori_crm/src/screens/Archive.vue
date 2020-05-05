@@ -15,16 +15,15 @@
       <search-card :onSearch="fetchArchives" :search-criteria="headers" />
       <data-list
         :auto-headers="false"
-        :data="data"
         :headers="headers"
         :is-loading="isLoading"
         :showSelect="true"
+        :data="data"
         :tableRowIcon="pageIcon"
         :serverItemsLength="totalItems"
         @rowData="rowData"
         @update:options="paginationHandler"
         class="archives__data-section"
-        iconRowValue="id"
       />
     </template>
   </main-section>
