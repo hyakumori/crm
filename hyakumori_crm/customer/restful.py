@@ -13,6 +13,7 @@ from .schemas import (
     ForestSerializer,
     CustomerMemoInput,
     RequiredContactInput,
+    ContactType,
 )
 from .service import (
     contacts_list_with_search,
@@ -100,9 +101,11 @@ class CustomerViewSets(ViewSet):
             return paginator.get_paginated_response(contacts)
         elif request.method == "POST":
             contact = create_contact(customer, data)
-            ActivityService.log(
-                CustomerActions.direct_contacts_updated, customer, request=request
-            )
+            if data.contact_type == ContactType.family:
+                action_type = CustomerActions.family_contacts_updated
+            elif data.contact_type == ContactType.others:
+                action_type = CustomerActions.other_contacts_updated
+            ActivityService.log(action_type, customer, request=request)
             return Response({"id": contact.id}, status=201)
         else:
             update_contacts(data)
