@@ -22,7 +22,7 @@ from ..core.utils import default_paginator, make_error_json
 from ..crm.models import Archive, Attachment
 from ..crm.restful.paginations import ListingPagination
 from ..crm.restful.serializers import ArchiveListingSerializer, ArchiveSerializer, AttachmentSerializer, \
-    ForestSerializer, CustomerSerializer
+    ForestSerializer, CustomerSerializer, ForestListingSerializer
 from ..users.models import User
 from ..users.serializers import UserSerializer
 
