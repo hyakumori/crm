@@ -24,6 +24,7 @@
         @rowData="rowData"
         @update:options="paginationHandler"
         class="archives__data-section"
+        iconRowValue="id"
       />
     </template>
   </main-section>

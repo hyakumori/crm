@@ -10,12 +10,16 @@
     <document-card
       class="my-2"
       v-for="(doc, index) in documents"
+      flat
       :isUpdating="isUpdate"
       :key="index"
       :fileName="doc.filename || doc.name"
+      :added="doc.added"
+      :deleted="doc.deleted"
       :downloadUrl="doc.download_url"
-      :deleteClick="onDeleteClick.bind(this, index)"
+      :deleteClick="onDeleteClick.bind(this, doc, index)"
       :downloadClick="onDownloadClick.bind(this, index)"
+      @undoDelete="handleUndoDelete(doc, index)"
     />
     <template v-if="isUpdate">
       <div class="attachments__addition-container">
@@ -37,7 +41,7 @@
         :cancel="cancel.bind(this)"
         :save="save.bind(this)"
         :save-disabled="saveDisabled"
-        :saving="addAttachmentLoading"
+        :saving="updateAttachmentLoading"
       />
     </template>
   </div>
@@ -69,11 +73,10 @@ export default {
       isUpdate: false,
       documents: [],
       fileRef: this.$refs.fileInput,
-      addAttachmentLoading: false,
+      updateAttachmentLoading: false,
       loading: false,
       deleteDocuments: [],
       immutableDocs: [],
-      saveDisabled: false,
     };
   },
 
@@ -89,7 +92,6 @@ export default {
 
     cancel() {
       this.isUpdate = false;
-      this.saveDisabled = false;
       this.documents = this.immutableDocs;
       this.deleteDocuments = [];
     },
@@ -109,9 +111,13 @@ export default {
       this.$refs.fileInput.click();
     },
 
-    onDeleteClick(index) {
-      this.deleteDocuments.push(this.documents[index]);
-      this.documents.splice(index, 1);
+    onDeleteClick(doc, index) {
+      if (doc.added) {
+        this.documents.splice(index, 1);
+      } else {
+        this.deleteDocuments.push(doc);
+        this.$set(doc, "deleted", true);
+      }
     },
 
     onDownloadClick(index) {
@@ -126,35 +132,54 @@ export default {
           document.size === file.size
         );
       });
+      this.documents.forEach(doc => {
+        if (!doc.id) {
+          doc.added = true;
+        }
+      });
     },
 
-    save() {
+    async save() {
       if (this.documents.length === 0) {
         this.isUpdate = false;
         this.deleteDocuments = [];
       } else {
-        this.addAttachmentLoading = true;
+        this.updateAttachmentLoading = true;
         const data = new FormData();
         const newDocs = this.documents.filter(doc => isNil(doc.id));
         newDocs.forEach(doc => data.append("file", doc));
-        this.$rest.post(`archives/${this.id}/attachments`, data).then(res => {
-          this.documents.splice(
-            this.documents.length - 1 - (newDocs.length - 1),
-            newDocs.length,
-            ...res.data,
-          );
-          this.addAttachmentLoading = false;
-          this.isUpdate = false;
+        await this.$rest
+          .post(`archives/${this.id}/attachments`, data)
+          .then(res => {
+            this.documents.splice(
+              this.documents.length - 1 - (newDocs.length - 1),
+              newDocs.length,
+              ...res.data,
+            );
+          });
+        await this.deleteDocuments.forEach(doc => {
+          this.$rest
+            .delete(`/archives/${this.id}/attachments/${doc.id}`)
+            .then();
         });
-        this.deleteDocuments.forEach(doc => {
-          if (doc.id) {
-            this.$rest
-              .delete(`/archives/${this.id}/attachments/${doc.id}`)
-              .then();
-          }
-        });
+        this.documents = this.documents.filter(doc => !doc.deleted);
+        this.updateAttachmentLoading = false;
+        this.isUpdate = false;
         this.deleteDocuments = [];
       }
+    },
+
+    handleUndoDelete(doc, index) {
+      this.$set(doc, "deleted", false);
+      this.deleteDocuments.splice(index, 1);
+    },
+  },
+
+  computed: {
+    saveDisabled() {
+      return (
+        this.documents.filter(doc => doc.added || doc.deleted).length === 0
+      );
     },
   },
 };

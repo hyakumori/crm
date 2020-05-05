@@ -1,17 +1,30 @@
 <template>
-  <v-card class="document-card d-hover" outlined flat>
+  <v-card
+    class="document-card d-hover"
+    outlined
+    flat
+    :class="{ deleted: deleted, added: added }"
+  >
     <v-icon class="document-card__icon" size="16">mdi-paperclip</v-icon>
     <span class="document-card__file-name">{{ fileName }}</span>
     <v-spacer></v-spacer>
     <v-btn
+      v-if="deleted"
       class="align-self-center ma-3"
-      v-if="isUpdating"
+      icon
+      @click.stop="$emit('undoDelete')"
+    >
+      <v-icon>mdi-undo</v-icon>
+    </v-btn>
+    <v-btn
+      class="align-self-center ma-3"
+      v-if="isUpdating && !deleted"
       icon
       @click="onDelete"
     >
       <v-icon size="24">mdi-close</v-icon>
     </v-btn>
-    <v-btn class="align-self-center ma-3" v-else icon @click="onDownload">
+    <v-btn class="align-self-center ma-3" v-if="!isUpdating && !deleted && !added" icon @click="onDownload">
       <a class="download" :href="downloadUrl" download target="_blank"></a>
       <v-icon size="24">mdi-download</v-icon>
     </v-btn>
@@ -28,6 +41,9 @@ export default {
     deleteClick: Function,
     downloadClick: Function,
     downloadUrl: String,
+    flat: { type: Boolean, default: false },
+    deleted: { type: Boolean, default: false },
+    added: { type: Boolean, default: false },
   },
 
   methods: {
@@ -44,6 +60,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../styles/variables";
+
+.document-card.deleted {
+  border: 1px solid #ff5252 !important;
+}
+
+.document-card.added {
+  border: 1px solid #12c7a6 !important;
+}
 
 .document-card {
   display: flex;
