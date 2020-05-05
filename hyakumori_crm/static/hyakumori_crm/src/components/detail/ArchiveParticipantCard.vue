@@ -10,7 +10,10 @@
       <span class="ml-3">{{ name }}</span>
     </div>
     <v-spacer></v-spacer>
-    <v-btn class="align-self-center mr-2" icon>
+    <v-btn class="align-self-center mr-2" v-if="isUpdate" icon>
+      <v-icon size="24" @click="onNavigation">mdi-chevron-right</v-icon>
+    </v-btn>
+    <v-btn class="align-self-center mr-2" v-else icon>
       <v-icon size="24" @click="onNavigation">mdi-chevron-right</v-icon>
     </v-btn>
   </v-card>
@@ -26,6 +29,7 @@ export default {
       default: false,
     },
     name: String,
+    isUpdate: Boolean,
   },
 
   methods: {

@@ -133,11 +133,14 @@ export default {
         this.addRelatedForestLoading = true;
         const addRequest = { ids: this.addedForestIds };
         if (this.deletedForestIds.length > 0) {
-          const isDeleted = await this.$rest.delete(`/archives/${this.id}/forests`, {
-            data: {
-              ids: this.deletedForestIds,
+          const isDeleted = await this.$rest.delete(
+            `/archives/${this.id}/forests`,
+            {
+              data: {
+                ids: this.deletedForestIds,
+              },
             },
-          });
+          );
           if (isDeleted) {
             this.relatedForests = pullAllWith(
               this.relatedForests,

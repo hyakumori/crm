@@ -2,7 +2,7 @@
   <v-row dense>
     <template v-for="(parti, index) in participants">
       <v-col cols="6" :key="index">
-        <archive-participant-card :name="parti" />
+        <archive-participant-card :name="parti" :isUpdate="isUpdate" />
       </v-col>
     </template>
   </v-row>

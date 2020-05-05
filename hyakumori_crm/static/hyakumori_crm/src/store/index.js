@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import forest from "./modules/forest";
+import archive from "./modules/archive";
 
 Vue.use(Vuex);
 
@@ -48,5 +49,6 @@ export default new Vuex.Store({
   },
   modules: {
     forest,
+    archive,
   },
 });
