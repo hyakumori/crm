@@ -3,8 +3,17 @@
     <v-icon class="document-card__icon" size="16">mdi-paperclip</v-icon>
     <span class="document-card__file-name">{{ fileName }}</span>
     <v-spacer></v-spacer>
-    <v-btn class="align-self-center ma-3" icon @click="onClick">
-      <v-icon size="24">{{ isUpdating ? "mdi-close" : "mdi-download" }}</v-icon>
+    <v-btn
+      class="align-self-center ma-3"
+      v-if="isUpdating"
+      icon
+      @click="onDelete"
+    >
+      <v-icon size="24">mdi-close</v-icon>
+    </v-btn>
+    <v-btn class="align-self-center ma-3" v-else icon @click="onDownload">
+      <a class="download" :href="downloadUrl" download target="_blank"></a>
+      <v-icon size="24">mdi-download</v-icon>
     </v-btn>
   </v-card>
 </template>
@@ -16,12 +25,18 @@ export default {
   props: {
     fileName: String,
     isUpdating: Boolean,
-    click: Function,
+    deleteClick: Function,
+    downloadClick: Function,
+    downloadUrl: String,
   },
 
   methods: {
-    onClick() {
-      this.click();
+    onDelete() {
+      this.deleteClick();
+    },
+
+    onDownload() {
+      this.downloadClick();
     },
   },
 };
