@@ -6,7 +6,7 @@
     :class="{ deleted: deleted, added: added }"
   >
     <v-icon class="document-card__icon" size="16">mdi-paperclip</v-icon>
-    <span class="document-card__file-name">{{ fileName }}</span>
+    <span class="document-card__file-name">{{ displayFileName }}</span>
     <v-spacer></v-spacer>
     <v-btn
       v-if="deleted"
@@ -41,6 +41,7 @@ export default {
   name: "document-card",
 
   props: {
+    attachment: Object,
     fileName: String,
     isUpdating: Boolean,
     deleteClick: Function,
@@ -58,6 +59,17 @@ export default {
 
     onDownload() {
       this.downloadClick();
+    },
+  },
+
+  computed: {
+    displayFileName() {
+      return (
+        (this.attachment &&
+          this.attachment.attributes &&
+          this.attachment.attributes["original_file_name"]) ||
+        this.fileName
+      );
     },
   },
 };

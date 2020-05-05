@@ -14,6 +14,7 @@
       :isUpdating="isUpdate"
       :key="index"
       :fileName="doc.filename || doc.name"
+      :attachment="doc"
       :added="doc.added"
       :deleted="doc.deleted"
       :loading="doc.loading"
@@ -32,7 +33,7 @@
           class="attachments__addition-container__file"
           ref="fileInput"
           type="file"
-          accept=".xlsx, .xls, .csv, .doc, .docx, .pdf"
+          accept=".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif"
           multiple
           @change="onFileChange"
         />
