@@ -14,6 +14,7 @@ from .schemas import (
     CustomerMemoInput,
     RequiredContactInput,
     ContactType,
+    required_contact_input_wrapper,
 )
 from .service import (
     contacts_list_with_search,
@@ -88,7 +89,7 @@ class CustomerViewSets(ViewSet):
         remove=True,
     )
     @api_validate_model(ContactsInput, methods=["PUT", "PATCH"])
-    @api_validate_model(RequiredContactInput, methods=["POST"])
+    @api_validate_model(required_contact_input_wrapper, methods=["POST"])
     @action_login_required(with_permissions=["change_customer", "view_customer"])
     def contacts(self, request, *, customer=None, data=None):
         if request.method == "GET":
