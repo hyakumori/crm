@@ -91,6 +91,7 @@ export default {
       this.isUpdate = false;
       this.saveDisabled = false;
       this.documents = this.immutableDocs;
+      this.deleteDocuments = [];
     },
 
     async fetchAttachments() {
@@ -128,27 +129,32 @@ export default {
     },
 
     save() {
-      this.addAttachmentLoading = true;
-      const data = new FormData();
-      const newDocs = this.documents.filter(doc => isNil(doc.id));
-      newDocs.forEach(doc => data.append("file", doc));
-      this.$rest.post(`archives/${this.id}/attachments`, data).then(res => {
-        this.documents.splice(
-          this.documents.length - 1 - (newDocs.length - 1),
-          newDocs.length,
-          ...res.data,
-        );
-        this.addAttachmentLoading = false;
+      if (this.documents.length === 0) {
         this.isUpdate = false;
-      });
-      this.deleteDocuments.forEach(doc => {
-        if (doc.id) {
-          this.$rest
-            .delete(`/archives/${this.id}/attachments/${doc.id}`)
-            .then();
-        }
-      });
-      this.deleteDocuments = [];
+        this.deleteDocuments = [];
+      } else {
+        this.addAttachmentLoading = true;
+        const data = new FormData();
+        const newDocs = this.documents.filter(doc => isNil(doc.id));
+        newDocs.forEach(doc => data.append("file", doc));
+        this.$rest.post(`archives/${this.id}/attachments`, data).then(res => {
+          this.documents.splice(
+            this.documents.length - 1 - (newDocs.length - 1),
+            newDocs.length,
+            ...res.data,
+          );
+          this.addAttachmentLoading = false;
+          this.isUpdate = false;
+        });
+        this.deleteDocuments.forEach(doc => {
+          if (doc.id) {
+            this.$rest
+              .delete(`/archives/${this.id}/attachments/${doc.id}`)
+              .then();
+          }
+        });
+        this.deleteDocuments = [];
+      }
     },
   },
 };
