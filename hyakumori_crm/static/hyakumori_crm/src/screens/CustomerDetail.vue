@@ -123,6 +123,7 @@
         <memo-input
           :api-url="`/customers/${$route.params.id}/memo`"
           :value="customer && customer.attributes['memo']"
+          @input="customer.attributes['memo'] = $event"
         ></memo-input>
         <action-log
           app-name="crm"
