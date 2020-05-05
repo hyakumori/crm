@@ -10,14 +10,15 @@
           :info="basicInfo"
           :id="id"
         >
-          <template #form="props"
-            ><ContactForm
+          <template #form="props">
+            <contact-form
               :id="id"
               :form="selfContactFormData"
               :toggleEditing="props.toggleEditing"
               :showCancel="isDetail"
               @updated="fetchCustomer"
-          /></template>
+            />
+          </template>
         </basic-info-container>
 
         <forest-list-container
@@ -58,7 +59,7 @@
           :isLoading="false"
         />
 
-        <CustomerContactsContainer
+        <customer-contacts-container
           v-if="id"
           class="mt-12"
           headerContent="家族情報"
@@ -72,7 +73,7 @@
           contactType="FAMILY"
         />
 
-        <CustomerContactsContainer
+        <customer-contacts-container
           v-if="id"
           class="mt-12"
           headerContent="その他関係者情報"
@@ -105,13 +106,14 @@
           :info="bankingInfo"
           :id="id"
         >
-          <template #form="props"
-            ><BankingInfoForm
+          <template #form="props">
+            <banking-info-form
               :id="id"
               :form="bankingInfoFormData"
               :toggleEditing="props.toggleEditing"
               @updated="fetchCustomer"
-          /></template>
+            />
+          </template>
         </basic-info-container>
       </div>
     </template>

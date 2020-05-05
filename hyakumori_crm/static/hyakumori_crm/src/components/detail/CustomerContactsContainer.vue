@@ -1,5 +1,5 @@
 <template>
-  <SectionContainerWrapper
+  <section-container-wrapper
     :headerContent="headerContent"
     :toggleEditBtnContent="toggleEditBtnContent"
     :addBtnContent="addBtnContent"
@@ -22,7 +22,7 @@
     :saving="saving"
   >
     <template>
-      <CustomerContactList
+      <customer-contact-list
         class="mt-4"
         :contacts="tempContacts"
         :isUpdate="isEditing"
@@ -42,7 +42,7 @@
           </v-card-actions>
           <v-divider></v-divider>
           <v-card-text style="min-height: 300px;" class="px-6 py-5">
-            <ContactForm
+            <contact-form
               :form="form"
               :handleSubmit="handleAdd"
               :errors="formErrors"
@@ -51,7 +51,7 @@
         </v-card>
       </v-dialog>
     </template>
-  </SectionContainerWrapper>
+  </section-container-wrapper>
 </template>
 
 <script>
@@ -60,7 +60,7 @@ import CustomerContactList from "./CustomerContactList";
 import ContainerMixin from "./ContainerMixin";
 import ContactForm from "../forms/ContactForm";
 
-import { debounce, reject, isEmpty, find } from "lodash";
+import { reject } from "lodash";
 
 export default {
   mixins: [ContainerMixin],

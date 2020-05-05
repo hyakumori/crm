@@ -222,10 +222,7 @@ export default {
             params: { id: data.id },
           });
         } else {
-          const data = await this.$rest.put(
-            `/customers/${this.id}`,
-            customerInput,
-          );
+          await this.$rest.put(`/customers/${this.id}`, customerInput);
           this.$emit("updated");
           this.toggleEditing();
         }
