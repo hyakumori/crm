@@ -92,6 +92,11 @@ def get_customer_contacts(pk: UUID):
                 "customercontact__forestcustomercontact__forestcustomer__forest_id"
             )
         )
+        .annotate(
+            forestcustomer_id=F(
+                "customercontact__forestcustomercontact__forestcustomer_id"
+            )
+        )
         .annotate(cc_attrs=F("customercontact__attributes"))
         .order_by("created_at")
     )
@@ -101,6 +106,7 @@ def get_customer_contacts(pk: UUID):
 def get_customer_forests(pk: UUID):
     return (
         Forest.objects.filter(forestcustomer__customer_id=pk)
+        .annotate(forestcustomer_id=F("forestcustomer__id"))
         .prefetch_related("forestcustomer_set")
         .order_by("created_at")
     )

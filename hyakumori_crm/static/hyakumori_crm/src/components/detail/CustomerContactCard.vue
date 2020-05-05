@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :color="mode != 'view' && selected ? '#f5f5f5' : undefined"
+    :color="mode != 'view' && selected ? '#dddddd' : undefined"
     class="customer-contact-card d-flex d-hover"
     :class="{ flat: flat, deleted: deleted, added: added }"
     outlined
