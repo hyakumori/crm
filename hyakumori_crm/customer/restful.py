@@ -100,6 +100,9 @@ class CustomerViewSets(ViewSet):
             return paginator.get_paginated_response(contacts)
         elif request.method == "POST":
             contact = create_contact(customer, data)
+            ActivityService.log(
+                CustomerActions.direct_contacts_updated, customer, request=request
+            )
             return Response({"id": contact.id}, status=201)
         else:
             update_contacts(data)

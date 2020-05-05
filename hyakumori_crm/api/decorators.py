@@ -126,7 +126,7 @@ def get_or_404(
     return decorator
 
 
-def api_validate_model(input_model, methods=["POST", "PUT", "PATCH"], arg_name="data"):
+def api_validate_model(input_model, arg_name="data", methods=["POST", "PUT", "PATCH"]):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs) -> Response:
