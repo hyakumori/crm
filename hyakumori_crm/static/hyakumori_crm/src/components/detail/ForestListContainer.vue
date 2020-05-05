@@ -78,7 +78,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import ForestInfoCard from "../detail/ForestInfoCard";
-import { reject, debounce } from "lodash";
+import { reject, debounce, find } from "lodash";
 
 export default {
   name: "forest-list-container",
@@ -173,6 +173,7 @@ export default {
         this.forestsToAdd = [];
       } catch (error) {
         this.saving = false;
+        this.$dialog.notify(error.response.data);
       }
     },
     async handleLoadMore() {
@@ -222,6 +223,12 @@ export default {
         this.forestsToDelete.length > 0 && (this.forestsToDelete = []);
       }
     },
+    // forests() {
+    //   const selectingForestExist = find(this.forests, {
+    //     id: this.selectingForestId_,
+    //   });
+    //   if (!selectingForestExist) this.selectingForestId_ = null;
+    // },
   },
 };
 </script>

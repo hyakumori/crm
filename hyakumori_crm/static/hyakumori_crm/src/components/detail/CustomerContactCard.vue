@@ -102,7 +102,7 @@
       "
       class="customer-contact-card__tag"
       :title="$t('buttons.set_as_default')"
-      v-bind:class="{
+      :class="{
         owner: isOwner,
         contactor: isContactor,
         default: this.contact.default,

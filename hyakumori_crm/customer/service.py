@@ -295,9 +295,10 @@ def delete_customer_contacts(contacts_delete_in: dict):
 
 def update_forests(data):
     customer = data.customer
-    ForestCustomer.objects.filter(
+    for fc in ForestCustomer.objects.filter(
         forest_id__in=data.deleted, customer_id=customer.pk
-    ).delete()
+    ).all():
+        fc.force_delete()
     added_forest_customers = []
     for added_forest_pk in data.added:
         forest_customer = ForestCustomer(

@@ -5,6 +5,10 @@
       :editBtnContent="editBtnContent"
       :update="isUpdate"
       @toggleEdit="val => (isUpdate = val)"
+      :displayAdditionBtn="
+        (contactType === 'FOREST' && !!selectingForestId) ||
+          contactType !== 'FOREST'
+      "
     />
 
     <customer-contact-list
@@ -231,6 +235,9 @@ export default {
         }
         this.contactsToDelete && (this.contactsToDelete = []);
       }
+    },
+    selectingForestId(val) {
+      if (this.contactType === "FOREST" && !val) this.isUpdate = false;
     },
   },
 };

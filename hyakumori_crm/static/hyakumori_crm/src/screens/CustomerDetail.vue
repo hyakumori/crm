@@ -289,7 +289,7 @@ export default {
       if (!this.selectingForestId)
         return filter(
           this.contacts,
-          c => c.forest_id || c.cc_attrs.contact_type === "FOREST",
+          c => c.forest_id && c.cc_attrs.contact_type === "FOREST",
         );
       return filter(this.contacts, { forest_id: this.selectingForestId });
     },
