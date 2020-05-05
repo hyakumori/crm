@@ -42,13 +42,14 @@
           editBtnContent="書類郵送記録を追加・編集"
           addBtnContent="協議履歴を追加"
           :isRequiredExpand="false"
+          :id="id"
         />
 
         <div id="forest-attributes">
           <content-header
             class="mt-9"
             content="森林情報"
-            :displayAdditionBtn="false"
+            :permissions="['just_unnecessary']"
           />
           <v-row class="forest-detail__header d-flex mx-0 mt-5">
             <template v-for="(header, index) in headerData">

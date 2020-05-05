@@ -35,6 +35,7 @@
       :submitBtnText="$t('buttons.add')"
       :handleSubmitClick="submitRelatedForest.bind(this)"
       submitBtnIcon="mdi-plus"
+      @search="deboundGetSearch"
       @needToLoad="handleLoadMore"
       @update:shown="val => (shown = val)"
     >
@@ -71,7 +72,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import ForestInfoCard from "./ForestInfoCard";
-import { cloneDeep, pullAllWith } from "lodash";
+import { cloneDeep, pullAllWith, debounce } from "lodash";
 
 export default {
   name: "archive-related-forest-container",
@@ -105,6 +106,10 @@ export default {
     };
   },
 
+  created() {
+    this.deboundGetSearch = debounce(this.fetchSearchForest, 500);
+  },
+
   mounted() {
     this.fetchRelatedForests();
   },
@@ -127,29 +132,34 @@ export default {
       } else {
         this.addRelatedForestLoading = true;
         const addRequest = { ids: this.addedForestIds };
-        await this.$rest
-          .delete(`/archives/${this.id}/forests`, {
+        if (this.deletedForestIds.length > 0) {
+          const isDeleted = await this.$rest.delete(`/archives/${this.id}/forests`, {
             data: {
               ids: this.deletedForestIds,
             },
-          })
-          .then(() => {
+          });
+          if (isDeleted) {
             this.relatedForests = pullAllWith(
               this.relatedForests,
               this.deletedForestIds,
               (f1, f2) => f1.id === f2,
             );
-          });
-        await this.$rest
-          .post(`/archives/${this.id}/forests`, addRequest)
-          .then(res => {
+          }
+        }
+        if (this.addedForestIds.length > 0) {
+          const newRelatedForests = await this.$rest.post(
+            `/archives/${this.id}/forests`,
+            addRequest,
+          );
+          if (newRelatedForests) {
             const tempForest = this.removeDuplicateForests(
               this.relatedForests,
-              res.data,
+              newRelatedForests.data,
             );
-            tempForest.push(...res.data);
+            tempForest.push(...newRelatedForests.data);
             this.relatedForests = tempForest;
-          });
+          }
+        }
         this.addRelatedForestLoading = false;
         this.isUpdate = false;
       }
@@ -172,10 +182,7 @@ export default {
 
     async fetchRelatedForests() {
       this.loading = true;
-      const response = await this.$rest
-        .get(`/archives/${this.id}/forests`)
-        .then(res => res)
-        .catch();
+      const response = await this.$rest.get(`/archives/${this.id}/forests`);
       if (response) {
         this.relatedForests = response.data;
         this.loading = false;
@@ -184,10 +191,7 @@ export default {
 
     async fetchAllForests(next) {
       this.fetchAllForestLoading = true;
-      const response = await this.$rest
-        .get(next || "/forests/minimal")
-        .then(res => res)
-        .catch();
+      const response = await this.$rest.get(next || "/forests/minimal");
       if (response) {
         this.fetchAllForestLoading = false;
         const filteredForests = this.removeDuplicateForests(
@@ -233,6 +237,23 @@ export default {
 
     handleUndoDelete(forest) {
       this.$set(forest, "deleted", false);
+    },
+
+    fetchSearchForest(keyword) {
+      this.fetchAllForestLoading = true;
+      this.$rest
+        .get("/forests/minimal", {
+          params: {
+            search: keyword || "",
+          },
+        })
+        .then(response => {
+          this.allForests = this.removeDuplicateForests(
+            response.results,
+            this.relatedForests,
+          );
+          this.fetchAllForestLoading = false;
+        });
     },
   },
 

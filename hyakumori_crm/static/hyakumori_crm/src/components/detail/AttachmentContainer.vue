@@ -48,6 +48,7 @@ export default {
   },
 
   props: {
+    id: String,
     isRequiredExpand: {
       type: Boolean,
       default: true,
@@ -56,7 +57,6 @@ export default {
 
   data() {
     return {
-      id: this.$route.params.id,
       loading: false,
       isExpand: false,
       isUpdate: false,
