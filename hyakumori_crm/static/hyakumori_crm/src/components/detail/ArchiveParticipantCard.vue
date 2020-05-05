@@ -1,5 +1,12 @@
 <template>
-  <v-card class="participant-card d-hover" outlined flat @click="onCardClick">
+  <v-card
+    class="participant-card d-hover"
+    outlined
+    flat
+    :color="selected ? '#f5f5f5' : undefined"
+    :class="{ flat: flat, deleted: deleted, added: added }"
+    @click="onCardClick"
+  >
     <v-card-title class="participant-card__title pa-0">{{
       isAuthor ? "作成者" : ""
     }}</v-card-title>
@@ -24,12 +31,13 @@ export default {
   name: "archive-participant-card",
 
   props: {
-    isAuthor: {
-      type: Boolean,
-      default: false,
-    },
+    isAuthor: { type: Boolean, default: false },
     name: String,
     isUpdate: Boolean,
+    showAction: { type: Boolean, default: true },
+    flat: { type: Boolean, default: false },
+    deleted: { type: Boolean, default: false },
+    added: { type: Boolean, default: false },
   },
 
   methods: {
@@ -46,6 +54,20 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../styles/variables";
+
+.participant-card.flat {
+  border: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #e1e1e1 !important;
+}
+
+.participant-card.deleted {
+  border: 1px solid #ff5252 !important;
+}
+
+.participant-card.added {
+  border: 1px solid #12c7a6 !important;
+}
 
 .participant-card {
   border-radius: 8px !important;
