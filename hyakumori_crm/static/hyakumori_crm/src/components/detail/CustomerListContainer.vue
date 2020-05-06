@@ -74,7 +74,7 @@ import UpdateButton from "./UpdateButton";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
 import CustomerContactCard from "../detail/CustomerContactCard";
-import { reject, debounce, find, isEmpty } from "lodash";
+import { reject, debounce, find } from "lodash";
 
 export default {
   name: "customer-list-container",

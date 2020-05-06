@@ -173,7 +173,9 @@ export default {
         this.forestsToAdd = [];
       } catch (error) {
         this.saving = false;
-        this.$dialog.notify(error.response.data);
+        this.$dialog.notify.error(
+          error.response.data.detail || error.response.statusText,
+        );
       }
     },
     async handleLoadMore() {
@@ -223,12 +225,6 @@ export default {
         this.forestsToDelete.length > 0 && (this.forestsToDelete = []);
       }
     },
-    // forests() {
-    //   const selectingForestExist = find(this.forests, {
-    //     id: this.selectingForestId_,
-    //   });
-    //   if (!selectingForestExist) this.selectingForestId_ = null;
-    // },
   },
 };
 </script>

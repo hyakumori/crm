@@ -237,8 +237,6 @@ export default {
       this.$rest.get(`/customers/${this.id}/forests`).then(async data => {
         let forests = data.results;
         let next = data.next;
-        //TODO: implement UI pagination
-        //TODO: use generator instead?
         while (!!next) {
           let nextForests = await this.$rest.get(next);
           forests.push(...nextForests.results);
@@ -253,7 +251,6 @@ export default {
       this.$rest.get(`/customers/${this.id}/contacts`).then(async data => {
         let contacts = data.results;
         let next = data.next;
-        //TODO: implement UI pagination
         while (!!next) {
           let nextContacts = await this.$rest.get(next);
           contacts.push(...nextContacts.results);
@@ -301,11 +298,6 @@ export default {
     getDiscussionsExpand() {
       // TODO: remove this
       return discussions;
-    },
-
-    getActionLogs() {
-      // TODO: remove this
-      return actionLogs;
     },
     selfContactFormData() {
       return {
