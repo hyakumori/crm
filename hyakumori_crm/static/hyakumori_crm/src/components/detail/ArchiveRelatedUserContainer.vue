@@ -3,27 +3,41 @@
     <content-header
       :content="headerContent"
       :editBtnContent="editBtnContent"
-      :loading="$store.state.archive.fetchRelatedUserLoading"
-      @toggleEdit="val => (isUpdate = val)"
+      :loading="fetchRelatedParticipantLoading"
+      @toggleEdit="handleToggleEdit"
       class="mb-4"
     />
     <archive-participant-list
-      :participants="relatedUsers"
+      :participants="relatedParticipants"
       :isUpdate="isUpdate"
+      @deleteParticipant="handleDeleteParticipant"
+      @undoDeletedParticipant="handleUndoDeletedParticipant"
     />
     <select-list-modal
       submitBtnIcon="mdi-plus"
-      :loading="fetchAllUserLoading"
+      :loading="fetchAllParticipantLoading"
       :submitBtnText="$t('buttons.add')"
       :shown="shown"
+      :handleSubmitClick="submitRelatedParticipant.bind(this)"
+      @search="debounceSearchParticipant"
+      @needToLoad="handleLoadMore"
       @update:shown="val => (shown = val)"
     >
       <template #list>
         <archive-participant-card
-          v-for="(user, index) in allUsers"
+          v-for="(participant, index) in allParticipants"
           :key="index"
-          :name="user.full_name"
+          :index="index"
+          :name="participant.full_name"
           :showAction="false"
+          :card_id="participant.id"
+          :selectedId="selectingParticipantId"
+          @selected="
+            (pId, pIndex) => {
+              selectingParticipantId = pId;
+              selectingParticipantIndex = pIndex;
+            }
+          "
           flat
         />
       </template>
@@ -32,9 +46,16 @@
       <addition-button
         class="my-2"
         :content="addBtnContent"
-        :click="addRelatedUser.bind(this)"
+        :click="addRelatedParticipant.bind(this)"
       />
-      <update-button :cancel="cancel.bind(this)" />
+      <update-button
+        :cancel="cancel.bind(this)"
+        :saving="updateParticipantLoading"
+        :save="updateParticipant.bind(this)"
+        :saveDisabled="
+          addedParticipantIds.length === 0 && deletedParticipantIds.length === 0
+        "
+      />
     </template>
   </div>
 </template>
@@ -47,6 +68,7 @@ import AdditionButton from "../AdditionButton";
 import UpdateButton from "./UpdateButton";
 import SelectListModal from "../SelectListModal";
 import ArchiveParticipantCard from "./ArchiveParticipantCard";
+import { cloneDeep, pullAllWith, debounce } from "lodash";
 
 export default {
   name: "ArchiveRelatedUserContainer",
@@ -66,42 +88,197 @@ export default {
     return {
       archive_id: this.$route.params.id,
       isUpdate: false,
-      relatedUsers: [],
-      allUsers: [],
+      relatedParticipants: [],
+      immutableRelatedParticipants: [],
+      allParticipants: [],
+      immutableAllParticipants: [],
       shown: false,
-      next: null,
-      fetchRelatedUserLoading: false,
-      fetchAllUserLoading: false,
+      next: "",
+      fetchRelatedParticipantLoading: false,
+      fetchAllParticipantLoading: false,
+      selectingParticipantId: null,
+      selectingParticipantIndex: null,
+      updateParticipantLoading: false,
     };
   },
 
+  created() {
+    this.debounceSearchParticipant = debounce(this.fetchSearchParticipant, 500);
+  },
+
   mounted() {
-    this.fetchRelatedUsers();
+    this.fetchRelatedParticipants();
   },
 
   methods: {
-    fetchRelatedUsers() {
-      this.fetchRelatedUserLoading = true;
-      this.$rest.get(`/archives/${this.archive_id}/users`).then(res => {
-        this.fetchRelatedUserLoading = false;
-        this.relatedUsers = res.results;
-      });
+    handleToggleEdit(val) {
+      this.isUpdate = val;
+      this.immutableRelatedParticipants = cloneDeep(this.relatedParticipants);
     },
 
-    fetchAllUsers() {
-      this.fetchAllUserLoading = true;
-      this.$rest.get(this.next || "/users").then(res => {
-        this.fetchAllUserLoading = false;
-        this.allUsers = res.results;
-        this.next = res.next;
-      });
+    cancel() {
+      this.isUpdate = false;
+      this.relatedParticipants = this.immutableRelatedParticipants;
+      this.allParticipants = this.immutableAllParticipants;
     },
 
-    addRelatedUser() {
-      this.shown = true;
-      if (this.allUsers.length === 0) {
-        this.fetchAllUsers();
+    async updateParticipant() {
+      if (this.relatedParticipants.length === 0) {
+        this.isUpdate = false;
+      } else {
+        this.updateParticipantLoading = true;
+        await this.deleteParticipants();
+        await this.addParticipants();
+        this.updateParticipantLoading = false;
+        this.isUpdate = false;
       }
+    },
+
+    async deleteParticipants() {
+      if (this.deletedParticipantIds.length > 0) {
+        const isDeleted = await this.$rest.delete(
+          `/archives/${this.archive_id}/users`,
+          {
+            data: {
+              ids: this.deletedParticipantIds,
+            },
+          },
+        );
+        if (isDeleted) {
+          this.relatedParticipants = pullAllWith(
+            this.relatedParticipants,
+            this.deletedParticipantIds,
+            (p1, p2) => p1.id === p2,
+          );
+        }
+      }
+    },
+
+    async addParticipants() {
+      if (this.addedParticipantIds.length > 0) {
+        const newParticipants = await this.$rest.post(
+          `/archives/${this.archive_id}/users`,
+          { ids: this.addedParticipantIds },
+        );
+        if (newParticipants) {
+          const tempParticipants = this.removeDuplicateParticipant(
+            this.relatedParticipants,
+            newParticipants.data,
+          );
+          tempParticipants.push(...newParticipants.data);
+          this.relatedParticipants = tempParticipants;
+        }
+      }
+    },
+
+    fetchRelatedParticipants() {
+      this.fetchRelatedParticipantLoading = true;
+      this.$rest.get(`/archives/${this.archive_id}/users`).then(res => {
+        this.fetchRelatedParticipantLoading = false;
+        this.relatedParticipants = res.results;
+      });
+    },
+
+    fetchAllParticipants() {
+      if (this.next !== null) {
+        this.fetchAllParticipantLoading = true;
+        this.$rest.get(this.next !== "" ? this.next : "/users").then(res => {
+          this.fetchAllParticipantLoading = false;
+          const filteredParticipants = this.removeDuplicateParticipant(
+            res.results,
+            this.relatedParticipants,
+          );
+          this.allParticipants.push(...filteredParticipants);
+          this.immutableRelatedParticipants = filteredParticipants;
+          this.next = res.next;
+        });
+      }
+    },
+
+    removeDuplicateParticipant(participant1, participant2) {
+      return pullAllWith(
+        participant1,
+        participant2,
+        (p1, p2) => p1.id === p2.id,
+      );
+    },
+
+    addRelatedParticipant() {
+      this.shown = true;
+      if (this.allParticipants.length === 0) {
+        this.fetchAllParticipants();
+      }
+    },
+
+    handleLoadMore() {
+      this.fetchAllParticipants(this.next);
+    },
+
+    submitRelatedParticipant() {
+      if (this.selectingParticipantId && this.selectingParticipantIndex) {
+        const selectedParticipant = this.allParticipants[
+          this.selectingParticipantIndex
+        ];
+        selectedParticipant.added = true;
+        this.relatedParticipants.push(selectedParticipant);
+        this.allParticipants.splice(this.selectingParticipantIndex, 1);
+        this.selectingParticipantId = null;
+        this.selectingParticipantIndex = null;
+      } else {
+        this.allParticipants[0].added = true;
+        this.relatedParticipants.push(this.allParticipants[0]);
+        this.allParticipants.splice(0, 1);
+      }
+    },
+
+    handleDeleteParticipant(participant, index) {
+      if (participant.added) {
+        this.relatedParticipants.splice(index, 1);
+        this.allParticipants = [participant, ...this.allParticipants];
+      } else {
+        this.$set(participant, "deleted", true);
+      }
+    },
+
+    handleUndoDeletedParticipant(participant) {
+      this.$set(participant, "deleted", false);
+    },
+
+    fetchSearchParticipant(keyword) {
+      this.fetchAllParticipantLoading = true;
+      this.$rest
+        .get("/users/minimal", {
+          params: {
+            search: keyword || "",
+          },
+        })
+        .then(response => {
+          this.allParticipants = this.removeDuplicateParticipant(
+            response.results,
+            this.relatedParticipants,
+          );
+          this.fetchAllParticipantLoading = false;
+        });
+    },
+  },
+
+  computed: {
+    addedParticipantIds() {
+      return (
+        this.relatedParticipants &&
+        this.relatedParticipants
+          .filter(participant => participant.added)
+          .map(participant => participant.id)
+      );
+    },
+
+    deletedParticipantIds() {
+      return (
+        this.relatedParticipants &&
+        this.relatedParticipants
+          .filter(participant => participant.deleted)
+          .map(participant => participant.id)
+      );
     },
   },
 };

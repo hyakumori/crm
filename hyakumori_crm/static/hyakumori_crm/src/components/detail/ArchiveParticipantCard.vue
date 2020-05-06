@@ -2,10 +2,10 @@
   <v-card
     class="participant-card d-hover"
     outlined
-    flat
+    :ripple="!showAction"
     :color="selected ? '#f5f5f5' : undefined"
     :class="{ flat: flat, deleted: deleted, added: added }"
-    @click="onCardClick"
+    @click="$emit('selected', card_id, index)"
   >
     <v-card-title class="participant-card__title pa-0">{{
       isAuthor ? "作成者" : ""
@@ -17,11 +17,29 @@
       <span class="ml-3">{{ name }}</span>
     </div>
     <v-spacer></v-spacer>
-    <v-btn class="align-self-center mr-2" v-if="isUpdate" icon>
-      <v-icon size="24" @click="onNavigation">mdi-chevron-right</v-icon>
+    <v-btn
+      class="align-self-center mr-2"
+      v-if="isUpdate && !deleted"
+      icon
+      @click="$emit('deleteParticipant')"
+    >
+      <v-icon size="24">mdi-close</v-icon>
     </v-btn>
-    <v-btn class="align-self-center mr-2" v-else icon>
-      <v-icon size="24" @click="onNavigation">mdi-chevron-right</v-icon>
+    <v-btn
+      class="align-self-center mr-2"
+      v-if="deleted"
+      icon
+      @click.stop="$emit('undoDeletedParticipant')"
+    >
+      <v-icon size="24">mdi-undo</v-icon>
+    </v-btn>
+    <v-btn
+      class="align-self-center mr-2"
+      v-if="!isUpdate && !deleted && !added"
+      icon
+      @click="onNavigation"
+    >
+      <v-icon size="24" v-show="showAction">mdi-chevron-right</v-icon>
     </v-btn>
   </v-card>
 </template>
@@ -33,20 +51,26 @@ export default {
   props: {
     isAuthor: { type: Boolean, default: false },
     name: String,
+    card_id: String,
+    selectedId: String,
     isUpdate: Boolean,
     showAction: { type: Boolean, default: true },
     flat: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
+    delete: Function,
+    index: Number,
   },
 
   methods: {
-    onCardClick() {
-      // TODO: handle card click
-    },
-
     onNavigation() {
-      // TODO: navigate
+      this.$router.push(`/users/${this.card_id}`);
+    },
+  },
+
+  computed: {
+    selected() {
+      return this.selectedId === this.card_id;
     },
   },
 };
@@ -73,6 +97,10 @@ export default {
   border-radius: 8px !important;
   min-height: 78px;
   display: flex;
+
+  &:focus::before {
+    opacity: 0 !important;
+  }
 
   &__title {
     min-width: 43px;

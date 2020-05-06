@@ -99,7 +99,7 @@ export default {
       fetchAllForestLoading: false,
       allForests: [],
       immutableAllForest: [],
-      next: null,
+      next: "",
       selectingForestId: null,
       selectingForestIndex: null,
       addRelatedForestLoading: false,
@@ -193,17 +193,19 @@ export default {
     },
 
     async fetchAllForests(next) {
-      this.fetchAllForestLoading = true;
-      const response = await this.$rest.get(next || "/forests/minimal");
-      if (response) {
-        this.fetchAllForestLoading = false;
-        const filteredForests = this.removeDuplicateForests(
-          response.results,
-          this.relatedForests,
-        );
-        this.allForests.push(...filteredForests);
-        this.immutableAllForest.push(...filteredForests);
-        this.next = response.next;
+      if (this.next !== null) {
+        this.fetchAllForestLoading = true;
+        const response = await this.$rest.get(next || "/forests/minimal");
+        if (response) {
+          this.fetchAllForestLoading = false;
+          const filteredForests = this.removeDuplicateForests(
+            response.results,
+            this.relatedForests,
+          );
+          this.allForests.push(...filteredForests);
+          this.immutableAllForest.push(...filteredForests);
+          this.next = response.next;
+        }
       }
     },
 
@@ -233,6 +235,7 @@ export default {
     deleteForest(forest, index) {
       if (forest.added) {
         this.relatedForests.splice(index, 1);
+        this.allForests = [forest, ...this.allForests];
       } else {
         this.$set(forest, "deleted", true);
       }
