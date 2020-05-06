@@ -1,0 +1,46 @@
+version: "2"
+
+services:
+  crm-dev:
+    image: registry.gitlab.com/datafluct/hyakumori_crm:v0.0.4-dev3-813800ab
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /project/services/.services-data/crm-dev/media:/app/media
+      - /project/services/.services-data/crm-dev/static:/app/static
+    environment:
+      - DEBUG=no
+      - SECRET_KEY=somesecret
+      - DATABASE_URL=
+      - STATIC_DIR=hyakumori_crm/static/hyakumori_crm/dist
+      - ALLOWED_HOSTS=crm-dev.52.199.18.56.nip.io
+      - CORS_ORIGIN_WHITELIST=https://crm-dev.52.199.18.56.nip.io,http://crm-dev.52.199.18.56.nip.io
+      - VUE_APP_GRAPHQL_HTTP=https://crm-dev.52.199.18.56.nip.io/graphql
+      - VUE_APP_REST_HTTP=https://crm-dev.52.199.18.56.nip.io/api/v1
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_HOST_USER=hyakumori.crm.dev@gmail.com
+      - EMAIL_HOST_PASSWORD=
+      - EMAIL_USE_TLS=yes
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.crm-dev.entrypoints=http"
+      - "traefik.http.routers.crm-dev.rule=Host(`crm-dev.52.199.18.56.nip.io`)"
+      #      - "traefik.http.middlewares.traefik-auth.basicauth.users="
+      - "traefik.http.middlewares.crm-dev-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.crm-dev.middlewares=crm-dev-https-redirect"
+      - "traefik.http.routers.crm-dev-secure.entrypoints=https"
+      - "traefik.http.routers.crm-dev-secure.rule=Host(`crm-dev.52.199.18.56.nip.io`)"
+      #      - "traefik.http.routers.crm-dev-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.crm-dev-secure.tls=true"
+      - "traefik.http.routers.crm-dev-secure.tls.certresolver=http"
+      - "traefik.http.routers.crm-dev-secure.service=crm-dev"
+      - "traefik.http.services.crm-dev.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external:
+      name: proxy
