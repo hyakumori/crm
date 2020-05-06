@@ -15,6 +15,7 @@ from rest_typed_views import Body, typed_action
 
 from .serializers import CustomTokenObtainPairSerializer
 from ..activity.services import ActivityService, UserActions
+from ..api.decorators import action_login_required
 from ..core.permissions import IsAdminOrSelf
 from ..core.utils import default_paginator, make_error_json, make_success_json
 from ..crm.restful.serializers import (
@@ -42,6 +43,7 @@ class CustomUserViewSet(UserViewSet):
         )
 
     @action(detail=False, url_path="minimal", methods=["get"])
+    @action_login_required(with_policies=["can_view_customers"])
     def list_minimal(self, request):
         queryset = self.get_queryset()
         keyword = request.GET.get("search")
