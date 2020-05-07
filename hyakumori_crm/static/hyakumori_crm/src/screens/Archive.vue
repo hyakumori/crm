@@ -12,20 +12,31 @@
       </page-header>
     </template>
     <template #section class="archives">
-      <search-card :onSearch="onSearchArchives" :search-criteria="headers" />
-      <data-list
-        :auto-headers="false"
-        :headers="headers"
-        :is-loading="isLoading"
-        :showSelect="true"
-        :data="data"
-        :tableRowIcon="pageIcon"
-        :serverItemsLength="totalItems"
-        @rowData="rowData"
-        @update:options="paginationHandler"
-        class="archives__data-section"
-        iconRowValue="id"
+      <search-card
+        :onSearch="onSearchArchives"
+        :search-criteria="headers"
+        ref="searchRef"
       />
+      <div class="archives__data-section">
+        <table-action
+          class="mb-4"
+          v-if="selectedRows.length > 0"
+          :selected-count="selectedRows.length"
+        />
+        <data-list
+          :auto-headers="false"
+          :headers="headers"
+          :is-loading="isLoading"
+          :showSelect="true"
+          :data="data"
+          :tableRowIcon="pageIcon"
+          :serverItemsLength="totalItems"
+          @rowData="rowData"
+          @update:options="paginationHandler"
+          @selectedRow="val => (selectedRows = val)"
+          iconRowValue="id"
+        />
+      </div>
     </template>
   </main-section>
 </template>
@@ -38,6 +49,7 @@ import ScreenMixin from "./ScreenMixin";
 import archive_header from "../assets/dump/archive_header.json";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
+import TableAction from "../components/TableAction";
 import { commonDatetimeFormat } from "../helpers/datetime";
 import { get as _get } from "lodash";
 
@@ -52,6 +64,7 @@ export default {
     DataList,
     PageHeader,
     OutlineRoundBtn,
+    TableAction,
   },
 
   data() {
@@ -60,6 +73,7 @@ export default {
       pageHeader: this.$t("page_header.archive_detail"),
       tableRowIcon: this.$t("icon.archive_icon"),
       data: [],
+      selectedRows: [],
       isLoading: false,
       totalItems: 0,
       next: null,
@@ -109,7 +123,25 @@ export default {
       }
       return "";
     },
-    async onSearchArchives() {},
+
+    async onSearchArchives() {
+      const searchData = this.$refs.searchRef.conditions;
+      const filter = searchData.map(data => {
+        return {
+          criteria: data.criteria,
+          keyword: data.keyword,
+        };
+      });
+      const queryString = this.arrayToQueryString(filter);
+      console.log(queryString);
+    },
+
+    arrayToQueryString(array) {
+      let result = "?";
+      array.forEach(data => (result += `${data.criteria}=${data.keyword}&`));
+      return result;
+    },
+
     async fetchArchives(api_url) {
       this.isLoading = true;
       const data = await this.$rest.get(api_url).then(res => res);

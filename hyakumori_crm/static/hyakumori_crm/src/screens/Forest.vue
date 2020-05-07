@@ -224,13 +224,6 @@ export default {
 .forest {
   &__data-section {
     overflow: hidden;
-
-    &__table-action ::v-deep {
-      .table-action__select {
-        height: 100%;
-        top: 20%;
-      }
-    }
   }
 }
 </style>
