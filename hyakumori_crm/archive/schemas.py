@@ -14,11 +14,12 @@ class ArchiveInput(HyakumoriDanticModel):
 
 class ArchiveFilter(HyakumoriDanticModel):
     id: str = None
-    short_id: str = None
+    sys_id: str = None
     archive_date: str = None
     title: str = None
     content: str = None
     author: str = None
+    location: str = None
     their_participants: str = None
     our_participants: str = None
     associated_forest: str = None

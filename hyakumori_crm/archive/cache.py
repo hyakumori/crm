@@ -5,7 +5,7 @@ from django.db.models.functions import Concat
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from hyakumori_crm.crm.models import Archive, Customer
+from hyakumori_crm.crm.models import Archive, Customer, Forest
 from hyakumori_crm.users.models import User
 
 
@@ -17,6 +17,11 @@ def refresh_user_participants_cache(archive: Archive, save=False):
                 .archiveuser_set.all()
                 .annotate(full_name=Concat("user__last_name", Value(" "), "user__first_name"))
                 .values("user_id", "full_name")))
+
+    archive.attributes["user_cache"]["repr"] = ",".join(list(map(
+        lambda c: c["full_name"],
+        archive.attributes["user_cache"]["list"])))
+
     if save:
         archive.save()
 
@@ -29,7 +34,12 @@ def refresh_forest_cache(archive: Archive, save=False):
         list=list(
             archive
                 .archiveforest_set.all()
-                .values("forest__internal_id")))
+                .values("forest__internal_id")),
+    )
+    archive.attributes["forest_cache"]["repr"] = ",".join(list(map(
+        lambda c: c["forest__internal_id"],
+        archive.attributes["forest_cache"]["list"])))
+
     if save:
         archive.save()
 
@@ -40,8 +50,13 @@ def refresh_customers_cache(archive: Archive, save=False):
     archive.attributes["customer_cache"] = dict(
         count=archive.archivecustomer_set.count(),
         list=list(
-            archive.archivecustomer_set.all().values(
-                "customer__id", "customer__name_kanji", "customer__name_kana", )))
+            archive.archivecustomer_set.all()
+                .values(
+                "customer__id", "customer__name_kanji", "customer__name_kana")))
+    archive.attributes["customer_cache"]["repr"] = ",".join(list(map(
+        lambda c: c["customer__name_kanji"]["last_name"] + " " + c["customer__name_kanji"]["first_name"],
+        archive.attributes["customer_cache"]["list"])))
+
     if save:
         archive.save()
 
@@ -63,7 +78,7 @@ def update_customer_cache(sender, instance, created, **kwargs):
             for archivecustomer in instance.archivecustomer_set.iterator():
                 refresh_customers_cache(archivecustomer.archive, save=True)
         except:
-            logging.warning(f"could not refresh customer cache for archive {instance.pk}")
+            logging.warning(f"could not refresh customer cache for archive, customer: {instance.pk}")
             pass
 
 
@@ -74,5 +89,16 @@ def update_user_cache(sender, instance, created, **kwargs):
             for archiveuser in instance.archiveuser_set.iterator():
                 refresh_user_participants_cache(archiveuser.archive, save=True)
         except:
-            logging.warning(f"could not refresh user cache for archive {instance.pk}")
+            logging.warning(f"could not refresh user cache for archive, customer: {instance.pk}")
+            pass
+
+
+@receiver(post_save, sender=Forest)
+def update_forest_cache(sender, instance, created, **kwargs):
+    if not created:
+        try:
+            for archiveforest in instance.archiveforest_set.iterator():
+                refresh_forest_cache(archiveforest.archive, save=True)
+        except:
+            logging.warning(f"could not refresh forest cache for archive, customer: {instance.pk}")
             pass
