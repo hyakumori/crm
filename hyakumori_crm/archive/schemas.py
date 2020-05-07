@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
+from functools import reduce
 
 from django.utils.translation import gettext_lazy as _
 from pydantic import validator, root_validator
@@ -55,6 +56,20 @@ class ArchiveCustomerInput(HyakumoriDanticModel):
 
     @root_validator(pre=True)
     def inject_archive(cls, values):
+        added = values.get("added")
+        if added is not None:
+            added_uniq = reduce(lambda l, x: l if x in l else l + [x], added, [])
+            if len(added_uniq) < len(added):
+                raise ValueError("Some of adding customer-contact pairs are duplicated")
+
+        deleted = values.get("deleted")
+        if deleted is not None:
+            deleted_uniq = reduce(lambda l, x: l if x in l else l + [x], deleted, [])
+            if len(deleted_uniq) < len(deleted):
+                raise ValueError(
+                    "Some of deleting customer-contact pairs are duplicated"
+                )
+
         if not values.get("archive"):
             return values
         cls.archive = values["archive"]
@@ -63,20 +78,15 @@ class ArchiveCustomerInput(HyakumoriDanticModel):
     @validator("deleted", each_item=True)
     def check_deleted(cls, v):
         try:
-            contact = Contact.objects.get(id=v.contact_id)
-        except Contact.DoesNotExist:
-            raise ValueError(_("Contact {} not found").format(v.contact_id))
-        if v.customer_id:
-            try:
-                cc = contact.customercontact_set.get(customer_id=v.customer_id)
-            except CustomerContact.DoesNotExist:
-                raise ValueError(_("Customer {} not found").format(v.customer_id))
-        else:
-            try:
-                cc = contact.customercontact_set.get(is_basic=True)
+            if v.customer_id:
+                cc = CustomerContact.objects.get(
+                    customer_id=v.customer_id, contact_id=v.contact_id
+                )
+            else:
+                cc = CustomerContact.objects.get(is_basic=True, contact_id=v.contact_id)
                 v.customer_id = cc.customer_id
-            except CustomerContact.DoesNotExist:
-                raise ValueError(_("Contact {} not found").format(v.contact_id))
+        except CustomerContact.DoesNotExist:
+            raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
             ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
         except ArchiveCustomer.DoesNotExist:
@@ -90,18 +100,23 @@ class ArchiveCustomerInput(HyakumoriDanticModel):
     @validator("added", each_item=True)
     def check_added(cls, v):
         try:
-            contact = Contact.objects.get(id=v.contact_id)
-        except Contact.DoesNotExist:
+            if v.customer_id:
+                cc = CustomerContact.objects.get(
+                    customer_id=v.customer_id, contact_id=v.contact_id
+                )
+            else:
+                cc = CustomerContact.objects.get(is_basic=True, contact_id=v.contact_id)
+                v.customer_id = cc.customer_id
+        except CustomerContact.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
-        if v.customer_id:
-            try:
-                contact.customercontact_set.get(customer_id=v.customer_id)
-            except CustomerContact.DoesNotExist:
-                raise ValueError(_("Customer {} not found").format(v.customer_id))
+        try:
+            ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
+        except ArchiveCustomer.DoesNotExist:
+            pass
         else:
             try:
-                cc = contact.customercontact_set.get(is_basic=True)
-                v.customer_id = cc.customer_id
-            except CustomerContact.DoesNotExist:
-                raise ValueError(_("Contact {} not found").format(v.contact_id))
+                ac.archivecustomercontact_set.get(customercontact_id=cc.id)
+                raise ValueError(_("Contact {} already exists").format(v.contact_id))
+            except ArchiveCustomerContact.DoesNotExist:
+                pass
         return v

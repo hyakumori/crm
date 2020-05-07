@@ -207,12 +207,17 @@ def add_participants(archive: Archive, data: ArchiveCustomerInput):
         cc = CustomerContact.objects.get(
             customer_id=item.customer_id, contact_id=item.contact_id
         )
-        if not cc.is_basic:
-            cc.archivecustomercontact_set.filter(customercontact_id=cc.id).delete()
-        else:
-            ac = ArchiveCustomer.objects.get(
+        ac = (
+            ArchiveCustomer.objects.filter(
                 archive_id=archive.id, customer_id=item.customer_id
             )
+            .prefetch_related("archivecustomercontact_set")
+            .first()
+        )
+        cc.archivecustomercontact_set.filter(
+            customercontact_id=cc.id, archivecustomer_id=ac.id
+        ).delete()
+        if len(ac.archivecustomercontact_set.all()) == 0:
             ac.force_delete()
 
     archive.save(update_fields=["updated_at"])
