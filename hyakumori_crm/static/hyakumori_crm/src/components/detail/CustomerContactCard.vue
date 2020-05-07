@@ -6,7 +6,7 @@
     outlined
     active-class="selected"
     :ripple="mode != 'view'"
-    @click="$emit('click', card_id, index)"
+    @click="$emit('click', contact.id, index)"
   >
     <v-icon class="customer-contact-card__icon">{{
       $t("icon.customer_icon")

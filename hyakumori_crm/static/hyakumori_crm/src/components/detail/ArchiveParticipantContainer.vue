@@ -7,7 +7,13 @@
       :loading="isLoading"
       @toggleEdit="val => (isUpdate = val)"
     />
-    <customer-contact-list :contacts="participants" :isUpdate="isUpdate" />
+    <customer-contact-list
+      :contacts="tempParticipants"
+      :isUpdate="isUpdate"
+      :showRelationshipSelect="false"
+      @deleteContact="handleDelete"
+      @undoDeleteContact="handleUndoDelete"
+    />
     <addition-button
       ref="addBtn"
       class="my-2"
@@ -29,10 +35,10 @@
           @click="
             (cId, inx) => {
               modalSelectingContactId = cId;
-              modalSelectingContactIndex = inx;
+              xx = inx;
             }
           "
-          v-for="(item, indx) in participantsForAdding"
+          v-for="(item, indx) in contactsForAdding.results || []"
           :key="item.id"
           :card_id="item.id"
           :contact="item"
@@ -79,7 +85,9 @@ export default {
     CustomerContactCard,
   },
   props: {
+    id: { type: String },
     participants: { type: Array, default: () => [] },
+    selectingCustomerId: { type: String },
   },
   created() {
     this.debounceLoadInitContactsForAdding = debounce(
@@ -94,21 +102,77 @@ export default {
       contactsForAdding: {},
       saving: false,
       modalSelectingContactId: null,
-      modalSelectingContactInde: null,
+      modalSelectingContactIndex: null,
       showSelect: false,
+      contactsToAdd: [],
+      contactsToDelete: [],
     };
   },
   computed: {
-    saveDisabled() {
-      return true;
+    tempParticipants() {
+      return [...this.participants, ...this.contactsToAdd];
     },
-    participantsForAdding() {
-      return this.contactsForAdding.results || [];
+    saveDisabled() {
+      return (
+        this.contactsToAdd.length === 0 && this.contactsToDelete.length === 0
+      );
+    },
+    contactsToAddData() {
+      return this.contactsToAdd.map(c => ({
+        contact_id: c.id,
+        customer_id: c.customer_id,
+      }));
+    },
+    contactsToDeleteData() {
+      return this.contactsToDelete.map(c => ({
+        contact_id: c.id,
+        customer_id: c.customer_id,
+      }));
     },
   },
   methods: {
-    handleSave() {},
-    handleAdd() {},
+    async handleSave() {
+      try {
+        this.saving = true;
+        await this.$rest.put(`/archives/${this.id}/customers`, {
+          added: this.contactsToAddData,
+          deleted: this.contactsToDeleteData,
+        });
+        this.$emit("saved");
+        this.saving = false;
+        this.contactsToDelete = [];
+        this.contactsToAdd = [];
+      } catch (error) {
+        this.saving = false;
+      }
+    },
+    handleAdd() {
+      const item = this.contactsForAdding.results.splice(
+        this.modalSelectingContactIndex,
+        1,
+      )[0];
+      item.added = true;
+      this.contactsToAdd.push(item);
+      this.modalSelectingContactIndex = null;
+      this.modalSelectingContactId = null;
+      // side-effect
+      if (this.contactsForAdding.length < 3) {
+        this.handleLoadMore();
+      }
+    },
+    handleDelete(contact) {
+      if (contact.added) {
+        delete contact.added;
+        this.contactsToAdd = reject(this.contactsToAdd, { id: contact.id });
+      } else {
+        this.$set(contact, "deleted", true);
+        this.contactsToDelete.push(contact);
+      }
+    },
+    handleUndoDelete(contact) {
+      this.$set(contact, "deleted", undefined);
+      this.contactsToDelete = reject(this.contactsToDelete, { id: contact.id });
+    },
     async handleLoadMore() {
       if (!this.contactsForAdding.next && this.loadContacts) return;
       this.loadContacts = true;
@@ -122,7 +186,10 @@ export default {
     },
     async loadInitContacts(keyword) {
       this.loadContacts = true;
-      this.contactsForAdding = await this.$rest.get("/contacts", {
+      const url = this.selectingCustomerId
+        ? `/customers/${this.selectingCustomerId}/contacts`
+        : "/contacts?is_basic=true";
+      this.contactsForAdding = await this.$rest.get(url, {
         params: {
           search: keyword || "",
         },
@@ -131,9 +198,18 @@ export default {
     },
   },
   watch: {
-    async showSelect(val) {
+    showSelect(val) {
       if (val && !this.contactsForAdding.next) {
-        await this.loadInitContacts();
+        this.loadInitContacts();
+      }
+    },
+    isUpdate(val) {
+      if (!val) {
+        this.contactsToAdd.length > 0 && (this.contactsToAdd = []);
+        for (let contactToDelete of this.contactsToDelete) {
+          this.$set(contactToDelete, "deleted", undefined);
+        }
+        this.contactsToDelete.length > 0 && (this.contactsToDelete = []);
       }
     },
   },

@@ -13,7 +13,9 @@
         :added="contact.added"
         :deleted="contact.deleted"
         :showRelationshipSelect="showRelationshipSelect"
-        @click="(card_id, indx) => isUpdate && $emit('selected', card_id, indx)"
+        @click="
+          (contact_id, indx) => isUpdate && $emit('selected', contact_id, indx)
+        "
         @toggleDefault="handleToggleCustomerDefault"
         @toggleContactDefault="handleToggleContactDefault"
         @relationshipChange="handleRelationshipChange"

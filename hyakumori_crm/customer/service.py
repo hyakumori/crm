@@ -277,7 +277,7 @@ def update_banking(data):
     return customer
 
 
-def contacts_list_with_search(search_str: str = None):
+def contacts_list_with_search(search_str: str = None, is_basic=False):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
         .values("id", "customer_id")
@@ -286,6 +286,10 @@ def contacts_list_with_search(search_str: str = None):
     queryset = Contact.objects.annotate(
         forests_count=Subquery(cc.values("forests_count")[:1])
     ).all()
+    if is_basic:
+        queryset = queryset.filter(customercontact__is_basic=True).annotate(
+            customer_id=F("customercontact__customer_id")
+        )
     if search_str:
         queryset = queryset.filter(
             Q(name_kanji__first_name__icontains=search_str)
