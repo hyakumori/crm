@@ -203,7 +203,7 @@ export default {
       return this.isUpdate ? "mdi-close" : "mdi-chevron-right";
     },
     selected() {
-      return this.selectedId === this.card_id;
+      return this.selectedId === this.contact.id;
     },
     relationshipType() {
       return this.isContactor ? this.contact.cc_attrs?.relationship_type : "";

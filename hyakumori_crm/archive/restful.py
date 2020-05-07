@@ -11,12 +11,12 @@ from hyakumori_crm.crm.common.utils import EncryptError, encrypt_string
 from .cache import refresh_single_archive_cache
 from .schemas import ArchiveFilter, ArchiveInput, ArchiveCustomerInput
 from .service import (
-    add_related_customer,
     add_related_forest,
     add_related_user,
     create_archive,
     create_attachment,
     delete_attachment_file,
+    add_participants,
     delete_related_customer,
     delete_related_forest,
     delete_related_user,
@@ -180,7 +180,7 @@ def archive_customers(
         participants = get_participants(archive)
         return Response(ContactSerializer(participants, many=True).data)
     elif request.method == "PUT":
-        customers = add_related_customer(archive, data)
+        customers = add_participants(archive, data)
         ActivityService.log(
             ArchiveActions.customer_participants_updated, archive, request=request
         )

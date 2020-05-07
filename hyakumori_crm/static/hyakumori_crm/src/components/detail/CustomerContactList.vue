@@ -21,6 +21,7 @@
         @relationshipChange="handleRelationshipChange"
         :selectedId="selectingId"
         :customerName="getCustomerName(contact.customer_id)"
+        :mode="mode"
       />
     </v-col>
   </v-row>
@@ -44,6 +45,7 @@ export default {
     showRelationshipSelect: { type: Boolean, default: true },
     selectingId: String,
     customerIdNameMap: Object,
+    mode: String,
   },
   methods: {
     getCustomerName(customer_id) {

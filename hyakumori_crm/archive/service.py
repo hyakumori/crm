@@ -166,27 +166,30 @@ def is_archive_customer_exist(archive_pk, customer_pk):
 
 
 def get_participants(archive: Archive):
-    return Contact.objects.filter(
-        customercontact__archivecustomercontact__archivecustomer__archive_id=archive.id
-    ).annotate(
-        customer_id=F(
-            "customercontact__archivecustomercontact__archivecustomer__customer_id"
+    return (
+        Contact.objects.filter(
+            customercontact__archivecustomercontact__archivecustomer__archive_id=archive.id
         )
+        .annotate(
+            customer_id=F(
+                "customercontact__archivecustomercontact__archivecustomer__customer_id"
+            )
+        )
+        .annotate(is_basic=F("customercontact__is_basic"))
     )
 
 
-def add_related_customer(archive: Archive, data: ArchiveCustomerInput):
-    acs = []
+def add_participants(archive: Archive, data: ArchiveCustomerInput):
     accs = []
     for item in data.added:
-        ac = ArchiveCustomer(archive_id=archive.id, customer_id=item.customer_id)
-        acs.append(ac)
-        cc, _ = CustomerContact.objects.get_or_create(
+        cc = CustomerContact.objects.get(
             customer_id=item.customer_id, contact_id=item.contact_id
+        )
+        ac, _ = ArchiveCustomer.objects.get_or_create(
+            archive_id=archive.id, customer_id=item.customer_id
         )
         acc = ArchiveCustomerContact(archivecustomer_id=ac.id, customercontact_id=cc.id)
         accs.append(acc)
-    ArchiveCustomer.objects.bulk_create(acs)
     ArchiveCustomerContact.objects.bulk_create(accs)
 
     for item in data.deleted:
@@ -194,7 +197,7 @@ def add_related_customer(archive: Archive, data: ArchiveCustomerInput):
             customer_id=item.customer_id, contact_id=item.contact_id
         )
         if not cc.is_basic:
-            ac.archivecustomercontact_set.filter(customercontact_id=cc.id).delete()
+            cc.archivecustomercontact_set.filter(customercontact_id=cc.id).delete()
         else:
             ac = ArchiveCustomer.objects.get(
                 archive_id=archive.id, customer_id=item.customer_id
