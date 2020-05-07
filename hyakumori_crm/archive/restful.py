@@ -7,22 +7,21 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
-from .schemas import ArchiveInput
-from .service import create_archive, get_archive_by_pk, edit_archive, get_all_attachments_by_archive_pk, \
-    create_attachment, get_attachment_by_pk, delete_attachment_file, get_related_forests, add_related_forest, \
-    delete_related_forest, get_related_customer, add_related_customer, delete_related_customer, add_related_user, \
-    delete_related_user, refresh_single_archive_cache
-from .utils import encrypt_string, EncryptError
+from hyakumori_crm.crm.common.utils import EncryptError, encrypt_string
+from .cache import refresh_single_archive_cache
+from .schemas import ArchiveFilter, ArchiveInput
+from .service import add_related_customer, add_related_forest, add_related_user, create_archive, create_attachment, \
+    delete_attachment_file, delete_related_customer, delete_related_forest, delete_related_user, edit_archive, \
+    get_all_attachments_by_archive_pk, get_archive_by_pk, get_attachment_by_pk, get_filtered_archive_ids, \
+    get_related_customer, \
+    get_related_forests
 from ..activity.services import ActivityService, ArchiveActions
-from ..api.decorators import (
-    api_validate_model,
-    get_or_404,
-    action_login_required)
+from ..api.decorators import (action_login_required, api_validate_model, get_or_404)
 from ..core.utils import default_paginator, make_error_json
 from ..crm.models import Archive, Attachment
 from ..crm.restful.paginations import ListingPagination
 from ..crm.restful.serializers import ArchiveListingSerializer, ArchiveSerializer, AttachmentSerializer, \
-    ForestSerializer, CustomerSerializer, ForestListingSerializer
+    CustomerSerializer, ForestListingSerializer
 from ..users.models import User
 from ..users.serializers import UserSerializer
 
@@ -33,9 +32,14 @@ from ..users.serializers import UserSerializer
 def archives(request, data: ArchiveInput = None):
     if request.method == 'GET':
         paginator_listing = ListingPagination()
+        in_ids = get_filtered_archive_ids(ArchiveFilter(**request.GET.dict()))
+        if len(in_ids) > 0:
+            queryset = Archive.objects.filter(pk__in=in_ids)
+        else:
+            queryset = Archive.objects.all()
         paged_list = paginator_listing.paginate_queryset(
             request=request,
-            queryset=Archive.objects.all().order_by("-created_at")
+            queryset=queryset.order_by("-created_at")
         )
         return paginator_listing.get_paginated_response(ArchiveListingSerializer(paged_list, many=True).data)
     else:
@@ -48,7 +52,7 @@ def archives(request, data: ArchiveInput = None):
 @api_view(["POST"])
 @get_or_404(get_archive_by_pk, to_name='archive', pass_to=["kwargs", "request"], remove=True)
 @action_login_required(with_permissions=["view_archive", "add_archive"])
-def reload_cache(request, *,  archive: Archive = None):
+def reload_cache(request, *, archive: Archive = None):
     refresh_single_archive_cache(archive)
     return Response()
 

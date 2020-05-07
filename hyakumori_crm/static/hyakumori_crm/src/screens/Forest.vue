@@ -223,6 +223,7 @@ export default {
 <style lang="scss" scoped>
 .forest {
   &__data-section {
+    flex: 1;
     overflow: hidden;
   }
 }

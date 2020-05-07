@@ -8,7 +8,7 @@ from rest_framework.request import Request
 
 from hyakumori_crm.crm.models import Attachment
 from .cache import *
-from .schemas import ArchiveInput
+from .schemas import ArchiveFilter, ArchiveInput
 from ..crm.models.customer import Customer
 from ..crm.models.forest import Forest
 from ..crm.models.relations import ArchiveForest, ArchiveCustomer, ArchiveUser
@@ -214,10 +214,14 @@ def delete_related_user(archive: Archive, data: dict):
     refresh_user_participants_cache(archive, True)
     return True
 
+def get_filtered_archive_ids(archive_filter: ArchiveFilter):
+    archive_filter = archive_filter.dict()
+    active_filters = dict()
+    for k, v in archive_filter.items():
+        if v is not None:
+            active_filters[k] = v
 
-def refresh_single_archive_cache(archive: Archive):
-    refresh_customers_cache(archive, save=False)
-    refresh_user_participants_cache(archive, save=False)
-    refresh_forest_cache(archive, save=False)
-    archive.save(update_fields=["attributes", "updated_at"])
-    return archive
+    if len(active_filters.keys()) > 0:
+        pass
+
+    return []

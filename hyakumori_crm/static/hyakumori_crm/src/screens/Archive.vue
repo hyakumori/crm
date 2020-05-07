@@ -32,6 +32,7 @@
           :tableRowIcon="pageIcon"
           :serverItemsLength="totalItems"
           @rowData="rowData"
+          :options.sync="options"
           @update:options="paginationHandler"
           @selectedRow="val => (selectedRows = val)"
           iconRowValue="id"
@@ -79,6 +80,8 @@ export default {
       next: null,
       previous: null,
       currentPage: 1,
+      filterQueryString: "",
+      options: {},
     };
   },
 
@@ -132,16 +135,18 @@ export default {
           keyword: data.keyword,
         };
       });
-      const queryString = this.arrayToQueryString(filter);
-      console.log(queryString);
+      this.filterQueryString = this.arrayToQueryString(filter);
+      const api_url = `/archives?page_size=${this.options.itemsPerPage}&${this.filterQueryString}`;
+      this.fetchArchives(api_url);
     },
 
-    arrayToQueryString(array) {
-      let result = "?";
-      array.forEach(data => (result += `${data.criteria}=${data.keyword}&`));
+    arrayToQueryString(filters) {
+      let result = "";
+      filters
+        .filter(item => item.keyword && item.criteria)
+        .forEach(item => (result += `${item.criteria}=${item.keyword}&`));
       return result;
     },
-
     async fetchArchives(api_url) {
       this.isLoading = true;
       const data = await this.$rest.get(api_url).then(res => res);
@@ -174,7 +179,7 @@ export default {
         this.currentPage = val.page;
         this.fetchArchives(this.previous);
       } else {
-        const api_url = `/archives?page_size=${val.itemsPerPage}`;
+        const api_url = `/archives?page_size=${val.itemsPerPage}&${this.filterQueryString}`;
         this.fetchArchives(api_url);
       }
     },
@@ -185,12 +190,22 @@ export default {
       return archive_header;
     },
   },
+
+  watch: {
+    options: {
+      async handler(val, old) {
+        const { sortBy, sortDesc, page, itemsPerPage } = val;
+      },
+      deep: true,
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .archives {
   &__data-section {
+    flex: 1;
     margin-left: 29px;
   }
 }
