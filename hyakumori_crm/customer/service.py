@@ -1,3 +1,4 @@
+import logging
 from typing import Iterator, Union
 from uuid import UUID
 
@@ -7,19 +8,17 @@ from django.utils.translation import gettext_lazy as _
 from querybuilder.query import Expression, Query
 
 from hyakumori_crm.core.models import RawSQLField
-from hyakumori_crm.crm.models import (Archive, Contact, Customer, CustomerContact, Forest, ForestCustomer,
-                                      ForestCustomerContact)
+from hyakumori_crm.crm.models import (
+    Archive,
+    Contact,
+    Customer,
+    CustomerContact,
+    Forest,
+    ForestCustomer,
+    ForestCustomerContact,
+)
 from .schemas import ContactType, CustomerInputSchema
-from ..archive.cache import refresh_single_archive_cache
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
-
-
-def get(pk):
-    # try:
-    #     return Customer.objects.get(pk=pk)
-    # except (Customer.DoesNotExist, ValidationError):
-    #     return None
-    return None
 
 
 def get_customer_by_pk(pk):
@@ -78,26 +77,26 @@ or concat(sc.postal_code, ' ', sc.address->>'sector', ' ',
 def get_customer_contacts(pk: UUID):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("id", "customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("id", "customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
     q = (
         Contact.objects.filter(
             customercontact__customer_id=pk, customercontact__is_basic=False,
         )
-            .annotate(
+        .annotate(
             forest_id=F(
                 "customercontact__forestcustomercontact__forestcustomer__forest_id"
             )
         )
-            .annotate(
+        .annotate(
             forestcustomer_id=F(
                 "customercontact__forestcustomercontact__forestcustomer_id"
             )
         )
-            .annotate(cc_attrs=F("customercontact__attributes"))
-            .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
-            .order_by("created_at")
+        .annotate(cc_attrs=F("customercontact__attributes"))
+        .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
+        .order_by("created_at")
     )
     return q
 
@@ -105,9 +104,9 @@ def get_customer_contacts(pk: UUID):
 def get_customer_forests(pk: UUID):
     return (
         Forest.objects.filter(forestcustomer__customer_id=pk)
-            .annotate(forestcustomer_id=F("forestcustomer__id"))
-            .prefetch_related("forestcustomer_set")
-            .order_by("created_at")
+        .annotate(forestcustomer_id=F("forestcustomer__id"))
+        .prefetch_related("forestcustomer_set")
+        .order_by("created_at")
     )
 
 
@@ -140,7 +139,7 @@ def get_list(
 
     representatives = (
         Query()
-            .from_table(
+        .from_table(
             {"contact": Contact},
             [
                 {
@@ -150,16 +149,16 @@ def get_list(
                 }
             ],
         )
-            .join(
+        .join(
             {"contact_rel": CustomerContact},
             condition="contact.id = contact_rel.contact_id",
         )
-            .where(Q(customer_id=Expression("c.id")))
-            .where(~Q(is_basic=Expression("true")))
-            .order_by(
+        .where(Q(customer_id=Expression("c.id")))
+        .where(~Q(is_basic=Expression("true")))
+        .order_by(
             "attributes->>'default'", table="contact_rel", desc=True, nulls_last=True
         )
-            .limit(1)
+        .limit(1)
     )
 
     tags_fields = get_tag_fields_for_query()
@@ -174,12 +173,12 @@ def get_list(
 
     query = (
         Query()
-            .from_table({"c": Customer}, fields=fields, )
-            .join(
+        .from_table({"c": Customer}, fields=fields,)
+        .join(
             {"self_contact_rel": CustomerContact},
             condition="c.id=self_contact_rel.customer_id and self_contact_rel.is_basic is true",
         )
-            .join(
+        .join(
             {"self_contact": Contact},
             condition="self_contact_rel.contact_id=self_contact.id",
             fields=[
@@ -252,16 +251,22 @@ def update_basic_info(data):
     self_contact.mobilephone = data.basic_contact.mobilephone
     self_contact.email = data.basic_contact.email
     self_contact.save()
-    # back saving
+
+    # cache saving for customer
     customer.name_kana = self_contact.name_kana
     customer.name_kanji = self_contact.name_kanji
     customer.address = self_contact.address
     customer.save(update_fields=["address", "name_kana", "name_kanji", "updated_at"])
-    # back saving forest
+
+    # cache saving for forest
     for forestcustomer in customer.forestcustomer_set.iterator():
-        forest = forestcustomer.forest
-        forest.owner["address"] = self_contact.address
-        forest.save(update_fields=["owner", "updated_at"])
+        try:
+            forest = forestcustomer.forest
+            forest.owner["address"] = self_contact.address
+            forest.save(update_fields=["owner", "updated_at"])
+        except:
+            logging.warning(f"could not saving latest user address in forest: {forestcustomer.forest.pk}")
+
     return customer
 
 
@@ -275,8 +280,8 @@ def update_banking(data):
 def contacts_list_with_search(search_str: str = None):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("id", "customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("id", "customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
     queryset = Contact.objects.annotate(
         forests_count=Subquery(cc.values("forests_count")[:1])
@@ -421,6 +426,6 @@ def get_customer_contacts_forests(pk):
     ).values("id")
     return (
         Forest.objects.filter(forestcustomer__customer_id__in=customers)
-            .prefetch_related("forestcustomer_set")
-            .order_by("created_at")
+        .prefetch_related("forestcustomer_set")
+        .order_by("created_at")
     )
