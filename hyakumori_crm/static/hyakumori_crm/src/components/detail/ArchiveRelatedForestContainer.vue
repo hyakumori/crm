@@ -123,7 +123,7 @@ export default {
     cancel() {
       this.isUpdate = false;
       this.relatedForests = this.immutableRelatedForest;
-      this.allForests = this.immutableAllForest;
+      this.allForests = cloneDeep(this.immutableAllForest);
     },
 
     async save() {

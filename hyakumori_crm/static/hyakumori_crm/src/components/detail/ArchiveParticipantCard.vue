@@ -58,7 +58,6 @@ export default {
     flat: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
-    delete: Function,
     index: Number,
   },
 

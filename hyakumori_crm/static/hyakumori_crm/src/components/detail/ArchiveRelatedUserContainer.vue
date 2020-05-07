@@ -53,7 +53,7 @@
         :saving="updateParticipantLoading"
         :save="updateParticipant.bind(this)"
         :saveDisabled="
-          addedParticipantIds.length === 0 && deletedParticipantIds.length === 0
+          addedParticipants.length === 0 && deletedParticipants.length === 0
         "
       />
     </template>
@@ -112,14 +112,16 @@ export default {
 
   methods: {
     handleToggleEdit(val) {
+      if (!this.isUpdate && this.relatedParticipants) {
+        this.immutableRelatedParticipants = cloneDeep(this.relatedParticipants);
+      }
       this.isUpdate = val;
-      this.immutableRelatedParticipants = cloneDeep(this.relatedParticipants);
     },
 
     cancel() {
       this.isUpdate = false;
-      this.relatedParticipants = this.immutableRelatedParticipants;
-      this.allParticipants = this.immutableAllParticipants;
+      this.relatedParticipants = cloneDeep(this.immutableRelatedParticipants);
+      this.allParticipants = cloneDeep(this.immutableAllParticipants);
     },
 
     async updateParticipant() {
@@ -135,36 +137,47 @@ export default {
     },
 
     async deleteParticipants() {
-      if (this.deletedParticipantIds.length > 0) {
+      if (this.deletedParticipants.length > 0) {
+        const deletedIds = this.deletedParticipants.map(p => p.id);
         const isDeleted = await this.$rest.delete(
           `/archives/${this.archive_id}/users`,
           {
             data: {
-              ids: this.deletedParticipantIds,
+              ids: deletedIds,
             },
           },
         );
         if (isDeleted) {
-          this.relatedParticipants = pullAllWith(
+          this.selectingParticipantId = null;
+          this.relatedParticipants = this.removeDuplicateParticipant(
             this.relatedParticipants,
-            this.deletedParticipantIds,
-            (p1, p2) => p1.id === p2,
+            this.deletedParticipants,
           );
+          const pureParticipants = cloneDeep(this.deletedParticipants);
+          pureParticipants.forEach(p => (p.deleted = false));
+          this.allParticipants.push(...pureParticipants);
+          this.immutableAllParticipants = cloneDeep(this.allParticipants);
         }
       }
     },
 
     async addParticipants() {
-      if (this.addedParticipantIds.length > 0) {
+      if (this.addedParticipants.length > 0) {
+        const addedIds = this.addedParticipants.map(p => p.id);
         const newParticipants = await this.$rest.post(
           `/archives/${this.archive_id}/users`,
-          { ids: this.addedParticipantIds },
+          { ids: addedIds },
         );
         if (newParticipants) {
           const tempParticipants = this.removeDuplicateParticipant(
             this.relatedParticipants,
             newParticipants.data,
           );
+          this.allParticipants = this.removeDuplicateParticipant(
+            this.allParticipants,
+            this.addedParticipants,
+          );
+          this.immutableAllParticipants = cloneDeep(this.allParticipants);
           tempParticipants.push(...newParticipants.data);
           this.relatedParticipants = tempParticipants;
         }
@@ -188,8 +201,12 @@ export default {
             res.results,
             this.relatedParticipants,
           );
-          this.allParticipants.push(...filteredParticipants);
-          this.immutableRelatedParticipants = filteredParticipants;
+          const allParticipants = this.removeDuplicateParticipant(
+            filteredParticipants,
+            this.allParticipants,
+          );
+          this.allParticipants.push(...allParticipants);
+          this.immutableAllParticipants = cloneDeep(this.allParticipants);
           this.next = res.next;
         });
       }
@@ -205,7 +222,7 @@ export default {
 
     addRelatedParticipant() {
       this.shown = true;
-      if (this.allParticipants.length === 0) {
+      if (this.allParticipants.length === 0 || this.next === "") {
         this.fetchAllParticipants();
       }
     },
@@ -263,21 +280,17 @@ export default {
   },
 
   computed: {
-    addedParticipantIds() {
+    addedParticipants() {
       return (
         this.relatedParticipants &&
-        this.relatedParticipants
-          .filter(participant => participant.added)
-          .map(participant => participant.id)
+        this.relatedParticipants.filter(participant => participant.added)
       );
     },
 
-    deletedParticipantIds() {
+    deletedParticipants() {
       return (
         this.relatedParticipants &&
-        this.relatedParticipants
-          .filter(participant => participant.deleted)
-          .map(participant => participant.id)
+        this.relatedParticipants.filter(participant => participant.deleted)
       );
     },
   },
