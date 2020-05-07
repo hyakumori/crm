@@ -209,7 +209,7 @@ export default {
             this.allParticipants,
           );
           this.allParticipants.push(...allParticipants);
-          this.immutableAllParticipants = cloneDeep(this.allParticipants);
+          this.immutableAllParticipants.push(...allParticipants);
           this.next = res.next;
         });
       }
@@ -298,16 +298,16 @@ export default {
     },
   },
 
-  // watch: {
-  //   allParticipants: {
-  //     deep: true,
-  //     handler(allParticipants) {
-  //       if (allParticipants.length === 3 && this.next !== null) {
-  //         this.handleLoadMore();
-  //       }
-  //     },
-  //   },
-  // },
+  watch: {
+    allParticipants: {
+      deep: true,
+      handler(allParticipants) {
+        if (allParticipants.length <= 3 && this.next !== null) {
+          this.handleLoadMore();
+        }
+      },
+    },
+  },
 };
 </script>
 

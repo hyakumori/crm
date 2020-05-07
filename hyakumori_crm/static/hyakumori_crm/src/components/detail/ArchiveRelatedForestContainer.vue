@@ -227,7 +227,7 @@ export default {
             this.allForests,
           );
           this.allForests.push(...allForests);
-          this.immutableAllForest = cloneDeep(this.allForests);
+          this.immutableAllForest.push(...allForests);
           this.next = response.next;
         }
       }
@@ -297,15 +297,15 @@ export default {
     },
   },
 
-  // watch: {
-  //   allForests: {
-  //     deep: true,
-  //     handler(allForests) {
-  //       if (allForests.length === 3 && this.next !== null) {
-  //         this.handleLoadMore();
-  //       }
-  //     },
-  //   },
-  // },
+  watch: {
+    allForests: {
+      deep: true,
+      handler(allForests) {
+        if (allForests.length <= 3 && this.next !== null) {
+          this.handleLoadMore();
+        }
+      },
+    },
+  },
 };
 </script>
