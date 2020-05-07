@@ -3,6 +3,7 @@ from urllib import parse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db.models import F
+from django.db.models.expressions import RawSQL
 from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
 from rest_framework.request import Request
@@ -176,6 +177,16 @@ def get_participants(archive: Archive):
             )
         )
         .annotate(is_basic=F("customercontact__is_basic"))
+        .annotate(
+            customer_name_kanji=RawSQL(
+                """(select C0.name_kanji
+from crm_contact C0
+join crm_customercontact CC0
+on C0.id = CC0.contact_id and CC0.is_basic = true
+where CC0.customer_id = crm_customercontact.customer_id)""",
+                params=[],
+            )
+        )
     )
 
 

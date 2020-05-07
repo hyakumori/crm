@@ -40,6 +40,7 @@ from ..crm.restful.serializers import (
     ForestSerializer,
     ContactSerializer,
     ForestListingSerializer,
+    CustomerContactSerializer,
 )
 from ..users.models import User
 from ..users.serializers import UserSerializer
@@ -178,7 +179,7 @@ def archive_customers(
 ):
     if request.method == "GET":
         participants = get_participants(archive)
-        return Response(ContactSerializer(participants, many=True).data)
+        return Response(CustomerContactSerializer(participants, many=True).data)
     elif request.method == "PUT":
         customers = add_participants(archive, data)
         ActivityService.log(

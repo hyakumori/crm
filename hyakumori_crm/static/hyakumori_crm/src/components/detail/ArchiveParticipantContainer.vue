@@ -13,9 +13,7 @@
       :showRelationshipSelect="false"
       @deleteContact="handleDelete"
       @undoDeleteContact="handleUndoDelete"
-      @selected="handleContactCardSelect"
-      :selectingId="selectingContactId"
-      :mode="isUpdate ? 'edit' : 'view'"
+      :customerIdNameMap="customerIdNameMap"
     />
     <addition-button
       ref="addBtn"
@@ -42,15 +40,21 @@
             }
           "
           v-for="(item, indx) in contactsForAdding.results || []"
-          :key="item.id"
+          :key="`${indx},${item.id}`"
           :card_id="item.id"
           :contact="item"
           :showAction="false"
           :index="indx"
           :selectedId="modalSelectingContactId"
+          :selectedIndex="modalSelectingContactIndex"
           flat
           mode="search"
           :showRelationshipSelect="false"
+          :customerName="
+            (!item.is_basic &&
+              `${item.customer_name_kanji.last_name} ${item.customer_name_kanji.first_name}`) ||
+              ''
+          "
         />
       </template>
     </select-list-modal>
@@ -110,6 +114,7 @@ export default {
       contactsToDelete: [],
       selectingContactId: null,
       selectingCustomerId: null,
+      customerIdNameMap: {},
     };
   },
   computed: {
@@ -134,7 +139,9 @@ export default {
       }));
     },
     contactIdsMap() {
-      return Object.fromEntries(this.tempParticipants.map(c => [c.id, true]));
+      return Object.fromEntries(
+        this.tempParticipants.map(c => [`${c.id},${c.customer_id}`, true]),
+      );
     },
   },
   methods: {
@@ -159,6 +166,7 @@ export default {
         this.saving = false;
         this.contactsToDelete = [];
         this.contactsToAdd = [];
+        this.loadInitContacts();
       } catch (error) {
         this.saving = false;
       }
@@ -168,6 +176,11 @@ export default {
         this.modalSelectingContactIndex,
         1,
       )[0];
+      this.$set(
+        this.customerIdNameMap,
+        item.customer_id,
+        item.customer_name_kanji,
+      );
       item.added = true;
       if (this.selectingCustomerId) {
         item.customer_id = this.selectingCustomerId;
@@ -183,7 +196,10 @@ export default {
     handleDelete(contact) {
       if (contact.added) {
         delete contact.added;
-        this.contactsToAdd = reject(this.contactsToAdd, { id: contact.id });
+        this.contactsToAdd = reject(this.contactsToAdd, {
+          id: contact.id,
+          customer_id: contact.customer_id,
+        });
       } else {
         this.$set(contact, "deleted", true);
         this.contactsToDelete.push(contact);
@@ -191,7 +207,10 @@ export default {
     },
     handleUndoDelete(contact) {
       this.$set(contact, "deleted", undefined);
-      this.contactsToDelete = reject(this.contactsToDelete, { id: contact.id });
+      this.contactsToDelete = reject(this.contactsToDelete, {
+        id: contact.id,
+        customer_id: contact.customer_id,
+      });
     },
     async handleLoadMore() {
       if (!this.contactsForAdding.next || this.loadContacts) return;
@@ -202,17 +221,17 @@ export default {
         previous: resp.previous,
         results: [
           ...this.contactsForAdding.results,
-          ...reject(resp.results, c => !!this.contactIdsMap[c.id]),
+          ...reject(
+            resp.results,
+            c => !!this.contactIdsMap[`${c.id},${c.customer_id}`],
+          ),
         ],
       };
       this.loadContacts = false;
     },
     async loadInitContacts(keyword) {
       this.loadContacts = true;
-      const url = this.selectingCustomerId
-        ? `/customers/${this.selectingCustomerId}/contacts`
-        : "/contacts?is_basic=true";
-      const resp = await this.$rest.get(url, {
+      const resp = await this.$rest.get("/customercontacts", {
         params: {
           search: keyword || "",
         },
@@ -220,7 +239,10 @@ export default {
       this.contactsForAdding = {
         next: resp.next,
         previous: resp.previous,
-        results: reject(resp.results, c => !!this.contactIdsMap[c.id]),
+        results: reject(
+          resp.results,
+          c => !!this.contactIdsMap[`${c.id},${c.customer_id}`],
+        ),
       };
       this.loadContacts = false;
     },
@@ -242,6 +264,13 @@ export default {
     },
     selectingCustomerId(val) {
       this.loadInitContacts();
+    },
+    participants(val) {
+      const customerIdNameMap = {};
+      for (let c of val) {
+        customerIdNameMap[c.customer_id] = c.customer_name_kanji;
+      }
+      this.customerIdNameMap = customerIdNameMap;
     },
   },
 };

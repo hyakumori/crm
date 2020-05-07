@@ -127,6 +127,7 @@ export default {
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
     selectedId: String,
+    selectedIndex: Number,
     index: Number,
     handleDeleteClick: Function,
     mode: { type: String, default: "view" },
@@ -203,7 +204,9 @@ export default {
       return this.isUpdate ? "mdi-close" : "mdi-chevron-right";
     },
     selected() {
-      return this.selectedId === this.contact.id;
+      return (
+        this.selectedId === this.contact.id && this.selectedIndex === this.index
+      );
     },
     relationshipType() {
       return this.isContactor ? this.contact.cc_attrs?.relationship_type : "";
