@@ -213,3 +213,11 @@ def delete_related_user(archive: Archive, data: dict):
             continue
     refresh_user_participants_cache(archive, True)
     return True
+
+
+def refresh_single_archive_cache(archive: Archive):
+    refresh_customers_cache(archive, save=False)
+    refresh_user_participants_cache(archive, save=False)
+    refresh_forest_cache(archive, save=False)
+    archive.save(update_fields=["attributes", "updated_at"])
+    return archive

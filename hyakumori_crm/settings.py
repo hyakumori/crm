@@ -113,7 +113,6 @@ DATABASES = {
     "default": dict(
         **dj_database_url.parse(
             urllib.parse.quote(os.environ.get("DATABASE_URL"), ":/@"),
-
         ),
         # ATOMIC REQUESTS
         # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#tying-transactions-to-http-requests

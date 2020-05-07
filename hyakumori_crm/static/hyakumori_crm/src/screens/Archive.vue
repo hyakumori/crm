@@ -39,6 +39,7 @@ import archive_header from "../assets/dump/archive_header.json";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
 import { commonDatetimeFormat } from "../helpers/datetime";
+import { get as _get } from "lodash";
 
 export default {
   name: "archive",
@@ -68,6 +69,46 @@ export default {
   },
 
   methods: {
+    renderParticipants(data) {
+      const list = _get(data, "attributes.customer_cache.list", []);
+      if (list.length > 0) {
+        let results = _get(list[0], "customer__name_kanji.last_name", "");
+        results += _get(list[0], "customer__name_kanji.first_name", "");
+        if (list.length > 1) {
+          results +=
+            " " +
+            this.$t("tables.another_item_human", { count: list.length - 1 });
+        }
+        return results;
+      }
+      return "";
+    },
+    renderUsers(data) {
+      const list = _get(data, "attributes.user_cache.list", []);
+      if (list.length > 0) {
+        let results = _get(list[0], "full_name", "");
+        if (list.length > 1) {
+          results +=
+            " " +
+            this.$t("tables.another_item_human", { count: list.length - 1 });
+        }
+        return results;
+      }
+      return "";
+    },
+    renderForests(data) {
+      const list = _get(data, "attributes.forest_cache.list", []);
+      if (list.length > 0) {
+        let results = _get(list[0], "forest__internal_id", "");
+        if (list.length > 1) {
+          results +=
+            " " +
+            this.$t("tables.another_item_thing", { count: list.length - 1 });
+        }
+        return results;
+      }
+      return "";
+    },
     async onSearchArchives() {},
     async fetchArchives(api_url) {
       this.isLoading = true;
@@ -78,12 +119,14 @@ export default {
       this.isLoading = false;
       this.data = data.results.map(data => ({
         id: data.id,
+        short_id: data.id.substr(0, 8),
         archive_date: commonDatetimeFormat(data.archive_date),
         title: data.title,
         content: data.content,
-        their_participants: "",
-        our_participants: "",
-        associated_forest: "",
+        author: data.author_name,
+        their_participants: this.renderParticipants(data),
+        our_participants: this.renderUsers(data),
+        associated_forest: this.renderForests(data),
       }));
     },
 
