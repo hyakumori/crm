@@ -97,7 +97,6 @@ def update_customer_cache(sender, instance, created, **kwargs):
             logging.warning(
                 f"could not refresh customer cache for archive, customer: {instance.pk}"
             )
-            pass
 
 
 @receiver(post_save, sender=User)
@@ -110,7 +109,6 @@ def update_user_cache(sender, instance, created, **kwargs):
             logging.warning(
                 f"could not refresh user cache for archive, user: {instance.pk}"
             )
-            pass
 
 
 @receiver(post_save, sender=Forest)
@@ -123,4 +121,3 @@ def update_forest_cache(sender, instance, created, **kwargs):
             logging.warning(
                 f"could not refresh forest cache for archive, forest: {instance.pk}"
             )
-            pass

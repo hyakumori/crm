@@ -26,7 +26,6 @@ from hyakumori_crm.permissions.enums import SystemGroups
 from .types import UserUpdateInput
 from ..activity.constants import UserActions
 from ..activity.services import ActivityService
-from ..archive.cache import refresh_single_archive_cache
 
 
 def _is_user_self(request, instance):
