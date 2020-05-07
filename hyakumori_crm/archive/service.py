@@ -6,7 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
 from rest_framework.request import Request
 
-from hyakumori_crm.crm.models import Archive, Attachment
+from hyakumori_crm.crm.models import Attachment
+from .cache import *
 from .schemas import ArchiveInput
 from ..crm.models.customer import Customer
 from ..crm.models.forest import Forest
@@ -117,6 +118,7 @@ def add_related_forest(archive: Archive, data: dict):
             archive_forest.forest_id = forest.id
             archive_forest.save()
             forests.append(forest)
+    refresh_forest_cache(archive, save=True)
     return forests
 
 
@@ -130,6 +132,7 @@ def delete_related_forest(archive: Archive, data: dict):
             archive_forest.delete()
         else:
             continue
+    refresh_forest_cache(archive, save=True)
     return True
 
 
@@ -156,6 +159,7 @@ def add_related_customer(archive: Archive, data: dict):
             archive_customer.customer_id = customer.id
             archive_customer.save()
             customers.append(customer)
+    refresh_customers_cache(archive, save=True)
     return customers
 
 
@@ -170,6 +174,7 @@ def delete_related_customer(archive: Archive, data: dict):
             archive_customer.delete()
         else:
             continue
+    refresh_customers_cache(archive, save=True)
     return True
 
 
@@ -192,6 +197,7 @@ def add_related_user(archive: Archive, data: dict):
             archive_user.user_id = user.id
             archive_user.save()
             users.append(user)
+    refresh_user_participants_cache(archive, True)
     return users
 
 
@@ -205,4 +211,5 @@ def delete_related_user(archive: Archive, data: dict):
             archive_user.delete()
         else:
             continue
+    refresh_user_participants_cache(archive, True)
     return True

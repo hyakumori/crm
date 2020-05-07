@@ -12,7 +12,7 @@
       </page-header>
     </template>
     <template #section class="archives">
-      <search-card :onSearch="fetchArchives" :search-criteria="headers" />
+      <search-card :onSearch="onSearchArchives" :search-criteria="headers" />
       <data-list
         :auto-headers="false"
         :headers="headers"
@@ -68,6 +68,7 @@ export default {
   },
 
   methods: {
+    async onSearchArchives() {},
     async fetchArchives(api_url) {
       this.isLoading = true;
       const data = await this.$rest.get(api_url).then(res => res);
