@@ -19,6 +19,9 @@
       :submitBtnText="$t('buttons.add')"
       :shown="shown"
       :handleSubmitClick="submitRelatedParticipant.bind(this)"
+      :disableAdditionBtn="
+        fetchAllParticipantLoading || allParticipants.length === 0
+      "
       @search="debounceSearchParticipant"
       @needToLoad="handleLoadMore"
       @update:shown="val => (shown = val)"
@@ -294,6 +297,17 @@ export default {
       );
     },
   },
+
+  // watch: {
+  //   allParticipants: {
+  //     deep: true,
+  //     handler(allParticipants) {
+  //       if (allParticipants.length === 3 && this.next !== null) {
+  //         this.handleLoadMore();
+  //       }
+  //     },
+  //   },
+  // },
 };
 </script>
 

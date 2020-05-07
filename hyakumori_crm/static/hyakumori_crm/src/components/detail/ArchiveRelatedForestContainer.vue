@@ -296,5 +296,16 @@ export default {
       return this.relatedForests.filter(forest => forest.deleted);
     },
   },
+
+  // watch: {
+  //   allForests: {
+  //     deep: true,
+  //     handler(allForests) {
+  //       if (allForests.length === 3 && this.next !== null) {
+  //         this.handleLoadMore();
+  //       }
+  //     },
+  //   },
+  // },
 };
 </script>
