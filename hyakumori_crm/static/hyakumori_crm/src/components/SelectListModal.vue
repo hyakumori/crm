@@ -47,7 +47,7 @@ export default {
     "shown",
     "loading",
     "handleSubmitClick",
-          "disableAdditionBtn",
+    "disableAdditionBtn",
   ],
   data() {
     return {

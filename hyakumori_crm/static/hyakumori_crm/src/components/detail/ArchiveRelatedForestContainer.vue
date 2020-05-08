@@ -32,6 +32,7 @@
       :loading="fetchAllForestLoading"
       :submitBtnText="$t('buttons.add')"
       :handleSubmitClick="submitRelatedForest.bind(this)"
+      :disableAdditionBtn="fetchAllForestLoading"
       submitBtnIcon="mdi-plus"
       @search="deboundGetSearch"
       @needToLoad="handleLoadMore"
@@ -101,6 +102,8 @@ export default {
       selectingForestId: null,
       selectingForestIndex: null,
       addRelatedForestLoading: false,
+      searchKeyword: null,
+      searchNext: null,
     };
   },
 
@@ -269,21 +272,37 @@ export default {
       this.$set(forest, "deleted", false);
     },
 
-    fetchSearchForest(keyword) {
+    async fetchSearchForest(keyword) {
       this.fetchAllForestLoading = true;
-      this.$rest
-        .get("/forests/minimal", {
-          params: {
-            search: keyword || "",
-          },
-        })
-        .then(response => {
-          this.allForests = this.removeDuplicateForests(
+      if (this.searchNext) {
+        const response = await this.$rest.get(this.searchNext);
+        if (response) {
+          const tempSearchData = this.removeDuplicateForests(
             response.results,
             this.relatedForests,
           );
-          this.fetchAllForestLoading = false;
+          this.next = response.next;
+          this.allForests.push(...tempSearchData);
+          this.immutableAllForest.push(...tempSearchData);
+        }
+      } else {
+        const response = await this.$rest.get("/forests/minimal", {
+          params: {
+            search: keyword || "",
+          },
         });
+        if (response) {
+          this.allForests = [];
+          const tempSearchData = this.removeDuplicateForests(
+            response.results,
+            this.relatedForests,
+          );
+          this.next = response.next;
+          this.allForests.push(...tempSearchData);
+          this.immutableAllForest.push(...tempSearchData);
+        }
+      }
+      this.fetchAllForestLoading = false;
     },
   },
 
