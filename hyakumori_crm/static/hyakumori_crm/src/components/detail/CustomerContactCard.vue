@@ -192,7 +192,7 @@ export default {
       }
       return (
         this.contact_.name_kanji.last_name ||
-        this.contact_.name_kanji.first_name
+        this.contact_.name_kanji.first_name || this.$t("not_available_field")
       );
     },
     address() {
