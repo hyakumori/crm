@@ -221,6 +221,8 @@ def add_participants(archive: Archive, data: ArchiveCustomerInput):
             ac.force_delete()
 
     archive.save(update_fields=["updated_at"])
+    refresh_customers_cache(archive, save=True)
+    return archive
 
 
 def delete_related_customer(archive: Archive, data: dict):

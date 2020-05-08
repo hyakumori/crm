@@ -200,13 +200,9 @@ class CustomerViewSets(ViewSet):
 @api_view(["GET"])
 @action_login_required(with_permissions=["view_customer"])
 def contacts_list(request):
-    is_basic = True if request.GET.get("is_basic") == "true" else False
     paginator = default_paginator()
     paged_list = paginator.paginate_queryset(
-        request=request,
-        queryset=contacts_list_with_search(
-            request.GET.get("search"), is_basic=is_basic
-        ),
+        request=request, queryset=contacts_list_with_search(request.GET.get("search")),
     )
     return paginator.get_paginated_response(
         ContactSerializer(paged_list, many=True).data
