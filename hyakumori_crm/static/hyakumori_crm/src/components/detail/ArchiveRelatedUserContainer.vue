@@ -19,9 +19,7 @@
       :submitBtnText="$t('buttons.add')"
       :shown="shown"
       :handleSubmitClick="submitRelatedParticipant.bind(this)"
-      :disableAdditionBtn="
-        fetchAllParticipantLoading
-      "
+      :disableAdditionBtn="fetchAllParticipantLoading"
       @search="debounceSearchParticipant"
       @needToLoad="handleLoadMore"
       @update:shown="val => (shown = val)"
@@ -190,10 +188,21 @@ export default {
 
     fetchRelatedParticipants() {
       this.fetchRelatedParticipantLoading = true;
-      this.$rest.get(`/archives/${this.archive_id}/users`).then(res => {
-        this.fetchRelatedParticipantLoading = false;
-        this.relatedParticipants = res.results;
-      });
+      this.$rest
+        .get(`/archives/${this.archive_id}/users`)
+        .then(async response => {
+          let tempRelatedData = response.results;
+          let next = response.next;
+          while (!!next) {
+            const paginationResponse = await this.$rest.get(next);
+            if (paginationResponse) {
+              tempRelatedData.push(...paginationResponse.results);
+              next = paginationResponse.next;
+            }
+          }
+          this.relatedParticipants = tempRelatedData;
+          this.fetchRelatedParticipantLoading = false;
+        });
     },
 
     fetchAllParticipants() {
