@@ -77,12 +77,21 @@ export default {
       saveDisabled: false,
       info: {},
       immutableInfo: {},
+      headerInfo: {
+        title: this.$t("page_header.archive_new"),
+        subtitle: "",
+        backUrl: "/archives",
+      },
     };
   },
 
   async mounted() {
     if (this.isDetail && !this.info.author) {
       await this.fetchBasicInfo();
+    }
+
+    if (!this.isDetail) {
+      await this.$store.dispatch("setHeaderInfo", this.headerInfo);
     }
   },
 
@@ -168,14 +177,16 @@ export default {
     info: {
       deep: true,
       handler() {
-        this.$store.dispatch("setHeaderInfo", {
-          title: this.info.title,
-          subTitle:
-            getDate(this.info.archive_date) +
-            " " +
-            this.renderParticipants(this.info),
-          backUrl: "/archives",
-        });
+        if (this.isDetail) {
+          this.$store.dispatch("setHeaderInfo", {
+            title: this.info.title,
+            subTitle:
+              getDate(this.info.archive_date) +
+              " " +
+              this.renderParticipants(this.info),
+            backUrl: "/archives",
+          });
+        }
       },
     },
   },

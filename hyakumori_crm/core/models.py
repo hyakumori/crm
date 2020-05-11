@@ -90,6 +90,7 @@ class HyakumoriDanticModel(BaseModel):
             "value_error.str.regex": _("Invalid"),
             "value_error.missing": _("Required"),
             "value_error.email": _("Invalid Email"),
+            "value_error.any_str.min_length": _("Required at least 1 character"),
         }
 
     @validator("*", pre=True)

@@ -96,7 +96,9 @@ export default {
     };
   },
   created() {
-    this.fetchParticipants();
+    if (this.isDetail) {
+      this.fetchParticipants();
+    }
   },
   mounted() {
     if (this.isDetail) {

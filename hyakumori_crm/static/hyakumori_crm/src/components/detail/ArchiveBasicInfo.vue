@@ -51,6 +51,7 @@
           v-if="isUpdate || !isDetail"
         />
         <archive-participant-card
+          class="author_card"
           :isAuthor="true"
           :name="info.author"
           :card_id="info.author_id"
@@ -188,5 +189,9 @@ export default {
   textarea {
     color: #999999;
   }
+}
+
+.author_card :hover {
+  cursor: default;
 }
 </style>
