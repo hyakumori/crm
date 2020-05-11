@@ -48,15 +48,17 @@ export default {
   methods: {
     async getActionLogs() {
       try {
-        if (!this.objectId || !this.objectType || !this.appName)
-          return;
+        if (!this.objectId || !this.objectType || !this.appName) return;
 
         this.isLoading = true;
         const response = await this.$rest.get(
           `/activity/ja_JP/${this.appName}/${this.objectType}/${this.objectId}`,
         );
         if (response) {
-          this.results = response.results;
+          this.results = response.results.sort(
+            (log1, log2) =>
+              new Date(log2.created_at) - new Date(log1.created_at),
+          );
         }
       } catch {
       } finally {
