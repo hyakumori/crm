@@ -34,7 +34,7 @@
       <template #list>
         <div
           v-if="contactsForAdding.results.length === 0 && !loadContacts"
-          style="text-align:center;"
+          class="text-center"
         >
           {{ $t("messages.not_found") }}
         </div>
