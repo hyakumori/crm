@@ -20,7 +20,7 @@
       :shown="shown"
       :handleSubmitClick="submitRelatedParticipant.bind(this)"
       :disableAdditionBtn="
-        fetchAllParticipantLoading || allParticipants.length === 0
+        fetchAllParticipantLoading
       "
       @search="debounceSearchParticipant"
       @needToLoad="handleLoadMore"
@@ -102,6 +102,7 @@ export default {
       selectingParticipantId: null,
       selectingParticipantIndex: null,
       updateParticipantLoading: false,
+      searchNext: null,
     };
   },
 
@@ -231,7 +232,9 @@ export default {
     },
 
     handleLoadMore() {
-      this.fetchAllParticipants(this.next);
+      if (this.next !== null) {
+        this.fetchAllParticipants(this.next);
+      }
     },
 
     submitRelatedParticipant() {
@@ -273,10 +276,15 @@ export default {
           },
         })
         .then(response => {
-          this.allParticipants = this.removeDuplicateParticipant(
+          this.allParticipants = [];
+          this.immutableAllParticipants = [];
+          const tempParticipants = this.removeDuplicateParticipant(
             response.results,
             this.relatedParticipants,
           );
+          this.next = response.next;
+          this.allParticipants.push(...tempParticipants);
+          this.immutableAllParticipants.push(...tempParticipants);
           this.fetchAllParticipantLoading = false;
         });
     },

@@ -102,7 +102,6 @@ export default {
       selectingForestId: null,
       selectingForestIndex: null,
       addRelatedForestLoading: false,
-      searchKeyword: null,
       searchNext: null,
     };
   },
@@ -241,7 +240,9 @@ export default {
     },
 
     handleLoadMore() {
-      this.fetchAllForests(this.next);
+      if (this.next !== null) {
+        this.fetchAllForests(this.next);
+      }
     },
 
     submitRelatedForest() {
@@ -274,35 +275,23 @@ export default {
 
     async fetchSearchForest(keyword) {
       this.fetchAllForestLoading = true;
-      if (this.searchNext) {
-        const response = await this.$rest.get(this.searchNext);
-        if (response) {
-          const tempSearchData = this.removeDuplicateForests(
-            response.results,
-            this.relatedForests,
-          );
-          this.next = response.next;
-          this.allForests.push(...tempSearchData);
-          this.immutableAllForest.push(...tempSearchData);
-        }
-      } else {
-        const response = await this.$rest.get("/forests/minimal", {
-          params: {
-            search: keyword || "",
-          },
-        });
-        if (response) {
-          this.allForests = [];
-          const tempSearchData = this.removeDuplicateForests(
-            response.results,
-            this.relatedForests,
-          );
-          this.next = response.next;
-          this.allForests.push(...tempSearchData);
-          this.immutableAllForest.push(...tempSearchData);
-        }
+      const response = await this.$rest.get("/forests/minimal", {
+        params: {
+          search: keyword || "",
+        },
+      });
+      if (response) {
+        this.allForests = [];
+        this.immutableAllForest = [];
+        const tempSearchData = this.removeDuplicateForests(
+          response.results,
+          this.relatedForests,
+        );
+        this.next = response.next;
+        this.allForests.push(...tempSearchData);
+        this.immutableAllForest.push(...tempSearchData);
+        this.fetchAllForestLoading = false;
       }
-      this.fetchAllForestLoading = false;
     },
   },
 
