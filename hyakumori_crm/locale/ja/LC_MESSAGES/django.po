@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 08:15+0000\n"
+"POT-Creation-Date: 2020-05-12 02:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,8 +112,9 @@ msgid "Invalid Email"
 msgstr "無効"
 
 #: hyakumori_crm/core/models.py:93
-msgid "Required at least 1 character"
-msgstr "1文字以上入力する必要があります。"
+#, python-brace-format
+msgid "Required at least {limit_value} character"
+msgstr "{limit_value}文字以上入力する必要があります。"
 
 #: hyakumori_crm/customer/resolvers.py:42
 msgid "Internal Id"
