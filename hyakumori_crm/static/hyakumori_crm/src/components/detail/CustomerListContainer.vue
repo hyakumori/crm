@@ -51,6 +51,7 @@
           :showAction="false"
           :index="indx"
           :selectedId="modalSelectingContactId"
+          :selectedIndex="modalSelectingContactIndex"
           flat
           mode="search"
         />
