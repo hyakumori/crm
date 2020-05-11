@@ -89,8 +89,9 @@ export default {
     renderParticipants(data) {
       const list = _get(data, "attributes.customer_cache.list", []);
       if (list.length > 0) {
-        let results = _get(list[0], "customer__name_kanji.last_name", "");
-        results += " " + _get(list[0], "customer__name_kanji.first_name", "");
+        let results = _get(list[0], "customer__name_kanji.last_name", "") || "";
+        results +=
+          " " + (_get(list[0], "customer__name_kanji.first_name", "") || "");
         if (list.length > 1) {
           results +=
             " " +
