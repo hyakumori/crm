@@ -55,10 +55,7 @@ export default {
           `/activity/ja_JP/${this.appName}/${this.objectType}/${this.objectId}`,
         );
         if (response) {
-          this.results = response.results.sort(
-            (log1, log2) =>
-              new Date(log2.created_at) - new Date(log1.created_at),
-          );
+          this.results = response.results;
         }
       } catch {
       } finally {
