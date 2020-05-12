@@ -89,10 +89,11 @@
     </v-btn>
     <router-link
       v-if="showAction && !deleted"
-      :to="{ name: 'customer-detail', params: { id: card_id } }"
+      :to="{ name: 'customer-detail', params: { id: customerId } }"
       v-slot="{ href }"
     >
       <v-btn
+        v-if="isUpdate || customerId"
         class="align-self-center"
         icon
         @click.stop="isUpdate ? $emit('deleteContact') : undefined"
@@ -125,7 +126,6 @@ export default {
   name: "customer-contact-card",
 
   props: {
-    card_id: String,
     relatedInfo: String,
     isOwner: Boolean,
     isContactor: Boolean,
@@ -166,7 +166,7 @@ export default {
     onTagClick() {
       if (!this.isUpdate) return;
       if (this.isOwner)
-        this.$emit("toggleDefault", !this.contact.default, this.card_id);
+        this.$emit("toggleDefault", !this.contact.default, this.contact.id);
       else if (this.isContactor)
         this.$emit(
           "toggleContactDefault",
@@ -183,6 +183,13 @@ export default {
       return this.contact.self_contact
         ? this.contact.self_contact
         : this.contact;
+    },
+    customerId() {
+      return this.contact.self_contact
+        ? this.contact.id
+        : this.contact.is_basic
+        ? this.contact.customer_id
+        : null;
     },
     fullname() {
       if (

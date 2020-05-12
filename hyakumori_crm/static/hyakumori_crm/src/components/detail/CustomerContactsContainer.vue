@@ -43,7 +43,7 @@
           <v-divider></v-divider>
           <v-card-text style="min-height: 300px;" class="px-6 py-5">
             <contact-form
-              :form="form"
+              :formData.sync="form"
               :handleSubmit="handleAdd"
               :errors="formErrors"
             />
@@ -193,6 +193,7 @@ export default {
         contact_type: this.contactType,
       };
       try {
+        console.log(data);
         await this.$rest.post(`/customers/${this.id}/contacts`, data);
         this.form = this.initForm();
         this.showNewContactDialog = false;
