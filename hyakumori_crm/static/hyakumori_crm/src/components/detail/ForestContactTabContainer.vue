@@ -312,7 +312,7 @@ export default {
     },
   },
   watch: {
-    async showSelect(val) {
+    showSelect(val) {
       if (val && !this.customersForAdding.next) {
         this.loadInitCustomersForAdding();
       }
