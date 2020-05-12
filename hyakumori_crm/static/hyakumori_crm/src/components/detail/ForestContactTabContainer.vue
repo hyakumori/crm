@@ -264,16 +264,15 @@ export default {
         : {};
       this.customersForAddingLoading = true;
       let resp = { next: "/customers" };
-      while (
-        (resp.next && keyword) ||
-        (resp.next && this.customersForAdding.results.length === 0)
-      ) {
+      while (resp.next) {
         resp = await this.$rest.get(resp.next, reqConfig);
         this.customersForAdding = {
           next: resp.next,
           previous: resp.previous,
           results: reject(resp.results, c => this.customerIdsMap[c.id]),
         };
+        if (this.customersForAdding.results.length > 5) break;
+        if (resp.next && resp.next.indexOf("page=") > -1) reqConfig = {};
       }
       this.customersForAddingLoading = false;
     },
