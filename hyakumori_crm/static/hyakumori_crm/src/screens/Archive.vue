@@ -140,8 +140,6 @@ export default {
         let keyword = data.keyword;
         if (criteria && criteria === "archive_date") {
           keyword = dateTimeKeywordSearchFormat(keyword);
-          // 2020-05-20 15:14
-          console.log(keyword);
         }
         return {
           criteria,
