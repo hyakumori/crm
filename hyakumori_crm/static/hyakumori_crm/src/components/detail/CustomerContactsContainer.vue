@@ -193,7 +193,6 @@ export default {
         contact_type: this.contactType,
       };
       try {
-        console.log(data);
         await this.$rest.post(`/customers/${this.id}/contacts`, data);
         this.form = this.initForm();
         this.showNewContactDialog = false;

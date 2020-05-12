@@ -6,7 +6,8 @@
     outlined
     active-class="selected"
     :ripple="mode != 'view'"
-    @click="$emit('click', contact.id, index)"
+    @click="clickable ? $emit('click', contact.id, index) : undefined"
+    :style="{ cursor: clickable ? 'pointer' : 'auto' }"
   >
     <v-icon class="customer-contact-card__icon">{{
       $t("icon.customer_icon")
@@ -143,6 +144,7 @@ export default {
     contact: Object,
     customerName: String,
     showDefaultBadge: { type: Boolean, default: false },
+    clickable: { type: Boolean, default: false },
   },
 
   data() {
@@ -163,6 +165,9 @@ export default {
   },
 
   methods: {
+    handleClick() {
+      return;
+    },
     onTagClick() {
       if (!this.isUpdate) return;
       if (this.isOwner)
@@ -185,11 +190,11 @@ export default {
         : this.contact;
     },
     customerId() {
-      return this.contact.self_contact
-        ? this.contact.id
-        : this.contact.is_basic
-        ? this.contact.customer_id
-        : null;
+      if (this.contact.self_contact) {
+        return this.contact.id;
+      } else {
+        return this.contact.is_basic ? this.contact.customer_id : null;
+      }
     },
     fullname() {
       if (

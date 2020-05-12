@@ -78,7 +78,7 @@ or concat(sc.postal_code, ' ', sc.address->>'sector', ' ',
 def get_customer_contacts(pk: UUID):
     cc_forest_counts = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-        .values("id", "customer_id")
+        .values("customer_id")
         .annotate(forests_count=Count("customer__forestcustomer"))
     )
     cc_is_basic = CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
