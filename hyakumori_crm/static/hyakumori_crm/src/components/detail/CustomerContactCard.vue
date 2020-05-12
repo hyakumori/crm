@@ -165,9 +165,6 @@ export default {
   },
 
   methods: {
-    handleClick() {
-      return;
-    },
     onTagClick() {
       if (!this.isUpdate) return;
       if (this.isOwner)
