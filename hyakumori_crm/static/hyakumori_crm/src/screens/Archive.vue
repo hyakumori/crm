@@ -51,7 +51,11 @@ import archive_header from "../assets/dump/archive_header.json";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
 import TableAction from "../components/TableAction";
-import { commonDatetimeFormat } from "../helpers/datetime";
+import {
+  commonDatetimeFormat,
+  dateTimeKeywordSearchFormat,
+  toUtcDatetime,
+} from "../helpers/datetime";
 import { get as _get } from "lodash";
 
 export default {
@@ -132,9 +136,16 @@ export default {
     async onSearchArchives() {
       const searchData = this.$refs.searchRef.conditions;
       const filter = searchData.map(data => {
+        let criteria = data.criteria;
+        let keyword = data.keyword;
+        if (criteria && criteria === "archive_date") {
+          keyword = dateTimeKeywordSearchFormat(keyword);
+          // 2020-05-20 15:14
+          console.log(keyword);
+        }
         return {
-          criteria: data.criteria,
-          keyword: data.keyword,
+          criteria,
+          keyword,
         };
       });
       this.filterQueryString = this.arrayToQueryString(filter);
