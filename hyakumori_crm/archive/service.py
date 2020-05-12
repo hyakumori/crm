@@ -311,7 +311,9 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
 
         if len(active_filters.keys()) > 0:
             return Archive.objects.annotate(
-                archive_date_text=Func(F('archive_date'), Value('YYYY-MM-DD HH:MI'), function='to_char')
+                archive_date_text=Func(
+                    F("archive_date"), Value("YYYY-MM-DD HH:MI"), function="to_char"
+                )
             ).filter(**active_filters)
 
         return Archive.objects.all()
