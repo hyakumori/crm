@@ -240,7 +240,7 @@ def delete_related_customer(archive: Archive, data: dict):
             archive_customer = ArchiveCustomer.objects.get(
                 archive_id=archive.id, customer_id=customer.id, deleted=None
             )
-            archive_customer.delete()
+            archive_customer.force_delete()
         else:
             continue
     refresh_customers_cache(archive, save=True)
@@ -281,7 +281,7 @@ def delete_related_user(archive: Archive, data: dict):
             archive_user = ArchiveUser.objects.get(
                 archive_id=archive.id, user_id=user.id, deleted=None
             )
-            archive_user.delete()
+            archive_user.force_delete()
         else:
             continue
     refresh_user_participants_cache(archive, True)
