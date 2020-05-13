@@ -314,7 +314,7 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
                 archive_date_text=Func(
                     F("archive_date"), Value("YYYY-MM-DD HH24:MI"), function="to_char"
                 )
-            ).filter(**active_filters)
+            ).select_related("author").filter(**active_filters)
 
         return Archive.objects.all()
     except Exception as e:
