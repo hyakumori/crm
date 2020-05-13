@@ -74,9 +74,12 @@
       <p class="ma-0 pt-2 caption text-truncate" v-if="forestInternalId">
         森林ID{{ forestInternalId }}の連絡者
       </p>
-      <p class="ma-0 pt-2 caption text-truncate" v-if="customerName">
-        <span style="background-color:#f5f5f5;color: black">
+      <p class="ma-0 pt-2 caption text-truncate">
+        <span style="background-color:#f5f5f5;color: black" v-if="customerName">
           {{ customerName.replace("null", "") }}の関係連絡先
+        </span>
+        <span style="background-color:#f5f5f5;color: black" v-else>
+          本人の連絡情報
         </span>
       </p>
     </div>
