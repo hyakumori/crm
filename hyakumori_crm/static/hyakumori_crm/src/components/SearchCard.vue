@@ -88,7 +88,7 @@ export default {
   data() {
     return {
       usedFields: new Set(),
-      originalSearchCriteria: [],
+      originalSearchCriteria: [...this.searchCriteria],
       conditions: [
         {
           fields: [...this.searchCriteria],
@@ -113,9 +113,6 @@ export default {
 
       return true;
     },
-  },
-  created() {
-    this.originalSearchCriteria = [...this.searchCriteria];
   },
   watch: {
     searchCriteria(val) {
