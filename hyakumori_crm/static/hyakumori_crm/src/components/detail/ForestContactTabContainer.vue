@@ -174,7 +174,7 @@ export default {
       if (customer.added) {
         delete customer.added;
         this.customersToAdd = reject(this.customersToAdd, { id: customer.id });
-        delete this.defaultCustomersEdit[customer_id];
+        delete this.defaultCustomersEdit[customer.id];
         this.customersForAdding = { results: [] };
       } else {
         const newCustomers = [...this.customers];
