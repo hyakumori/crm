@@ -316,7 +316,7 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
                 )
             ).select_related("author").filter(**active_filters)
 
-        return Archive.objects.all()
+        return Archive.objects.select_related("author").all()
     except Exception as e:
         return Archive.objects.none()
 
