@@ -101,7 +101,7 @@ def delete_tag_for_type(request, app_name, object_type, tag_delete_input, *args,
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @api_validate_model(AssignTagInput, "tag_input")
-def assign_tag_for_object(request, app_name, object_type, tag_input, *args, **kwargs):
+def assign_tag_for_object(request, app_name, object_type, tag_input: AssignTagInput, *args, **kwargs):
     if not app_name or not object_type:
         return make_error_json(_("Wrong parameters"))
 

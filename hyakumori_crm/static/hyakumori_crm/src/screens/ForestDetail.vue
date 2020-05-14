@@ -160,33 +160,41 @@ export default {
   },
 
   computed: {
-    forestInfo() {
-      return this.$store.state.forest.forest;
+    forestInfo: {
+      get() {
+        return this.$store.state.forest.forest;
+      },
+      set(val) {
+        this.$store.commit("forest/setForest", val);
+      },
     },
+
     headerData() {
       let headerData = [];
       const forestInfo = this.forestInfo;
 
       if (forestInfo) {
         const attr = forestInfo.forest_attributes;
-        return [
-          {
-            name: "地番面積_ha",
-            data: attr["地番面積_ha"],
-          },
-          {
-            name: "面積_ha",
-            data: attr["面積_ha"],
-          },
-          {
-            name: "面積_m2",
-            data: attr["面積_m2"],
-          },
-          {
-            name: "平均傾斜度",
-            data: attr["平均傾斜度"],
-          },
-        ];
+        return (
+          attr && [
+            {
+              name: "地番面積_ha",
+              data: attr["地番面積_ha"],
+            },
+            {
+              name: "面積_ha",
+              data: attr["面積_ha"],
+            },
+            {
+              name: "面積_m2",
+              data: attr["面積_m2"],
+            },
+            {
+              name: "平均傾斜度",
+              data: attr["平均傾斜度"],
+            },
+          ]
+        );
       }
       return headerData;
     },

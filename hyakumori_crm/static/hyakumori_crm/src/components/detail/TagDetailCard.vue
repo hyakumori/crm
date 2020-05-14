@@ -9,7 +9,7 @@
     ></v-progress-linear>
     <div class="items">
       <v-card class="tag-card d-hover" flat @click="onClickCard">
-        <div v-for="(key, index) in Object.keys(tags)" :key="index">
+        <div v-for="(key, index) in (tags && Object.keys(tags))" :key="index">
           <v-chip small class="ml-2" v-if="tags[key]">
             {{ key }}: {{ tags[key] }}
           </v-chip>

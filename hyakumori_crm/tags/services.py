@@ -116,16 +116,14 @@ class TagService:
         if instance is None:
             raise ObjectNotFound(_("Could not retrieve object: %(object_type)s, with ID: %(object_id)s")
                                  % {'object_type': object_type, 'object_id': tag_input.object_id})
-
+        # get list of tags
+        available_tags_for_types = cls.get_setting_for_type(app_name, object_type).values_list("name", flat=True)
         _before = dict(**instance.tags)
 
-        for tag in tag_input.add:
-            instance.tags[tag.tag_name] = tag.value
-
-        for tag in tag_input.delete:
-            if instance.tags.get(tag.tag_name) is not None:
-                del instance.tags[tag.tag_name]
-
+        instance.tags = dict()
+        for tag in tag_input.tags:
+            if tag.tag_name in available_tags_for_types:
+                instance.tags[tag.tag_name] = tag.value
         instance.save()
 
         has_changed = _before != instance.tags

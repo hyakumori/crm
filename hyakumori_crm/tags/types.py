@@ -27,5 +27,4 @@ class TagDeleteInput(BaseModel):
 
 class AssignTagInput(BaseModel):
     object_id: str
-    delete: List[AssignTagItem] = []
-    add: List[AssignTagItem] = []
+    tags: List[AssignTagItem] = []
