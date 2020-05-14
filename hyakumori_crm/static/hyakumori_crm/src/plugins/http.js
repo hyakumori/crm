@@ -33,7 +33,7 @@ const setupRestClient = options => {
   axios.interceptors.response.use(
     response => {
       const method = response && response.config && response.config.method;
-      if (method !== "get") {
+      if (method !== "get" && response.config["no_activity"] !== true) {
         eventBus.$emit("action-log:reload");
       }
       return response && response.data;

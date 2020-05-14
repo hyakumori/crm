@@ -110,11 +110,7 @@ export default {
 
   methods: {
     forceRefreshCache() {
-      this.$rest.post(
-        `/archives/${this.id}/cache`,
-        {},
-        { "no-activity": true },
-      );
+      this.$rest.post(`/archives/${this.id}/cache`, {}, { no_activity: true });
     },
     async fetchParticipants() {
       this.participantsLoading = true;

@@ -130,7 +130,7 @@ export default {
             ...this.form,
           },
           {
-            "no-activity": true,
+            no_activity: true,
           },
         );
 
