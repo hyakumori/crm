@@ -359,7 +359,12 @@ export default {
         },
         {
           label: this.$t("forms.labels.address"),
-          value: this.customer?.self_contact.address.sector || "",
+          value:
+            (this.customer?.self_contact.address.prefecture || "") +
+            " " +
+            (this.customer?.self_contact.address.municipality || "") +
+            " " +
+            (this.customer?.self_contact.address.sector || ""),
         },
         {
           label: this.$t("forms.labels.customer.phone_number"),
