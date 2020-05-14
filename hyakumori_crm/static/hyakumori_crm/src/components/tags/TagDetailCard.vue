@@ -182,6 +182,8 @@ export default {
         );
         if (results) {
           this.$emit("input", results.tags);
+          await this.getTagValues();
+          await this.getTagSettings();
         }
       } catch (e) {
       } finally {
@@ -209,6 +211,9 @@ export default {
       return item.includes(queryText);
     },
     async addTag() {
+      if (!this.tagValueSearchInput || this.tagValueSearchInput.length === 0) {
+        return;
+      }
       let hasItem = false;
       for (let item of this.editingTags) {
         if (this.selectedTagKey === item.key) {
@@ -227,7 +232,7 @@ export default {
         });
       }
       this.tagValueSearchInput = "";
-      await this.getTagValues();
+      this.selectedTagKey = "";
     },
     mapTagsToEditingValues(tags) {
       let results = [];
