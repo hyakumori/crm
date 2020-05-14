@@ -59,7 +59,7 @@ import { hasScope } from "../../helpers/security";
 export default {
   props: {
     apiUrl: { type: String, required: true },
-    value: { type: Object, required: true },
+    value: { type: Object },
     objectType: { type: String, required: true },
   },
   components: {
