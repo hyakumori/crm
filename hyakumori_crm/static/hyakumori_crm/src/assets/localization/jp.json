@@ -2,7 +2,7 @@
   "buttons": {
     "add_and_edit": "追加＆編集",
     "add_customer": "顧客を追加",
-    "add_archive": "アーカイブを追加",
+    "add_archive": "交渉履歴を追加",
     "add_user": "アカウントを追加",
     "back": "前のページに戻る",
     "cancel": "キャンセル",
@@ -128,7 +128,7 @@
   },
   "page_header": {
     "archive_detail": "交渉履歴",
-    "archive_new": "アーカイブ情報を追加",
+    "archive_new": "交渉履歴情報を追加",
     "archive_mgmt": "交渉履歴一覧",
     "customer_detail": "顧客情報詳細",
     "customer_new": "顧客情報の追加",
