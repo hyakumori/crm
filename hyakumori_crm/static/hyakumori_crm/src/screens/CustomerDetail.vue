@@ -384,10 +384,6 @@ export default {
     bankingInfo() {
       return [
         {
-          label: "口座指定者",
-          value: "",
-        },
-        {
           label: "銀行名",
           value: this.customer?.banking?.bank_name || "",
         },
