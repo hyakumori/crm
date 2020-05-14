@@ -18,7 +18,7 @@ const getters = {
     return {
       title: state.forest.internal_id,
       subTitle: state.forest.owner.name_kanji,
-      tag: [state.forest.tag.danchi],
+      tags: [state.forest.tags.danchi],
       backUrl: { name: "forests" },
     };
   },
