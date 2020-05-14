@@ -121,6 +121,7 @@
                       <v-btn
                         color="primary"
                         depressed
+                        :disabled="!hasChanged"
                         @click.stop="onSave"
                         v-if="!isEditing"
                       >
@@ -128,6 +129,7 @@
                       </v-btn>
                       <v-btn
                         color="primary"
+                        :disabled="!hasChanged"
                         depressed
                         @click.stop="onUpdate"
                         v-else
@@ -148,7 +150,7 @@
 
 <script>
 import TagSettingColorItem from "./TagSettingColorItem";
-import debounce from "lodash/debounce";
+import { debounce, isEqual, get as _get, isEmpty } from "lodash";
 
 export default {
   props: {
@@ -166,13 +168,15 @@ export default {
       tagSettings: [],
       tagValues: [],
       colorMaps: [],
-      mask: "!#XXXXXXXX",
       selectedTag: {
+        ...this.buildTagSetting(),
+      },
+      originalSelectedTag: {
         ...this.buildTagSetting(),
       },
       selectedTagMigrateInfo: null,
       addingColorItem: {
-        ...this.buildTagSetting(),
+        value: "",
         color: "#FF0000",
       },
     };
@@ -240,6 +244,7 @@ export default {
     },
     switchToAddNew() {
       this.selectedTag = { ...this.buildTagSetting() };
+      this.originalSelectedTag = { ...this.selectedTag };
     },
     onClose() {
       this.$emit("update:showDialog", false);
@@ -358,9 +363,12 @@ export default {
         this.loading = false;
       }
     },
+    initAddingColorItem() {
+      this.addingColorItem = { value: "", color: "#FF0000" };
+    },
     resetData() {
       this.selectedTag = { ...this.buildTagSetting() };
-      this.addingColorItem = { value: "", color: "#FF0000" };
+      this.initAddingColorItem();
     },
     addNewColorSetting() {
       if (!this.addingColorItem.value || !this.addingColorItem.color) {
@@ -379,7 +387,7 @@ export default {
       this.colorMaps.push({
         ...this.addingColorItem,
       });
-      this.addingColorItem = {};
+      this.initAddingColorItem();
     },
     onColorSettingDelete({ id }) {
       this.colorMaps.splice(id, 1);
@@ -388,6 +396,17 @@ export default {
   computed: {
     isEditing() {
       return this.selectedTag && this.selectedTag.id;
+    },
+    hasChanged() {
+      const colors = this.colorMaps.map(item => ({
+        value: item.value,
+        color: item.color,
+      }));
+
+      return (
+        !isEqual(this.selectedTag, this.originalSelectedTag) ||
+        !isEqual(_get(this.originalSelectedTag, "attributes.colors"), colors)
+      );
     },
   },
   watch: {
@@ -406,20 +425,20 @@ export default {
       } else {
         this.selectedTag = tag;
       }
+      this.originalSelectedTag = { ...this.selectedTag };
     },
-    selectedTag() {
-      if (
-        this.selectedTag &&
-        this.selectedTag.attributes &&
-        this.selectedTag.attributes.colors
-      ) {
-        this.colorMaps = this.selectedTag.attributes.colors.map(item => ({
-          ...item,
-          menu: false,
-        }));
-      } else {
-        this.colorMaps = [];
-      }
+    "selectedTag.attributes": {
+      deep: true,
+      handler() {
+        if (this.selectedTag.attributes.colors) {
+          this.colorMaps = this.selectedTag.attributes.colors.map(item => ({
+            ...item,
+            menu: false,
+          }));
+        } else {
+          this.colorMaps = [];
+        }
+      },
     },
     "selectedTag.id"() {
       this.tagSettings = this.tagSettings.map(item => ({
