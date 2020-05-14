@@ -131,3 +131,11 @@ class TagService:
         has_changed = _before != instance.tags
 
         return instance, has_changed
+
+    @classmethod
+    def delete_tag_settings(cls, tag_id):
+        tag_setting = TagSetting.objects.filter(pk=tag_id).first()
+        if tag_setting is None:
+            raise ObjectNotFound(_("Could not find tag setting %(id)s") % {'id': tag_id})
+        tag_setting.delete()
+        return tag_setting

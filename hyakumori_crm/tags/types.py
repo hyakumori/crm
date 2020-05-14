@@ -21,6 +21,10 @@ class AssignTagItem(BaseModel):
     value: str
 
 
+class TagDeleteInput(BaseModel):
+    id: str
+
+
 class AssignTagInput(BaseModel):
     object_id: str
     delete: List[AssignTagItem] = []

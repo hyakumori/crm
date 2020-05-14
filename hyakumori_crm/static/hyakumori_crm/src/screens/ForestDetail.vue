@@ -65,6 +65,11 @@
           object-type="forest"
           v-model="forestInfo"
         ></memo-input>
+        <tag-detail-card
+          app-name="crm"
+          object-type="forest"
+          :tags="forestInfo && forestInfo.tags"
+        ></tag-detail-card>
         <action-log
           app-name="crm"
           object-type="forest"
@@ -85,6 +90,8 @@ import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 import ActionLog from "../components/detail/ActionLog";
 import MemoInput from "../components/detail/MemoInput";
+import TagDetailCard from "../components/detail/TagDetailCard";
+import { fetchBasicInfo, fetchForestOwner } from "../api/forest";
 
 export default {
   name: "forest-detail",
@@ -96,6 +103,7 @@ export default {
     ContentHeader,
     ActionLog,
     MemoInput,
+    TagDetailCard,
     ForestAttributeTable,
     ForestBasicInfoContainer,
     AttachmentContainer,
