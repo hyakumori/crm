@@ -126,6 +126,7 @@
       <div>
         <memo-input
           :api-url="`/customers/${$route.params.id}/memo`"
+          object-type="customer"
           v-model="customer"
         ></memo-input>
         <action-log
