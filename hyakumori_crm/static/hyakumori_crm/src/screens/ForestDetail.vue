@@ -68,7 +68,9 @@
         <tag-detail-card
           app-name="crm"
           object-type="forest"
+          :object-id="$route.params.id"
           :tags="forestInfo && forestInfo.tags"
+          @input="$store.dispatch('setHeaderTagInfo', $event)"
         ></tag-detail-card>
         <action-log
           app-name="crm"
@@ -90,8 +92,7 @@ import AttachmentContainer from "../components/detail/AttachmentContainer";
 import ForestAttributeTable from "../components/detail/ForestAttributeTable";
 import ActionLog from "../components/detail/ActionLog";
 import MemoInput from "../components/detail/MemoInput";
-import TagDetailCard from "../components/detail/TagDetailCard";
-import { fetchBasicInfo, fetchForestOwner } from "../api/forest";
+import TagDetailCard from "../components/tags/TagDetailCard";
 
 export default {
   name: "forest-detail",
@@ -135,30 +136,7 @@ export default {
     fallbackText(text) {
       return text || "";
     },
-
-    mapContact(info) {
-      const self_contact = info.self_contact;
-      const addr = self_contact.address;
-      const kanji_name = self_contact.name_kanji;
-      return {
-        id: info.id,
-        customer_id: info.id,
-        fullname:
-          this.fallbackText(kanji_name.last_name) +
-          this.fallbackText(kanji_name.first_name),
-        telephone: self_contact.telephone,
-        mobilephone: self_contact.mobilephone,
-        forests_count: info.forests_count,
-        address: `${this.fallbackText(
-          self_contact.postal_code,
-        )} ${this.fallbackText(addr.prefecture)} ${this.fallbackText(
-          addr.municipality,
-        )} ${this.fallbackText(addr.sector)}`,
-        email: self_contact.email,
-      };
-    },
   },
-
   computed: {
     forestInfo: {
       get() {

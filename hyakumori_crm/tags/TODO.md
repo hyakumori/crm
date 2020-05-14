@@ -32,9 +32,7 @@
 [v] add tag setting model
 [v] listed all tags in model
 [v] permission
-- api
-- remove current implementations on separated fields (tags as separated columns)
-- action logs (added tags ...)
+[v] api
+[v] remove current implementations on separated fields (tags as separated columns)
+[v] action logs (added tags ...)
 
-# concerns
-- how to fetch for different resource?

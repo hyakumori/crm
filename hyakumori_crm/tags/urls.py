@@ -10,4 +10,6 @@ api_urls = [
     path("tags/<str:app_name>/<str:object_type>/modify", modify_tag_for_type),
     path("tags/<str:app_name>/<str:object_type>/delete", delete_tag_for_type),
     path("tags/<str:app_name>/<str:object_type>/assign", assign_tag_for_object),
+    path("tags/<str:app_name>/<str:object_type>/migrate", migrate_tag_key_objects),
+    path("tags/<str:app_name>/<str:object_type>/migrate_all", migrate_tag_key_all_objects),
 ]

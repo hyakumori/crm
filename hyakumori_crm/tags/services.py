@@ -1,6 +1,5 @@
 import logging
-from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
@@ -10,7 +9,7 @@ from django.utils.translation import gettext as _
 from hyakumori_crm.crm.models import Customer, Forest, get_user_model
 from hyakumori_crm.tags.exceptions import ContentTypeNotFound, TagFieldNotExists, ObjectNotFound, DuplicatedTagSetting
 from hyakumori_crm.tags.models import TagSetting
-from hyakumori_crm.tags.types import TagSettingInput, ColorMapInput, AssignTagInput
+from hyakumori_crm.tags.types import TagSettingInput, AssignTagInput, TagKeyMigrateInput, TagKeyMigrateAllInput
 
 
 class TagService:
@@ -58,12 +57,12 @@ class TagService:
             model = content_type.model_class()
             table_name = model._meta.db_table
             with connection.cursor() as cursor:
-                query = """
+                query = f"""
                        select distinct j1.key as key, j1.value as value
-                       from %s
+                       from {table_name}
                        cross join lateral jsonb_each(tags) j1
                        order by key, value
-                    """ % table_name
+                    """
                 cursor.execute(query)
                 # columns = [col[0] for col in cursor.description]
                 formatted_results = dict()
@@ -78,7 +77,8 @@ class TagService:
             return []
 
     @classmethod
-    def create_tag_for_type(cls, app_name, object_type, author: AbstractUser, tag_setting_input: TagSettingInput):
+    def create_tag_setting_for_type(cls, app_name, object_type, author: AbstractUser,
+                                    tag_setting_input: TagSettingInput):
         content_type = cls.get_content_type(app_name, object_type)
         try:
             tag_setting = TagSetting(content_type=content_type,
@@ -97,15 +97,23 @@ class TagService:
         tag_setting = TagSetting.objects.filter(pk=tag_setting_id).first()
         if tag_setting is None:
             raise ObjectNotFound(_("Could not find tag setting %(id)s") % {'id': tag_setting_id})
+        previous_tag_name = tag_setting.name
         tag_setting.name = tag_setting_input.name
         tag_setting.code = tag_setting_input.code
         tag_setting.attributes["colors"] = list(map(lambda item: dict(value=item.value, color=item.color.as_hex()),
                                                     tag_setting_input.color_maps))
         tag_setting.save()
-        return tag_setting
+        content_type = tag_setting.content_type
+        model = content_type.model_class()
+        migrate_results = cls._do_migrate_all_tag_key(
+            model._meta.db_table,
+            TagKeyMigrateAllInput(from_key=previous_tag_name, to_key=tag_setting_input.name),
+            do_update=True)
+        return dict(tag=tag_setting,
+                    migrate=dict(success=migrate_results[0], count=migrate_results[1]))
 
     @classmethod
-    def assign_tag_for_object(cls, app_name, object_type, tag_input: AssignTagInput):
+    def assign_tag_for_object(cls, app_name, object_type, user, tag_input: AssignTagInput):
         content_type = cls.get_content_type(app_name, object_type)
 
         model = content_type.model_class()
@@ -121,19 +129,109 @@ class TagService:
         _before = dict(**instance.tags)
 
         instance.tags = dict()
-        for tag in tag_input.tags:
-            if tag.tag_name in available_tags_for_types:
-                instance.tags[tag.tag_name] = tag.value
-        instance.save()
 
+        for tag in tag_input.tags:
+            if tag.tag_name is not None and len(tag.tag_name) > 0:
+                instance.tags[tag.tag_name] = tag.value
+
+            if tag.tag_name not in available_tags_for_types:
+                try:
+                    cls.create_tag_setting_for_type(app_name, object_type, user, TagSettingInput(
+                        name=tag.tag_name,
+                        code=f"tag_{uuid4().hex[0:8]}",
+                        color_maps=[]
+                    ))
+                except DuplicatedTagSetting:
+                    continue
+
+        instance.save()
         has_changed = _before != instance.tags
 
         return instance, has_changed
 
     @classmethod
     def delete_tag_settings(cls, tag_id):
+        """
+        Delete tag setting.
+        Currently will keep object tags values.
+        :param tag_id:
+        :return:
+        """
         tag_setting = TagSetting.objects.filter(pk=tag_id).first()
         if tag_setting is None:
             raise ObjectNotFound(_("Could not find tag setting %(id)s") % {'id': tag_id})
         tag_setting.delete()
         return tag_setting
+
+    @classmethod
+    def migrate_tag_key_objects(cls, app_name, object_type, migrate_input: TagKeyMigrateInput, do_update=False):
+        content_type = cls.get_content_type(app_name, object_type)
+
+        try:
+            model = content_type.model_class()
+            table_name = model._meta.db_table
+            object_ids = ",".join(migrate_input.object_ids)
+            with connection.cursor() as cursor:
+                count_query = f"""
+                    select count(*) as count
+                    from {table_name}
+                    where tags ? %s and id in (%s)
+                """
+                cursor.execute(count_query, (migrate_input.from_key, object_ids))
+                result = cursor.fetchone()
+                if do_update:
+                    query = f"""
+                         update {table_name}
+                         set tags = tags - %s
+                             || jsonb_build_object(%s, tags->%s)
+                         where tags ? %s AND id IN (%s)
+                    """
+                    cursor.execute(query, (
+                        migrate_input.from_key,
+                        migrate_input.to_key,
+                        migrate_input.from_key,
+                        migrate_input.from_key,
+                        object_ids,
+                    ))
+
+                return True, result[0]
+        except Exception as e:
+            cls.logger.exception(e)
+            return False, 0
+
+    @classmethod
+    def migrate_tag_key_all_objects(cls, app_name, object_type, migrate_input: TagKeyMigrateAllInput, do_update=False):
+        content_type = cls.get_content_type(app_name, object_type)
+
+        try:
+            model = content_type.model_class()
+            table_name = model._meta.db_table
+            return cls._do_migrate_all_tag_key(table_name, migrate_input, do_update)
+        except Exception as e:
+            cls.logger.exception(e)
+            return False, 0
+
+    @classmethod
+    def _do_migrate_all_tag_key(cls, table_name, migrate_input, do_update):
+        with connection.cursor() as cursor:
+            count_query = f"""
+                    select count(*) as count
+                    from {table_name}
+                    where tags ? %s
+                """
+            cursor.execute(count_query, (migrate_input.from_key,))
+            result = cursor.fetchone()
+            if do_update:
+                query = f"""
+                         update {table_name}
+                         set tags = tags - %s
+                             || jsonb_build_object(%s, tags->%s)
+                         where tags ? %s
+                    """
+                cursor.execute(query, (
+                    migrate_input.from_key,
+                    migrate_input.to_key,
+                    migrate_input.from_key,
+                    migrate_input.from_key,
+                ))
+            return True, result[0]

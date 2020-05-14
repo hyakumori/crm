@@ -1,5 +1,6 @@
 import * as forestApi from "../../api/forest";
 import { find } from "lodash";
+import { tags_to_array } from "../../helpers/tags";
 
 const state = {
   forest: null,
@@ -18,7 +19,7 @@ const getters = {
     return {
       title: state.forest.internal_id,
       subTitle: state.forest.owner.name_kanji,
-      tags: [state.forest.tags.danchi],
+      tags: tags_to_array(state.forest.tags),
       backUrl: { name: "forests" },
     };
   },

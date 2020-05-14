@@ -83,6 +83,11 @@ class ArchiveActions:
         "関連する森林が更新されました。",
         "mdi-image-filter-hdr",
     )
+    tags_updated = (
+        "customer.tags_updated",
+        "タグ情報が更新されました。",
+        "mdi-tag-outline",
+    )
 
 
 class UserActions:
