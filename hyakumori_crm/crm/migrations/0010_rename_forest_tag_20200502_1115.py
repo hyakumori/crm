@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('crm', '0009_messagetemplate'),
     ]
@@ -22,5 +21,16 @@ class Migration(migrations.Migration):
                     END IF;
                 END $$;
                 """],
+            reverse_sql=["""
+                DO $$
+                BEGIN
+                    IF EXISTS(SELECT *
+                        FROM information_schema.columns
+                        WHERE table_name='crm_forest' and column_name='tags')
+                    THEN
+                        ALTER TABLE crm_forest RENAME COLUMN "tags" TO "tag";
+                    END IF;
+                END $$;
+             """]
         ),
     ]

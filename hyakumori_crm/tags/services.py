@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 from hyakumori_crm.crm.models import Customer, Forest, get_user_model
 from hyakumori_crm.tags.exceptions import ContentTypeNotFound, TagFieldNotExists, ObjectNotFound, DuplicatedTagSetting
 from hyakumori_crm.tags.models import TagSetting
-from hyakumori_crm.tags.types import TagSettingInput, AssignTagInput, TagKeyMigrateInput, TagKeyMigrateAllInput
+from hyakumori_crm.tags.schemas import TagSettingInput, AssignTagInput, TagKeyMigrateInput, TagKeyMigrateAllInput
 
 
 class TagService:
