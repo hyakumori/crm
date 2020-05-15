@@ -51,8 +51,8 @@
                       type="error"
                       v-model="hasError"
                       :icon="false"
-                      >{{ errors }}</v-alert
-                    >
+                      >{{ errors }}
+                    </v-alert>
                   </div>
                   <v-text-field
                     v-model="selectedTag.name"
@@ -121,7 +121,7 @@
                       <v-btn
                         color="primary"
                         depressed
-                        :disabled="!hasChanged"
+                        :disabled="!hasChanged && !canSave"
                         @click.stop="onSave"
                         v-if="!isEditing"
                       >
@@ -250,16 +250,20 @@ export default {
       this.$emit("update:showDialog", false);
     },
     async onUpdate() {
-      if (!this.selectedTag.name || !this.selectedTag.code) {
+      if (
+        !this.selectedTag.name ||
+        !this.selectedTag.code ||
+        this.selectedTag.code.length === 0 ||
+        this.selectedTag.name.length === 0
+      ) {
         this.errors = this.$t("tags.required_fields");
         return;
       }
 
-      if (this.selectedTag.name === this.selectedTag.original_name) {
-        return;
-      }
-
       if (this.selectedTagMigrateInfo > 0) {
+        if (this.selectedTag.name === this.selectedTag.original_name) {
+          return;
+        }
         const confirm = await this.$dialog.confirm({
           title: this.$t("tags.migrate_title"),
           text: this.$t("tags.confirm_migrate", {
@@ -270,6 +274,7 @@ export default {
           return;
         }
       }
+
       try {
         this.loading = true;
         const response = await this.$rest.put(
@@ -297,7 +302,12 @@ export default {
       }
     },
     async onSave() {
-      if (!this.selectedTag.name || !this.selectedTag.code) {
+      if (
+        !this.selectedTag.name ||
+        !this.selectedTag.code ||
+        this.selectedTag.code.length === 0 ||
+        this.selectedTag.name.length === 0
+      ) {
         this.errors = this.$t("tags.required_fields");
         return;
       }
@@ -375,7 +385,7 @@ export default {
         return;
       }
       if (!this.selectedTag.attributes.colors) {
-        this.$set(this.selectedTag.attributes, "colors", []);
+        this.selectedTag.attributes.colors = [];
       }
       if (
         this.selectedTag.attributes.colors.findIndex(
@@ -384,8 +394,13 @@ export default {
       ) {
         return;
       }
+      this.selectedTag.attributes.colors.push({
+        ...this.addingColorItem,
+        menu: false,
+      });
       this.colorMaps.push({
         ...this.addingColorItem,
+        menu: false,
       });
       this.initAddingColorItem();
     },
@@ -403,10 +418,20 @@ export default {
         color: item.color,
       }));
 
-      return (
+      const check =
         !isEqual(this.selectedTag, this.originalSelectedTag) ||
-        !isEqual(_get(this.originalSelectedTag, "attributes.colors"), colors)
-      );
+        !isEqual(
+          JSON.parse(
+            JSON.stringify(
+              _get(this.originalSelectedTag, "attributes.colors", []),
+            ),
+          ),
+          colors,
+        );
+      return check;
+    },
+    canSave() {
+      return this.selectedTag.name && this.selectedTag.name.length > 0;
     },
   },
   watch: {
@@ -430,12 +455,16 @@ export default {
     "selectedTag.attributes": {
       deep: true,
       handler() {
-        if (this.selectedTag.attributes.colors) {
+        if (
+          this.selectedTag.attributes.colors &&
+          this.selectedTag.attributes.colors.length > 0
+        ) {
           this.colorMaps = this.selectedTag.attributes.colors.map(item => ({
             ...item,
             menu: false,
           }));
         } else {
+          this.initAddingColorItem();
           this.colorMaps = [];
         }
       },
@@ -446,8 +475,12 @@ export default {
         name: item.original_name,
       }));
     },
-    "selectedTag.name"() {
-      if (this.selectedTag && this.selectedTag.id) {
+    "selectedTag.name"(val) {
+      if (
+        this.selectedTag.id &&
+        val.length > 0 &&
+        val !== this.originalSelectedTag.name
+      ) {
         this.debouncedGetMigrateInfo();
       }
     },

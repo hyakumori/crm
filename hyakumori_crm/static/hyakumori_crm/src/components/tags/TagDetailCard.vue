@@ -182,6 +182,7 @@ export default {
         );
         if (results) {
           this.$emit("input", results.tags);
+          this.tags = results.tags;
           await this.getTagValues();
           await this.getTagSettings();
         }
@@ -255,7 +256,9 @@ export default {
       return hasScope(managePermission);
     },
     hasChanged() {
-      return this.editingTags.filter(item => !item.deleted).length > 0;
+      return (
+        this.editingTags.filter(item => !item.deleted || item.added).length > 0
+      );
     },
     tagKeyItems() {
       const selectedTagKeys = this.editingTags
