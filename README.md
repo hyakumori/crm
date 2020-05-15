@@ -110,3 +110,9 @@ docker run --rm -it --env-file .env --network=host --name=hyakumori_crm_test hya
 ```
 docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 ```
+
+### Task queue
+- Using `django-q` for async task and schedule
+- Run `./migrate.py setup_schedule_tasks` to set up schedule tasks
+- Run `./migrate.py qcluster` to start workers
+- Check info by running `./migrate.py qinfo`
