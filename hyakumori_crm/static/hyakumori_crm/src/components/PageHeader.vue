@@ -267,7 +267,8 @@ export default {
             transition: transform 0.2s;
           }
 
-          &:hover {
+          &:hover,
+          &.router-link-active {
             &:after {
               transform-origin: bottom left;
               transform: scaleX(1);
