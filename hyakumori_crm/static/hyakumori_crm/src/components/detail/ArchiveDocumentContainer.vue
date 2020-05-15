@@ -191,6 +191,11 @@ export default {
           validFiles.push(file);
         }
       });
+      if (files.length !== validFiles.length) {
+        this.$dialog.notify.warning("Removed invalid file extension", {
+          timeout: 5000,
+        });
+      }
       const originalDocs = [...this.documents, ...validFiles];
       this.duplicateUploadFiles = this.getDuplicateFiles(
         this.documents,
