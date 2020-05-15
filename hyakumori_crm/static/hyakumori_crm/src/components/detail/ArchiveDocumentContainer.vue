@@ -47,17 +47,35 @@
       <v-dialog v-model="showDuplicateFileDialog" max-width="500">
         <v-card color="white">
           <v-card-title>
-            以下のファイルが既に存在します。古いファイルを削除してから再度アップロードしてください。
+            以下のファイルは既に存在する、または不正なファイルです。
+            もう一度確認してから、アップロードしてください。
           </v-card-title>
           <v-card-text>
-            <ul>
-              <li v-for="(file, index) in duplicateUploadFiles" :key="index">
-                {{
-                  (file.attributes && file.attributes.original_file_name) ||
-                    file.name
-                }}
-              </li>
-            </ul>
+            <div v-if="duplicateUploadFiles.length > 0">
+              <p class="mb-0">■既に存在するファイル</p>
+              <ul>
+                <li v-for="(file, index) in duplicateUploadFiles" :key="index">
+                  {{
+                    (file.attributes && file.attributes.original_file_name) ||
+                      file.name
+                  }}
+                </li>
+              </ul>
+            </div>
+            <div
+              :class="{ 'mt-2': duplicateUploadFiles.length > 0 }"
+              v-if="invalidUploadFilesExtension.length > 0"
+            >
+              <p class="mb-0">■不正ファイル</p>
+              <ul>
+                <li
+                  v-for="(file, index) in invalidUploadFilesExtension"
+                  :key="index"
+                >
+                  {{ file.name }}
+                </li>
+              </ul>
+            </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -107,6 +125,7 @@ export default {
       immutableDocs: [],
       showDuplicateFileDialog: false,
       duplicateUploadFiles: [],
+      invalidUploadFilesExtension: [],
       acceptFileExtensions:
         ".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif, .txt",
     };
@@ -186,16 +205,14 @@ export default {
       const files = e.target.files;
       const acceptExtensionArr = this.acceptFileExtensions.split(", ");
       const validFiles = [];
+      this.invalidUploadFilesExtension = [];
       files.forEach(file => {
         if (this.isValidFileExtension(acceptExtensionArr, file.name)) {
           validFiles.push(file);
+        } else {
+          this.invalidUploadFilesExtension.push(file);
         }
       });
-      if (files.length !== validFiles.length) {
-        this.$dialog.notify.warning("Removed invalid file extension", {
-          timeout: 5000,
-        });
-      }
       const originalDocs = [...this.documents, ...validFiles];
       this.duplicateUploadFiles = this.getDuplicateFiles(
         this.documents,
@@ -205,7 +222,10 @@ export default {
         this.documents,
         validFiles,
       );
-      if (originalDocs.length !== filteredDocs.length) {
+      if (
+        originalDocs.length !== filteredDocs.length ||
+        files.length !== validFiles.length
+      ) {
         this.showDuplicateFileDialog = true;
       }
       this.documents = filteredDocs;
