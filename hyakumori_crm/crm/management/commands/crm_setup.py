@@ -40,7 +40,8 @@ class Command(BaseCommand):
         sync_created = kwargs.get("sync_created", False)
         if sync_created:
             answer = input(
-                "With sync_created is set, require some time to finish insert `created` log, continue (Y/n)? "
+                "With sync_created is set, require some time to"
+                " finish insert `created` log, continue (Y/n)? "
             )
             if not strtobool(answer):
                 sync_created = False
