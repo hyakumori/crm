@@ -3,7 +3,6 @@
 [![pipeline status](https://gitlab.com/datafluct/hyakumori_crm/badges/develop/pipeline.svg)](https://gitlab.com/datafluct/hyakumori_crm/-/commits/develop)
 [![coverage report](https://gitlab.com/datafluct/hyakumori_crm/badges/develop/coverage.svg)](https://gitlab.com/datafluct/hyakumori_crm/-/commits/develop)
 
-
 ## Requirements
 
 - Python>=3.7 (consider using `pyenv` to manage python version).
@@ -30,6 +29,17 @@ $ docker run --name postgres \
 
 - Or use `docker-compose` with provided `docker-compose.infra.yml`
 
+### REDIS
+
+```
+$ docker run --name redis \
+    --mount type=volume,source=redis,destination=/data \
+    --publish 6379:6379 \
+    redis:alpine
+```
+
+- Or use `docker-compose` with provided `docker-compose.infra.yml`
+
 ### Python
 
 - Create virtualenv: `python -m venv venv`
@@ -44,8 +54,9 @@ $ docker run --name postgres \
 
 1. Install once with `HYAKUMORI_LIGHT_BUILD=1 pip install -e .[dev]`
 2. Copy `.env.example` to `.env` and fill necessary variables for both backend and fontend.
-3. [FRONTEND] Move to `hyakumori_crm/static/hyakumori_crm` run `yarn`
-4. Run dev server with `STATIC_DIR="" hyakumori runserver`. You might want to set `STATIC_DIR=""` in `.env`.
+3. Run dev server with `STATIC_DIR="" hyakumori runserver`. You might want to set `STATIC_DIR=""` in `.env`.
+4. [FRONTEND] Move to `hyakumori_crm/static/hyakumori_crm` run `yarn`. Skip if at step 4, STATIC_DIR is set.
+5. [Optional] Run worker `./manage.py qcluster`
 
 ### Dependency management
 
@@ -72,6 +83,7 @@ Using `pip-tools`
 Remember to reinstall package.
 
 ### Using Docker build
+
 - `Dockerfile.full` is for building all in one image, included compiling Front-end
 - `Dockerfile` is used mainly for CI to build serve-able image using previous job artifacts
 - See `docker-compose.infra.yml` for local infrastructure reference
