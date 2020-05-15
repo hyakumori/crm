@@ -184,7 +184,7 @@ CORS_ALLOW_HEADERS = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_CACHE_LOCATION") or "redis://127.0.0.1:6379/1",
+        "LOCATION": os.getenv("REDIS_CACHE_URL") or "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
