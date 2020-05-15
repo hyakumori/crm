@@ -305,7 +305,6 @@ export default {
 
   &__detail__data {
     height: 40px;
-    max-width: 500px;
     padding-left: 9px;
 
     &__title {
