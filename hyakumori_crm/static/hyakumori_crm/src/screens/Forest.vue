@@ -1,5 +1,30 @@
 <template>
   <main-section class="forest">
+    <template #top>
+      <page-header>
+        <template #bottom-right>
+          <div>
+            <outline-round-btn
+              :icon="$t('icon.add')"
+              :content="$t('buttons.upload_csv')"
+              @click="uploadCsv"
+            />
+            <outline-round-btn
+              class="mx-2"
+              :icon="$t('icon.add')"
+              :content="$t('buttons.download_all_csv')"
+              @click="downloadAllCsv"
+            />
+            <outline-round-btn
+              :icon="$t('icon.add')"
+              :content="$t('buttons.download_specific_row')"
+              @click="downloadSelectedRows"
+            />
+          </div>
+        </template>
+      </page-header>
+    </template>
+
     <template #section>
       <search-card
         :searchCriteria="filterFields"
@@ -51,6 +76,9 @@ import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
 import MainSection from "../components/MainSection";
+import PageHeader from "../components/PageHeader";
+import OutlineRoundBtn from "../components/OutlineRoundBtn";
+import { saveAs } from "file-saver";
 
 export default {
   name: "forest",
@@ -63,6 +91,8 @@ export default {
     // TableAction,
     SnackBar,
     MainSection,
+    PageHeader,
+    OutlineRoundBtn,
   },
 
   data() {
@@ -138,6 +168,22 @@ export default {
     onSearch() {
       this.filter = { ...this.filter, filters: this.requestFilters };
       this.$apollo.queries.forestsInfo.refetch();
+    },
+
+    uploadCsv() {
+      console.log("hello");
+    },
+
+    async downloadAllCsv() {
+      const csvData = await this.$rest.get("/forests/download-csv");
+      if (csvData) {
+        const blob = new Blob([csvData], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, "all-forests.csv");
+      }
+    },
+
+    downloadSelectedRows() {
+      console.log("downloadSelectedRows");
     },
   },
 
