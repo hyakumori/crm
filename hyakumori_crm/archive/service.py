@@ -6,7 +6,7 @@ from django.db.models import F, Subquery, OuterRef, Count
 from django.db.models.expressions import Func, RawSQL, Value
 from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
-from django.core.exceptions import ValidationError as FileExtensionValidationError
+from django.core.exceptions import ValidationError as DjValidationError
 from rest_framework.request import Request
 
 from ..crm.models import (
@@ -90,7 +90,7 @@ def check_valid_file_extension(files):
         if file_extension.lower() in valid_extensions:
             valid_files.append(file)
         else:
-            raise FileExtensionValidationError('Unsupported file extension')
+            raise DjValidationError('Unsupported file extension')
     return valid_files
 
 

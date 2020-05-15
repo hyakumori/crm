@@ -46,11 +46,11 @@
       />
       <v-dialog v-model="showDuplicateFileDialog" max-width="500">
         <v-card color="white">
-          <v-card-title>
+          <v-card-title class="display-0">
             以下のファイルは既に存在する、または不正なファイルです。
             もう一度確認してから、アップロードしてください。
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="mt-2">
             <div v-if="duplicateUploadFiles.length > 0">
               <p class="mb-0">■既に存在するファイル</p>
               <ul>
