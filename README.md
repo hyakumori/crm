@@ -55,8 +55,7 @@ $ docker run --name redis \
 1. Install once with `HYAKUMORI_LIGHT_BUILD=1 pip install -e .[dev]`
 2. Copy `.env.example` to `.env` and fill necessary variables for both backend and fontend.
 3. Run dev server with `STATIC_DIR="" hyakumori runserver`. You might want to set `STATIC_DIR=""` in `.env`.
-4. [FRONTEND] Move to `hyakumori_crm/static/hyakumori_crm` run `yarn`. Skip if at step 4, STATIC_DIR is set.
-5. [Optional] Run worker `./manage.py qcluster`
+4. [FRONTEND] Move to `hyakumori_crm/static/hyakumori_crm` run `yarn`. Skip if at step 3, STATIC_DIR is set.
 
 ### Dependency management
 
@@ -113,6 +112,6 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
 ### Task queue
 - Using `django-q` for async task and schedule
-- Run `./migrate.py setup_schedule_tasks` to set up schedule tasks
-- Run `./migrate.py qcluster` to start workers
-- Check info by running `./migrate.py qinfo`
+- Run `./manage.py setup_schedule_tasks` to set up schedule tasks
+- Run `./manage.py qcluster` to start workers
+- Check info by running `./manage.py qinfo`
