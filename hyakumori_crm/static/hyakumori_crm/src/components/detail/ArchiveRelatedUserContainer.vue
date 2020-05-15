@@ -8,10 +8,10 @@
       class="mb-4"
     />
     <archive-participant-list
-      :participants="relatedParticipants"
-      :isEditing="isEditing"
-      @deleteParticipant="handleDeleteParticipant"
-      @undoDeletedParticipant="handleUndoDeletedParticipant"
+      :participants="tempUserParticipants"
+      :isUpdate="isEditing"
+      @deleteParticipant="handleDelete"
+      @undoDeletedParticipant="handleUndoDelete"
     />
     <select-list-modal
       submitBtnIcon="mdi-plus"
@@ -69,7 +69,7 @@ import AdditionButton from "../AdditionButton";
 import UpdateButton from "./UpdateButton";
 import SelectListModal from "../SelectListModal";
 import ArchiveParticipantCard from "./ArchiveParticipantCard";
-import { cloneDeep, pullAllWith, debounce } from "lodash";
+import { reject } from "lodash";
 
 export default {
   name: "ArchiveRelatedUserContainer",
@@ -88,10 +88,9 @@ export default {
   data() {
     return {
       archive_id: this.$route.params.id,
-      relatedParticipants: [],
-      immutableRelatedParticipants: [],
-      immutableAllParticipants: [],
-      next: "",
+      userParticipants: [],
+      addedParticipants: [],
+      deletedParticipants: [],
       itemsForAddingUrl: "/users/minimal",
       isLoading_: false,
     };
@@ -103,31 +102,19 @@ export default {
 
   methods: {
     itemsForAddingResultFilter(p) {
-      return false;
+      return this.userIdsMap[p.id];
     },
     handleToggleEdit(val) {
-      if (!this.isEditing && this.relatedParticipants) {
-        this.immutableRelatedParticipants = cloneDeep(this.relatedParticipants);
-      }
       this.isEditing = val;
     },
 
-    cancel() {
-      this.isEditing = false;
-      this.relatedParticipants = cloneDeep(this.immutableRelatedParticipants);
-      this.itemsForAdding = cloneDeep(this.immutableAllParticipants);
-    },
-
     async updateParticipant() {
-      if (this.relatedParticipants.length === 0) {
-        this.isEditing = false;
-      } else {
-        this.saving = true;
-        await this.deleteParticipants();
-        await this.addParticipants();
-        this.saving = false;
-        this.isEditing = false;
-      }
+      this.saving = true;
+      await this.deleteParticipants();
+      await this.addParticipants();
+      this.saving = false;
+      this.isEditing = false;
+      this.fetchRelatedParticipants();
     },
 
     async deleteParticipants() {
@@ -143,14 +130,6 @@ export default {
         );
         if (isDeleted) {
           this.modalSelectingId = null;
-          this.relatedParticipants = this.removeDuplicateParticipant(
-            this.relatedParticipants,
-            this.deletedParticipants,
-          );
-          const pureParticipants = cloneDeep(this.deletedParticipants);
-          pureParticipants.forEach(p => (p.deleted = false));
-          this.itemsForAdding.push(...pureParticipants);
-          this.immutableAllParticipants = cloneDeep(this.itemsForAdding);
         }
       }
     },
@@ -163,17 +142,6 @@ export default {
           { ids: addedIds },
         );
         if (newParticipants) {
-          const tempParticipants = this.removeDuplicateParticipant(
-            this.relatedParticipants,
-            newParticipants.data,
-          );
-          this.itemsForAdding = this.removeDuplicateParticipant(
-            this.itemsForAdding,
-            this.addedParticipants,
-          );
-          this.immutableAllParticipants = cloneDeep(this.itemsForAdding);
-          tempParticipants.push(...newParticipants.data);
-          this.relatedParticipants = tempParticipants;
         }
       }
     },
@@ -192,79 +160,76 @@ export default {
               next = paginationResponse.next;
             }
           }
-          this.relatedParticipants = tempRelatedData;
+          this.userParticipants = tempRelatedData;
           this.isLoading_ = false;
         });
     },
 
-    addRelatedParticipant() {
-      this.showSelect = true;
-      if (this.itemsForAdding.length === 0 || this.next === "") {
-        this.fetchAllParticipants();
-      }
-    },
-
     submitRelatedParticipant() {
-      if (this.modalSelectingId && this.modelSelectingIndex) {
-        const selectedParticipant = this.itemsForAdding[
-          this.modelSelectingIndex
-        ];
-        selectedParticipant.added = true;
-        this.relatedParticipants.push(selectedParticipant);
-        this.itemsForAdding.splice(this.modelSelectingIndex, 1);
-        this.modalSelectingId = null;
-        this.modelSelectingIndex = null;
-      } else {
-        this.itemsForAdding[0].added = true;
-        this.relatedParticipants.push(this.itemsForAdding[0]);
-        this.itemsForAdding.splice(0, 1);
+      const participant = this.itemsForAdding.results.splice(
+        this.modalSelectingIndex,
+        1,
+      )[0];
+      participant.added = true;
+      this.addedParticipants.push(participant);
+      this.modalSelectingIndex = null;
+      this.modalSelectingId = null;
+      if (this.itemsForAdding.results.length <= 3) {
+        this.handleLoadMore();
       }
     },
-
-    handleDeleteParticipant(participant, index) {
+    handleDelete(participant) {
       if (participant.added) {
-        this.relatedParticipants.splice(index, 1);
-        this.itemsForAdding = [participant, ...this.itemsForAdding];
+        delete participant.added;
+        this.addedParticipants = reject(this.addedParticipants, {
+          id: participant.id,
+        });
+        this.itemsForAdding = { results: [] };
       } else {
         this.$set(participant, "deleted", true);
+        this.deletedParticipants.push(participant);
       }
     },
-
-    handleUndoDeletedParticipant(participant) {
-      this.$set(participant, "deleted", false);
+    handleUndoDelete(participant) {
+      this.$set(participant, "deleted", undefined);
+      this.deletedParticipants = reject(this.deletedParticipants, {
+        id: participant.id,
+      });
     },
   },
 
   computed: {
+    tempUserParticipants() {
+      return [...this.userParticipants, ...this.addedParticipants];
+    },
+    userIdsMap() {
+      return Object.fromEntries(
+        this.tempUserParticipants.map(u => [u.id, true]),
+      );
+    },
     saveDisabled() {
       return (
         this.addedParticipants.length === 0 &&
         this.deletedParticipants.length === 0
       );
     },
-    addedParticipants() {
-      return (
-        this.relatedParticipants &&
-        this.relatedParticipants.filter(participant => participant.added)
-      );
-    },
-
-    deletedParticipants() {
-      return (
-        this.relatedParticipants &&
-        this.relatedParticipants.filter(participant => participant.deleted)
-      );
-    },
   },
 
   watch: {
-    itemsForAdding: {
-      deep: true,
-      handler(itemsForAdding) {
-        if (itemsForAdding.length <= 3 && this.next !== null) {
-          this.handleLoadMore();
+    isEditing(val) {
+      if (!val) {
+        if (this.addedParticipants.length > 0) {
+          this.addedParticipants = [];
+          this.itemsForAdding = { results: [] };
         }
-      },
+        for (let p of this.deletedParticipants) {
+          this.$set(p, "deleted", undefined);
+        }
+        if (this.deletedParticipants.length > 0) {
+          this.deletedParticipants = [];
+          this.itemsForAdding = { results: [] };
+        }
+      }
     },
   },
 };
