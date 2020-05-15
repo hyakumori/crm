@@ -2,61 +2,59 @@
   <div>
     <content-header
       :content="headerContent"
-      :editBtnContent="editBtnContent"
-      :loading="fetchRelatedParticipantLoading"
+      :toggleEditBtnContent="toggleEditBtnContent"
+      :update="isEditing"
       @toggleEdit="handleToggleEdit"
       class="mb-4"
     />
     <archive-participant-list
       :participants="relatedParticipants"
-      :isUpdate="isUpdate"
+      :isEditing="isEditing"
       @deleteParticipant="handleDeleteParticipant"
       @undoDeletedParticipant="handleUndoDeletedParticipant"
     />
     <select-list-modal
       submitBtnIcon="mdi-plus"
-      :loading="fetchAllParticipantLoading"
+      :loading="itemsForAddingLoading"
       :submitBtnText="$t('buttons.add')"
-      :shown="shown"
-      :handleSubmitClick="submitRelatedParticipant.bind(this)"
-      :disableAdditionBtn="fetchAllParticipantLoading"
-      @search="debounceSearchParticipant"
+      :shown.sync="showSelect"
+      :handleSubmitClick="submitRelatedParticipant"
+      :disableAdditionBtn="itemsForAddingLoading"
+      @search="debounceLoadInitItemsForAdding"
       @needToLoad="handleLoadMore"
-      @update:shown="val => (shown = val)"
+      ref="selectListModal"
     >
       <template #list>
         <archive-participant-card
-          v-for="(participant, index) in allParticipants"
+          v-for="(participant, index) in itemsForAdding.results"
           showPointer
           :key="index"
           :index="index"
           :name="participant.full_name"
           :showAction="false"
           :card_id="participant.id"
-          :selectedId="selectingParticipantId"
+          :selectedId="modalSelectingId"
           @selected="
             (pId, pIndex) => {
-              selectingParticipantId = pId;
-              selectingParticipantIndex = pIndex;
+              modalSelectingId = pId;
+              modelSelectingIndex = pIndex;
             }
           "
           flat
         />
       </template>
     </select-list-modal>
-    <template v-if="isUpdate">
+    <template v-if="isEditing">
       <addition-button
         class="my-2"
         :content="addBtnContent"
-        :click="addRelatedParticipant.bind(this)"
+        :click="() => (showSelect = true)"
       />
       <update-button
-        :cancel="cancel.bind(this)"
-        :saving="updateParticipantLoading"
-        :save="updateParticipant.bind(this)"
-        :saveDisabled="
-          addedParticipants.length === 0 && deletedParticipants.length === 0
-        "
+        :cancel="cancel"
+        :saving="saving"
+        :save="updateParticipant"
+        :saveDisabled="saveDisabled"
       />
     </template>
   </div>
@@ -65,6 +63,7 @@
 <script>
 import ContentHeader from "./ContentHeader";
 import ContainerMixin from "./ContainerMixin";
+import SelectListModalMixin from "./SelectListModalMixin";
 import ArchiveParticipantList from "./ArchiveParticipantList";
 import AdditionButton from "../AdditionButton";
 import UpdateButton from "./UpdateButton";
@@ -75,7 +74,7 @@ import { cloneDeep, pullAllWith, debounce } from "lodash";
 export default {
   name: "ArchiveRelatedUserContainer",
 
-  mixins: [ContainerMixin],
+  mixins: [ContainerMixin, SelectListModalMixin],
 
   components: {
     ContentHeader,
@@ -89,24 +88,13 @@ export default {
   data() {
     return {
       archive_id: this.$route.params.id,
-      isUpdate: false,
       relatedParticipants: [],
       immutableRelatedParticipants: [],
-      allParticipants: [],
       immutableAllParticipants: [],
-      shown: false,
       next: "",
-      fetchRelatedParticipantLoading: false,
-      fetchAllParticipantLoading: false,
-      selectingParticipantId: null,
-      selectingParticipantIndex: null,
-      updateParticipantLoading: false,
-      searchNext: null,
+      itemsForAddingUrl: "/users/minimal",
+      isLoading_: false,
     };
-  },
-
-  created() {
-    this.debounceSearchParticipant = debounce(this.fetchSearchParticipant, 500);
   },
 
   mounted() {
@@ -114,28 +102,31 @@ export default {
   },
 
   methods: {
+    itemsForAddingResultFilter(p) {
+      return false;
+    },
     handleToggleEdit(val) {
-      if (!this.isUpdate && this.relatedParticipants) {
+      if (!this.isEditing && this.relatedParticipants) {
         this.immutableRelatedParticipants = cloneDeep(this.relatedParticipants);
       }
-      this.isUpdate = val;
+      this.isEditing = val;
     },
 
     cancel() {
-      this.isUpdate = false;
+      this.isEditing = false;
       this.relatedParticipants = cloneDeep(this.immutableRelatedParticipants);
-      this.allParticipants = cloneDeep(this.immutableAllParticipants);
+      this.itemsForAdding = cloneDeep(this.immutableAllParticipants);
     },
 
     async updateParticipant() {
       if (this.relatedParticipants.length === 0) {
-        this.isUpdate = false;
+        this.isEditing = false;
       } else {
-        this.updateParticipantLoading = true;
+        this.saving = true;
         await this.deleteParticipants();
         await this.addParticipants();
-        this.updateParticipantLoading = false;
-        this.isUpdate = false;
+        this.saving = false;
+        this.isEditing = false;
       }
     },
 
@@ -151,15 +142,15 @@ export default {
           },
         );
         if (isDeleted) {
-          this.selectingParticipantId = null;
+          this.modalSelectingId = null;
           this.relatedParticipants = this.removeDuplicateParticipant(
             this.relatedParticipants,
             this.deletedParticipants,
           );
           const pureParticipants = cloneDeep(this.deletedParticipants);
           pureParticipants.forEach(p => (p.deleted = false));
-          this.allParticipants.push(...pureParticipants);
-          this.immutableAllParticipants = cloneDeep(this.allParticipants);
+          this.itemsForAdding.push(...pureParticipants);
+          this.immutableAllParticipants = cloneDeep(this.itemsForAdding);
         }
       }
     },
@@ -176,11 +167,11 @@ export default {
             this.relatedParticipants,
             newParticipants.data,
           );
-          this.allParticipants = this.removeDuplicateParticipant(
-            this.allParticipants,
+          this.itemsForAdding = this.removeDuplicateParticipant(
+            this.itemsForAdding,
             this.addedParticipants,
           );
-          this.immutableAllParticipants = cloneDeep(this.allParticipants);
+          this.immutableAllParticipants = cloneDeep(this.itemsForAdding);
           tempParticipants.push(...newParticipants.data);
           this.relatedParticipants = tempParticipants;
         }
@@ -188,7 +179,7 @@ export default {
     },
 
     fetchRelatedParticipants() {
-      this.fetchRelatedParticipantLoading = true;
+      this.isLoading_ = true;
       this.$rest
         .get(`/archives/${this.archive_id}/users`)
         .then(async response => {
@@ -202,74 +193,38 @@ export default {
             }
           }
           this.relatedParticipants = tempRelatedData;
-          this.fetchRelatedParticipantLoading = false;
+          this.isLoading_ = false;
         });
     },
 
-    fetchAllParticipants() {
-      if (this.next !== null) {
-        this.fetchAllParticipantLoading = true;
-        this.$rest
-          .get(this.next !== "" ? this.next : "/users/minimal")
-          .then(res => {
-            this.fetchAllParticipantLoading = false;
-            const filteredParticipants = this.removeDuplicateParticipant(
-              res.results,
-              this.relatedParticipants,
-            );
-            const allParticipants = this.removeDuplicateParticipant(
-              filteredParticipants,
-              this.allParticipants,
-            );
-            this.allParticipants.push(...allParticipants);
-            this.immutableAllParticipants.push(...allParticipants);
-            this.next = res.next;
-          });
-      }
-    },
-
-    removeDuplicateParticipant(participant1, participant2) {
-      return pullAllWith(
-        participant1,
-        participant2,
-        (p1, p2) => p1.id === p2.id,
-      );
-    },
-
     addRelatedParticipant() {
-      this.shown = true;
-      if (this.allParticipants.length === 0 || this.next === "") {
+      this.showSelect = true;
+      if (this.itemsForAdding.length === 0 || this.next === "") {
         this.fetchAllParticipants();
       }
     },
 
-    handleLoadMore() {
-      if (this.next !== null) {
-        this.fetchAllParticipants(this.next);
-      }
-    },
-
     submitRelatedParticipant() {
-      if (this.selectingParticipantId && this.selectingParticipantIndex) {
-        const selectedParticipant = this.allParticipants[
-          this.selectingParticipantIndex
+      if (this.modalSelectingId && this.modelSelectingIndex) {
+        const selectedParticipant = this.itemsForAdding[
+          this.modelSelectingIndex
         ];
         selectedParticipant.added = true;
         this.relatedParticipants.push(selectedParticipant);
-        this.allParticipants.splice(this.selectingParticipantIndex, 1);
-        this.selectingParticipantId = null;
-        this.selectingParticipantIndex = null;
+        this.itemsForAdding.splice(this.modelSelectingIndex, 1);
+        this.modalSelectingId = null;
+        this.modelSelectingIndex = null;
       } else {
-        this.allParticipants[0].added = true;
-        this.relatedParticipants.push(this.allParticipants[0]);
-        this.allParticipants.splice(0, 1);
+        this.itemsForAdding[0].added = true;
+        this.relatedParticipants.push(this.itemsForAdding[0]);
+        this.itemsForAdding.splice(0, 1);
       }
     },
 
     handleDeleteParticipant(participant, index) {
       if (participant.added) {
         this.relatedParticipants.splice(index, 1);
-        this.allParticipants = [participant, ...this.allParticipants];
+        this.itemsForAdding = [participant, ...this.itemsForAdding];
       } else {
         this.$set(participant, "deleted", true);
       }
@@ -278,31 +233,15 @@ export default {
     handleUndoDeletedParticipant(participant) {
       this.$set(participant, "deleted", false);
     },
-
-    fetchSearchParticipant(keyword) {
-      this.fetchAllParticipantLoading = true;
-      this.$rest
-        .get("/users/minimal", {
-          params: {
-            search: keyword || "",
-          },
-        })
-        .then(response => {
-          this.allParticipants = [];
-          this.immutableAllParticipants = [];
-          const tempParticipants = this.removeDuplicateParticipant(
-            response.results,
-            this.relatedParticipants,
-          );
-          this.next = response.next;
-          this.allParticipants.push(...tempParticipants);
-          this.immutableAllParticipants.push(...tempParticipants);
-          this.fetchAllParticipantLoading = false;
-        });
-    },
   },
 
   computed: {
+    saveDisabled() {
+      return (
+        this.addedParticipants.length === 0 &&
+        this.deletedParticipants.length === 0
+      );
+    },
     addedParticipants() {
       return (
         this.relatedParticipants &&
@@ -319,10 +258,10 @@ export default {
   },
 
   watch: {
-    allParticipants: {
+    itemsForAdding: {
       deep: true,
-      handler(allParticipants) {
-        if (allParticipants.length <= 3 && this.next !== null) {
+      handler(itemsForAdding) {
+        if (itemsForAdding.length <= 3 && this.next !== null) {
           this.handleLoadMore();
         }
       },
