@@ -1,15 +1,75 @@
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection
+from django.db import connection, transaction
 
 from hyakumori_crm.activity.constants import *
 from hyakumori_crm.activity.models import ActionLog
 from hyakumori_crm.core.utils import get_remote_ip
+from hyakumori_crm.crm.models import Customer, Forest
 from hyakumori_crm.crm.models.message_template import MessageTemplate
 import logging
 
 
 class ActivityService:
     logger = logging.getLogger(__name__)
+
+    @classmethod
+    def setup_templates(cls, sync_created=False):
+        with transaction.atomic():
+            MessageTemplate.objects.all().delete()
+
+            ActivityService.import_message_templates(
+                for_type="forest", action_class=ForestActions
+            )
+            ActivityService.import_message_templates(
+                for_type="customer", action_class=CustomerActions
+            )
+            ActivityService.import_message_templates(
+                for_type="archive", action_class=ArchiveActions
+            )
+            ActivityService.import_message_templates(
+                for_type="user", action_class=UserActions
+            )
+
+            if sync_created:
+                ActionLog.objects.filter(
+                    template_name__in=[
+                        "forest.created",
+                        "customer.created",
+                        "archive.created",
+                        "user.created",
+                    ]
+                ).all().delete()
+
+                admin = (
+                    get_user_model()
+                        .objects.filter(is_superuser=True)
+                        .order_by("date_joined")
+                        .first()
+                )
+                for forest in Forest.objects.iterator():
+                    ActivityService.log(
+                        ForestActions.created,
+                        forest,
+                        user=admin,
+                        created_at=forest.created_at,
+                    )
+
+                for customer in Customer.objects.iterator():
+                    ActivityService.log(
+                        CustomerActions.created,
+                        customer,
+                        user=admin,
+                        created_at=customer.created_at,
+                    )
+
+                for user in get_user_model().objects.iterator():
+                    ActivityService.log(
+                        UserActions.created,
+                        user,
+                        user=admin,
+                        created_at=user.date_joined,
+                    )
 
     @classmethod
     def import_message_templates(cls, for_type: str, action_class):
@@ -56,12 +116,12 @@ class ActivityService:
             template = MessageTemplate.objects.get(name=template_name)
             content_type = ContentType.objects.get_for_model(model_instance)
             log = ActionLog.objects.create(content_type=content_type,
-                            object_pk=model_instance.pk,
-                            template_name=template.name,
-                            template_data=template_data,
-                            changes=changes,
-                            user=user,
-                            remote_ip=remote_ip)
+                                           object_pk=model_instance.pk,
+                                           template_name=template.name,
+                                           template_data=template_data,
+                                           changes=changes,
+                                           user=user,
+                                           remote_ip=remote_ip)
             if created_at is not None:
                 log.created_at = created_at
             return log.save(update_fields=["created_at"])

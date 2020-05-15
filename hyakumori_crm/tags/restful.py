@@ -29,13 +29,6 @@ from ..permissions.services import PermissionService
 logger = logging.getLogger(__name__)
 
 
-@api_view(["POST"])
-@permission_classes([IsAdminUser])
-def setup_tags(request):
-    TagService.setup_tags()
-    return make_success_json(data=dict(success=True))
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_settings_for_type(request, app_name, object_type):
