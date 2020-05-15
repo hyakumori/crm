@@ -33,7 +33,7 @@
           class="attachments__addition-container__file"
           ref="fileInput"
           type="file"
-          accept=".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif"
+          :accept="acceptFileExtensions"
           multiple
           @change="onFileChange"
         />
@@ -107,6 +107,8 @@ export default {
       immutableDocs: [],
       showDuplicateFileDialog: false,
       duplicateUploadFiles: [],
+      acceptFileExtensions:
+        ".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif, .txt",
     };
   },
 
@@ -174,11 +176,30 @@ export default {
       });
     },
 
+    isValidFileExtension(acceptExtension, filename) {
+      const fileSplitByDots = filename.split(".");
+      const fileExtension = `.${fileSplitByDots[fileSplitByDots.length - 1]}`;
+      return acceptExtension.includes(fileExtension);
+    },
+
     onFileChange(e) {
       const files = e.target.files;
-      const originalDocs = [...this.documents, ...files];
-      this.duplicateUploadFiles = this.getDuplicateFiles(this.documents, files);
-      const filteredDocs = this.removeDuplicateFiles(this.documents, files);
+      const acceptExtensionArr = this.acceptFileExtensions.split(", ");
+      const validFiles = [];
+      files.forEach(file => {
+        if (this.isValidFileExtension(acceptExtensionArr, file.name)) {
+          validFiles.push(file);
+        }
+      });
+      const originalDocs = [...this.documents, ...validFiles];
+      this.duplicateUploadFiles = this.getDuplicateFiles(
+        this.documents,
+        validFiles,
+      );
+      const filteredDocs = this.removeDuplicateFiles(
+        this.documents,
+        validFiles,
+      );
       if (originalDocs.length !== filteredDocs.length) {
         this.showDuplicateFileDialog = true;
       }
