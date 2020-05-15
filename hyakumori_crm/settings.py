@@ -168,16 +168,16 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, "hyakumori_crm", "locale")]
 CORS_ORIGIN_WHITELIST = ["http://localhost:8080", "http://127.0.0.1:8080"]
 CORS_ORIGIN_WHITELIST += os.getenv("CORS_ORIGIN_WHITELIST", "").split(",")
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    'cache-control'
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "cache-control",
 ]
 # ---------------------------------------------------------------------------- #
 #                                    CACHES                                    #
@@ -185,7 +185,7 @@ CORS_ALLOW_HEADERS = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_CACHE_URL", "redis://127.0.0.1:6379/1"),
+        "LOCATION": os.getenv("REDIS_CACHE_URL") or "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
@@ -273,18 +273,18 @@ EMAIL_USE_TLS = strtobool(os.getenv("EMAIL_USE_TLS", "no"))
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    'formatters': {
-        'sql': {
-            '()': 'hyakumori_crm.core.utils.SQLFormatter',
-            'format': '[%(duration).3f] %(statement)s',
+    "formatters": {
+        "sql": {
+            "()": "hyakumori_crm.core.utils.SQLFormatter",
+            "format": "[%(duration).3f] %(statement)s",
         }
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
-        'sql': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'sql',
-            'level': 'DEBUG',
+        "sql": {
+            "class": "logging.StreamHandler",
+            "formatter": "sql",
+            "level": "DEBUG",
         },
     },
     "root": {"handlers": ["console"], "level": "WARNING"},
@@ -294,10 +294,10 @@ LOGGING = {
             "level": os.getenv("DB_LOG_LEVEL", "DEBUG" if DEBUG else "WARNING"),
             "propagate": False,
         },
-        'django.db.backends.schema': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "django.db.backends.schema": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
         },
     },
 }

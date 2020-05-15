@@ -14,9 +14,8 @@ class Command(BaseCommand):
     help = "Setup schedule tasks"
 
     def handle(self, *args, **kwargs):
-        schedule('hyakumori_crm.tasks.healthcheck.do_healthcheck',
-                 schedule_type=Schedule.MINUTES,
-                 minutes=1)
-
-
-
+        schedule(
+            "hyakumori_crm.tasks.healthcheck.do_healthcheck",
+            schedule_type=Schedule.MINUTES,
+            minutes=1,
+        )
