@@ -150,7 +150,7 @@
 
 <script>
 import TagSettingColorItem from "./TagSettingColorItem";
-import { debounce, isEqual, get as _get, isEmpty } from "lodash";
+import { debounce, isEqual, get as _get } from "lodash";
 
 export default {
   props: {
@@ -259,11 +259,10 @@ export default {
         this.errors = this.$t("tags.required_fields");
         return;
       }
-
-      if (this.selectedTagMigrateInfo > 0) {
-        if (this.selectedTag.name === this.selectedTag.original_name) {
-          return;
-        }
+      if (
+        this.selectedTagMigrateInfo > 0 &&
+        this.selectedTag.name !== this.selectedTag.original_name
+      ) {
         const confirm = await this.$dialog.confirm({
           title: this.$t("tags.migrate_title"),
           text: this.$t("tags.confirm_migrate", {
@@ -295,6 +294,7 @@ export default {
             ...response.results,
             original_name: response.results.name,
           };
+          this.onSelectedTagIdChanged();
         }
       } catch (e) {
       } finally {
@@ -324,9 +324,10 @@ export default {
             no_activity: true,
           },
         );
-        if (response) {
+        if (response && response.results) {
           await this.getTagSettings();
-          this.selectedTag = response.results;
+          this.selectedTagId = response.results.id;
+          this.onSelectedTagIdChanged();
         }
       } finally {
         this.loading = false;
@@ -378,6 +379,8 @@ export default {
     },
     resetData() {
       this.selectedTag = { ...this.buildTagSetting() };
+      this.colorMaps = [];
+      this.originalSelectedTag = { ...this.buildTagSetting() };
       this.initAddingColorItem();
     },
     addNewColorSetting() {
@@ -388,16 +391,12 @@ export default {
         this.selectedTag.attributes.colors = [];
       }
       if (
-        this.selectedTag.attributes.colors.findIndex(
+        this.colorMaps.findIndex(
           item => item.value === this.addingColorItem.value,
         ) > -1
       ) {
         return;
       }
-      this.selectedTag.attributes.colors.push({
-        ...this.addingColorItem,
-        menu: false,
-      });
       this.colorMaps.push({
         ...this.addingColorItem,
         menu: false,
@@ -406,6 +405,17 @@ export default {
     },
     onColorSettingDelete({ id }) {
       this.colorMaps.splice(id, 1);
+    },
+    onSelectedTagIdChanged() {
+      const tag = this.tagSettings.find(item => item.id === this.selectedTagId);
+      if (!tag) {
+        this.selectedTag = { ...this.buildTagSetting() };
+      } else {
+        this.selectedTag = { ...tag };
+      }
+      this.originalSelectedTag = {
+        ...this.selectedTag,
+      };
     },
   },
   computed: {
@@ -444,13 +454,7 @@ export default {
       }
     },
     selectedTagId() {
-      const tag = this.tagSettings.find(item => item.id === this.selectedTagId);
-      if (!tag) {
-        this.selectedTag = { ...this.buildTagSetting() };
-      } else {
-        this.selectedTag = tag;
-      }
-      this.originalSelectedTag = { ...this.selectedTag };
+      this.onSelectedTagIdChanged();
     },
     "selectedTag.attributes": {
       deep: true,
@@ -468,12 +472,6 @@ export default {
           this.colorMaps = [];
         }
       },
-    },
-    "selectedTag.id"() {
-      this.tagSettings = this.tagSettings.map(item => ({
-        ...item,
-        name: item.original_name,
-      }));
     },
     "selectedTag.name"(val) {
       if (
