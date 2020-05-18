@@ -127,7 +127,7 @@ export default {
     forceRefreshCache() {
       try {
         this.$rest.post(
-          `/archives/${this.id}/cache`,
+          `/cache/archives/${this.id}`,
           {},
           { no_activity: true },
         );
