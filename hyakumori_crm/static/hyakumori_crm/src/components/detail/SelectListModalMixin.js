@@ -57,8 +57,12 @@ export default {
   watch: {
     showSelect(val) {
       if (val && this.itemsForAdding.results.length === 0) {
-        this.$refs.selectListModal.keyword = "";
-        this.loadInitItemsForAdding();
+        if (this.$refs.selectListModal.isSearchEmpty)
+          this.loadInitItemsForAdding();
+        else {
+          // this will auto triggers load items
+          this.$refs.selectListModal.clearSearch();
+        }
       }
     },
   },

@@ -70,11 +70,19 @@ export default {
     },
   },
   methods: {
+    clearSearch() {
+      this.keyword = "";
+    },
     needLoadOnNearEnd(event) {
       const el = event.target;
       if (el.scrollHeight - el.scrollTop === el.clientHeight) {
         this.$emit("needToLoad");
       }
+    },
+  },
+  computed: {
+    isSearchEmpty() {
+      return this.keyword === "";
     },
   },
   beforeDestroy() {

@@ -82,7 +82,7 @@ import CustomerContactList from "./CustomerContactList";
 import CustomerContactCard from "./CustomerContactCard";
 import AdditionButton from "../AdditionButton";
 import SelectListModal from "../SelectListModal";
-import { debounce, reject } from "lodash";
+import { reject } from "lodash";
 
 export default {
   name: "archive-participant-container",

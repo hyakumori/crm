@@ -37,6 +37,7 @@
       @search="deboundGetSearch"
       @needToLoad="handleLoadMore"
       @update:shown="val => (shown = val)"
+      ref="selectListModal"
     >
       <template #list>
         <forest-info-card
@@ -307,6 +308,12 @@ export default {
   },
 
   watch: {
+    shown(val) {
+      if (!val) {
+        if (this.allForests.length === 0)
+          this.$refs.selectListModal.keyword = "";
+      }
+    },
     allForests: {
       deep: true,
       handler(allForests) {
