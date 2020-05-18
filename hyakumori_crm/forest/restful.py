@@ -36,6 +36,7 @@ from ..api.decorators import (
     get_or_404,
     action_login_required,
 )
+from ..cache.forest import refresh_customer_forest_cache
 from ..permissions.services import PermissionService
 
 

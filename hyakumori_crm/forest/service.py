@@ -27,8 +27,8 @@ def get_customer_of_forest(pk, customer_pk):
     try:
         return (
             ForestCustomer.objects.select_related("customer")
-            .get(customer_id=customer_pk, forest_id=pk)
-            .customer
+                .get(customer_id=customer_pk, forest_id=pk)
+                .customer
         )
     except (
         ForestCustomer.DoesNotExist,
@@ -52,7 +52,7 @@ def get_forests_by_condition(
         return [], 0
     query = filters.qs if filters else Forest.objects.all()
     total = query.count()
-    forests = query.order_by("-updated_at", "-created_at")[offset : offset + per_page]
+    forests = query.order_by("-updated_at", "-created_at")[offset: offset + per_page]
     return forests, total
 
 
@@ -120,16 +120,16 @@ def get_customer_contacts_of_forest(pk):
             customercontact__attributes__contact_type="FOREST",
             customercontact__forestcustomercontact__forestcustomer__forest_id=pk,
         )
-        .annotate(
+            .annotate(
             is_basic=F("customercontact__is_basic")
         )  # actualy its always False, why did we retrieve it?
-        .annotate(customer_id=F("customercontact__customer_id"))
-        .annotate(
+            .annotate(customer_id=F("customercontact__customer_id"))
+            .annotate(
             default=RawSQL(
                 "crm_forestcustomercontact.attributes->>'default'", params=[]
             )
         )
-        .annotate(cc_attrs=F("customercontact__attributes"))
+            .annotate(cc_attrs=F("customercontact__attributes"))
     )
 
 

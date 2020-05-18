@@ -1,4 +1,3 @@
-import logging
 from typing import Iterator, Union
 from uuid import UUID
 
@@ -19,6 +18,7 @@ from hyakumori_crm.crm.models import (
     ForestCustomerContact,
 )
 from .schemas import ContactType, CustomerInputSchema, ContactsInput
+from ..cache.forest import refresh_customer_forest_cache
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
 
 
@@ -267,6 +267,11 @@ def update_basic_info(data):
     customer.address = self_contact.address
     customer.save(update_fields=["address", "name_kana", "name_kanji", "updated_at"])
 
+    # cache saving for forest
+    refresh_customer_forest_cache(
+        list(customer.forestcustomer_set.values_list("forest_id", flat=True))
+    )
+
     return customer
 
 
@@ -358,24 +363,38 @@ def delete_customer_contacts(contacts_delete_in: dict):
 
 
 def update_forests(data):
+    """
+    Assign forests to user, support delete, add forest
+    :param data:
+    :return:
+    """
     customer = data.customer
+
+    # delete relations
     forestcustomers = ForestCustomer.objects.filter(
         forest_id__in=data.deleted, customer_id=customer.pk
     ).all()
     CustomerContact.objects.filter(
         forestcustomercontact__forestcustomer_id__in=forestcustomers.values("id")
     ).delete()
+
     for fc in forestcustomers:
         fc.force_delete()
 
+    # assign new relations
     added_forest_customers = []
     for added_forest_pk in data.added:
         forest_customer = ForestCustomer(
             customer_id=customer.id, forest_id=added_forest_pk,
         )
         added_forest_customers.append(forest_customer)
+
     ForestCustomer.objects.bulk_create(added_forest_customers)
     customer.save(update_fields=["updated_at"])
+
+    customer.refresh_from_db()
+    refresh_customer_forest_cache(data.added + data.deleted)
+
     return customer
 
 

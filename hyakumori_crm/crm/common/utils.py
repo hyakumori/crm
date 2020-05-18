@@ -32,3 +32,13 @@ def decrypt_string(data, to_dict=True):
         return content
     except:
         raise DecryptError
+
+
+def get_customer_name(name_dict):
+    customer_name = ""
+    if name_dict.get("last_name", None) is not None:
+        customer_name = name_dict.get("last_name")
+    if name_dict.get("first_name", None) is not None:
+        customer_name += name_dict.get("first_name")
+
+    return customer_name
