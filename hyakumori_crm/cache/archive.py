@@ -9,6 +9,8 @@ from hyakumori_crm.crm.common.utils import get_customer_name
 from hyakumori_crm.crm.models import Archive, Customer, Forest
 from hyakumori_crm.users.models import User
 
+logger = logging.Logger(__name__)
+
 
 def refresh_user_participants_cache(archive: Archive, save=False):
     try:
@@ -97,7 +99,7 @@ def update_customer_cache(sender, instance, created, **kwargs):
             for archivecustomer in instance.archivecustomer_set.iterator():
                 refresh_customers_cache(archivecustomer.archive, save=True)
         except:
-            logging.warning(
+            logger.warning(
                 f"could not refresh customer cache for archive, customer: {instance.pk}"
             )
 
@@ -109,7 +111,7 @@ def update_user_cache(sender, instance, created, **kwargs):
             for archiveuser in instance.archiveuser_set.iterator():
                 refresh_user_participants_cache(archiveuser.archive, save=True)
         except:
-            logging.warning(
+            logger.warning(
                 f"could not refresh user cache for archive, user: {instance.pk}"
             )
 
@@ -121,6 +123,6 @@ def update_forest_cache(sender, instance, created, **kwargs):
             for archiveforest in instance.archiveforest_set.iterator():
                 refresh_forest_cache(archiveforest.archive, save=True)
         except:
-            logging.warning(
+            logger.warning(
                 f"could not refresh forest cache for archive, forest: {instance.pk}"
             )
