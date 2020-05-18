@@ -3,7 +3,6 @@
     <content-header
       :content="headerContent"
       :toggleEditBtnContent="toggleEditBtnContent"
-      :update="isEditing"
       @toggleEdit="val => (isEditing = val)"
       :displayAdditionBtn="
         (contactType === 'FOREST' && !!selectingForestCustomerId) ||
@@ -14,7 +13,7 @@
     <customer-contact-list
       class="mt-4"
       :contacts="tempContacts"
-      :isEditing="isEditing"
+      :isUpdate="isEditing"
       isContactor
       @deleteContact="handleDelete"
       @undoDeleteContact="handleUndoDelete"

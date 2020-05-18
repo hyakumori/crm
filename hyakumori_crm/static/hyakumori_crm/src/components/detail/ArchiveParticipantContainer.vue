@@ -9,7 +9,7 @@
     />
     <customer-contact-list
       :contacts="tempParticipants"
-      :isEditing="isEditing"
+      :isUpdate="isEditing"
       :showRelationshipSelect="false"
       @deleteContact="handleDelete"
       @undoDeleteContact="handleUndoDelete"

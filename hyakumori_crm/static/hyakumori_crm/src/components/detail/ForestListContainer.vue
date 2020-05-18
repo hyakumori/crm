@@ -10,7 +10,7 @@
     <forest-info-list
       class="mt-4"
       :forests="tempForests"
-      :isEditing="isEditing"
+      :isUpdate="isEditing"
       @deleteForest="handleDelete"
       @undoDeleteForest="handleUndoDelete"
       :selectedId="selectingForestId_"
