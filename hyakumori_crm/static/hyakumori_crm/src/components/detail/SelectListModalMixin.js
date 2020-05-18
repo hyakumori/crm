@@ -8,6 +8,9 @@ export default {
     );
   },
   data() {
+    /*
+     * itemsForAddingUrl: { type: String }
+     */
     return {
       itemsForAddingLoading: false,
       itemsForAdding: { results: [] },

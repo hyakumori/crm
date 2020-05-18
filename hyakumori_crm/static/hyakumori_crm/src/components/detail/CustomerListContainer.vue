@@ -101,9 +101,6 @@ export default {
     customer: Object,
     contactType: String,
   },
-  created() {
-    this.debounceLoadInitItemsForAdding = debounce(this.loadInitContacts, 500);
-  },
   data() {
     return {
       selectingContactId: null,
