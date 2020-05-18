@@ -5,19 +5,19 @@
         <template #bottom-right>
           <div>
             <outline-round-btn
-              :icon="$t('icon.add')"
               :content="$t('buttons.upload_csv')"
+              :icon="$t('icon.add')"
               @click="uploadCsv"
             />
             <outline-round-btn
-              class="mx-2"
-              :icon="$t('icon.add')"
               :content="$t('buttons.download_all_csv')"
+              :icon="$t('icon.add')"
               @click="downloadAllCsv"
+              class="mx-2"
             />
             <outline-round-btn
-              :icon="$t('icon.add')"
               :content="$t('buttons.download_specific_row')"
+              :icon="$t('icon.add')"
               @click="downloadSelectedRows"
             />
           </div>
@@ -27,8 +27,8 @@
 
     <template #section>
       <search-card
-        :searchCriteria="filterFields"
         :onSearch="onSearch"
+        :searchCriteria="filterFields"
         ref="filter"
       />
 
@@ -41,27 +41,27 @@
         <!--        />-->
 
         <data-list
-          mode="forest"
-          itemKey="id"
-          :headers="getHeaders"
+          :autoHeaders="false"
           :data="getData"
-          :showSelect="false"
+          :headers="getHeaders"
           :isLoading="$apollo.queries.forestsInfo.loading"
-          :serverItemsLength="getTotalForests"
-          :tableRowIcon="tableRowIcon"
           :options.sync="options"
+          :serverItemsLength="getTotalForests"
+          :showSelect="true"
+          :tableRowIcon="tableRowIcon"
           @rowData="rowData"
           @selectedRow="selectedRow"
-          :autoHeaders="false"
+          itemKey="id"
+          mode="forest"
         ></data-list>
       </div>
 
       <snack-bar
-        color="error"
         :isShow="isShowErr"
         :msg="errMsg"
         :timeout="sbTimeout"
         @dismiss="onDismissSb"
+        color="error"
       />
     </template>
   </main-section>
@@ -71,7 +71,6 @@
 import gql from "graphql-tag";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
-import TableAction from "../components/TableAction";
 import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
@@ -182,8 +181,16 @@ export default {
       }
     },
 
-    downloadSelectedRows() {
-      console.log("downloadSelectedRows");
+    async downloadSelectedRows() {
+      const selectedRowIds = this.tableSelectedRow.map(row => row.id);
+      const csvData = await this.$rest.post(
+        "/forests/download-csv",
+        selectedRowIds,
+      );
+      if (csvData) {
+        const blob = new Blob([csvData], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, "specific_forests.csv");
+      }
     },
   },
 

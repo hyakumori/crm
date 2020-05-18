@@ -183,6 +183,25 @@ def get_all_forest_csv_data():
         customer_internal_id=F("forestcustomer__customer__internal_id"))
 
 
+def get_specific_forest_csv_data(forest_ids: list):
+    return Forest.objects.filter(id__in=forest_ids).distinct("id").annotate(forest_id=F("id")).annotate(
+        customer_name_kana=RawSQL(
+            "select array_to_string(array_agg(concat(name_kana->>'last_name',name_kana->>'first_name')), '; ') "
+            "from crm_customer c "
+            "inner join crm_forestcustomer cf on c.id = cf.customer_id "
+            "where crm_forest.id = cf.forest_id",
+            params=[]
+        )).annotate(
+        customer_name_kanji=RawSQL(
+            "select array_to_string(array_agg(concat(name_kanji->>'last_name',name_kanji->>'first_name')), '; ') "
+            "from crm_customer c "
+            "inner join crm_forestcustomer cf on c.id = cf.customer_id "
+            "where crm_forest.id = cf.forest_id",
+            params=[]
+        )).annotate(
+        customer_internal_id=F("forestcustomer__customer__internal_id"))
+
+
 def forest_csv_data_mapping(forest):
     return [
         forest.forest_id,
