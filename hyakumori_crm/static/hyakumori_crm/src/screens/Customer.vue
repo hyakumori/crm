@@ -115,20 +115,14 @@ export default {
     },
   },
   methods: {
-    handelDownloadSelected() {
-      const ids = Object.keys(this.$refs.table.$refs.dataTable.selection);
-      const qStr = ids.map(id => `ids=${id}`).join("&");
-      const fileStream = streamSaver.createWriteStream(
-        "customers_filtered.csv",
-      );
+    downloadCsv(fileName, url) {
+      const fileStream = streamSaver.createWriteStream(fileName);
 
-      fetch("/api/v1/customers/download_csv?" + qStr, {
+      fetch(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }).then(res => {
-        const readableStream = res.body;
-
         window.writer = fileStream.getWriter();
 
         const reader = res.body.getReader();
@@ -142,28 +136,16 @@ export default {
         pump();
       });
     },
+    handelDownloadSelected() {
+      const ids = Object.keys(this.$refs.table.$refs.dataTable.selection);
+      const qStr = ids.map(id => `ids=${id}`).join("&");
+      this.downloadCsv(
+        "customers_filtered.csv",
+        "/api/v1/customers/download_csv?" + qStr,
+      );
+    },
     handelDownloadAll() {
-      const fileStream = streamSaver.createWriteStream("customers.csv");
-
-      fetch("/api/v1/customers/download_csv", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }).then(res => {
-        const readableStream = res.body;
-
-        window.writer = fileStream.getWriter();
-
-        const reader = res.body.getReader();
-        const pump = () =>
-          reader
-            .read()
-            .then(res =>
-              res.done ? writer.close() : writer.write(res.value).then(pump),
-            );
-
-        pump();
-      });
+      this.downloadCsv("customers.csv", "/api/v1/customers/download_csv");
     },
     rowData(val) {
       this.$router.push({
