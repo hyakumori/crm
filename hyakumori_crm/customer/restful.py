@@ -212,7 +212,12 @@ class CustomerViewSets(ViewSet):
 
     @action(detail=False, methods=["GET"])
     def download_csv(self, request):
-        customers, _ = get_list(per_page=None)
+        pks = request.GET.getlist("ids")
+        if len(pks) == 0:
+            filters = {}
+        else:
+            filters = {"id__in": pks}
+        customers, _ = get_list(per_page=None, filters=filters)
         headers = [
             "所有者ID",
             "新規ID発行",
