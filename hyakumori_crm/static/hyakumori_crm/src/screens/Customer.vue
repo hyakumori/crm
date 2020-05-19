@@ -16,13 +16,13 @@
               <v-list>
                 <v-list-item
                   v-if="$refs.table && $refs.table.selected.length > 0"
-                  @click="handelDownloadSelected"
+                  @click="handleDownloadSelected"
                 >
                   <v-list-item-title>{{
                     $t("buttons.download_selected")
                   }}</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="handelDownloadAll">
+                <v-list-item @click="handleDownloadAll">
                   <v-list-item-title>{{
                     $t("buttons.download_all")
                   }}</v-list-item-title>
@@ -134,16 +134,19 @@ export default {
         pump();
       });
     },
-    handelDownloadSelected() {
+    handleDownloadSelected() {
       const ids = Object.keys(this.$refs.table.$refs.dataTable.selection);
       const qStr = ids.map(id => `ids=${id}`).join("&");
       this.downloadCsv(
         "customers_filtered.csv",
-        "/api/v1/customers/download_csv?" + qStr,
+        `${this.$rest.defaults.baseURL}/customers/download_csv?` + qStr,
       );
     },
-    handelDownloadAll() {
-      this.downloadCsv("customers.csv", "/api/v1/customers/download_csv");
+    handleDownloadAll() {
+      this.downloadCsv(
+        "customers.csv",
+        `${this.$rest.defaults.baseURL}/customers/download_csv`,
+      );
     },
     rowData(val) {
       this.$router.push({

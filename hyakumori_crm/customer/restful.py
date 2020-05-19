@@ -209,7 +209,7 @@ class CustomerViewSets(ViewSet):
             filters = {"id__in": pks}
         customers, _ = get_list(per_page=None, filters=filters)
         headers = [
-            "\ufeff所有者ID",  # contains BOM char for opening on fucking windows excel
+            "\ufeff所有者ID",  # contains BOM char for opening on windows excel
             "新規ID発行",
             "土地所有者名（漢字）",
             "土地所有者名（カナ）",

@@ -157,7 +157,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_URL = "/static/"
+STATIC_URL = "/"
 
 AUTH_USER_MODEL = "users.User"
 
@@ -310,8 +310,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # https://docs.djangoproject.com/en/3.0/ref/settings/#std:setting-MEDIA_ROOT
 # https://docs.djangoproject.com/en/3.0/ref/settings/#std:setting-MEDIA_URL
 MEDIA_ROOT = os.getenv("MEDIA_PATH", os.path.join(BASE_DIR, "media"))
-MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 
 Q_CLUSTER = {"name": "hyakumori-q", "django_redis": "default"}
 
+# for mitm.html downloading sw.js in firefox
 X_FRAME_OPTIONS = "SAMEORIGIN"
