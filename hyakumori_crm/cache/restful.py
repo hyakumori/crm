@@ -1,3 +1,4 @@
+from django_q.tasks import async_task
 from rest_framework.decorators import api_view
 
 from hyakumori_crm.api.decorators import action_login_required, get_or_404
@@ -14,7 +15,7 @@ from hyakumori_crm.crm.models import Archive
 )
 @action_login_required(with_permissions=["manage_archive"])
 def reload_single_archive_cache(request, *, archive: Archive = None):
-    refresh_single_archive_cache(archive)
+    async_task(refresh_single_archive_cache, archive)
     return make_success_json(data=dict(message="done"))
 
 
@@ -22,5 +23,5 @@ def reload_single_archive_cache(request, *, archive: Archive = None):
 @action_login_required(with_permissions=["change_forest"])
 def reload_forest_cache(request):
     forest_ids = request.data.get("forest_ids", [])
-    refresh_customer_forest_cache(forest_ids)
+    async_task(refresh_customer_forest_cache, forest_ids)
     return make_success_json(data=dict(msg="done"))
