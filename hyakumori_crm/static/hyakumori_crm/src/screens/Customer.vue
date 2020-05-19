@@ -4,6 +4,22 @@
       <page-header>
         <template #bottom-right>
           <div>
+            <outline-round-btn
+              icon="mdi-upload"
+              :content="`upload ${selectedFileName}`"
+              class="mr-2"
+              @click="handleUploadBtnClick"
+              :loading="uploadCsvLoading"
+            />
+            <input
+              ref="csvUploadInput"
+              type="file"
+              name=""
+              id="foo"
+              style="height:0;width:0;"
+              accept=".csv"
+              @change="handleFileChange"
+            />
             <v-menu offset-y nudge-bottom="4">
               <template v-slot:activator="{ on }">
                 <outline-round-btn
@@ -130,6 +146,8 @@ export default {
       headers: [],
       downloadCsvLoading: false,
       newTagValue: null,
+      selectedFileName: "",
+      uploadCsvLoading: false,
     };
   },
   mounted() {
@@ -151,6 +169,25 @@ export default {
     },
   },
   methods: {
+    async handleUploadBtnClick() {
+      if (this.selectedFileName !== "") {
+        this.uploadCsvLoading = true;
+        const formData = new FormData();
+        formData.append("file", this.$refs.csvUploadInput.files[0]);
+        await this.$rest.post("/customers/upload_csv", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        this.uploadCsvLoading = false;
+        this.$refs.csvUploadInput.value = null;
+        this.selectedFileName = "";
+      } else {
+        this.$refs.csvUploadInput.click();
+      }
+    },
+    handleFileChange(e) {
+      if (e.target.files[0]) this.selectedFileName = e.target.files[0].name;
+      else this.selectedFileName = "";
+    },
     downloadCsv(fileName, url) {
       this.downloadCsvLoading = true;
       const fileStream = streamSaver.createWriteStream(fileName);

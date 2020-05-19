@@ -301,6 +301,11 @@ class CustomerViewSets(ViewSet):
         ] = 'application/octet-stream; filename="customers.csv"'
         return response
 
+    @action(detail=False, methods=["POST"])
+    def upload_csv(self, request):
+        breakpoint()
+        return Response({})
+
 
 @api_view(["GET"])
 @action_login_required(with_permissions=["view_customer"])
