@@ -313,3 +313,5 @@ MEDIA_ROOT = os.getenv("MEDIA_PATH", os.path.join(BASE_DIR, "media"))
 MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 
 Q_CLUSTER = {"name": "hyakumori-q", "django_redis": "default"}
+
+X_FRAME_OPTIONS = "SAMEORIGIN"

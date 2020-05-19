@@ -72,9 +72,7 @@ import SearchCard from "../components/SearchCard";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
 import DataList from "../components/DataList";
 import BusEvent from "../BusEvent";
-import streamSaver from "streamsaver";
-
-streamSaver.mitm = "/static/mitm.html";
+import streamSaver from "../plugins/streamsaver";
 
 export default {
   components: {
