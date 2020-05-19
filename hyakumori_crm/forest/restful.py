@@ -43,6 +43,7 @@ from ..crm.common.constants import (
     FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, FOREST_TAG_KEYS,
     FOREST_ATTRIBUTES
 )
+from ..cache.forest import refresh_customer_forest_cache
 from ..permissions.services import PermissionService
 
 
