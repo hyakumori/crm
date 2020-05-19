@@ -5,7 +5,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from hyakumori_crm.core.utils import default_paginator
+from hyakumori_crm.core.utils import default_paginator, Echo
 from hyakumori_crm.crm.restful.serializers import (
     ContactSerializer,
     CustomerContactSerializer,
@@ -47,16 +47,6 @@ from .service import (
     customercontacts_list_with_search,
     get_list,
 )
-
-
-class Echo:
-    """An object that implements just the write method of the file-like
-    interface.
-    """
-
-    def write(self, value):
-        """Write the value by returning it, instead of storing in a buffer."""
-        return value
 
 
 class CustomerViewSets(ViewSet):
@@ -219,7 +209,7 @@ class CustomerViewSets(ViewSet):
             filters = {"id__in": pks}
         customers, _ = get_list(per_page=None, filters=filters)
         headers = [
-            "所有者ID",
+            "\ufeff所有者ID",  # contains BOM char for opening on fucking windows excel
             "新規ID発行",
             "土地所有者名（漢字）",
             "土地所有者名（カナ）",
@@ -271,7 +261,9 @@ class CustomerViewSets(ViewSet):
             (writer.writerow(row) for row in generator(headers, customers)),
             content_type="text/csv",
         )
-        response["Content-Disposition"] = 'attachment; filename="customers.csv"'
+        response[
+            "Content-Disposition"
+        ] = 'application/octet-stream; filename="customers.csv"'
         return response
 
 
