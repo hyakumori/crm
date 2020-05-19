@@ -3,11 +3,38 @@
     <template #top>
       <page-header>
         <template #bottom-right>
-          <outline-round-btn
-            :icon="$t('icon.add')"
-            @click="$router.push({ name: 'customer-new' })"
-            :content="$t('buttons.add_customer')"
-          />
+          <div>
+            <v-menu offset-y>
+              <template v-slot:activator="{ on }">
+                <outline-round-btn
+                  icon="mdi-download"
+                  :content="$t('buttons.csv_download')"
+                  class="mr-2"
+                  v-on="on"
+                />
+              </template>
+              <v-list>
+                <v-list-item
+                  v-if="$refs.table && $refs.table.selected.length > 0"
+                  @click="handelDownloadSelected"
+                >
+                  <v-list-item-title>{{
+                    $t("buttons.download_selected")
+                  }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="handelDownloadAll">
+                  <v-list-item-title>{{
+                    $t("buttons.download_all")
+                  }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <outline-round-btn
+              :icon="$t('icon.add')"
+              @click="$router.push({ name: 'customer-new' })"
+              :content="$t('buttons.add_customer')"
+            />
+          </div>
         </template>
       </page-header>
     </template>
@@ -19,11 +46,12 @@
         ref="filter"
       />
       <data-list
+        ref="table"
         class="ml-7"
         itemKey="id"
         :headers="headers"
         :data="customers"
-        :showSelect="false"
+        showSelect
         :options.sync="options"
         :serverItemsLength="totalCustomers"
         :tableRowIcon="tableRowIcon"
@@ -44,6 +72,9 @@ import SearchCard from "../components/SearchCard";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
 import DataList from "../components/DataList";
 import BusEvent from "../BusEvent";
+import streamSaver from "streamsaver";
+
+streamSaver.mitm = "/static/mitm.html";
 
 export default {
   components: {
@@ -84,6 +115,56 @@ export default {
     },
   },
   methods: {
+    handelDownloadSelected() {
+      const ids = Object.keys(this.$refs.table.$refs.dataTable.selection);
+      const qStr = ids.map(id => `ids=${id}`).join("&");
+      const fileStream = streamSaver.createWriteStream(
+        "customers_filtered.csv",
+      );
+
+      fetch("/api/v1/customers/download_csv?" + qStr, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then(res => {
+        const readableStream = res.body;
+
+        window.writer = fileStream.getWriter();
+
+        const reader = res.body.getReader();
+        const pump = () =>
+          reader
+            .read()
+            .then(res =>
+              res.done ? writer.close() : writer.write(res.value).then(pump),
+            );
+
+        pump();
+      });
+    },
+    handelDownloadAll() {
+      const fileStream = streamSaver.createWriteStream("customers.csv");
+
+      fetch("/api/v1/customers/download_csv", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then(res => {
+        const readableStream = res.body;
+
+        window.writer = fileStream.getWriter();
+
+        const reader = res.body.getReader();
+        const pump = () =>
+          reader
+            .read()
+            .then(res =>
+              res.done ? writer.close() : writer.write(res.value).then(pump),
+            );
+
+        pump();
+      });
+    },
     rowData(val) {
       this.$router.push({
         name: "customer-detail",
