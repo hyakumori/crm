@@ -150,7 +150,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_data = get_specific_forest_csv_data(request.data)
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment'
-        header = ["内部ID", "土地管理ID"]
+        header = ["\ufeff内部ID", "土地管理ID"]
         flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
                                               FOREST_CONTRACT, list(FOREST_TAG_KEYS.values()),
                                               FOREST_ATTRIBUTES))

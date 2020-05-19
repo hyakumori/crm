@@ -1,10 +1,11 @@
 from typing import Iterator, Union
 
-from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.db.models.expressions import RawSQL
+from django.utils.translation import gettext_lazy as _
 
+from .schemas import ForestFilter, CustomerDefaultInput, CustomerContactDefaultInput
 from ..crm.models import (
     Forest,
     ForestCustomer,
@@ -13,7 +14,6 @@ from ..crm.models import (
     ForestCustomerContact,
     Contact,
 )
-from .schemas import ForestFilter, CustomerDefaultInput, CustomerContactDefaultInput
 
 
 def get_forest_by_pk(pk):
@@ -27,8 +27,8 @@ def get_customer_of_forest(pk, customer_pk):
     try:
         return (
             ForestCustomer.objects.select_related("customer")
-            .get(customer_id=customer_pk, forest_id=pk)
-            .customer
+                .get(customer_id=customer_pk, forest_id=pk)
+                .customer
         )
     except (
         ForestCustomer.DoesNotExist,
@@ -52,7 +52,7 @@ def get_forests_by_condition(
         return [], 0
     query = filters.qs if filters else Forest.objects.all()
     total = query.count()
-    forests = query.order_by("-updated_at", "-created_at")[offset : offset + per_page]
+    forests = query.order_by("-updated_at", "-created_at")[offset: offset + per_page]
     return forests, total
 
 
@@ -120,16 +120,16 @@ def get_customer_contacts_of_forest(pk):
             customercontact__attributes__contact_type="FOREST",
             customercontact__forestcustomercontact__forestcustomer__forest_id=pk,
         )
-        .annotate(
+            .annotate(
             is_basic=F("customercontact__is_basic")
         )  # actualy its always False, why did we retrieve it?
-        .annotate(customer_id=F("customercontact__customer_id"))
-        .annotate(
+            .annotate(customer_id=F("customercontact__customer_id"))
+            .annotate(
             default=RawSQL(
                 "crm_forestcustomercontact.attributes->>'default'", params=[]
             )
         )
-        .annotate(cc_attrs=F("customercontact__attributes"))
+            .annotate(cc_attrs=F("customercontact__attributes"))
     )
 
 
@@ -168,7 +168,7 @@ def get_all_forest_csv_data():
     return Forest.objects.all().distinct("id").annotate(forest_id=F("id")).annotate(
         customer_name_kana=RawSQL(
             """
-            select array_to_string(array_agg(concat(cc2.name_kana->>'last_name', ' ', cc2.name_kana->>'first_name')), '; ')
+            select array_to_string(array_agg(concat_ws(' ', cc2.name_kana->>'last_name', cc2.name_kana->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
             inner join crm_customercontact cc on c.id = cc.customer_id
@@ -179,7 +179,7 @@ def get_all_forest_csv_data():
         )).annotate(
         customer_name_kanji=RawSQL(
             """
-            select array_to_string(array_agg(concat(cc4.name_kanji->>'last_name', ' ', cc4.name_kanji->>'first_name')), '; ')
+            select array_to_string(array_agg(concat_ws(' ', cc4.name_kanji->>'last_name', cc4.name_kanji->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
             inner join crm_customercontact cc3 on c.id = cc3.customer_id
@@ -195,7 +195,7 @@ def get_specific_forest_csv_data(forest_ids):
     return Forest.objects.filter(id__in=forest_ids).distinct("id").annotate(forest_id=F("id")).annotate(
         customer_name_kana=RawSQL(
             """
-            select array_to_string(array_agg(concat(cc2.name_kana->>'last_name', ' ', cc2.name_kana->>'first_name')), '; ')
+            select array_to_string(array_agg(concat_ws(' ', cc2.name_kana->>'last_name', cc2.name_kana->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
             inner join crm_customercontact cc on c.id = cc.customer_id
@@ -206,7 +206,7 @@ def get_specific_forest_csv_data(forest_ids):
         )).annotate(
         customer_name_kanji=RawSQL(
             """
-            select array_to_string(array_agg(concat(cc4.name_kanji->>'last_name', ' ', cc4.name_kanji->>'first_name')), '; ')
+            select array_to_string(array_agg(concat_ws(' ', cc4.name_kanji->>'last_name', cc4.name_kanji->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
             inner join crm_customercontact cc3 on c.id = cc3.customer_id

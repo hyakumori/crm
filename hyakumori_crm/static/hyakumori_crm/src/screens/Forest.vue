@@ -5,12 +5,13 @@
         <template #bottom-right>
           <div>
             <outline-round-btn
+              v-show="false"
               class="mr-2"
               :icon="$t('icon.add')"
               :content="$t('buttons.csv_upload')"
               @click="uploadCsv"
             />
-            <v-menu offset-y nudge-bottom="4" class="pa-0">
+            <v-menu offset-y nudge-bottom="4">
               <template v-slot:activator="{ on }">
                 <outline-round-btn
                   icon="mdi-download"
@@ -20,7 +21,7 @@
                   v-on="on"
                 />
               </template>
-              <v-list dense>
+              <v-list dense class="pa-0">
                 <v-list-item
                   v-if="tableSelectedRow && tableSelectedRow.length > 0"
                   @click="downloadSelectedRows"
@@ -192,35 +193,29 @@ export default {
     },
 
     async downloadAllCsv() {
-      this.downloadCsvLoading = true;
-      let csvData = await this.$rest.get("/forests/download-csv");
-      if (csvData) {
-        // Excel for Windows & Mac do support BOM encoding, the current one work fine on linux
-        if (navigator.platform === "Windows" || navigator.platform === "Mac") {
-          const encodeBOM = "\ufeff";
-          csvData = encodeBOM + csvData;
-        }
+      try {
+        this.downloadCsvLoading = true;
+        let csvData = await this.$rest.get("/forests/download-csv");
         const blob = new Blob([csvData], { type: "text/csv;charset=UTF-8" });
         saveAs(blob, "all-forests.csv");
+      } catch (e) {
+      } finally {
         this.downloadCsvLoading = false;
       }
     },
 
     async downloadSelectedRows() {
-      this.downloadCsvLoading = true;
-      const selectedRowIds = this.tableSelectedRow.map(row => row.id);
-      let csvData = await this.$rest.post(
-        "/forests/download-csv",
-        selectedRowIds,
-      );
-      if (csvData) {
-        // Excel for Windows & Mac do support BOM encoding, the current one work fine on linux
-        if (navigator.platform === "Windows" || navigator.platform === "Mac") {
-          const encodeBOM = "\ufeff";
-          csvData = encodeBOM + csvData;
-        }
+      try {
+        this.downloadCsvLoading = true;
+        const selectedRowIds = this.tableSelectedRow.map(row => row.id);
+        let csvData = await this.$rest.post(
+          "/forests/download-csv",
+          selectedRowIds,
+        );
         const blob = new Blob([csvData], { type: "text/csv;charset=UTF-8" });
         saveAs(blob, "selected_forests.csv");
+      } catch (e) {
+      } finally {
         this.downloadCsvLoading = false;
       }
     },
