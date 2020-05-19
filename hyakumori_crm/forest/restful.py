@@ -1,4 +1,8 @@
+import csv
+import itertools
+
 from django.db.models import Q, F, Count
+from django.http import HttpResponse
 from rest_framework import mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -58,8 +62,8 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     def list_minimal(self, request):
         query = (
             self.get_queryset()
-            .annotate(customers_count=Count(F("forestcustomer__customer_id")))
-            .values("id", "internal_id", "cadastral", "customers_count")
+                .annotate(customers_count=Count(F("forestcustomer__customer_id")))
+                .values("id", "internal_id", "cadastral", "customers_count")
         )
         search_str = request.GET.get("search")
         if search_str:
@@ -145,7 +149,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
         else:
             csv_data = get_specific_forest_csv_data(request.data)
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="all-forest.csv"'
+        response['Content-Disposition'] = 'attachment'
         header = ["内部ID", "土地管理ID"]
         flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
                                               FOREST_CONTRACT, list(FOREST_TAG_KEYS.values()),
