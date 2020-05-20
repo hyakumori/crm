@@ -39,7 +39,9 @@ from .service import (
     get_forests_for_csv,
     get_forests_by_ids,
     update_forest_tags,
+    update_db_with_csv,
 )
+
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -193,6 +195,13 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action_login_required(with_permissions=["change_forest"])
     def tags(self, request):
         update_forest_tags(request.data)
+        return Response({"msg": "OK"})
+
+    @action(detail=False, methods=["POST"], url_path="upload-csv")
+    @action_login_required(with_permissions=["change_forest"])
+    def upload_csv(self, request):
+        file = request.FILES["file"]
+        data = update_db_with_csv(file)
         return Response({"msg": "OK"})
 
 

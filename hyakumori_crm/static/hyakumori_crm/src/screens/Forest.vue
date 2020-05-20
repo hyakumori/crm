@@ -3,15 +3,22 @@
     <template #top>
       <page-header>
         <template #bottom-right>
-          <div>
+          <div class="forest__csv-section">
             <outline-round-btn
-              :content="$t('buttons.csv_upload')"
-              :icon="$t('icon.add')"
-              @click="uploadCsv"
+              v-show="true"
               class="mr-2"
-              v-show="false"
+              :icon="$t('icon.add')"
+              :content="$t('buttons.csv_upload')"
+              @click="uploadCsv"
             />
-            <v-menu nudge-bottom="4" offset-y>
+            <input
+              @change="onCsvInputChange"
+              accept=".csv"
+              class="forest__csv-section__upload"
+              ref="uploadCsv"
+              type="file"
+            />
+            <v-menu offset-y nudge-bottom="4">
               <template v-slot:activator="{ on }">
                 <outline-round-btn
                   :content="$t('buttons.csv_download')"
@@ -221,7 +228,29 @@ export default {
     },
 
     uploadCsv() {
-      // TODO: handle upload forest as csv
+      if (this.$refs.uploadCsv) {
+        this.$refs.uploadCsv.click();
+      }
+    },
+
+    checkCsvExtension(filename) {
+      const filenameSplitByDot = filename.split(".");
+      const fileExtension = filenameSplitByDot[filenameSplitByDot.length - 1];
+      return fileExtension === "csv";
+    },
+
+    async onCsvInputChange(e) {
+      const file = e.target.files[0];
+      if (file.type === "text/csv" && this.checkCsvExtension(file.name)) {
+        const requestFile = new FormData();
+        requestFile.append("file", file);
+        await this.$rest.post("/forests/upload-csv", requestFile);
+      } else {
+        await this.$dialog.notify.error("Invalid file input", {
+          timeout: 5000,
+        });
+      }
+      this.$refs.uploadCsv.value = "";
     },
 
     async downloadAllCsv() {
@@ -407,6 +436,14 @@ export default {
   &__data-section {
     flex: 1;
     overflow: hidden;
+  }
+
+  &__csv-section {
+    &__upload {
+      height: 1px;
+      width: 1px;
+      visibility: hidden;
+    }
   }
 }
 </style>

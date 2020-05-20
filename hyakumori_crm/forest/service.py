@@ -318,3 +318,8 @@ def forest_csv_data_mapping(forest):
         forest.forest_attributes.get("第3相対幹"),
         forest.forest_attributes.get("第3形状比"),
     ]
+
+
+def update_db_with_csv(file):
+    for line in file:
+        print(line.decode('UTF-8'))
