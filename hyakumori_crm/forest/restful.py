@@ -40,6 +40,7 @@ from .service import (
     get_forests_by_ids,
     update_forest_tags,
     update_db_with_csv,
+    csv_headers,
 )
 
 from ..activity.services import ActivityService, ForestActions
@@ -162,20 +163,9 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_data = get_forests_for_csv(request.data)
         response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
         response["Content-Disposition"] = "attachment"
-        header = ["\ufeff内部ID", "土地管理ID"]
-        flatten_header = list(
-            itertools.chain(
-                header,
-                FOREST_CADASTRAL,
-                FOREST_LAND_ATTRIBUTES,
-                FOREST_OWNER_NAME,
-                FOREST_CONTRACT,
-                [_("Tag")],
-                FOREST_ATTRIBUTES,
-            )
-        )
-        writer = csv.writer(response)
-        writer.writerow(flatten_header)
+        headers = csv_headers()
+        writer = csv.writer(response, dialect="excel")
+        writer.writerow(headers)
         for forest in csv_data:
             csv_row = forest_csv_data_mapping(forest)
             writer.writerow(csv_row)

@@ -5,11 +5,12 @@
         <template #bottom-right>
           <div class="forest__csv-section">
             <outline-round-btn
-              v-show="true"
-              class="mr-2"
-              :icon="$t('icon.add')"
               :content="$t('buttons.csv_upload')"
+              :icon="$t('icon.add')"
+              :loading="uploadCsvLoading"
               @click="uploadCsv"
+              class="mr-2"
+              v-show="true"
             />
             <input
               @change="onCsvInputChange"
@@ -18,7 +19,7 @@
               ref="uploadCsv"
               type="file"
             />
-            <v-menu offset-y nudge-bottom="4">
+            <v-menu nudge-bottom="4" offset-y>
               <template v-slot:activator="{ on }">
                 <outline-round-btn
                   :content="$t('buttons.csv_download')"
@@ -110,7 +111,6 @@
 import gql from "graphql-tag";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
-import TableAction from "../components/TableAction";
 import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
@@ -169,6 +169,7 @@ export default {
       headers: [],
       downloadCsvLoading: false,
       newTagValue: null,
+      uploadCsvLoading: false,
     };
   },
 
@@ -244,7 +245,14 @@ export default {
       if (file.type === "text/csv" && this.checkCsvExtension(file.name)) {
         const requestFile = new FormData();
         requestFile.append("file", file);
-        await this.$rest.post("/forests/upload-csv", requestFile);
+        try {
+          this.uploadCsvLoading = true;
+          await this.$rest.post("/forests/upload-csv", requestFile);
+          await this.$apollo.queries.forestsInfo.refetch();
+        } catch (e) {
+        } finally {
+          this.uploadCsvLoading = false;
+        }
       } else {
         await this.$dialog.notify.error("Invalid file input", {
           timeout: 5000,
