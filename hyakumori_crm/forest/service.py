@@ -1,3 +1,4 @@
+import itertools
 from typing import Iterator, Union
 
 from django.core.exceptions import ValidationError
@@ -7,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 from .schemas import ForestFilter, CustomerDefaultInput, CustomerContactDefaultInput
 from ..cache.forest import refresh_customer_forest_cache
+from ..crm.common.constants import FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, \
+    FOREST_TAG_KEYS, FOREST_ATTRIBUTES
 from ..crm.models import (
     Forest,
     ForestCustomer,
@@ -174,6 +177,13 @@ def update_forest_memo(forest, memo):
     return forest, _updated
 
 
+def csv_headers():
+    header = ["\ufeff内部ID", "土地管理ID"]
+    return list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
+                                FOREST_CONTRACT, list(FOREST_TAG_KEYS.values()),
+                                FOREST_ATTRIBUTES))
+
+
 def get_forests_for_csv(forest_ids: list = None):
     if forest_ids is not None and len(forest_ids) > 0:
         queryset = Forest.objects.filter(id__in=forest_ids)
@@ -292,6 +302,55 @@ def forest_csv_data_mapping(forest):
     ]
 
 
-def update_db_with_csv(file):
-    for line in file:
-        print(line.decode('UTF-8'))
+def csv_column_to_dict(keys, values):
+    result = {}
+    if keys is not None and values is not None and len(keys) == len(values):
+        for i in range(len(keys)):
+            result[keys[i]] = values[i]
+    return result
+
+
+def update_db_with_csv(row_data: str):
+    data_split = row_data.split(',')
+    new_forest = Forest()
+    cadastral_keys = ["prefecture", "municipality", "sector", "subsector"]
+    cadastral = []
+    land_attributes = []
+    contract_keys = ["type", "status", "start_date", "end_date"]
+    long_term_contract = []
+    work_load_contract = []
+    fsc_contract = []
+    contracts = []
+    tags = []
+    forest_attributes = []
+    for i in range(len(data_split)):
+        if i == 0:
+            new_forest = get_forest_by_pk(data_split[i])
+        if i == 1:
+            new_forest.internal_id = data_split[i]
+        if 1 < i <= 5:
+            cadastral.append(data_split[i])
+        if 5 < i <= 11:
+            land_attributes.append(data_split[i])
+        if 13 < i <= 16:
+            long_term_contract.append(data_split[i])
+        if 16 < i <= 19:
+            work_load_contract.append(data_split[i])
+        if 19 < i <= 22:
+            fsc_contract.append(data_split[i])
+        if 22 < i <= 24:
+            tags.append(data_split[i])
+        if 24 < i <= len(data_split) - 1:
+            forest_attributes.append(data_split[i])
+    new_forest.cadastral = csv_column_to_dict(cadastral_keys, cadastral)
+    new_forest.land_attributes = csv_column_to_dict(FOREST_LAND_ATTRIBUTES, land_attributes)
+    long_term_contract.insert(0, FOREST_CONTRACT[0])
+    work_load_contract.insert(0, FOREST_CONTRACT[3])
+    fsc_contract.insert(0, FOREST_CONTRACT[6])
+    contracts.append(csv_column_to_dict(contract_keys, long_term_contract))
+    contracts.append(csv_column_to_dict(contract_keys, work_load_contract))
+    contracts.append(csv_column_to_dict(contract_keys, fsc_contract))
+    new_forest.contracts = contracts
+    new_forest.tags = csv_column_to_dict(list(FOREST_TAG_KEYS.values()), tags)
+    new_forest.forest_attributes = csv_column_to_dict(FOREST_ATTRIBUTES, forest_attributes)
+    new_forest.save()

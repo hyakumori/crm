@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from hyakumori_crm.core.utils import default_paginator
+from hyakumori_crm.core.utils import default_paginator, make_error_json
 from hyakumori_crm.crm.models import Forest, Archive
 from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
@@ -34,8 +34,7 @@ from .service import (
     set_default_customer,
     set_default_customer_contact,
     update_forest_memo, forest_csv_data_mapping, get_all_forest_csv_data, get_specific_forest_csv_data,
-    update_db_with_csv, get_forests_for_csv)
-
+    update_db_with_csv, csv_headers, get_forests_for_csv)
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -153,12 +152,9 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_data = get_forests_for_csv(request.data)
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment'
-        header = ["\ufeff内部ID", "土地管理ID"]
-        flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
-                                              FOREST_CONTRACT, [_("Tag")],
-                                              FOREST_ATTRIBUTES))
-        writer = csv.writer(response)
-        writer.writerow(flatten_header)
+        headers = csv_headers()
+        writer = csv.writer(response, dialect='excel')
+        writer.writerow(headers)
         for forest in csv_data:
             csv_row = forest_csv_data_mapping(forest)
             writer.writerow(csv_row)
@@ -168,7 +164,18 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action_login_required(with_permissions=["change_forest"])
     def upload_csv(self, request):
         file = request.FILES['file']
-        data = update_db_with_csv(file)
+        headers = csv_headers()
+        header_count = len(headers)
+        for index, row in enumerate(file):
+            if index == 0:
+                continue
+            elif len(row.decode('utf-8').split(',')) == header_count:
+                try:
+                    update_db_with_csv(row.decode('utf-8'))
+                except ValueError as err:
+                    return make_error_json(str(err))
+            else:
+                return make_error_json(f"csv upload file error in line {index}")
         return Response({"msg": "OK"})
 
 
