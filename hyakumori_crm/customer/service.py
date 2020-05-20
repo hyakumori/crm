@@ -1,4 +1,5 @@
-from typing import Iterator, Union
+import logging
+from typing import Iterator, List, Union
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,6 +11,7 @@ from querybuilder.query import Query
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import (
+    Address,
     Archive,
     Contact,
     Customer,
@@ -17,9 +19,11 @@ from hyakumori_crm.crm.models import (
     Forest,
     ForestCustomer,
     ForestCustomerContact,
+    Name,
 )
 from .schemas import ContactType, CustomerInputSchema, ContactsInput
 from ..crm.common.constants import CUSTOMER_TAG_KEYS
+from ..crm.common.utils import get_customer_name
 
 
 def get_customer_by_pk(pk):
@@ -237,6 +241,58 @@ def create(customer_in: CustomerInputSchema):
     return customer
 
 
+def _refresh_customer_forest_cache(forest_ids: List[str]):
+    forestcustomercontacts = ForestCustomerContact.objects.filter(
+        forestcustomer__forest_id__in=list(forest_ids), customercontact__is_basic=True
+    ).select_related(
+        "customercontact__contact", "forestcustomer__customer", "forestcustomer__forest"
+    )
+
+    for fcc in forestcustomercontacts.iterator():
+        try:
+            forest = fcc.forestcustomer.forest
+            customer = fcc.forestcustomer.customer
+            self_contact = fcc.customercontact.contact
+
+            forest.refresh_from_db()
+            if forest.attributes.get("customer_cache") is None:
+                forest.attributes["customer_cache"] = dict(
+                    list=dict(), repr_name_kanji="", repr_name_kana=""
+                )
+
+            _repr_name_kanji = []
+            _repr_name_kana = []
+            if isinstance(forest.attributes["customer_cache"]["list"], list):
+                forest.attributes["customer_cache"]["list"] = {}
+
+            customer_id = str(customer.id)
+            if customer_id in forest.attributes["customer_cache"]["list"]:
+                del forest.attributes["customer_cache"]["list"][customer_id]
+
+            forest.attributes["customer_cache"]["list"][customer_id] = dict(
+                contact_id=str(self_contact.id),
+                name_kanji=self_contact.name_kanji,
+                name_kana=self_contact.name_kana,
+            )
+
+            for _, item in forest.attributes["customer_cache"]["list"].items():
+                _repr_name_kanji.append(get_customer_name(item.get("name_kanji")))
+                _repr_name_kana.append(get_customer_name(item.get("name_kana")))
+
+            forest.attributes["customer_cache"]["repr_name_kanji"] = ",".join(
+                _repr_name_kanji
+            )
+            forest.attributes["customer_cache"]["repr_name_kana"] = ",".join(
+                _repr_name_kana
+            )
+            forest.save(update_fields=["attributes", "updated_at"])
+        except Exception as e:
+            logging.warning(
+                f"could not saving latest user self contact info in forest: {fcc.forestcustomer.forest.pk}",
+                exc_info=e,
+            )
+
+
 def update_basic_info(data):
     customer = data.customer
     self_contact = CustomerContact.objects.get(
@@ -256,6 +312,11 @@ def update_basic_info(data):
     customer.name_kanji = self_contact.name_kanji
     customer.address = self_contact.address
     customer.save(update_fields=["address", "name_kana", "name_kanji", "updated_at"])
+
+    # cache saving for forest
+    _refresh_customer_forest_cache(
+        customer.forestcustomer_set.values_list("forest_id", flat=True)
+    )
 
     return customer
 
@@ -357,7 +418,14 @@ def delete_customer_contacts(contacts_delete_in: dict):
 
 
 def update_forests(data):
+    """
+    Assign forests to user, support delete, add forest
+    :param data:
+    :return:
+    """
     customer = data.customer
+
+    # delete relations
     forestcustomers = ForestCustomer.objects.filter(
         forest_id__in=data.deleted, customer_id=customer.pk
     ).all()
@@ -365,17 +433,24 @@ def update_forests(data):
         forestcustomercontact__forestcustomer_id__in=forestcustomers.values("id"),
         is_basic=False,
     ).delete()
+
     for fc in forestcustomers:
         fc.force_delete()
 
+    # assign new relations
     added_forest_customers = []
     for added_forest_pk in data.added:
         forest_customer = ForestCustomer(
             customer_id=customer.id, forest_id=added_forest_pk,
         )
         added_forest_customers.append(forest_customer)
+
     ForestCustomer.objects.bulk_create(added_forest_customers)
     customer.save(update_fields=["updated_at"])
+
+    customer.refresh_from_db()
+    _refresh_customer_forest_cache(data.added + data.deleted)
+
     return customer
 
 
