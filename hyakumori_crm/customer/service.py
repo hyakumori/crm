@@ -1,5 +1,4 @@
-import logging
-from random import random
+from typing import Iterator, Union
 from typing import Iterator, Union
 from uuid import UUID
 
@@ -7,7 +6,7 @@ from django.db import DataError, IntegrityError, connection
 from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import RawSQL
 from django.utils.translation import gettext_lazy as _
-from querybuilder.query import Expression, Query
+from querybuilder.query import Query
 
 from hyakumori_crm.core.models import RawSQLField
 from hyakumori_crm.crm.models import (
@@ -470,10 +469,3 @@ def get_customer_contacts_forests(pk):
             .prefetch_related("forestcustomer_set")
             .order_by("created_at")
     )
-
-
-def generate_customer_ids():
-    prefix = "DFFC"
-    rand = "{:02d}".format(int(random.random() * 100))
-
-    pass
