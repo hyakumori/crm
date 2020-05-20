@@ -33,8 +33,9 @@ from .service import (
     get_customer_contacts_of_forest,
     set_default_customer,
     set_default_customer_contact,
-    update_forest_memo, forest_csv_data_mapping,
-    get_forests_for_csv, )
+    update_forest_memo, forest_csv_data_mapping, get_all_forest_csv_data, get_specific_forest_csv_data,
+    update_db_with_csv, get_forests_for_csv)
+
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -162,6 +163,13 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_row = forest_csv_data_mapping(forest)
             writer.writerow(csv_row)
         return response
+
+    @action(detail=False, methods=["POST"], url_path="upload-csv")
+    @action_login_required(with_permissions=["change_forest"])
+    def upload_csv(self, request):
+        file = request.FILES['file']
+        data = update_db_with_csv(file)
+        return Response({"msg": "OK"})
 
 
 @api_view(["PUT", "PATCH"])
