@@ -78,34 +78,40 @@ or concat(sc.postal_code, ' ', sc.address->>'sector', ' ',
 def get_customer_contacts(pk: UUID):
     cc_forest_counts = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
     cc_is_basic = CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
+    cc_is_basic_business_id = CustomerContact.objects.filter(
+        is_basic=True, contact=OuterRef("pk")
+    ).annotate(business_id=F("customer__business_id"))
     q = (
         Contact.objects.filter(
             customercontact__customer_id=pk, customercontact__is_basic=False,
         )
-            .annotate(
+        .annotate(
             forest_internal_id=F(
                 "customercontact__forestcustomercontact__forestcustomer__forest__internal_id"
             )
         )
-            .annotate(
+        .annotate(
             forest_id=F(
                 "customercontact__forestcustomercontact__forestcustomer__forest_id"
             )
         )
-            .annotate(
+        .annotate(
             forestcustomer_id=F(
                 "customercontact__forestcustomercontact__forestcustomer_id"
             )
         )
-            .annotate(cc_attrs=F("customercontact__attributes"))
-            .annotate(forests_count=Subquery(cc_forest_counts.values("forests_count")[:1]))
-            .annotate(is_basic=Subquery(cc_is_basic.values("is_basic")[:1]))
-            .annotate(customer_id=Subquery(cc_is_basic.values("customer_id")[:1]))
-            .order_by("created_at")
+        .annotate(cc_attrs=F("customercontact__attributes"))
+        .annotate(forests_count=Subquery(cc_forest_counts.values("forests_count")[:1]))
+        .annotate(is_basic=Subquery(cc_is_basic.values("is_basic")[:1]))
+        .annotate(customer_id=Subquery(cc_is_basic.values("customer_id")[:1]))
+        .annotate(
+            business_id=Subquery(cc_is_basic_business_id.values("business_id")[:1])
+        )
+        .order_by("created_at")
     )
     return q
 
@@ -113,9 +119,9 @@ def get_customer_contacts(pk: UUID):
 def get_customer_forests(pk: UUID):
     return (
         Forest.objects.filter(forestcustomer__customer_id=pk)
-            .annotate(forestcustomer_id=F("forestcustomer__id"))
-            .prefetch_related("forestcustomer_set")
-            .order_by("created_at")
+        .annotate(forestcustomer_id=F("forestcustomer__id"))
+        .prefetch_related("forestcustomer_set")
+        .order_by("created_at")
     )
 
 
@@ -166,12 +172,12 @@ def get_list(
 
     query = (
         Query()
-            .from_table({"c": Customer}, fields=fields, )
-            .join(
+        .from_table({"c": Customer}, fields=fields,)
+        .join(
             {"self_contact_rel": CustomerContact},
             condition="c.id=self_contact_rel.customer_id and self_contact_rel.is_basic is true",
         )
-            .join(
+        .join(
             {"self_contact": Contact},
             condition="self_contact_rel.contact_id=self_contact.id",
             fields=[
@@ -264,11 +270,15 @@ def update_banking(data):
 def contacts_list_with_search(search_str: str = None):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("id", "customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("id", "customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
+    cc_business_id = CustomerContact.objects.filter(
+        is_basic=True, contact=OuterRef("pk")
+    ).annotate(business_id=F("customer__business_id"))
     queryset = Contact.objects.annotate(
         forests_count=Subquery(cc.values("forests_count")[:1]),
+        business_id=Subquery(cc_business_id.values("business_id")[:1]),
     ).all()
 
     if search_str:
@@ -291,12 +301,13 @@ def contacts_list_with_search(search_str: str = None):
 def customercontacts_list_with_search(search_str: str = None):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("id", "customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("id", "customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
     queryset = (
         Contact.objects.annotate(
             customer_id=F("customercontact__customer_id"),
+            business_id=F("customercontact__customer__business_id"),
             is_basic=F("customercontact__is_basic"),
             forests_count=Subquery(cc.values("forests_count")[:1]),
             cc_attrs=F("customercontact__attributes"),
@@ -309,8 +320,8 @@ def customercontacts_list_with_search(search_str: str = None):
                 params=[],
             ),
         )
-            .filter(is_basic__isnull=False)
-            .all()
+        .filter(is_basic__isnull=False)
+        .all()
     )
     if search_str:
         queryset = queryset.filter(
@@ -467,8 +478,8 @@ def get_customer_contacts_forests(pk):
     ).values("id")
     return (
         Forest.objects.filter(forestcustomer__customer_id__in=customers)
-            .prefetch_related("forestcustomer_set")
-            .order_by("created_at")
+        .prefetch_related("forestcustomer_set")
+        .order_by("created_at")
     )
 
 
