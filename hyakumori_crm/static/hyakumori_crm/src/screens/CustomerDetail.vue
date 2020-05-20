@@ -241,8 +241,12 @@ export default {
         });
         if (customer && customer.business_id && customer.id) {
           this.customer = customer;
+        } else {
+          this.$router.replace({ name: "not-found" });
         }
-      } catch {}
+      } catch {
+        this.$router.replace({ name: "not-found" });
+      }
     },
     checkAndShowLoading() {
       //only available under detail page
