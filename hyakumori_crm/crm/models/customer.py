@@ -49,7 +49,7 @@ class Customer(BaseResourceModel):
     """
     所有者ID    土地所有者名    土地所有者住所	連絡先情報  口座情報	タグ
     """
-
+    document_id = models.CharField(default="", max_length=255, db_index=True)
     name_kanji = JSONField(default=DefaultCustomer.name_kanji, db_index=True)
     name_kana = JSONField(default=DefaultCustomer.name_kana, db_index=True)
     address = JSONField(default=DefaultCustomer.address, db_index=True)
