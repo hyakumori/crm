@@ -142,7 +142,8 @@ export default {
     },
 
     clickRow(value) {
-      this.$emit("rowData", value.id);
+      this.$emit("rowData", value[this.itemKey]);
+      this.$emit("rowDataItem", value);
       window.scrollTo(0, 0);
     },
 

@@ -7,9 +7,6 @@ from django.utils.translation import gettext as _
 from hyakumori_crm.graphql.decorators import login_required
 from ..core.decorators import validate_model
 from .schemas import (
-    CustomerInputSchema,
-    CustomerRead,
-    CustomerUpdate,
     CustomerFilter,
     CustomerPaginator,
 )

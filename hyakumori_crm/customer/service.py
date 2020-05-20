@@ -1,6 +1,7 @@
 from typing import Iterator, Union
 from uuid import UUID
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import DataError, IntegrityError, connection
 from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import RawSQL
@@ -469,3 +470,10 @@ def get_customer_contacts_forests(pk):
             .prefetch_related("forestcustomer_set")
             .order_by("created_at")
     )
+
+
+def get_customer_by_business_id(busines_id):
+    customer = Customer.objects.get(business_id=busines_id)
+    if not customer.business_id or len(customer.business_id) == 0:
+        raise ValueError(_("Customer ID is empty or not available"))
+    return customer
