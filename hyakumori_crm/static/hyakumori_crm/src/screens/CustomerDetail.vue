@@ -459,7 +459,6 @@ export default {
       },
     },
     pk() {
-      console.log(this.pk);
       this.fetchInitialData();
     },
     forests: {

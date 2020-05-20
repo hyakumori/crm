@@ -111,7 +111,6 @@ export default {
       return this.customerList.total;
     },
     filterFields() {
-      console.log(this.headers);
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))
         .filter(f => f.value !== undefined);
