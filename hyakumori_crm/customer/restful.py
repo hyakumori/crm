@@ -5,7 +5,12 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from hyakumori_crm.core.utils import default_paginator, Echo, make_success_json, make_error_json
+from hyakumori_crm.core.utils import (
+    default_paginator,
+    Echo,
+    make_success_json,
+    make_error_json,
+)
 from hyakumori_crm.crm.restful.serializers import (
     ContactSerializer,
     CustomerContactSerializer,
@@ -46,7 +51,7 @@ from .service import (
     get_customer_contacts_forests,
     customercontacts_list_with_search,
     get_list,
-    get_customer_by_business_id
+    get_customer_by_business_id,
 )
 
 
@@ -72,7 +77,9 @@ class CustomerViewSets(ViewSet):
     def create(self, request, data: dict = None):
         customer = create(data)
         ActivityService.log(CustomerActions.created, customer, request=request)
-        return Response({"id": customer.id}, status=201)
+        return Response(
+            {"id": customer.id, "business_id": customer.business_id}, status=201
+        )
 
     @get_or_404(get_customer_by_pk, to_name="customer", remove=True)
     @api_validate_model(CustomerUpdateSchema)

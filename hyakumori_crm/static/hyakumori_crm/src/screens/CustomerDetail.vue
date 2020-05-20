@@ -10,7 +10,7 @@
           :info="basicInfo"
           :id="pk"
         >
-          <template #form="props" v-if="pk">
+          <template #form="props" v-if="!id">
             <contact-form
               :id="pk"
               :formData="selfContactFormData"
@@ -208,7 +208,7 @@ export default {
   },
 
   async created() {
-    await this.resolveBusinessId();
+    await this.fetchInitialData();
   },
 
   mounted() {
@@ -265,8 +265,9 @@ export default {
 
       return (nameObj && (nameObj.last_name || nameObj.first_name)) || "";
     },
-    fetchInitialData() {
+    async fetchInitialData() {
       if (this.isDetail) {
+        await this.resolveBusinessId();
         this.fetchForests();
         this.fetchContacts();
         this.fetchArchives();
@@ -451,7 +452,7 @@ export default {
   },
 
   watch: {
-    // $route: "fetchInitialData",
+    $route: "fetchInitialData",
     customer: {
       deep: true,
       handler: function() {
@@ -461,9 +462,6 @@ export default {
           tags: tags_to_array(this.customer?.tags),
         };
       },
-    },
-    pk() {
-      this.fetchInitialData();
     },
     forests: {
       deep: true,

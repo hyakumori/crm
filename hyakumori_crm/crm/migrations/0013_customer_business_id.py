@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crm', '0012_archive_tags'),
+        ("crm", "0012_archive_tags"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customer',
-            name='business_id',
-            field=models.CharField(db_index=True, default='', max_length=255),
+            model_name="customer",
+            name="business_id",
+            field=models.CharField(db_index=True, null=True, max_length=255),
         ),
     ]
