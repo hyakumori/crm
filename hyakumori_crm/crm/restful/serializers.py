@@ -50,6 +50,7 @@ class CustomerSerializer(ModelSerializer):
         model = Customer
         fields = [
             "id",
+            "business_id",
             "internal_id",
             "attributes",
             "tags",

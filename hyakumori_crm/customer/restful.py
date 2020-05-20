@@ -209,8 +209,8 @@ class CustomerViewSets(ViewSet):
             filters = {"id__in": pks}
         customers, _ = get_list(per_page=None, filters=filters)
         headers = [
-            "\ufeff所有者ID",  # contains BOM char for opening on windows excel
-            "新規ID発行",
+            "\ufeffID",  # contains BOM char for opening on windows excel
+            "所有者ID",
             "土地所有者名（漢字）",
             "土地所有者名（カナ）",
             "土地所有者住所_都道府県",
@@ -235,7 +235,7 @@ class CustomerViewSets(ViewSet):
             for row in rows:
                 yield [
                     row["id"],
-                    row["internal_id"],
+                    row["business_id"],
                     row["fullname_kana"],
                     row["fullname_kanji"],
                     row["prefecture"],

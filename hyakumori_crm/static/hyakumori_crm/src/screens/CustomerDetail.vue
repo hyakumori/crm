@@ -210,11 +210,21 @@ export default {
   },
 
   mounted() {
-    const info = {
-      title: this.$t("page_header.customer_new"),
-      subTitle: "",
-      backUrl: "/customers",
-    };
+    let info = {};
+    if (!this.isDetail) {
+      info = {
+        title: this.$t("page_header.customer_new"),
+        subTitle: "",
+        backUrl: "/customers",
+      };
+    } else {
+      info = {
+        title: this.$t("page_header.customer_mgmt"),
+        subTitle: "",
+        backUrl: "/customers",
+      };
+    }
+
     this.$store.dispatch("setHeaderInfo", info);
   },
 

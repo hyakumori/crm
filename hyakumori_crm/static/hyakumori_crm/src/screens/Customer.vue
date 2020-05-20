@@ -56,6 +56,8 @@
         :options.sync="options"
         :serverItemsLength="totalCustomers"
         :tableRowIcon="tableRowIcon"
+        :icon-row-value-slice="{ enableSlice: false }"
+        iconRowValue="business_id"
         :autoHeaders="false"
         @rowData="rowData"
         :isLoading="$apollo.queries.customerList.loading"
@@ -199,7 +201,7 @@ export default {
             ok
             items {
               id
-              internal_id
+              business_id
               fullname_kana
               fullname_kanji
               postal_code

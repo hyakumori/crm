@@ -1,5 +1,4 @@
 from typing import Iterator, Union
-from typing import Iterator, Union
 from uuid import UUID
 
 from django.db import DataError, IntegrityError, connection
@@ -154,6 +153,7 @@ def get_list(
     fields = [
         "id",
         "internal_id",
+        "business_id",
         {"bank_name": RawSQLField("banking->>'bank_name'")},
         {"bank_branch_name": RawSQLField("banking->>'branch_name'")},
         {"bank_account_type": RawSQLField("banking->>'account_type'")},
