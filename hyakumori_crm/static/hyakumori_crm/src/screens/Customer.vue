@@ -211,8 +211,7 @@ export default {
               telephone
               mobilephone
               email
-              status
-              ranking
+              tags
             }
             total
           }
