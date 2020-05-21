@@ -428,7 +428,6 @@ export default {
       const originalColorsAttrs = JSON.parse(
         JSON.stringify(_get(this.originalSelectedTag, "attributes.colors", [])),
       );
-      console.log(colors, originalColorsAttrs);
       return (
         !isEqual(this.selectedTag, this.originalSelectedTag) ||
         !isEqual(originalColorsAttrs, colors)
