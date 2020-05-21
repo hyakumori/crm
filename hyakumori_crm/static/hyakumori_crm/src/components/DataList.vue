@@ -207,7 +207,7 @@ export default {
     border-radius: 4px;
     color: white;
     margin: 0 2px;
-    padding: 4px 6px !important;
+    padding: 1px 4px !important;
     font-size: 12px;
   }
 
