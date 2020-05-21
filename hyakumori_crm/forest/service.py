@@ -28,8 +28,8 @@ def get_customer_of_forest(pk, customer_pk):
     try:
         return (
             ForestCustomer.objects.select_related("customer")
-            .get(customer_id=customer_pk, forest_id=pk)
-            .customer
+                .get(customer_id=customer_pk, forest_id=pk)
+                .customer
         )
     except (
         ForestCustomer.DoesNotExist,
@@ -53,7 +53,7 @@ def get_forests_by_condition(
         return [], 0
     query = filters.qs if filters else Forest.objects.all()
     total = query.count()
-    forests = query.order_by("-updated_at", "-created_at")[offset : offset + per_page]
+    forests = query.order_by("-updated_at", "-created_at")[offset: offset + per_page]
     return forests, total
 
 
@@ -129,17 +129,17 @@ def get_customer_contacts_of_forest(pk):
             customercontact__forestcustomercontact__forestcustomer__forest_id=pk,
             customercontact__is_basic=False,
         )
-        .annotate(customer_id=F("customercontact__customer_id"))
-        .annotate(
+            .annotate(customer_id=F("customercontact__customer_id"))
+            .annotate(
             default=RawSQL(
                 "crm_forestcustomercontact.attributes->>'default'", params=[]
             )
         )
-        .annotate(cc_attrs=F("customercontact__attributes"))
-        .annotate(is_basic=Subquery(cc.values("is_basic")[:1]))
-        .annotate(customer_id=Subquery(cc.values("customer_id")[:1]))
-        .annotate(owner_customer_id=F("customercontact__customer_id"))
-        .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
+            .annotate(cc_attrs=F("customercontact__attributes"))
+            .annotate(is_basic=Subquery(cc.values("is_basic")[:1]))
+            .annotate(customer_id=Subquery(cc.values("customer_id")[:1]))
+            .annotate(owner_customer_id=F("customercontact__customer_id"))
+            .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
     )
 
 
@@ -205,6 +205,18 @@ def get_forests_for_csv(forest_ids: list = None):
         customer_internal_id=F("forestcustomer__customer__internal_id"))
 
 
+def parse_tags_for_csv(tags: dict):
+    if tags is None or len(tags.keys()) == 0:
+        return None
+    else:
+        result = ''
+        for (k, v) in tags.items():
+            if k is not None and v is not None:
+                result += f"{k}:{v}; "
+        # remove the last semicolon
+        return result[0:len(result) - 2]
+
+
 def forest_csv_data_mapping(forest):
     return [
         forest.forest_id,
@@ -230,8 +242,7 @@ def forest_csv_data_mapping(forest):
         forest.contracts[2].get("status"),
         forest.contracts[2].get("start_date"),
         forest.contracts[2].get("end_date"),
-        forest.tags.get("danchi"),
-        forest.tags.get("manage_type"),
+        parse_tags_for_csv(forest.tags),
         forest.forest_attributes.get("地番面積_ha"),
         forest.forest_attributes.get("面積_ha"),
         forest.forest_attributes.get("面積_m2"),

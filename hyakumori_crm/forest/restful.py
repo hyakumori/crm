@@ -3,6 +3,7 @@ import itertools
 
 from django.db.models import Q, F, Count
 from django.http import HttpResponse
+from django.utils.translation import gettext as _
 from rest_framework import mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -153,7 +154,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
         response['Content-Disposition'] = 'attachment'
         header = ["\ufeff内部ID", "土地管理ID"]
         flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
-                                              FOREST_CONTRACT, list(FOREST_TAG_KEYS.values()),
+                                              FOREST_CONTRACT, [_("Tag")],
                                               FOREST_ATTRIBUTES))
         writer = csv.writer(response)
         writer.writerow(flatten_header)
