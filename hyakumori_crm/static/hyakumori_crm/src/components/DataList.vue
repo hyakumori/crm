@@ -47,14 +47,12 @@
         </div>
       </template>
 
-      <template
-        v-for="(nego, index) in negotiationCols"
-        v-slot:[`item.${nego}`]="{ item }"
-      >
-        <p class="negotiation" v-if="isNegotiation(item[nego])" :key="index">
-          {{ $t("raw_text.in_negotiation") }}
-        </p>
-        <p class="d-inline" v-else :key="index">{{ item[nego] }}</p>
+      <template v-slot:item.tags="{ item }" class="text-truncate">
+        <template v-for="(tag, name, index) in item['tags']">
+          <p class="tag pa-1" v-if="tag && name" :key="index">
+            {{ `${name}: ${tag}` }}
+          </p>
+        </template>
       </template>
     </v-data-table>
   </v-layout>
@@ -74,7 +72,7 @@ export default {
     showSelect: Boolean,
     data: Array,
     headers: Array,
-    negotiationCols: Array,
+    tagCols: Array,
     serverItemsLength: Number,
     options: Object,
     tableRowIcon: String,
@@ -203,12 +201,13 @@ export default {
     border-radius: 50%;
   }
 
-  & .negotiation {
-    display: inline;
-    padding: 5px;
+  & .tag {
+    display: inline-block;
     background: #ffa726;
     border-radius: 2px;
     color: white;
+    margin: 0 2px;
+    font-size: 12px;
   }
 
   & ::v-deep tr {
