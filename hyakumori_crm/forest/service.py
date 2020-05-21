@@ -174,14 +174,14 @@ def update_forest_memo(forest, memo):
     return forest, _updated
 
 
-def get_all_forest_csv_data():
-    return (
-        Forest.objects.all()
-        .distinct("id")
-        .annotate(forest_id=F("id"))
-        .annotate(
-            customer_name_kana=RawSQL(
-                """
+def get_forests_for_csv(forest_ids: list = None):
+    if forest_ids is not None and len(forest_ids) > 0:
+        queryset = Forest.objects.filter(id__in=forest_ids)
+    else:
+        queryset = Forest.objects.all()
+    return queryset.distinct("id").annotate(forest_id=F("id")).annotate(
+        customer_name_kana=RawSQL(
+            """
             select array_to_string(array_agg(concat_ws(' ', cc2.name_kana->>'last_name', cc2.name_kana->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
@@ -189,12 +189,10 @@ def get_all_forest_csv_data():
             inner join crm_contact cc2 on cc.contact_id = cc2.id
             where crm_forest.id = cf.forest_id and cc.is_basic = true
             """,
-                params=[],
-            )
-        )
-        .annotate(
-            customer_name_kanji=RawSQL(
-                """
+            params=[]
+        )).annotate(
+        customer_name_kanji=RawSQL(
+            """
             select array_to_string(array_agg(concat_ws(' ', cc4.name_kanji->>'last_name', cc4.name_kanji->>'first_name')), '; ')
             from crm_customer c
             inner join crm_forestcustomer cf on c.id = cf.customer_id
@@ -202,46 +200,9 @@ def get_all_forest_csv_data():
             inner join crm_contact cc4 on cc3.contact_id = cc4.id
             where crm_forest.id = cf.forest_id and cc3.is_basic = true
             """,
-                params=[],
-            )
-        )
-        .annotate(customer_internal_id=F("forestcustomer__customer__internal_id"))
-    )
-
-
-def get_specific_forest_csv_data(forest_ids):
-    return (
-        Forest.objects.filter(id__in=forest_ids)
-        .distinct("id")
-        .annotate(forest_id=F("id"))
-        .annotate(
-            customer_name_kana=RawSQL(
-                """
-            select array_to_string(array_agg(concat_ws(' ', cc2.name_kana->>'last_name', cc2.name_kana->>'first_name')), '; ')
-            from crm_customer c
-            inner join crm_forestcustomer cf on c.id = cf.customer_id
-            inner join crm_customercontact cc on c.id = cc.customer_id
-            inner join crm_contact cc2 on cc.contact_id = cc2.id
-            where crm_forest.id = cf.forest_id and cc.is_basic = true
-            """,
-                params=[],
-            )
-        )
-        .annotate(
-            customer_name_kanji=RawSQL(
-                """
-            select array_to_string(array_agg(concat_ws(' ', cc4.name_kanji->>'last_name', cc4.name_kanji->>'first_name')), '; ')
-            from crm_customer c
-            inner join crm_forestcustomer cf on c.id = cf.customer_id
-            inner join crm_customercontact cc3 on c.id = cc3.customer_id
-            inner join crm_contact cc4 on cc3.contact_id = cc4.id
-            where crm_forest.id = cf.forest_id and cc3.is_basic = true
-            """,
-                params=[],
-            )
-        )
-        .annotate(customer_internal_id=F("forestcustomer__customer__internal_id"))
-    )
+            params=[]
+        )).annotate(
+        customer_internal_id=F("forestcustomer__customer__internal_id"))
 
 
 def forest_csv_data_mapping(forest):

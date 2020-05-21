@@ -32,7 +32,8 @@ from .service import (
     get_customer_contacts_of_forest,
     set_default_customer,
     set_default_customer_contact,
-    update_forest_memo, forest_csv_data_mapping, get_all_forest_csv_data, get_specific_forest_csv_data, )
+    update_forest_memo, forest_csv_data_mapping,
+    get_forests_for_csv, )
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -145,9 +146,9 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action_login_required(with_permissions=["change_forest"])
     def download_all_csv(self, request):
         if request.data is None or len(request.data) == 0:
-            csv_data = get_all_forest_csv_data()
+            csv_data = get_forests_for_csv()
         else:
-            csv_data = get_specific_forest_csv_data(request.data)
+            csv_data = get_forests_for_csv(request.data)
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment'
         header = ["\ufeff内部ID", "土地管理ID"]
