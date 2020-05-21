@@ -13,23 +13,6 @@ from .schemas import (
 from .service import get_list
 
 query = ObjectType("Query")
-mutation = ObjectType("Mutation")
-
-
-@query.field("get_customer")
-@login_required(with_policies=["can_view_customers"])
-def get_customer_by_id(
-    obj: Any, info: GraphQLResolveInfo, id: str = None, **kwargs
-) -> dict:
-    return {
-        "ok": True,
-        "customer": {
-            "id": uuid.uuid4(),
-            "internal_id": "ajshdq8w123",
-            "profile": {"first_name": "Ha", "last_name": "Tran", "middle_name": None},
-            "attributes": None,
-        },
-    }
 
 
 @query.field("customertable_headers")
@@ -72,4 +55,4 @@ def list_customers(obj: Any, info: GraphQLResolveInfo, data=None, **kwargs) -> d
     return {"items": customers, "total": total}
 
 
-resolvers = [query, mutation]
+resolvers = [query]

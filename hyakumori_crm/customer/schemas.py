@@ -65,14 +65,6 @@ class CustomerUpdateSchema(CustomerInputSchema):
         arbitrary_types_allowed = True
 
 
-class CustomerRead:
-    pass
-
-
-class CustomerUpdate:
-    pass
-
-
 class CustomerFilter(FilterSet):
     internal_id = CharFilter(lookup_expr="icontains")
     business_id = CharFilter(lookup_expr="icontains")
@@ -318,3 +310,80 @@ def required_contact_input_wrapper(**kwargs):
         except StopIteration:
             pass
         raise e
+
+
+class CustomerUploadCsv(HyakumoriDanticModel):
+    business_id: constr(regex=regexes.CUSTOMER_ID, strip_whitespace=True)
+    fullname_kana: str
+    fullname_kanji: str
+    prefecture: Optional[str] = EMPTY
+    municipality: Optional[str] = EMPTY
+    sector: str  # sector
+    postal_code: Optional[
+        constr(regex=regexes.POSTAL_CODE, strip_whitespace=True)
+    ] = EMPTY
+
+    telephone: Optional[
+        constr(regex=regexes.TELEPHONE_NUMBER, strip_whitespace=True)
+    ] = EMPTY
+
+    mobilephone: Optional[
+        constr(regex=regexes.MOBILEPHONE_NUMBER, strip_whitespace=True)
+    ] = EMPTY
+    email: Optional[EmailStr] = EMPTY
+    bank_name: Optional[str] = EMPTY
+    bank_branch_name: Optional[str] = EMPTY
+    bank_account_type: Optional[str] = EMPTY
+    bank_account_number: Optional[constr(regex=regexes.BANKING_ACCOUNT_NUMBER)]
+    bank_account_name: Optional[str] = EMPTY
+    ranking: Optional[str]
+    status: Optional[str]
+    same_name: Optional[str]
+
+    @root_validator
+    def validate_atleast_one_way_to_contact(cls, values):
+        telephone = values.get("telephone")
+        mobilephone = values.get("mobilephone")
+        email = values.get("email")
+        if not telephone and not mobilephone and not email:
+            raise ValueError(_("Enter at least telephone or mobilephone or email."))
+        return values
+
+    @property
+    def name_kana(self):
+        name_parts = self.fullname_kana.split("\u3000")
+        return {"first_name": name_parts[1], "last_name": name_parts[0]}
+
+    @property
+    def name_kanji(self):
+        name_parts = self.fullname_kanji.split("\u3000")
+        return {"first_name": name_parts[1], "last_name": name_parts[0]}
+
+    @property
+    def address(self):
+        return {
+            "prefecture": self.prefecture,
+            "municipality": self.municipality,
+            "sector": self.sector,
+        }
+
+    @property
+    def banking(self):
+        return {
+            "bank_name": self.bank_name,
+            "branch_name": self.bank_branch_name,
+            "account_type": self.bank_account_type,
+            "account_number": self.bank_account_number,
+            "account_name": self.bank_account_name,
+        }
+
+    @property
+    def tags(self):
+        tags = {}
+        if self.ranking:
+            tags["ranking"] = self.ranking
+        if self.status:
+            tags["status"] = self.status
+        if self.same_name:
+            tags["same_name"] = self.same_name
+        return tags

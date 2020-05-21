@@ -117,6 +117,7 @@ import BusEvent from "../BusEvent";
 import streamSaver from "../plugins/streamsaver";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
 import TableAction from "../components/TableAction";
+import ErrorCard from "../components/ErrorsCard";
 
 export default {
   components: {
@@ -174,9 +175,18 @@ export default {
         this.uploadCsvLoading = true;
         const formData = new FormData();
         formData.append("file", this.$refs.csvUploadInput.files[0]);
-        await this.$rest.post("/customers/upload_csv", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        try {
+          await this.$rest.post("/customers/upload_csv", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } catch (error) {
+          if (error.response.data) {
+            this.$dialog.show(ErrorCard, {
+              line: error.response.data.line,
+              errors: error.response.data.errors,
+            });
+          }
+        }
         this.uploadCsvLoading = false;
         this.$refs.csvUploadInput.value = null;
         this.selectedFileName = "";

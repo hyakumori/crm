@@ -81,6 +81,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "hyakumori_crm.crm.middlewares.in_maintain_middleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -221,7 +222,7 @@ DJOSER = {
     "EMAIL": {"activation": "hyakumori_crm.users.emails.ActivationEmail"},
     "PERMISSIONS": {
         "user_list": ["hyakumori_crm.permissions.IsAdminUser"],
-        "user": ["hyakumori_crm.permissions.CurrentUserOrAdmin"]
+        "user": ["hyakumori_crm.permissions.CurrentUserOrAdmin"],
     },
     "LOGIN_FIELD": "email",
     "HIDE_USERS": False,
