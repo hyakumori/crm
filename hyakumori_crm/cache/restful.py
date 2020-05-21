@@ -1,6 +1,5 @@
 from django_q.tasks import async_task
 from rest_framework.decorators import api_view
-
 from hyakumori_crm.api.decorators import action_login_required, get_or_404
 from hyakumori_crm.archive.service import get_archive_by_pk
 from hyakumori_crm.cache.archive import refresh_single_archive_cache
