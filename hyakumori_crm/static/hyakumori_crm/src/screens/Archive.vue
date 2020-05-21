@@ -181,6 +181,7 @@ export default {
         their_participants: this.renderParticipants(data),
         our_participants: this.renderUsers(data),
         associated_forest: this.renderForests(data),
+        tags: data.tags,
       }));
     },
 

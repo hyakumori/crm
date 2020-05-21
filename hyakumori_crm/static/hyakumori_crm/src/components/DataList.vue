@@ -49,7 +49,7 @@
 
       <template v-slot:item.tags="{ item }" class="text-truncate">
         <template v-for="(tag, name, index) in item['tags']">
-          <p class="tag pa-1" v-if="tag && name" :key="index">
+          <p class="tag" v-if="tag && name" :key="index">
             {{ `${name}: ${tag}` }}
           </p>
         </template>
@@ -203,10 +203,11 @@ export default {
 
   & .tag {
     display: inline-block;
-    background: #ffa726;
-    border-radius: 2px;
+    background: #12c7a6;
+    border-radius: 4px;
     color: white;
     margin: 0 2px;
+    padding: 4px 6px !important;
     font-size: 12px;
   }
 
