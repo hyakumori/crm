@@ -16,7 +16,7 @@ from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
     ForestSerializer,
     ContactSerializer,
-    ArchiveSerializer,
+    ArchiveSerializer, ForestListingSerializer,
 )
 from .schemas import (
     ForestInput,
@@ -34,7 +34,7 @@ from .service import (
     set_default_customer,
     set_default_customer_contact,
     update_forest_memo, forest_csv_data_mapping,
-    get_forests_for_csv, )
+    get_forests_for_csv, get_forests_by_ids, update_forest_tags, )
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -162,6 +162,22 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_row = forest_csv_data_mapping(forest)
             writer.writerow(csv_row)
         return response
+
+    @action(detail=False, methods=["PUT"], url_path="ids")
+    @action_login_required(with_permissions=["change_forest"])
+    def get_list_forests_by_ids(self, request):
+        ids = request.data
+        if ids and len(ids) == 0:
+            return Response({"data": []})
+        else:
+            forests = get_forests_by_ids(ids)
+            return Response(ForestListingSerializer(forests, many=True).data)
+
+    @action(detail=False, methods=["PUT"], url_path="tags")
+    @action_login_required(with_permissions=["change_forest"])
+    def tags(self, request):
+        update_forest_tags(request.data)
+        return Response({"msg": "OK"})
 
 
 @api_view(["PUT", "PATCH"])

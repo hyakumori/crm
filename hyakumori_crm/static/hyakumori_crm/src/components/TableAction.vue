@@ -6,7 +6,7 @@
 
     <select-list
       class="ml-12 table-action__select"
-      :actions="getActions"
+      :actions="actions"
       :placeHolder="$t('search.select_action')"
       @selectedAction="onSelected"
     />
@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import actions from "../assets/dump/table_actions.json";
 import SelectList from "./SelectList";
 
 export default {
@@ -26,17 +25,12 @@ export default {
 
   props: {
     selectedCount: Number,
+    actions: Array,
   },
 
   methods: {
-    onSelected() {
-      // console.log(val)
-    },
-  },
-
-  computed: {
-    getActions() {
-      return actions;
+    onSelected(val) {
+      this.$emit("selected-action", val);
     },
   },
 };

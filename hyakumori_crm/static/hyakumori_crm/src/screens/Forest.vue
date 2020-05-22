@@ -5,35 +5,35 @@
         <template #bottom-right>
           <div>
             <outline-round-btn
-              v-show="false"
-              class="mr-2"
-              :icon="$t('icon.add')"
               :content="$t('buttons.csv_upload')"
+              :icon="$t('icon.add')"
               @click="uploadCsv"
+              class="mr-2"
+              v-show="false"
             />
-            <v-menu offset-y nudge-bottom="4">
+            <v-menu nudge-bottom="4" offset-y>
               <template v-slot:activator="{ on }">
                 <outline-round-btn
-                  icon="mdi-download"
                   :content="$t('buttons.csv_download')"
                   :loading="downloadCsvLoading"
                   class="mr-2"
+                  icon="mdi-download"
                   v-on="on"
                 />
               </template>
-              <v-list dense class="pa-0">
+              <v-list class="pa-0" dense>
                 <v-list-item
-                  v-if="tableSelectedRow && tableSelectedRow.length > 0"
                   @click="downloadSelectedRows"
+                  v-if="tableSelectedRow && tableSelectedRow.length > 0"
                 >
-                  <v-list-item-title>{{
-                    $t("buttons.download_selected")
-                  }}</v-list-item-title>
+                  <v-list-item-title
+                    >{{ $t("buttons.download_selected") }}
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="downloadAllCsv">
-                  <v-list-item-title>{{
-                    $t("buttons.download_all")
-                  }}</v-list-item-title>
+                  <v-list-item-title
+                    >{{ $t("buttons.download_all") }}
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -44,42 +44,95 @@
 
     <template #section>
       <search-card
-        :searchCriteria="filterFields"
         :onSearch="onSearch"
+        :searchCriteria="filterFields"
         ref="filter"
       />
 
       <div class="ml-7 forest__data-section">
-        <!--   For now it has no function, so remove it temporary  -->
-        <!--        <table-action-->
-        <!--          class="forest__data-section__table-action mb-4"-->
-        <!--          v-if="tableSelectedRow.length > 0"-->
-        <!--          :selectedCount="tableSelectedRow.length"-->
-        <!--        />-->
+        <table-action
+          :actions="actions"
+          :selectedCount="tableSelectedRow.length"
+          @selected-action="selectedAction"
+          class="forest__data-section__table-action mb-4"
+          v-if="tableSelectedRow.length > 0"
+        />
 
         <data-list
-          mode="forest"
-          itemKey="id"
-          :headers="getHeaders"
+          :autoHeaders="false"
           :data="getData"
-          :showSelect="true"
+          :headers="getHeaders"
           :isLoading="$apollo.queries.forestsInfo.loading"
-          :serverItemsLength="getTotalForests"
-          :tableRowIcon="tableRowIcon"
           :options.sync="options"
+          :serverItemsLength="getTotalForests"
+          :showSelect="true"
+          :tableRowIcon="tableRowIcon"
           @rowData="rowData"
           @selectedRow="selectedRow"
-          :autoHeaders="false"
+          itemKey="id"
+          mode="forest"
         ></data-list>
       </div>
 
       <snack-bar
-        color="error"
         :isShow="isShowErr"
         :msg="errMsg"
         :timeout="sbTimeout"
         @dismiss="onDismissSb"
+        color="error"
       />
+
+      <v-dialog
+        v-model="showChangeTagDialog"
+        max-width="700"
+        transition
+        @click:outside="showChangeTagDialog = false"
+      >
+        <ValidationObserver v-slot="{ invalid }">
+          <v-card>
+            <v-card-title class="display-0">
+              {{ $t("action.change_tag_value") }}
+            </v-card-title>
+            <v-card-text class="pb-0">
+              <v-row>
+                <v-col cols="6">
+                  <h4>タグを選択</h4>
+                  <v-select
+                    ref="tagList"
+                    outlined
+                    dense
+                    height="45"
+                    no-data-text="データなし"
+                    :items="tagKeys"
+                    @change="onSelectedTagChange"
+                  />
+                </v-col>
+                <v-col cols="6">
+                  <h4>タグバリュー</h4>
+                  <text-input
+                    v-model="newTagValue"
+                    label="タグバリュー"
+                    rules="required|max:255"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions class="px-4">
+              <v-btn text color="primary" @click="setDefaultTagData"
+                >Cancel</v-btn
+              >
+              <v-spacer></v-spacer>
+              <v-btn
+                text
+                color="primary"
+                @click="updateSelectedTags"
+                :disabled="invalid || !selectedTagUpdate"
+                >OK</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </ValidationObserver>
+      </v-dialog>
     </template>
   </main-section>
 </template>
@@ -95,8 +148,10 @@ import ScreenMixin from "./ScreenMixin";
 import MainSection from "../components/MainSection";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
+import TextInput from "../components/forms/TextInput";
 import { saveAs } from "file-saver";
-import { get as _get } from "lodash";
+import { flatten, get as _get } from "lodash";
+import { ValidationObserver } from "vee-validate";
 
 export default {
   name: "forest",
@@ -106,15 +161,35 @@ export default {
   components: {
     DataList,
     SearchCard,
-    // TableAction,
+    TableAction,
     SnackBar,
     MainSection,
     PageHeader,
     OutlineRoundBtn,
+    TextInput,
+    ValidationObserver,
   },
 
   data() {
     return {
+      actions: [
+        {
+          text: this.$t("action.contract_status_to_contracted"),
+          value: 0,
+        },
+        {
+          text: this.$t("action.contract_status_to_unsigned"),
+          value: 1,
+        },
+        {
+          text: this.$t("action.contract_status_to_expired"),
+          value: 2,
+        },
+        {
+          text: this.$t("action.change_tag_value"),
+          value: 3,
+        },
+      ],
       pageIcon: this.$t("icon.forest_icon"),
       pageHeader: this.$t("page_header.forest_mgmt"),
       tableRowIcon: this.$t("icon.forest_icon"),
@@ -127,6 +202,10 @@ export default {
       tableSelectedRow: [],
       headers: [],
       downloadCsvLoading: false,
+      showChangeTagDialog: false,
+      tagKeys: [],
+      selectedTagUpdate: null,
+      newTagValue: null,
     };
   },
 
@@ -208,10 +287,9 @@ export default {
     async downloadSelectedRows() {
       try {
         this.downloadCsvLoading = true;
-        const selectedRowIds = this.tableSelectedRow.map(row => row.id);
         let csvData = await this.$rest.post(
           "/forests/download-csv",
-          selectedRowIds,
+          this.selectedRowIds,
         );
         const blob = new Blob([csvData], { type: "text/csv;charset=UTF-8" });
         saveAs(blob, "selected_forests.csv");
@@ -252,6 +330,66 @@ export default {
         return results;
       }
       return "";
+    },
+
+    setDefaultTagData() {
+      this.newTagValue = null;
+      this.$refs.tagList.internalValue = "";
+      this.showChangeTagDialog = false;
+    },
+
+    async fetchSelectedForests() {
+      try {
+        const forests = await this.$rest.put(
+          "/forests/ids",
+          this.selectedRowIds,
+        );
+        const tags = forests.map(forest => forest.tags);
+        tags.forEach(tag => this.tagKeys.push(Object.keys(tag)));
+        this.tagKeys = [...new Set(flatten(this.tagKeys))];
+        this.showChangeTagDialog = true;
+      } catch (e) {
+        this.showChangeTagDialog = false;
+      } finally {
+      }
+    },
+
+    async updateSelectedTags() {
+      const params = {
+        ids: this.selectedRowIds,
+        key: this.selectedTagUpdate,
+        value: this.newTagValue,
+      };
+      try {
+        await this.$rest.put("/forests/tags", params);
+      } catch (e) {
+      } finally {
+        this.setDefaultTagData();
+        await this.$apollo.queries.forestsInfo.refetch();
+      }
+    },
+
+    onSelectedTagChange(val) {
+      this.selectedTagUpdate = val;
+    },
+
+    selectedAction(index) {
+      switch (index) {
+        case 0:
+          console.log("0");
+          break;
+        case 1:
+          console.log("1");
+          break;
+        case 2:
+          console.log("2");
+          break;
+        case 3:
+          this.fetchSelectedForests();
+          break;
+        default:
+          return;
+      }
     },
   },
 
@@ -326,6 +464,13 @@ export default {
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))
         .filter(f => f.value !== undefined);
+    },
+
+    selectedRowIds() {
+      return (
+        this.tableSelectedRow.length > 0 &&
+        this.tableSelectedRow.map(row => row.id)
+      );
     },
   },
 };

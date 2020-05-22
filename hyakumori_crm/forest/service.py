@@ -24,6 +24,17 @@ def get_forest_by_pk(pk):
         raise ValueError(_("Forest not found"))
 
 
+def get_forests_by_ids(ids):
+    forests = []
+    for pk in ids:
+        try:
+            forest = get_forest_by_pk(pk)
+            forests.append(forest)
+        except ValueError:
+            continue
+    return forests
+
+
 def get_customer_of_forest(pk, customer_pk):
     try:
         return (
@@ -62,6 +73,19 @@ def update(forest: Forest, forest_in: dict):
     forest.contracts = forest_in["contracts"]
     forest.save()
     return forest
+
+
+def update_forest_tags(data: dict):
+    ids = data.get("ids")
+    tag_key = data.get("key")
+    new_value = data.get("value")
+    forests = Forest.objects.filter(id__in=ids)
+    for forest in forests:
+        if forest.tags.get(tag_key) is None:
+            continue
+        else:
+            forest.tags[tag_key] = new_value
+            forest.save()
 
 
 def update_owners(owner_pks_in):

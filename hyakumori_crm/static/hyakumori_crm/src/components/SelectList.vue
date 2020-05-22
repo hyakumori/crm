@@ -8,7 +8,6 @@
     :items="actions"
     :placeholder="placeHolder"
     @change="onChangeSelectedItem"
-    :value="value"
   ></v-select>
 </template>
 
@@ -21,8 +20,6 @@ export default {
   props: {
     actions: Array,
     placeHolder: String,
-    index: Number,
-    value: String,
   },
 
   mounted() {
@@ -39,12 +36,12 @@ export default {
 
     resizeInputWidth() {
       const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
-      input.style.width = "1ch";
+      input.style.width = "3ch";
     },
 
     onChangeSelectedItem(val) {
       this.resizeInputWidth();
-      this.$emit("selectedAction", val, this.index);
+      this.$emit("selectedAction", val);
     },
   },
 };
