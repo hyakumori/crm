@@ -1,14 +1,28 @@
 <template>
   <div id="app">
+    <v-snackbar
+      color="cyan darken-2"
+      v-model="inMaintain"
+      top
+      :timeout="0"
+      multi-line
+    >
+      Website is under maintenance mode.<br />Any update operation is not
+      allowed.
+    </v-snackbar>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import eventBus from "./BusEvent";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "App",
+  created() {
+    this.getMaintenanceStatus();
+  },
   mounted() {
     eventBus.$on("auth:relogin", () => {
       localStorage.clear();
@@ -17,6 +31,17 @@ export default {
     eventBus.$on("rest:404", () => {
       this.$router.replace({ name: "not-found" }).catch();
     });
+  },
+  methods: {
+    ...mapActions({ getMaintenanceStatus: "getMaintenanceStatus" }),
+  },
+  computed: {
+    ...mapState({
+      inMaintain: "inMaintain",
+    }),
+  },
+  watch: {
+    $route: "getMaintenanceStatus",
   },
 };
 </script>

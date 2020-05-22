@@ -1,0 +1,64 @@
+import csv
+import json
+import time
+
+from django.db import DatabaseError, transaction
+import pydantic
+
+from hyakumori_crm.core.decorators import errors_wrapper
+from hyakumori_crm.crm.models import Customer
+
+from .schemas import CustomerUploadCsv
+from .service import save_customer_from_csv_data
+
+
+def csv_upload(fp):
+    header_map = {
+        "business_id": "所有者ID",
+        "fullname_kana": "土地所有者名（漢字）",
+        "fullname_kanji": "土地所有者名（カナ）",
+        "prefecture": "土地所有者住所_都道府県",
+        "municipality": "土地所有者住所_市町村",
+        "sector": "土地所有者住所_大字",
+        "postal_code": "連絡先情報_郵便番号",
+        "telephone": "連絡先情報_電話番号",
+        "mobilephone": "連絡先情報_携帯電話",
+        "email": "連絡先情報_メールアドレス",
+        "bank_name": "口座情報_銀行名",
+        "bank_branch_name": "口座情報_支店名",
+        "bank_account_type": "口座情報_種別",
+        "bank_account_number": "口座情報_口座番号",
+        "bank_account_name": "口座情報_口座名義",
+        "ranking": "所有者順位",
+        "status": "登録/未登録",
+        "same_name": "同姓同名",
+    }
+    time.sleep(100)
+    with open(fp, mode="r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        line_count = 0
+        with transaction.atomic():
+            for row in reader:
+                if line_count == 0:
+                    line_count += 1
+                row_data = {k: row[v] for k, v in header_map.items()}
+                try:
+                    c = Customer.objects.select_for_update(nowait=True).get(
+                        business_id=row_data["business_id"]
+                    )
+                except DatabaseError:
+                    raise ValueError("Current resources are not ready for update!!")
+                else:
+                    try:
+                        customer_data = CustomerUploadCsv(**row_data)
+                        save_customer_from_csv_data(c, customer_data)
+                    except pydantic.ValidationError as e:
+                        errors = {}
+                        for key, msgs in errors_wrapper(e.errors()).items():
+                            if key == "__root__":
+                                errors[key] = msgs
+                            else:
+                                errors[header_map[key]] = msgs
+                        raise ValueError(json.dumps(errors))
+                line_count += 1
+        return line_count

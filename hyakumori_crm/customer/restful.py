@@ -1,13 +1,14 @@
 import csv
+import pathlib
 import time
-import io
-from filelock import SoftFileLock
 
+from django.core.cache import cache
 from django.http.response import StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from django_q.tasks import async_task
 
 from hyakumori_crm.core.utils import (
     default_paginator,
@@ -21,6 +22,10 @@ from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
     ArchiveSerializer,
 )
+from ..core.utils import clear_maintain_task_id_cache
+from ..activity.services import ActivityService, CustomerActions
+from ..api.decorators import action_login_required, api_validate_model, get_or_404
+
 from .schemas import (
     BankingInput,
     ContactsInput,
@@ -56,9 +61,8 @@ from .service import (
     get_customers_by_ids,
     update_customer_tags,
 )
-from ..activity.services import ActivityService, CustomerActions
-from ..api.decorators import action_login_required, api_validate_model, get_or_404
 from ..forest.service import parse_tags_for_csv
+from .tasks import csv_upload
 
 
 class CustomerViewSets(ViewSet):
@@ -305,57 +309,18 @@ class CustomerViewSets(ViewSet):
 
     @action(detail=False, methods=["POST"])
     def upload_csv(self, request):
-        lock = SoftFileLock("in_maintain.lck")
-        with lock.acquire():
-            csv_file = request.data["file"]
-            if csv_file.content_type != "text/csv":
-                return Response({"detail": "Invalid format"}, 400)
-            header_map = {
-                "business_id": "所有者ID",
-                "fullname_kana": "土地所有者名（漢字）",
-                "fullname_kanji": "土地所有者名（カナ）",
-                "prefecture": "土地所有者住所_都道府県",
-                "municipality": "土地所有者住所_市町村",
-                "sector": "土地所有者住所_大字",
-                "postal_code": "連絡先情報_郵便番号",
-                "telephone": "連絡先情報_電話番号",
-                "mobilephone": "連絡先情報_携帯電話",
-                "email": "連絡先情報_メールアドレス",
-                "bank_name": "口座情報_銀行名",
-                "bank_branch_name": "口座情報_支店名",
-                "bank_account_type": "口座情報_種別",
-                "bank_account_number": "口座情報_口座番号",
-                "bank_account_name": "口座情報_口座名義",
-                "ranking": "所有者順位",
-                "status": "登録/未登録",
-                "same_name": "同姓同名",
-            }
-            reader = csv.DictReader(io.StringIO(csv_file.read().decode("utf-8-sig")))
-            line_count = 0
-            for row in reader:
-                if line_count == 0:
-                    line_count += 1
-                print("yo")
-                row_data = {k: row[v] for k, v in header_map.items()}
-                try:
-                    c = Customer.objects.select_for_update(nowait=True).get(
-                        business_id=row_data["business_id"]
-                    )
-                except DatabaseError:
-                    return Response({}, 400)
-                else:
-                    try:
-                        customer_data = CustomerUploadCsv(**row_data)
-                        save_customer_from_csv_data(c, customer_data)
-                    except pydantic.ValidationError as e:
-                        return Response(
-                            {"line": line_count, "errors": errors_wrapper(e.errors())},
-                            400,
-                        )
-                line_count += 1
-            time.sleep(10)
-            print(f"Processed {line_count} lines.")
-            return Response({})
+        csv_file = request.data["file"]
+        if csv_file.content_type != "text/csv":
+            return Response({"detail": _("Please upload a csv file!!")}, 400)
+        pathlib.Path("media/upload/customer").mkdir(parents=True, exist_ok=True)
+        file_name = f"{pathlib.Path(csv_file.name).stem}-{int(time.time())}.csv"
+        fp = f"media/upload/customer/{file_name}"
+        with open(fp, "wb+") as destination:
+            for chunk in csv_file.chunks():
+                destination.write(chunk)
+        task_id = async_task(csv_upload, fp, hook=clear_maintain_task_id_cache)
+        cache.set("maintain_task_id", task_id)
+        return Response({"task_id": task_id}, status=202)
 
 
 @api_view(["GET"])

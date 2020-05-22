@@ -1,6 +1,10 @@
 import os.path
 from django.http import HttpResponse, JsonResponse
+from django.db.models import F
+from rest_framework.response import Response
 from rest_framework.exceptions import APIException
+from django_q.models import Task
+from django.core.cache import cache
 
 
 class ServiceUnavailable(APIException):
@@ -11,14 +15,13 @@ class ServiceUnavailable(APIException):
 
 def in_maintain_middleware(get_response):
     def middleware(request):
-        if os.path.exists("in_maintain.lck"):
-            print(request.path)
-            if request.path.startswith("/api/v1") or request.path.startswith(
-                "/graphql"
-            ):
+        if request.path.startswith("/api/v1") and request.method in [
+            "POST",
+            "PUT",
+            "PATCH",
+        ]:
+            if cache.get("maintain_task_id") is not None:
                 return JsonResponse({"detail": "Service Unavailable"}, status=503)
-            else:
-                return HttpResponse("Service Unavailable", "text/plain", 503)
         resp = get_response(request)
 
         return resp
