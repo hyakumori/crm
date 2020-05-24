@@ -1,6 +1,7 @@
 import csv
 import pathlib
 import time
+import json
 
 from django.core.cache import cache
 from django.http.response import StreamingHttpResponse
@@ -8,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from django_q.tasks import async_task
+from django_q.tasks import async_task, result
 
 from hyakumori_crm.core.utils import (
     default_paginator,
@@ -311,7 +312,7 @@ class CustomerViewSets(ViewSet):
     def upload_csv(self, request):
         csv_file = request.data["file"]
         if csv_file.content_type != "text/csv":
-            return Response({"detail": _("Please upload a csv file!!")}, 400)
+            return Response({"errors": _("Please upload a csv file!!")}, 400)
         pathlib.Path("media/upload/customer").mkdir(parents=True, exist_ok=True)
         file_name = f"{pathlib.Path(csv_file.name).stem}-{int(time.time())}.csv"
         fp = f"media/upload/customer/{file_name}"
@@ -320,7 +321,11 @@ class CustomerViewSets(ViewSet):
                 destination.write(chunk)
         task_id = async_task(csv_upload, fp, hook=clear_maintain_task_id_cache)
         cache.set("maintain_task_id", task_id)
-        return Response({"task_id": task_id}, status=202)
+        r = result(task_id, wait=-1)
+        if type(r) is int:
+            return Response({"task_id": task_id}, status=200)
+        else:
+            return Response(json.loads(r), status=400)
 
 
 @api_view(["GET"])

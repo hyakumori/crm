@@ -33,7 +33,6 @@ def csv_upload(fp):
         "status": "登録/未登録",
         "same_name": "同姓同名",
     }
-    time.sleep(100)
     with open(fp, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         line_count = 0
@@ -47,7 +46,13 @@ def csv_upload(fp):
                         business_id=row_data["business_id"]
                     )
                 except DatabaseError:
-                    raise ValueError("Current resources are not ready for update!!")
+                    return json.dumps(
+                        {
+                            "errors": {
+                                "__root__": "Current resources are not ready for update!!",
+                            }
+                        }
+                    )
                 else:
                     try:
                         customer_data = CustomerUploadCsv(**row_data)
@@ -59,6 +64,6 @@ def csv_upload(fp):
                                 errors[key] = msgs
                             else:
                                 errors[header_map[key]] = msgs
-                        raise ValueError(json.dumps(errors))
+                        return json.dumps({"line": line_count + 1, "errors": errors})
                 line_count += 1
-        return line_count
+    return line_count

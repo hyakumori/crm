@@ -179,6 +179,7 @@ export default {
           await this.$rest.post("/customers/upload_csv", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
+          this.$apollo.queries.customerList.refetch();
         } catch (error) {
           if (error.response.data) {
             this.$dialog.show(ErrorCard, {
