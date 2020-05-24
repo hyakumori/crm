@@ -3,37 +3,45 @@
     <template #top>
       <page-header>
         <template #bottom-right>
-          <div>
+          <div class="forest__csv-section">
             <outline-round-btn
-              v-show="false"
-              class="mr-2"
-              :icon="$t('icon.add')"
               :content="$t('buttons.csv_upload')"
+              :icon="$t('icon.add')"
+              :loading="uploadCsvLoading"
               @click="uploadCsv"
+              class="mr-2"
+              v-show="true"
             />
-            <v-menu offset-y nudge-bottom="4">
+            <input
+              @change="onCsvInputChange"
+              accept=".csv"
+              class="forest__csv-section__upload"
+              ref="uploadCsv"
+              type="file"
+            />
+            <v-menu nudge-bottom="4" offset-y>
               <template v-slot:activator="{ on }">
                 <outline-round-btn
-                  icon="mdi-download"
                   :content="$t('buttons.csv_download')"
                   :loading="downloadCsvLoading"
                   class="mr-2"
+                  icon="mdi-download"
                   v-on="on"
                 />
               </template>
-              <v-list dense class="pa-0">
+              <v-list class="pa-0" dense>
                 <v-list-item
-                  v-if="tableSelectedRow && tableSelectedRow.length > 0"
                   @click="downloadSelectedRows"
+                  v-if="tableSelectedRow && tableSelectedRow.length > 0"
                 >
-                  <v-list-item-title>{{
-                    $t("buttons.download_selected")
-                  }}</v-list-item-title>
+                  <v-list-item-title
+                    >{{ $t("buttons.download_selected") }}
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="downloadAllCsv">
-                  <v-list-item-title>{{
-                    $t("buttons.download_all")
-                  }}</v-list-item-title>
+                  <v-list-item-title
+                    >{{ $t("buttons.download_all") }}
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -44,8 +52,8 @@
 
     <template #section>
       <search-card
-        :searchCriteria="filterFields"
         :onSearch="onSearch"
+        :searchCriteria="filterFields"
         ref="filter"
       />
 
@@ -58,27 +66,27 @@
         <!--        />-->
 
         <data-list
-          mode="forest"
-          itemKey="id"
-          :headers="getHeaders"
+          :autoHeaders="false"
           :data="getData"
-          :showSelect="true"
+          :headers="getHeaders"
           :isLoading="$apollo.queries.forestsInfo.loading"
-          :serverItemsLength="getTotalForests"
-          :tableRowIcon="tableRowIcon"
           :options.sync="options"
+          :serverItemsLength="getTotalForests"
+          :showSelect="true"
+          :tableRowIcon="tableRowIcon"
           @rowData="rowData"
           @selectedRow="selectedRow"
-          :autoHeaders="false"
+          itemKey="id"
+          mode="forest"
         ></data-list>
       </div>
 
       <snack-bar
-        color="error"
         :isShow="isShowErr"
         :msg="errMsg"
         :timeout="sbTimeout"
         @dismiss="onDismissSb"
+        color="error"
       />
     </template>
   </main-section>
@@ -88,7 +96,6 @@
 import gql from "graphql-tag";
 import DataList from "../components/DataList";
 import SearchCard from "../components/SearchCard";
-import TableAction from "../components/TableAction";
 import GetForestList from "../graphql/GetForestList.gql";
 import SnackBar from "../components/SnackBar";
 import ScreenMixin from "./ScreenMixin";
@@ -127,6 +134,7 @@ export default {
       tableSelectedRow: [],
       headers: [],
       downloadCsvLoading: false,
+      uploadCsvLoading: false,
     };
   },
 
@@ -190,7 +198,36 @@ export default {
     },
 
     uploadCsv() {
-      // TODO: handle upload forest as csv
+      if (this.$refs.uploadCsv) {
+        this.$refs.uploadCsv.click();
+      }
+    },
+
+    checkCsvExtension(filename) {
+      const filenameSplitByDot = filename.split(".");
+      const fileExtension = filenameSplitByDot[filenameSplitByDot.length - 1];
+      return fileExtension === "csv";
+    },
+
+    async onCsvInputChange(e) {
+      const file = e.target.files[0];
+      if (file.type === "text/csv" && this.checkCsvExtension(file.name)) {
+        const requestFile = new FormData();
+        requestFile.append("file", file);
+        try {
+          this.uploadCsvLoading = true;
+          await this.$rest.post("/forests/upload-csv", requestFile);
+          await this.$apollo.queries.forestsInfo.refetch();
+        } catch (e) {
+        } finally {
+          this.uploadCsvLoading = false;
+        }
+      } else {
+        await this.$dialog.notify.error("Invalid file input", {
+          timeout: 5000,
+        });
+      }
+      this.$refs.uploadCsv.value = "";
     },
 
     async downloadAllCsv() {
@@ -336,6 +373,14 @@ export default {
   &__data-section {
     flex: 1;
     overflow: hidden;
+  }
+
+  &__csv-section {
+    &__upload {
+      height: 1px;
+      width: 1px;
+      visibility: hidden;
+    }
   }
 }
 </style>

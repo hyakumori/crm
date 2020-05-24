@@ -1,16 +1,16 @@
 import csv
-import itertools
 
 from django.db.models import Q, F, Count
 from django.http import HttpResponse
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
+from pydantic import ValidationError
 from rest_framework import mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from hyakumori_crm.core.utils import default_paginator
+from hyakumori_crm.core.utils import default_paginator, make_error_json
 from hyakumori_crm.crm.models import Forest, Archive
 from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
@@ -23,8 +23,7 @@ from .schemas import (
     OwnerPksInput,
     CustomerDefaultInput,
     CustomerContactDefaultInput,
-    ForestMemoInput,
-)
+    ForestMemoInput, ForestCsvInput, )
 from .service import (
     get_forest_by_pk,
     update,
@@ -34,16 +33,12 @@ from .service import (
     set_default_customer,
     set_default_customer_contact,
     update_forest_memo, forest_csv_data_mapping,
-    get_forests_for_csv, )
+    csv_headers, get_forests_for_csv, parse_csv_data_to_dict, update_forest_csv)
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
     get_or_404,
     action_login_required,
-)
-from ..crm.common.constants import (
-    FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, FOREST_TAG_KEYS,
-    FOREST_ATTRIBUTES
 )
 from ..permissions.services import PermissionService
 
@@ -152,16 +147,39 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_data = get_forests_for_csv(request.data)
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment'
-        header = ["\ufeff内部ID", "土地管理ID"]
-        flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
-                                              FOREST_CONTRACT, [_("Tag")],
-                                              FOREST_ATTRIBUTES))
-        writer = csv.writer(response)
-        writer.writerow(flatten_header)
+        headers = csv_headers()
+        writer = csv.writer(response, dialect='excel')
+        writer.writerow(headers)
         for forest in csv_data:
             csv_row = forest_csv_data_mapping(forest)
             writer.writerow(csv_row)
         return response
+
+    @action(detail=False, methods=["POST"], url_path="upload-csv")
+    @action_login_required(with_permissions=["change_forest"])
+    def upload_csv(self, request):
+        file = request.FILES['file']
+        headers = csv_headers()
+        header_count = len(headers)
+        for index, row in enumerate(file):
+            row_input_data = row.decode('utf-8-sig').split(",")
+            if index == 0:
+                # check number of headers
+                if len(row_input_data) == header_count:
+                    continue
+                else:
+                    return make_error_json(_("{column} error at line {row_num}").format(column='', row_num=index + 1))
+            # number of rows data equal to number of headers
+            elif len(row_input_data) == header_count:
+                try:
+                    row_data = parse_csv_data_to_dict(row.decode('utf-8-sig'))
+                    clean_forest = ForestCsvInput(**row_data)
+                    update_forest_csv(clean_forest)
+                except (ValidationError, ValueError):
+                    return make_error_json(_("{column} error at line {row_num}").format(column='', row_num=index + 1))
+            else:
+                return make_error_json(_("{column} error at line {row_num}").format(column='', row_num=index + 1))
+        return Response({"msg": "OK"})
 
 
 @api_view(["PUT", "PATCH"])
