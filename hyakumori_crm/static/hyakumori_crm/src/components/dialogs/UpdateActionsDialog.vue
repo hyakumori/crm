@@ -1,10 +1,5 @@
 <template>
-  <v-dialog
-    v-model="isShowDialog"
-    max-width="700"
-    transition
-    @click:outside="$emit('toggle-show-dialog', false)"
-  >
+  <v-dialog v-model="isShowDialog" max-width="700" transition persistent>
     <ValidationObserver v-slot="{ invalid }">
       <v-card>
         <v-card-title class="display-0">
@@ -36,7 +31,7 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="px-4">
-          <v-btn text color="primary" :disabled="updating" @click="setDefault"
+          <v-btn text color="primary" :disabled="updating" @click="onCancel"
             >Cancel</v-btn
           >
           <v-spacer></v-spacer>
@@ -74,6 +69,7 @@ export default {
     showDialog: Boolean,
     loadingItems: Boolean,
     updating: Boolean,
+    cancel: Function,
   },
 
   data() {
@@ -99,6 +95,11 @@ export default {
 
     async onUpdateData() {
       await this.updateData();
+      this.setDefault();
+    },
+
+    onCancel() {
+      this.cancel();
       this.setDefault();
     },
   },

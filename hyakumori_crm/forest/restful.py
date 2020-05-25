@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from hyakumori_crm.core.utils import default_paginator
+from hyakumori_crm.core.utils import default_paginator, make_error_json
 from hyakumori_crm.crm.models import Forest, Archive
 from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
@@ -175,8 +175,11 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action(detail=False, methods=["PUT"], url_path="tags")
     @action_login_required(with_permissions=["change_forest"])
     def tags(self, request):
-        update_forest_tags(request.data)
-        return Response({"msg": "OK"})
+        is_deleted = update_forest_tags(request.data)
+        if is_deleted:
+            return Response({"msg": "OK"})
+        else:
+            return make_error_json("Transaction is not available")
 
 
 @api_view(["PUT", "PATCH"])

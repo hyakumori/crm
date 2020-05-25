@@ -234,8 +234,11 @@ class CustomerViewSets(ViewSet):
     @action(detail=False, methods=['PUT'], url_path='tags')
     @action_login_required(with_permissions=["change_customer"])
     def tags(self, request):
-        update_customer_tags(request.data)
-        return Response({"msg": "OK"})
+        is_updated = update_customer_tags(request.data)
+        if is_updated:
+            return Response({"msg": "OK"})
+        else:
+            return make_error_json("Transaction is not available")
 
     @action(detail=False, methods=["GET"])
     def download_csv(self, request):

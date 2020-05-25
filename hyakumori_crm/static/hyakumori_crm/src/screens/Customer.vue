@@ -48,6 +48,7 @@
       />
       <div class="ml-7 customer__data-section">
         <table-action
+          ref="actionRef"
           :actions="actions"
           :selectedCount="tableSelectedRows.length"
           @selected-action="selectedAction"
@@ -78,6 +79,7 @@
         :showDialog="showChangeTagDialog"
         :loadingItems="fetchTagsLoading"
         :updating="updatingTags"
+        :cancel="resetActionChoices"
         :updateData="updateTagForSelectedCustomers"
         @update-value="val => (newTagValue = val)"
         @selected-tag="val => (selectedTagForUpdate = val)"
@@ -127,7 +129,6 @@ export default {
       tableRowIcon: this.$t("icon.customer_icon"),
       headers: [],
       downloadCsvLoading: false,
-      selectedTagForUpdate: null,
       newTagValue: null,
     };
   },
@@ -207,9 +208,12 @@ export default {
         this.updatingTags = true;
         await this.$rest.put("/customers/tags", params);
       } catch (e) {
+        await this.$dialog.notify.error(e);
       } finally {
         this.updatingTags = false;
         this.showChangeTagDialog = false;
+        this.selectedTagForUpdate = null;
+        this.resetActionChoices();
         await this.$apollo.queries.customerList.refetch();
       }
     },

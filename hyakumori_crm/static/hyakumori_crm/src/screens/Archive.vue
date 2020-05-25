@@ -47,6 +47,7 @@
         :isDisableUpdate="!selectedTagForUpdate"
         :loadingItems="fetchTagsLoading"
         :updateData="updateTagForSelectedArchives"
+        :cancel="resetActionChoices"
         :updating="updatingTags"
         @update-value="val => (newTagValue = val)"
         @selected-tag="val => (selectedTagForUpdate = val)"
@@ -106,7 +107,6 @@ export default {
       filterQueryString: "",
       options: {},
       headers: [],
-      selectedTagForUpdate: null,
       newTagValue: null,
     };
   },
@@ -242,10 +242,13 @@ export default {
         this.updatingTags = true;
         await this.$rest.put("/archives/ids/tags", params);
       } catch (e) {
+        await this.$dialog.notify.error(e);
       } finally {
         const api_url = `/archives?page_size=${this.options.itemsPerPage}&${this.filterQueryString}`;
         this.updatingTags = false;
         this.showChangeTagDialog = false;
+        this.selectedTagForUpdate = null;
+        this.resetActionChoices();
         await this.fetchArchives(api_url);
       }
     },

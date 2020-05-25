@@ -1,7 +1,7 @@
 from typing import Iterator, Union
 from uuid import UUID
 
-from django.db import DataError, IntegrityError
+from django.db import DataError, IntegrityError, transaction, OperationalError
 from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import RawSQL
 from django.utils.translation import gettext_lazy as _
@@ -504,10 +504,10 @@ def update_customer_tags(data: dict):
     ids = data.get("ids")
     tag_key = data.get("key")
     new_value = data.get("value")
-    customers = Customer.objects.filter(id__in=ids)
-    for customer in customers:
-        if customer.tags.get(tag_key) is None:
-            continue
-        else:
-            customer.tags[tag_key] = new_value
-            customer.save()
+    with transaction.atomic():
+        try:
+            Customer.objects.select_for_update(nowait=True).filter(id__in=ids, tags__has_key=tag_key).update(
+                tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]))
+            return True
+        except OperationalError:
+            return False

@@ -289,5 +289,8 @@ def archive_ids(request):
 @api_view(["PUT"])
 @action_login_required(with_permissions=["change_archive"])
 def archive_tags(request):
-    update_archive_tag(request.data)
-    return Response({"msg": "OK"})
+    is_updated = update_archive_tag(request.data)
+    if is_updated:
+        return Response({"msg": "OK"})
+    else:
+        return make_error_json("Transaction is not available")

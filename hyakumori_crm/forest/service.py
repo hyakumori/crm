@@ -1,6 +1,7 @@
 from typing import Iterator, Union
 
 from django.core.exceptions import ValidationError
+from django.db import transaction, OperationalError
 from django.db.models import F, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
 from django.utils.translation import gettext_lazy as _
@@ -79,13 +80,13 @@ def update_forest_tags(data: dict):
     ids = data.get("ids")
     tag_key = data.get("key")
     new_value = data.get("value")
-    forests = Forest.objects.filter(id__in=ids)
-    for forest in forests:
-        if forest.tags.get(tag_key) is None:
-            continue
-        else:
-            forest.tags[tag_key] = new_value
-            forest.save()
+    with transaction.atomic():
+        try:
+            Forest.objects.select_for_update(nowait=True).filter(id__in=ids, tags__has_key=tag_key).update(
+                tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]))
+            return True
+        except OperationalError:
+            return False
 
 
 def update_owners(owner_pks_in):

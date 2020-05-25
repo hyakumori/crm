@@ -58,7 +58,7 @@ $action-list-color: #825929;
     .v-select__selections,
     .v-select__selection,
     input::placeholder {
-      color: $action-list-color;
+      color: $action-list-color !important;
     }
 
     .mdi-chevron-down {

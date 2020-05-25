@@ -8,6 +8,7 @@ export default {
       showChangeTagDialog: false,
       fetchTagsLoading: false,
       updatingTags: false,
+      selectedTagForUpdate: null,
     };
   },
   mounted() {
@@ -40,8 +41,11 @@ export default {
     },
 
     resetActionChoices() {
-      const actionListRef = this.$refs.actionRef.$children[0].$refs.selectList;
-      actionListRef.reset();
+      const actionListRef = this.$refs.actionRef.$children[0];
+      const actionListRefChild = actionListRef.$children[0];
+      this.selectedTagForUpdate = null;
+      actionListRefChild.reset();
+      actionListRef.resizeInputWidth();
     },
   },
   computed: {

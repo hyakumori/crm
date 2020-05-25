@@ -1,8 +1,10 @@
+import time
 from urllib import parse
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError as DjValidationError
+from django.db import transaction, OperationalError
 from django.db.models import F, Subquery, OuterRef, Count
 from django.db.models.expressions import Func, RawSQL, Value
 from django.utils.translation import gettext_lazy as _
@@ -422,10 +424,10 @@ def update_archive_tag(data: dict):
     ids = data.get("ids")
     tag_key = data.get("key")
     new_value = data.get("value")
-    archives = Archive.objects.filter(id__in=ids)
-    for archive in archives:
-        if archive.tags.get(tag_key) is None:
-            continue
-        else:
-            archive.tags[tag_key] = new_value
-            archive.save()
+    with transaction.atomic():
+        try:
+            Archive.objects.select_for_update(nowait=True).filter(id__in=ids, tags__has_key=tag_key).update(
+                tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]))
+            return True
+        except OperationalError:
+            return False
