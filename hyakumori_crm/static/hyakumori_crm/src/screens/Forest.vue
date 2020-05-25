@@ -24,7 +24,7 @@
               <v-list class="pa-0" dense>
                 <v-list-item
                   @click="downloadSelectedRows"
-                  v-if="tableSelectedRow && tableSelectedRow.length > 0"
+                  v-if="tableSelectedRows && tableSelectedRows.length > 0"
                 >
                   <v-list-item-title
                     >{{ $t("buttons.download_selected") }}
@@ -52,10 +52,10 @@
       <div class="ml-7 forest__data-section">
         <table-action
           :actions="actions"
-          :selectedCount="tableSelectedRow.length"
+          :selectedCount="tableSelectedRows.length"
           @selected-action="selectedAction"
-          class="forest__data-section__table-action mb-4"
-          v-if="tableSelectedRow.length > 0"
+          class="mb-4"
+          v-if="tableSelectedRows.length > 0"
         />
 
         <data-list
@@ -68,7 +68,7 @@
           :showSelect="true"
           :tableRowIcon="tableRowIcon"
           @rowData="rowData"
-          @selectedRow="selectedRow"
+          @selectedRow="selectedRows"
           itemKey="id"
           mode="forest"
         ></data-list>
@@ -82,57 +82,15 @@
         color="error"
       />
 
-      <v-dialog
-        v-model="showChangeTagDialog"
-        max-width="700"
-        transition
-        @click:outside="showChangeTagDialog = false"
-      >
-        <ValidationObserver v-slot="{ invalid }">
-          <v-card>
-            <v-card-title class="display-0">
-              {{ $t("action.change_tag_value") }}
-            </v-card-title>
-            <v-card-text class="pb-0">
-              <v-row>
-                <v-col cols="6">
-                  <h4>タグを選択</h4>
-                  <v-select
-                    ref="tagList"
-                    outlined
-                    dense
-                    height="45"
-                    no-data-text="データなし"
-                    :items="tagKeys"
-                    @change="onSelectedTagChange"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <h4>タグバリュー</h4>
-                  <text-input
-                    v-model="newTagValue"
-                    label="タグバリュー"
-                    rules="required|max:255"
-                  />
-                </v-col>
-              </v-row>
-            </v-card-text>
-            <v-card-actions class="px-4">
-              <v-btn text color="primary" @click="setDefaultTagData"
-                >Cancel</v-btn
-              >
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                color="primary"
-                @click="updateSelectedTags"
-                :disabled="invalid || !selectedTagUpdate"
-                >OK</v-btn
-              >
-            </v-card-actions>
-          </v-card>
-        </ValidationObserver>
-      </v-dialog>
+      <update-actions-dialog
+        :items="tagKeys"
+        :isDisableUpdate="!selectedTagForUpdate"
+        :updateData="updateTagForSelectedForests"
+        :showDialog="showChangeTagDialog"
+        @update-value="val => (newTagValue = val)"
+        @selected-tag="val => (selectedTagForUpdate = val)"
+        @toggle-show-dialog="val => (showChangeTagDialog = val)"
+      />
     </template>
   </main-section>
 </template>
@@ -148,10 +106,9 @@ import ScreenMixin from "./ScreenMixin";
 import MainSection from "../components/MainSection";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
-import TextInput from "../components/forms/TextInput";
 import { saveAs } from "file-saver";
-import { flatten, get as _get } from "lodash";
-import { ValidationObserver } from "vee-validate";
+import { get as _get } from "lodash";
+import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
 
 export default {
   name: "forest",
@@ -166,8 +123,7 @@ export default {
     MainSection,
     PageHeader,
     OutlineRoundBtn,
-    TextInput,
-    ValidationObserver,
+    UpdateActionsDialog,
   },
 
   data() {
@@ -199,12 +155,9 @@ export default {
       sbTimeout: 5000,
       filter: {},
       options: {},
-      tableSelectedRow: [],
       headers: [],
       downloadCsvLoading: false,
-      showChangeTagDialog: false,
-      tagKeys: [],
-      selectedTagUpdate: null,
+      selectedTagForUpdate: null,
       newTagValue: null,
     };
   },
@@ -257,10 +210,6 @@ export default {
         this.isShowErr = true;
         this.errMsg = this.$t("search.condition_is_maximum");
       }
-    },
-
-    selectedRow(val) {
-      this.tableSelectedRow = val;
     },
 
     onSearch() {
@@ -332,45 +281,18 @@ export default {
       return "";
     },
 
-    setDefaultTagData() {
-      this.newTagValue = null;
-      this.$refs.tagList.internalValue = "";
-      this.showChangeTagDialog = false;
-    },
-
-    async fetchSelectedForests() {
-      try {
-        const forests = await this.$rest.put(
-          "/forests/ids",
-          this.selectedRowIds,
-        );
-        const tags = forests.map(forest => forest.tags);
-        tags.forEach(tag => this.tagKeys.push(Object.keys(tag)));
-        this.tagKeys = [...new Set(flatten(this.tagKeys))];
-        this.showChangeTagDialog = true;
-      } catch (e) {
-        this.showChangeTagDialog = false;
-      } finally {
-      }
-    },
-
-    async updateSelectedTags() {
+    async updateTagForSelectedForests() {
       const params = {
         ids: this.selectedRowIds,
-        key: this.selectedTagUpdate,
+        key: this.selectedTagForUpdate,
         value: this.newTagValue,
       };
       try {
         await this.$rest.put("/forests/tags", params);
       } catch (e) {
       } finally {
-        this.setDefaultTagData();
         await this.$apollo.queries.forestsInfo.refetch();
       }
-    },
-
-    onSelectedTagChange(val) {
-      this.selectedTagUpdate = val;
     },
 
     selectedAction(index) {
@@ -385,7 +307,7 @@ export default {
           console.log("2");
           break;
         case 3:
-          this.fetchSelectedForests();
+          this.getSelectedObject("/forests/ids");
           break;
         default:
           return;
@@ -464,13 +386,6 @@ export default {
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))
         .filter(f => f.value !== undefined);
-    },
-
-    selectedRowIds() {
-      return (
-        this.tableSelectedRow.length > 0 &&
-        this.tableSelectedRow.map(row => row.id)
-      );
     },
   },
 };

@@ -42,8 +42,7 @@ from ..api.decorators import (
     action_login_required,
 )
 from ..crm.common.constants import (
-    FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, FOREST_TAG_KEYS,
-    FOREST_ATTRIBUTES
+    FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, FOREST_ATTRIBUTES
 )
 from ..permissions.services import PermissionService
 
@@ -165,9 +164,9 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
 
     @action(detail=False, methods=["PUT"], url_path="ids")
     @action_login_required(with_permissions=["change_forest"])
-    def get_list_forests_by_ids(self, request):
+    def get_forests_by_ids(self, request):
         ids = request.data
-        if ids and len(ids) == 0:
+        if ids is None or len(ids) == 0:
             return Response({"data": []})
         else:
             forests = get_forests_by_ids(ids)

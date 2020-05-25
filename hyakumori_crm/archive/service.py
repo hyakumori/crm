@@ -2,13 +2,19 @@ from urllib import parse
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError as DjValidationError
 from django.db.models import F, Subquery, OuterRef, Count
 from django.db.models.expressions import Func, RawSQL, Value
 from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
-from django.core.exceptions import ValidationError as DjValidationError
 from rest_framework.request import Request
 
+from hyakumori_crm.cache.archive import (
+    refresh_customers_cache,
+    refresh_forest_cache,
+    refresh_user_participants_cache,
+)
+from .schemas import ArchiveInput, ArchiveCustomerInput, ArchiveFilter
 from ..crm.models import (
     Archive,
     Attachment,
@@ -20,15 +26,7 @@ from ..crm.models import (
     ArchiveCustomerContact,
     CustomerContact,
 )
-from ..customer.service import get_customer_by_pk
 from ..forest.service import get_forest_by_pk
-
-from hyakumori_crm.cache.archive import (
-    refresh_customers_cache,
-    refresh_forest_cache,
-    refresh_user_participants_cache,
-)
-from .schemas import ArchiveInput, ArchiveCustomerInput, ArchiveFilter
 
 
 def get_archive_by_pk(pk):
@@ -36,6 +34,17 @@ def get_archive_by_pk(pk):
         return Archive.objects.get(pk=pk)
     except (Archive.DoesNotExist, ValidationError):
         raise ValueError("Archive not found")
+
+
+def get_archive_by_ids(ids: list):
+    archives = []
+    for pk in ids:
+        try:
+            archive = get_archive_by_pk(pk)
+            archives.append(archive)
+        except ValueError:
+            continue
+    return archives
 
 
 def get_attachment_by_pk(attachment_pk):
@@ -199,8 +208,8 @@ def is_archive_customer_exist(archive_pk, customer_pk):
 def get_participants(archive: Archive):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-        .values("id", "customer_id")
-        .annotate(forests_count=Count("customer__forestcustomer"))
+            .values("id", "customer_id")
+            .annotate(forests_count=Count("customer__forestcustomer"))
     )
     cc_business_id = CustomerContact.objects.filter(
         is_basic=True, contact=OuterRef("pk")
@@ -209,14 +218,14 @@ def get_participants(archive: Archive):
         Contact.objects.filter(
             customercontact__archivecustomercontact__archivecustomer__archive_id=archive.id
         )
-        .annotate(
+            .annotate(
             customer_id=F(
                 "customercontact__archivecustomercontact__archivecustomer__customer_id"
             ),
             cc_attrs=F("customercontact__attributes"),
         )
-        .annotate(is_basic=F("customercontact__is_basic"))
-        .annotate(
+            .annotate(is_basic=F("customercontact__is_basic"))
+            .annotate(
             customer_name_kanji=RawSQL(
                 """(select
                         C0.name_kanji
@@ -227,8 +236,8 @@ def get_participants(archive: Archive):
                 params=[],
             )
         )
-        .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
-        .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
+            .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
+            .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
     )
 
 
@@ -253,8 +262,8 @@ def add_participants(archive: Archive, data: ArchiveCustomerInput):
             ArchiveCustomer.objects.filter(
                 archive_id=archive.id, customer_id=item.customer_id
             )
-            .prefetch_related("archivecustomercontact_set")
-            .first()
+                .prefetch_related("archivecustomercontact_set")
+                .first()
         )
         cc.archivecustomercontact_set.filter(
             customercontact_id=cc.id, archivecustomer_id=ac.id
@@ -341,8 +350,8 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
                         function="to_char",
                     )
                 )
-                .select_related("author")
-                .filter(**active_filters)
+                    .select_related("author")
+                    .filter(**active_filters)
             )
 
         return Archive.objects.select_related("author").all()
@@ -407,3 +416,16 @@ def _archives_list_raw_sql(page_size, page, filters, order_by):
         -- offset 0
     """
     return query
+
+
+def update_archive_tag(data: dict):
+    ids = data.get("ids")
+    tag_key = data.get("key")
+    new_value = data.get("value")
+    archives = Archive.objects.filter(id__in=ids)
+    for archive in archives:
+        if archive.tags.get(tag_key) is None:
+            continue
+        else:
+            archive.tags[tag_key] = new_value
+            archive.save()
