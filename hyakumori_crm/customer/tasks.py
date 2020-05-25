@@ -2,14 +2,15 @@ import csv
 import json
 import time
 
-from django.db import DatabaseError, transaction
+from django.db import OperationalError, transaction
 import pydantic
 
 from hyakumori_crm.core.decorators import errors_wrapper
-from hyakumori_crm.crm.models import Customer
+from hyakumori_crm.crm.models import Customer, Forest
 
 from .schemas import CustomerUploadCsv
 from .service import save_customer_from_csv_data
+from ..cache.forest import refresh_customer_forest_cache
 
 
 def csv_upload(fp):
@@ -36,34 +37,37 @@ def csv_upload(fp):
     with open(fp, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         line_count = 0
-        with transaction.atomic():
-            for row in reader:
-                if line_count == 0:
-                    line_count += 1
-                row_data = {k: row[v] for k, v in header_map.items()}
-                try:
-                    c = Customer.objects.select_for_update(nowait=True).get(
-                        business_id=row_data["business_id"]
-                    )
-                except DatabaseError:
-                    return json.dumps(
-                        {
-                            "errors": {
-                                "__root__": "Current resources are not ready for update!!",
-                            }
-                        }
-                    )
-                else:
-                    try:
-                        customer_data = CustomerUploadCsv(**row_data)
-                        save_customer_from_csv_data(c, customer_data)
-                    except pydantic.ValidationError as e:
-                        errors = {}
-                        for key, msgs in errors_wrapper(e.errors()).items():
-                            if key == "__root__":
-                                errors[key] = msgs
-                            else:
-                                errors[header_map[key]] = msgs
-                        return json.dumps({"line": line_count + 1, "errors": errors})
+        customer_ids = []
+        for row in reader:
+            if line_count == 0:
                 line_count += 1
+            row_data = {k: row[v] for k, v in header_map.items()}
+            try:
+                c = Customer.objects.select_for_update(nowait=True).get(
+                    business_id=row_data["business_id"]
+                )
+                customer_ids.append(c.id)
+            except OperationalError:
+                return {
+                    "errors": {
+                        "__root__": ["Current resources are not ready for update!!"]
+                    }
+                }
+            else:
+                try:
+                    customer_data = CustomerUploadCsv(**row_data)
+                    save_customer_from_csv_data(c, customer_data)
+                except pydantic.ValidationError as e:
+                    errors = {}
+                    for key, msgs in errors_wrapper(e.errors()).items():
+                        if key == "__root__":
+                            errors[key] = msgs
+                        else:
+                            errors[header_map[key]] = msgs
+                    return {"line": line_count + 1, "errors": errors}
+            line_count += 1
+        fids = Forest.objects.filter(
+            forestcustomer__customer_id__in=customer_ids
+        ).values_list("id", flat=True)
+        refresh_customer_forest_cache(fids)
     return line_count

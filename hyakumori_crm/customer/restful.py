@@ -9,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from django_q.tasks import async_task, result
 
 from hyakumori_crm.core.utils import (
     default_paginator,
@@ -319,13 +318,13 @@ class CustomerViewSets(ViewSet):
         with open(fp, "wb+") as destination:
             for chunk in csv_file.chunks():
                 destination.write(chunk)
-        task_id = async_task(csv_upload, fp, hook=clear_maintain_task_id_cache)
-        cache.set("maintain_task_id", task_id)
-        r = result(task_id, wait=-1)
-        if type(r) is int:
-            return Response({"task_id": task_id}, status=200)
+        cache.set("maintain_task_id", f"customers/{file_name}")
+        result = csv_upload(fp)
+        clear_maintain_task_id_cache()
+        if type(result) is int:
+            return Response({"msg": "OK"}, status=200)
         else:
-            return Response(json.loads(r), status=400)
+            return Response(result, status=400)
 
 
 @api_view(["GET"])

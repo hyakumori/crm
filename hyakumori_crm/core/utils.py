@@ -102,5 +102,5 @@ class Echo:
         return value
 
 
-def clear_maintain_task_id_cache(task):
+def clear_maintain_task_id_cache(task=None):
     cache.delete("maintain_task_id")

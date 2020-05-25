@@ -1,5 +1,10 @@
 import csv
+import json
+import pathlib
+import time
+import functools
 
+from django.core.cache import cache
 from django.db.models import Q, F, Count
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +14,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from django_q.tasks import async_task, result
 
 from hyakumori_crm.core.utils import default_paginator, make_error_json
 from hyakumori_crm.crm.models import Forest, Archive
@@ -42,6 +48,7 @@ from .service import (
     update_forest_tags,
     update_db_with_csv,
     csv_headers,
+    csv_upload,
 )
 
 from ..activity.services import ActivityService, ForestActions
@@ -58,6 +65,7 @@ from ..crm.common.constants import (
     FOREST_ATTRIBUTES,
 )
 from ..permissions.services import PermissionService
+from ..core.utils import clear_maintain_task_id_cache
 
 
 class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -191,9 +199,22 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action(detail=False, methods=["POST"], url_path="upload-csv")
     @action_login_required(with_permissions=["change_forest"])
     def upload_csv(self, request):
-        file = request.FILES["file"]
-        data = update_db_with_csv(file)
-        return Response({"msg": "OK"})
+        csv_file = request.data["file"]
+        if csv_file.content_type != "text/csv":
+            return Response({"errors": _("Please upload a csv file!!")}, 400)
+        pathlib.Path("media/upload/forest").mkdir(parents=True, exist_ok=True)
+        file_name = f"{pathlib.Path(csv_file.name).stem}-{int(time.time())}.csv"
+        fp = f"media/upload/forest/{file_name}"
+        with open(fp, "wb+") as destination:
+            for chunk in csv_file.chunks():
+                destination.write(chunk)
+        cache.set("maintain_task_id", f"forests/{file_name}")
+        r = csv_upload(fp)
+        clear_maintain_task_id_cache()
+        if type(r) is int:
+            return Response({"msg": "OK"}, status=200)
+        else:
+            return Response(r, status=400)
 
 
 @api_view(["PUT", "PATCH"])

@@ -1,4 +1,8 @@
+import csv
 import itertools
+import json
+import time
+from collections import defaultdict
 from typing import Iterator, Union
 
 from django.core.exceptions import ValidationError
@@ -6,11 +10,24 @@ from django.db import transaction, OperationalError
 from django.db.models import F, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
 from django.utils.translation import gettext_lazy as _
+import pydantic
 
-from .schemas import ForestFilter, CustomerDefaultInput, CustomerContactDefaultInput, ForestCsvInput
+from ..core.decorators import errors_wrapper
+
+from .schemas import (
+    ForestFilter,
+    CustomerDefaultInput,
+    CustomerContactDefaultInput,
+    ForestCsvInput,
+)
 from ..cache.forest import refresh_customer_forest_cache
-from ..crm.common.constants import FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, \
-    FOREST_ATTRIBUTES
+from ..crm.common.constants import (
+    FOREST_CADASTRAL,
+    FOREST_LAND_ATTRIBUTES,
+    FOREST_OWNER_NAME,
+    FOREST_CONTRACT,
+    FOREST_ATTRIBUTES,
+)
 from ..crm.models import (
     Forest,
     ForestCustomer,
@@ -19,6 +36,7 @@ from ..crm.models import (
     ForestCustomerContact,
     Contact,
 )
+from ..crm.schemas.contract import ContractType
 
 
 def get_forest_by_pk(pk):
@@ -68,7 +86,7 @@ def get_forests_by_condition(
         return [], 0
     query = filters.qs if filters else Forest.objects.all()
     total = query.count()
-    forests = query.order_by("-updated_at", "-created_at")[offset : offset + per_page]
+    forests = query.order_by("internal_id")[offset : offset + per_page]
     return forests, total
 
 
@@ -199,10 +217,18 @@ def update_forest_memo(forest, memo):
 
 
 def csv_headers():
-    header = ["\ufeff内部ID", "土地管理ID"]
-    return list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
-                                FOREST_CONTRACT, [_("Tag")],
-                                FOREST_ATTRIBUTES))
+    header = ["内部ID", "土地管理ID"]
+    return list(
+        itertools.chain(
+            header,
+            FOREST_CADASTRAL,
+            FOREST_LAND_ATTRIBUTES,
+            FOREST_OWNER_NAME,
+            FOREST_CONTRACT,
+            [_("Tag")],
+            FOREST_ATTRIBUTES,
+        )
+    )
 
 
 def get_forests_for_csv(forest_ids: list = None):
@@ -355,13 +381,7 @@ def tags_csv_to_dict(tags_data: str):
 
 
 def dict_to_list(data: dict):
-    result = []
-    for key, value in data.items():
-        result.append({
-            "key": key,
-            "value": value
-        })
-    return result
+    return [{"key": key, "value": value} for key, value in data.items()]
 
 
 def list_to_dict(data: list):
@@ -372,7 +392,6 @@ def list_to_dict(data: list):
 
 
 def parse_csv_data_to_dict(row_data):
-    data_split = row_data.split(',')
     new_forest = {}
     cadastral_keys = ["prefecture", "municipality", "sector", "subsector"]
     cadastral = []
@@ -383,27 +402,29 @@ def parse_csv_data_to_dict(row_data):
     fsc_contract = []
     contracts = []
     forest_attributes = []
-    for i in range(len(data_split)):
+    for i in range(len(row_data)):
         if i == 0:
-            new_forest["id"] = data_split[i]
-        if i == 1:
-            new_forest["internal_id"] = data_split[i]
-        if 1 < i <= 5:
-            cadastral.append(data_split[i])
-        if 5 < i <= 11:
-            land_attributes.append(data_split[i])
-        if 13 < i <= 16:
-            long_term_contract.append(data_split[i])
-        if 16 < i <= 19:
-            work_load_contract.append(data_split[i])
-        if 19 < i <= 22:
-            fsc_contract.append(data_split[i])
-        if i == 23:
-            new_forest["tags"] = tags_csv_to_dict(data_split[i])
-        if 23 < i <= len(data_split) - 1:
-            forest_attributes.append(data_split[i])
+            new_forest["id"] = row_data[i][1:]  # exluce BOM char
+        elif i == 1:
+            new_forest["internal_id"] = row_data[i]
+        elif 1 < i <= 5:
+            cadastral.append(row_data[i])
+        elif 5 < i <= 11:
+            land_attributes.append(row_data[i])
+        elif 13 < i <= 16:
+            long_term_contract.append(row_data[i])
+        elif 16 < i <= 19:
+            work_load_contract.append(row_data[i])
+        elif 19 < i <= 22:
+            fsc_contract.append(row_data[i])
+        elif i == 23:
+            new_forest["tags"] = tags_csv_to_dict(row_data[i])
+        elif 23 < i <= len(row_data) - 1:
+            forest_attributes.append(row_data[i])
     new_forest["cadastral"] = csv_column_to_dict(cadastral_keys, cadastral)
-    new_forest["land_attributes"] = dict_to_list(csv_column_to_dict(FOREST_LAND_ATTRIBUTES, land_attributes))
+    new_forest["land_attributes"] = dict_to_list(
+        csv_column_to_dict(FOREST_LAND_ATTRIBUTES, land_attributes)
+    )
     long_term_contract.insert(0, FOREST_CONTRACT[0])
     work_load_contract.insert(0, FOREST_CONTRACT[3])
     fsc_contract.insert(0, FOREST_CONTRACT[6])
@@ -411,19 +432,78 @@ def parse_csv_data_to_dict(row_data):
     contracts.append(csv_column_to_dict(contract_keys, work_load_contract))
     contracts.append(csv_column_to_dict(contract_keys, fsc_contract))
     new_forest["contracts"] = contracts
-    new_forest["forest_attributes"] = dict_to_list(csv_column_to_dict(FOREST_ATTRIBUTES, forest_attributes))
+    new_forest["forest_attributes"] = dict_to_list(
+        csv_column_to_dict(FOREST_ATTRIBUTES, forest_attributes)
+    )
     return new_forest
 
 
-def update_forest_csv(data: ForestCsvInput):
-    contracts = []
-    for contract in data.contracts:
-        contracts.append(contract.dict())
-    forest = get_forest_by_pk(data.id)
+def update_forest_csv(forest, data: ForestCsvInput):
     forest.internal_id = data.internal_id
-    forest.cadastral = dict(data.cadastral)
+    forest.cadastral = data.cadastral.dict()
     forest.land_attributes = list_to_dict(data.land_attributes)
-    forest.contracts = contracts
+    forest.contracts = [c.dict() for c in data.contracts]
     forest.tags = data.tags
     forest.forest_attributes = list_to_dict(data.forest_attributes)
     forest.save()
+
+
+def csv_upload(fp):
+    with open(fp, mode="r", encoding="utf-8-sig") as f:
+        reader = csv.reader(f)
+        line_count = 0
+        for row in reader:
+            if line_count == 0:
+                line_count += 1
+                continue
+            row_data = parse_csv_data_to_dict(row)
+            try:
+                clean_forest = ForestCsvInput(**row_data)
+            except pydantic.ValidationError as e:
+                errors = {}
+                for key, msgs in errors_wrapper(e.errors()).items():
+                    if key == "__root__":
+                        errors[key] = msgs
+                    else:
+                        try:
+                            errors[csv_errors_map[key]] = msgs
+                        except KeyError:
+                            errors[key] = msgs
+                return {"line": line_count + 1, "errors": errors}
+            try:
+                forest = Forest.objects.select_for_update(nowait=True).get(
+                    pk=row_data["id"]
+                )
+            except (Forest.DoesNotExist, ValidationError):
+                return {
+                    "line": line_count + 1,
+                    "errors": {"__root__": _("Forest not found")},
+                }
+            except OperationalError:
+                return {
+                    "errors": {
+                        "__root__": ["Current resources are not ready for update!!"]
+                    },
+                }
+            else:
+                update_forest_csv(forest, clean_forest)
+        return line_count
+
+
+csv_errors_map = {
+    "id": "内部ID",
+    "internal_id": "土地管理ID",
+    "cadastral.prefecture": "地籍_都道府県",
+    "cadastral.municipality": "地籍_市町村",
+    "cadastral.sector": "地籍_大字",
+    "cadastral.subsector": "地籍_字",
+    "contacts.0.status": "長期契約",
+    "contacts.0.start_date": "開始日",
+    "contacts.0.end_date": "終了日",
+    "contacts.1.status": "作業道契約",
+    "contacts.1.start_date": "開始日",
+    "contacts.1.end_date": "終了日",
+    "contacts.2.status": "FSC認証",
+    "contacts.2.start_date": "開始日",
+    "contacts.2.end_date": "終了日",
+}

@@ -117,6 +117,7 @@ import ScreenMixin from "./ScreenMixin";
 import MainSection from "../components/MainSection";
 import PageHeader from "../components/PageHeader";
 import OutlineRoundBtn from "../components/OutlineRoundBtn";
+import ErrorCard from "../components/ErrorsCard";
 import { saveAs } from "file-saver";
 import { get as _get } from "lodash";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
@@ -199,8 +200,14 @@ export default {
       },
     },
   },
-
+  beforeRouteLeave(to, from, next) {
+    if (this.uploadCsvLoading && !confirm("Do you want to leave?")) next(false);
+    else next();
+  },
   methods: {
+    confirmReload(e) {
+      e.returnValue = "Do you want to leave?";
+    },
     rowData(val) {
       this.$router.push(`forests/${val}`);
     },
@@ -247,14 +254,23 @@ export default {
         requestFile.append("file", file);
         try {
           this.uploadCsvLoading = true;
+          window.addEventListener("beforeunload", this.confirmReload);
           await this.$rest.post("/forests/upload-csv", requestFile);
-          await this.$apollo.queries.forestsInfo.refetch();
-        } catch (e) {
+          this.$apollo.queries.forestsInfo.refetch();
+          this.$dialog.notify.success("Upload successfully");
+        } catch (error) {
+          if (error.response.data) {
+            this.$dialog.show(ErrorCard, {
+              line: error.response.data.line,
+              errors: error.response.data.errors,
+            });
+          }
         } finally {
+          window.removeEventListener("beforeunload", this.confirmReload);
           this.uploadCsvLoading = false;
         }
       } else {
-        await this.$dialog.notify.error("Invalid file input", {
+        this.$dialog.notify.error("Invalid file input", {
           timeout: 5000,
         });
       }

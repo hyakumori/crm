@@ -169,10 +169,22 @@ export default {
         .filter(f => f.value !== undefined);
     },
   },
+  beforeRouteLeave(to, from, next) {
+    if (this.uploadCsvLoading && !confirm("Do you want to leave?")) next(false);
+    else next();
+  },
   methods: {
+    confirmReload(e) {
+      e.returnValue = "Do you want to leave?";
+    },
     async handleUploadBtnClick() {
       if (this.selectedFileName !== "") {
+        const confirmUpload = confirm(
+          "Upload will put website in maintain mode. Continue?",
+        );
+        if (!confirmUpload) return;
         this.uploadCsvLoading = true;
+        window.addEventListener("beforeunload", this.confirmReload);
         const formData = new FormData();
         formData.append("file", this.$refs.csvUploadInput.files[0]);
         try {
@@ -180,6 +192,7 @@ export default {
             headers: { "Content-Type": "multipart/form-data" },
           });
           this.$apollo.queries.customerList.refetch();
+          this.$dialog.notify.success("Upload successfully");
         } catch (error) {
           if (error.response.data) {
             this.$dialog.show(ErrorCard, {
@@ -187,6 +200,8 @@ export default {
               errors: error.response.data.errors,
             });
           }
+        } finally {
+          window.removeEventListener("beforeunload", this.confirmReload);
         }
         this.uploadCsvLoading = false;
         this.$refs.csvUploadInput.value = null;
