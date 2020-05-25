@@ -3,7 +3,7 @@
     v-model="isShowDialog"
     max-width="700"
     transition
-    @click:outside="isShowDialog = false"
+    @click:outside="$emit('toggle-show-dialog', false)"
   >
     <ValidationObserver v-slot="{ invalid }">
       <v-card>
@@ -21,6 +21,7 @@
                 height="45"
                 no-data-text="データなし"
                 :items="items"
+                :loading="loadingItems"
                 @change="onItemChange"
               />
             </v-col>
@@ -35,13 +36,16 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="px-4">
-          <v-btn text color="primary" @click="setDefault">Cancel</v-btn>
+          <v-btn text color="primary" :disabled="updating" @click="setDefault"
+            >Cancel</v-btn
+          >
           <v-spacer></v-spacer>
           <v-btn
             text
             color="primary"
             @click="onUpdateData"
             :disabled="invalid || isDisableUpdate"
+            :loading="updating"
             >OK</v-btn
           >
         </v-card-actions>
@@ -68,6 +72,8 @@ export default {
     isDisableUpdate: Boolean,
     updateData: Function,
     showDialog: Boolean,
+    loadingItems: Boolean,
+    updating: Boolean,
   },
 
   data() {
@@ -91,8 +97,8 @@ export default {
       this.$emit("toggle-show-dialog", this.isShowDialog);
     },
 
-    onUpdateData() {
-      this.updateData();
+    async onUpdateData() {
+      await this.updateData();
       this.setDefault();
     },
   },

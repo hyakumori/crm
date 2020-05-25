@@ -76,6 +76,8 @@
         :items="tagKeys"
         :isDisableUpdate="!selectedTagForUpdate"
         :showDialog="showChangeTagDialog"
+        :loadingItems="fetchTagsLoading"
+        :updating="updatingTags"
         :updateData="updateTagForSelectedCustomers"
         @update-value="val => (newTagValue = val)"
         @selected-tag="val => (selectedTagForUpdate = val)"
@@ -202,15 +204,20 @@ export default {
         value: this.newTagValue,
       };
       try {
+        this.updatingTags = true;
         await this.$rest.put("/customers/tags", params);
       } catch (e) {
       } finally {
+        this.updatingTags = false;
+        this.showChangeTagDialog = false;
         await this.$apollo.queries.customerList.refetch();
       }
     },
     selectedAction(index) {
       switch (index) {
         case 0:
+          this.showChangeTagDialog = true;
+          this.fetchTagsLoading = true;
           this.getSelectedObject("/customers/ids");
           break;
         default:

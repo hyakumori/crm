@@ -19,6 +19,7 @@
       />
       <div class="archives__data-section">
         <table-action
+          ref="actionRef"
           class="mb-4"
           v-if="tableSelectedRows.length > 0"
           :actions="actions"
@@ -44,7 +45,9 @@
         :items="tagKeys"
         :show-dialog="showChangeTagDialog"
         :isDisableUpdate="!selectedTagForUpdate"
+        :loadingItems="fetchTagsLoading"
         :updateData="updateTagForSelectedArchives"
+        :updating="updatingTags"
         @update-value="val => (newTagValue = val)"
         @selected-tag="val => (selectedTagForUpdate = val)"
         @toggle-show-dialog="val => (showChangeTagDialog = val)"
@@ -236,10 +239,13 @@ export default {
         value: this.newTagValue,
       };
       try {
+        this.updatingTags = true;
         await this.$rest.put("/archives/ids/tags", params);
       } catch (e) {
       } finally {
         const api_url = `/archives?page_size=${this.options.itemsPerPage}&${this.filterQueryString}`;
+        this.updatingTags = false;
+        this.showChangeTagDialog = false;
         await this.fetchArchives(api_url);
       }
     },
@@ -247,6 +253,8 @@ export default {
     selectedAction(index) {
       switch (index) {
         case 0:
+          this.showChangeTagDialog = true;
+          this.fetchTagsLoading = true;
           this.getSelectedObject("/archives/ids");
           break;
         default:

@@ -87,6 +87,8 @@
         :isDisableUpdate="!selectedTagForUpdate"
         :updateData="updateTagForSelectedForests"
         :showDialog="showChangeTagDialog"
+        :loadingItems="fetchTagsLoading"
+        :updating="updatingTags"
         @update-value="val => (newTagValue = val)"
         @selected-tag="val => (selectedTagForUpdate = val)"
         @toggle-show-dialog="val => (showChangeTagDialog = val)"
@@ -288,9 +290,12 @@ export default {
         value: this.newTagValue,
       };
       try {
+        this.updatingTags = true;
         await this.$rest.put("/forests/tags", params);
       } catch (e) {
       } finally {
+        this.updatingTags = false;
+        this.showChangeTagDialog = false;
         await this.$apollo.queries.forestsInfo.refetch();
       }
     },
@@ -307,6 +312,8 @@ export default {
           console.log("2");
           break;
         case 3:
+          this.showChangeTagDialog = true;
+          this.fetchTagsLoading = true;
           this.getSelectedObject("/forests/ids");
           break;
         default:

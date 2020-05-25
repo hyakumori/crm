@@ -6,6 +6,8 @@ export default {
       tableSelectedRows: [],
       tagKeys: [],
       showChangeTagDialog: false,
+      fetchTagsLoading: false,
+      updatingTags: false,
     };
   },
   mounted() {
@@ -26,15 +28,20 @@ export default {
         const tags = objects.map(obj => obj.tags);
         tags.forEach(tag => this.tagKeys.push(Object.keys(tag)));
         this.tagKeys = [...new Set(flatten(this.tagKeys))];
-        this.showChangeTagDialog = true;
       } catch (e) {
         this.showChangeTagDialog = false;
       } finally {
+        this.fetchTagsLoading = false;
       }
     },
 
     selectedRows(val) {
       this.tableSelectedRows = val;
+    },
+
+    resetActionChoices() {
+      const actionListRef = this.$refs.actionRef.$children[0].$refs.selectList;
+      actionListRef.reset();
     },
   },
   computed: {

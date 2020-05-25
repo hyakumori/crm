@@ -28,7 +28,7 @@ export default {
 
   methods: {
     resizeInputPlaceholderWidth() {
-      const additionWidthSize = 2;
+      const additionWidthSize = 3;
       const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
       const placeHolderLength = input.placeholder.length;
       input.size = placeHolderLength + additionWidthSize;
