@@ -33,6 +33,8 @@ from ..crm.models import (
     Contact,
 )
 
+from ..contracts.models import ContractType
+
 
 def get_forest_by_pk(pk):
     try:
@@ -66,6 +68,43 @@ def get_customer_of_forest(pk, customer_pk):
         raise ValueError(_("Customer not found"))
 
 
+def get_contract_by_type(contracts, contract_type):
+    result = next(
+        iter(
+            [
+                contract
+                for contract in contracts
+                if contract.get("type") == contract_type
+                and contract.get("status") is not None
+                and len(contract.get("status")) > 0
+            ]
+        ),
+        None,
+    )
+    if result is None:
+        result = {"type": None, "status": None, "start_date": None, "end_date": None}
+    return result
+
+
+def map_forests_contracts(forest, contract_types):
+    work_road = get_contract_by_type(forest.contracts, contract_types["work_road"])
+    long_term = get_contract_by_type(forest.contracts, contract_types["long_term"])
+    fsc = get_contract_by_type(forest.contracts, contract_types["fsc"])
+    contract = long_term if long_term.get("type") is not None else work_road
+
+    forest.contracts = dict(
+        contract_type=contract.get("type"),
+        contract_status=contract.get("status"),
+        contract_start_date=contract.get("start_date"),
+        contract_end_date=contract.get("end_date"),
+        fsc_status=fsc.get("status"),
+        fsc_start_date=fsc.get("start_date"),
+        fsc_end_date=fsc.get("end_date"),
+    )
+
+    return forest
+
+
 def get_forests_by_condition(
     page_num: int = 1,
     per_page: int = 10,
@@ -81,7 +120,9 @@ def get_forests_by_condition(
     query = filters.qs if filters else Forest.objects.all()
     total = query.count()
     forests = query.order_by("internal_id")[offset : offset + per_page]
-    return forests, total
+    contract_types = dict(ContractType.objects.values_list("code", "name"))
+    results = [map_forests_contracts(forest, contract_types) for forest in forests]
+    return results, total
 
 
 def update(forest: Forest, forest_in: dict):

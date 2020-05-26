@@ -84,6 +84,28 @@ msgstr "期限切れのURL"
 msgid "file not found"
 msgstr "ファイルが見つかりません"
 
+#: contracts/models.py:8
+msgid "contract type name"
+msgstr ""
+
+#: contracts/models.py:10
+msgid "contract code name, reversed enum value"
+msgstr ""
+
+#: contracts/models.py:11
+msgid "contract type description"
+msgstr ""
+
+#: contracts/models.py:15 contracts/models.py:16
+#: forest/resolvers.py:56
+msgid "contract type"
+msgstr "契約種類"
+
+#: contracts/models.py:19
+#, python-brace-format
+msgid "ContractType, id: {id}"
+msgstr ""
+
 #: core/http.py:12
 msgid "Not found"
 msgstr "見つかりません"
@@ -153,8 +175,8 @@ msgstr "携帯番号"
 msgid "Email"
 msgstr "メールアドレス"
 
-#: customer/resolvers.py:30 customer/restful.py:277 customer/tasks.py:33
-#: forest/resolvers.py:111 forest/service.py:223
+#: customer/resolvers.py:49 customer/restful.py:247
+#: forest/resolvers.py:98 forest/restful.py:157
 msgid "Tag"
 msgstr "タグ"
 
@@ -193,7 +215,7 @@ msgstr "森{}が見つかりません"
 msgid "Enter at least telephone or mobilephone or email."
 msgstr "少なくとも電話、携帯電話、または電子メールを入力してください。"
 
-#: customer/service.py:41 forest/service.py:66
+#: customer/service.py:38 forest/service.py:39
 msgid "Customer not found"
 msgstr "顧客が見つかりません"
 
@@ -257,13 +279,33 @@ msgstr "終了日"
 msgid "FSC certification participation"
 msgstr "FSC認証加入"
 
-#: forest/resolvers.py:99
-msgid "FSC start"
-msgstr "開始日"
+#: forest/resolvers.py:98
+#: forest/resolvers.py:62
+#| msgid "Long term start"
+msgid "contract status"
+msgstr "契約ステータス"
 
-#: forest/resolvers.py:105
+#: forest/resolvers.py:68
+msgid "contract start date"
+msgstr "契約開始日"
+
+#: forest/resolvers.py:74
+#| msgid "email address"
+msgid "contract end date"
+msgstr "契約終了日"
+
+#: forest/resolvers.py:80
+msgid "FSC certification participation"
+msgstr "FSC認証加入"
+
+#: forest/resolvers.py:86
+msgid "FSC start"
+msgstr "FSC開始日"
+
+#: forest/resolvers.py:104
+#: forest/resolvers.py:92
 msgid "FSC end"
-msgstr "終了日"
+msgstr "FSC終了日"
 
 #: forest/schemas.py:67 forest/schemas.py:77
 #, fuzzy
@@ -291,7 +333,17 @@ msgstr "無効な形式（タグ1：値1; タグ2：値2）"
 msgid "Forest not found"
 msgstr "森が見つかりません"
 
-#: settings.py:166
+#: forest/service.py:326
+#, python-brace-format
+msgid "{column} error at line {row_num}"
+msgstr "{column}カラムの{row_num}行目の値が不正です。"
+
+#: settings.py:165
+#: forest/service.py:24 tests/test_api/test_forest_api.py:66
+msgid "Forest not found"
+msgstr "森が見つかりません"
+
+#: settings.py:167
 msgid "Japan"
 msgstr "Japan"
 
@@ -661,6 +713,21 @@ msgstr ""
 
 #~ msgid "Same name"
 #~ msgstr "同姓同名"
+
+#~ msgid "Long term contract"
+#~ msgstr "長期契約"
+
+#~ msgid "Long term end"
+#~ msgstr "終了日"
+
+#~ msgid "Work load contract"
+#~ msgstr "作業道契約"
+
+#~ msgid "Work load start"
+#~ msgstr "開始日"
+
+#~ msgid "Work load end"
+#~ msgstr "終了日"
 
 #~ msgid "Owner address prefecture"
 #~ msgstr "土地所有者住所_都道府県"
