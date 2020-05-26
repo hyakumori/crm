@@ -243,6 +243,7 @@ SIMPLE_JWT = {
 
 # Django Rest Framework
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "hyakumori_crm.api.views.exception_handler",
     "DEFAULT_PAGINATION_CLASS": "hyakumori_crm.crm.restful.paginations.StandardPagination",  # noqa
     "PAGE_SIZE": int(os.getenv("DJANGO_PAGINATION_LIMIT", 10)),
     "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%S%z",

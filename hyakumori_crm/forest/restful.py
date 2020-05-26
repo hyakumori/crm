@@ -46,7 +46,6 @@ from .service import (
     get_forests_for_csv,
     get_forests_by_ids,
     update_forest_tags,
-    update_db_with_csv,
     csv_headers,
     csv_upload,
 )

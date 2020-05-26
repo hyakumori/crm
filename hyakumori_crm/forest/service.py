@@ -477,7 +477,7 @@ def csv_upload(fp):
             except (Forest.DoesNotExist, ValidationError):
                 return {
                     "line": line_count + 1,
-                    "errors": {"__root__": _("Forest not found")},
+                    "errors": {"__root__": [_("Forest not found")]},
                 }
             except OperationalError:
                 return {
@@ -497,13 +497,13 @@ csv_errors_map = {
     "cadastral.municipality": "地籍_市町村",
     "cadastral.sector": "地籍_大字",
     "cadastral.subsector": "地籍_字",
-    "contacts.0.status": "長期契約",
-    "contacts.0.start_date": "開始日",
-    "contacts.0.end_date": "終了日",
-    "contacts.1.status": "作業道契約",
-    "contacts.1.start_date": "開始日",
-    "contacts.1.end_date": "終了日",
-    "contacts.2.status": "FSC認証",
-    "contacts.2.start_date": "開始日",
-    "contacts.2.end_date": "終了日",
+    "contracts.0.status": "長期契約",
+    "contracts.0.start_date": "開始日",
+    "contracts.0.end_date": "終了日",
+    "contracts.1.status": "作業道契約",
+    "contracts.1.start_date": "開始日",
+    "contracts.1.end_date": "終了日",
+    "contracts.2.status": "FSC認証",
+    "contracts.2.start_date": "開始日",
+    "contracts.2.end_date": "終了日",
 }

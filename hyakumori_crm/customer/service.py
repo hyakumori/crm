@@ -519,6 +519,6 @@ def save_customer_from_csv_data(customer, data):
     self_contact.mobilephone = data.mobilephone
     self_contact.email = data.email
     self_contact.save()
-    customer.tags = data.tags
+    customer.tags = data.tags_json
     customer.banking = data.banking
     customer.save()

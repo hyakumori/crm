@@ -111,7 +111,6 @@
           :info="bankingInfo"
           :businessId="id"
           :id="pk"
-          :businessId="id"
         >
           <template #form="props">
             <banking-info-form

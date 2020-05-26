@@ -5,6 +5,12 @@
         <template #bottom-right>
           <div>
             <outline-round-btn
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_customer',
+              ]"
               icon="mdi-upload"
               :content="
                 selectedFileName
@@ -16,13 +22,28 @@
               :loading="uploadCsvLoading"
             />
             <input
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_customer',
+              ]"
               ref="csvUploadInput"
               type="file"
               style="height:0;width:0;"
               accept=".csv"
               @change="handleFileChange"
             />
-            <v-menu offset-y nudge-bottom="4">
+            <v-menu
+              offset-y
+              nudge-bottom="4"
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_customer',
+              ]"
+            >
               <template v-slot:activator="{ on }">
                 <outline-round-btn
                   icon="mdi-download"

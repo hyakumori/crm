@@ -5,6 +5,12 @@
         <template #bottom-right>
           <div class="forest__csv-section">
             <outline-round-btn
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_forest',
+              ]"
               :content="$t('buttons.csv_upload')"
               icon="mdi-upload"
               :loading="uploadCsvLoading"
@@ -13,13 +19,28 @@
               v-show="true"
             />
             <input
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_forest',
+              ]"
               @change="onCsvInputChange"
               accept=".csv"
               class="forest__csv-section__upload"
               ref="uploadCsv"
               type="file"
             />
-            <v-menu nudge-bottom="4" offset-y>
+            <v-menu
+              nudge-bottom="4"
+              offset-y
+              v-acl-only="[
+                'admin',
+                'group_admin',
+                'group_normal_user',
+                'manage_forest',
+              ]"
+            >
               <template v-slot:activator="{ on }">
                 <outline-round-btn
                   :content="$t('buttons.csv_download')"
@@ -121,6 +142,7 @@ import ErrorCard from "../components/ErrorsCard";
 import { saveAs } from "file-saver";
 import { get as _get } from "lodash";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
+import TableAction from "../components/TableAction";
 
 export default {
   name: "forest",

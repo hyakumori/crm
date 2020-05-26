@@ -15,6 +15,7 @@ from ..core.models import HyakumoriDanticModel, HyakumoriDanticUpdateModel, Pagi
 from ..crm.common import regexes
 from ..crm.common.constants import DEFAULT_EMAIL, EMPTY, UNKNOWN
 from ..crm.models import Customer, Forest, ForestCustomer, Contact
+from ..forest.service import tags_csv_to_dict
 
 
 class Name(HyakumoriDanticModel):
@@ -336,9 +337,7 @@ class CustomerUploadCsv(HyakumoriDanticModel):
     bank_account_type: Optional[str] = EMPTY
     bank_account_number: Optional[constr(regex=regexes.BANKING_ACCOUNT_NUMBER)]
     bank_account_name: Optional[str] = EMPTY
-    ranking: Optional[str]
-    status: Optional[str]
-    same_name: Optional[str]
+    tags: Optional[str]
 
     @root_validator
     def validate_atleast_one_way_to_contact(cls, values):
@@ -349,15 +348,27 @@ class CustomerUploadCsv(HyakumoriDanticModel):
             raise ValueError(_("Enter at least telephone or mobilephone or email."))
         return values
 
+    @validator("tags")
+    def tags_validator(cls, value):
+        try:
+            tags_csv_to_dict(value)
+        except ValueError:
+            raise ValueError("Invalid format")
+        return value
+
     @property
     def name_kana(self):
         name_parts = self.fullname_kana.split("\u3000")
-        return {"first_name": name_parts[1], "last_name": name_parts[0]}
+        if len(name_parts) == 2:
+            return {"first_name": name_parts[1], "last_name": name_parts[0]}
+        return {"first_name": "", "last_name": name_parts[0]}
 
     @property
     def name_kanji(self):
         name_parts = self.fullname_kanji.split("\u3000")
-        return {"first_name": name_parts[1], "last_name": name_parts[0]}
+        if len(name_parts) == 2:
+            return {"first_name": name_parts[1], "last_name": name_parts[0]}
+        return {"first_name": "", "last_name": name_parts[0]}
 
     @property
     def address(self):
@@ -378,12 +389,5 @@ class CustomerUploadCsv(HyakumoriDanticModel):
         }
 
     @property
-    def tags(self):
-        tags = {}
-        if self.ranking:
-            tags["ranking"] = self.ranking
-        if self.status:
-            tags["status"] = self.status
-        if self.same_name:
-            tags["same_name"] = self.same_name
-        return tags
+    def tags_json(self):
+        return tags_csv_to_dict(self.tags)

@@ -3,6 +3,7 @@ import json
 import time
 
 from django.db import OperationalError, transaction
+from django.utils.translation import gettext_lazy as _
 import pydantic
 
 from hyakumori_crm.core.decorators import errors_wrapper
@@ -30,9 +31,7 @@ def csv_upload(fp):
         "bank_account_type": "口座情報_種別",
         "bank_account_number": "口座情報_口座番号",
         "bank_account_name": "口座情報_口座名義",
-        "ranking": "所有者順位",
-        "status": "登録/未登録",
-        "same_name": "同姓同名",
+        "tags": _("Tag"),
     }
     with open(fp, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -47,6 +46,8 @@ def csv_upload(fp):
                     business_id=row_data["business_id"]
                 )
                 customer_ids.append(c.id)
+            except Customer.DoesNotExist:
+                return {"errors": {"__root__": ["Customer not found"]}}
             except OperationalError:
                 return {
                     "errors": {
