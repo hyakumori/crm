@@ -16,7 +16,8 @@ from hyakumori_crm.crm.restful.serializers import (
     CustomerSerializer,
     ForestSerializer,
     ContactSerializer,
-    ArchiveSerializer, ForestListingSerializer,
+    ArchiveSerializer,
+    ForestListingSerializer,
 )
 from .schemas import (
     ForestInput,
@@ -33,8 +34,12 @@ from .service import (
     get_customer_contacts_of_forest,
     set_default_customer,
     set_default_customer_contact,
-    update_forest_memo, forest_csv_data_mapping,
-    get_forests_for_csv, get_forests_by_ids, update_forest_tags, )
+    update_forest_memo,
+    forest_csv_data_mapping,
+    get_forests_for_csv,
+    get_forests_by_ids,
+    update_forest_tags,
+)
 from ..activity.services import ActivityService, ForestActions
 from ..api.decorators import (
     api_validate_model,
@@ -42,7 +47,11 @@ from ..api.decorators import (
     action_login_required,
 )
 from ..crm.common.constants import (
-    FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME, FOREST_CONTRACT, FOREST_ATTRIBUTES
+    FOREST_CADASTRAL,
+    FOREST_LAND_ATTRIBUTES,
+    FOREST_OWNER_NAME,
+    FOREST_CONTRACT,
+    FOREST_ATTRIBUTES,
 )
 from ..permissions.services import PermissionService
 
@@ -63,8 +72,8 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     def list_minimal(self, request):
         query = (
             self.get_queryset()
-                .annotate(customers_count=Count(F("forestcustomer__customer_id")))
-                .values("id", "internal_id", "cadastral", "customers_count")
+            .annotate(customers_count=Count(F("forestcustomer__customer_id")))
+            .values("id", "internal_id", "cadastral", "customers_count")
         )
         search_str = request.GET.get("search")
         if search_str:
@@ -149,12 +158,20 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
             csv_data = get_forests_for_csv()
         else:
             csv_data = get_forests_for_csv(request.data)
-        response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
-        response['Content-Disposition'] = 'attachment'
+        response = HttpResponse(content_type="text/csv; charset=utf-8-sig")
+        response["Content-Disposition"] = "attachment"
         header = ["\ufeff内部ID", "土地管理ID"]
-        flatten_header = list(itertools.chain(header, FOREST_CADASTRAL, FOREST_LAND_ATTRIBUTES, FOREST_OWNER_NAME,
-                                              FOREST_CONTRACT, [_("Tag")],
-                                              FOREST_ATTRIBUTES))
+        flatten_header = list(
+            itertools.chain(
+                header,
+                FOREST_CADASTRAL,
+                FOREST_LAND_ATTRIBUTES,
+                FOREST_OWNER_NAME,
+                FOREST_CONTRACT,
+                [_("Tag")],
+                FOREST_ATTRIBUTES,
+            )
+        )
         writer = csv.writer(response)
         writer.writerow(flatten_header)
         for forest in csv_data:
@@ -175,11 +192,8 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
     @action(detail=False, methods=["PUT"], url_path="tags")
     @action_login_required(with_permissions=["change_forest"])
     def tags(self, request):
-        is_deleted = update_forest_tags(request.data)
-        if is_deleted:
-            return Response({"msg": "OK"})
-        else:
-            return make_error_json("Transaction is not available")
+        update_forest_tags(request.data)
+        return Response({"msg": "OK"})
 
 
 @api_view(["PUT", "PATCH"])

@@ -307,13 +307,13 @@ export default {
     selectedAction(index) {
       switch (index) {
         case 0:
-          console.log("0");
+          // update forest contract
           break;
         case 1:
-          console.log("1");
+          // update forest contract
           break;
         case 2:
-          console.log("2");
+          // update forest contract
           break;
         case 3:
           this.showChangeTagDialog = true;

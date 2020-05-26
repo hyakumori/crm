@@ -25,7 +25,9 @@ from .service import (
     get_attachment_by_pk,
     get_filtered_archive_queryset,
     get_participants,
-    get_related_forests, get_archive_by_ids, update_archive_tag,
+    get_related_forests,
+    get_archive_by_ids,
+    update_archive_tag,
 )
 from ..activity.services import ActivityService, ArchiveActions
 from ..api.decorators import action_login_required, api_validate_model, get_or_404
@@ -67,59 +69,30 @@ def archives(request, data: ArchiveInput = None):
 @action_login_required(with_permissions=["view_archive"])
 def archive_headers(request):
     headers = [
-        {
-            "value": "id",
-            "text": "交渉履歴ID",
-            "align": "center"
-        },
-        {
-            "value": "archive_date",
-            "text": "日付",
-            "sortable": False,
-            "align": "center"
-        },
-        {
-            "value": "title",
-            "text": "タイトル",
-            "sortable": False,
-            "align": "center"
-        },
-        {
-            "value": "content",
-            "text": "内容",
-            "sortable": False,
-            "align": "center"
-        },
-        {
-            "value": "author",
-            "text": "作成者",
-            "sortable": False,
-            "align": "center"
-        },
+        {"value": "id", "text": "交渉履歴ID", "align": "center"},
+        {"value": "archive_date", "text": "日付", "sortable": False, "align": "center"},
+        {"value": "title", "text": "タイトル", "sortable": False, "align": "center"},
+        {"value": "content", "text": "内容", "sortable": False, "align": "center"},
+        {"value": "author", "text": "作成者", "sortable": False, "align": "center"},
         {
             "value": "their_participants",
             "text": "先方参加者",
             "sortable": False,
-            "align": "center"
+            "align": "center",
         },
         {
             "value": "our_participants",
             "text": "当方参加者",
             "sortable": False,
-            "align": "center"
+            "align": "center",
         },
         {
             "value": "associated_forest",
             "text": "関連する森林",
             "sortable": False,
-            "align": "center"
+            "align": "center",
         },
-        {
-            "value": "tags",
-            "text": "タグ",
-            "sortable": False,
-            "align": "center"
-        }
+        {"value": "tags", "text": "タグ", "sortable": False, "align": "center"},
     ]
     return Response({"data": headers})
 
@@ -289,8 +262,5 @@ def archive_ids(request):
 @api_view(["PUT"])
 @action_login_required(with_permissions=["change_archive"])
 def archive_tags(request):
-    is_updated = update_archive_tag(request.data)
-    if is_updated:
-        return Response({"msg": "OK"})
-    else:
-        return make_error_json("Transaction is not available")
+    update_archive_tag(request.data)
+    return Response({"msg": "OK"})

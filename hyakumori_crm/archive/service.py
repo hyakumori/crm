@@ -210,8 +210,8 @@ def is_archive_customer_exist(archive_pk, customer_pk):
 def get_participants(archive: Archive):
     cc = (
         CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-            .values("id", "customer_id")
-            .annotate(forests_count=Count("customer__forestcustomer"))
+        .values("id", "customer_id")
+        .annotate(forests_count=Count("customer__forestcustomer"))
     )
     cc_business_id = CustomerContact.objects.filter(
         is_basic=True, contact=OuterRef("pk")
@@ -220,14 +220,14 @@ def get_participants(archive: Archive):
         Contact.objects.filter(
             customercontact__archivecustomercontact__archivecustomer__archive_id=archive.id
         )
-            .annotate(
+        .annotate(
             customer_id=F(
                 "customercontact__archivecustomercontact__archivecustomer__customer_id"
             ),
             cc_attrs=F("customercontact__attributes"),
         )
-            .annotate(is_basic=F("customercontact__is_basic"))
-            .annotate(
+        .annotate(is_basic=F("customercontact__is_basic"))
+        .annotate(
             customer_name_kanji=RawSQL(
                 """(select
                         C0.name_kanji
@@ -238,8 +238,8 @@ def get_participants(archive: Archive):
                 params=[],
             )
         )
-            .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
-            .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
+        .annotate(forests_count=Subquery(cc.values("forests_count")[:1]))
+        .annotate(business_id=Subquery(cc_business_id.values("business_id")[:1]))
     )
 
 
@@ -264,8 +264,8 @@ def add_participants(archive: Archive, data: ArchiveCustomerInput):
             ArchiveCustomer.objects.filter(
                 archive_id=archive.id, customer_id=item.customer_id
             )
-                .prefetch_related("archivecustomercontact_set")
-                .first()
+            .prefetch_related("archivecustomercontact_set")
+            .first()
         )
         cc.archivecustomercontact_set.filter(
             customercontact_id=cc.id, archivecustomer_id=ac.id
@@ -352,8 +352,8 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
                         function="to_char",
                     )
                 )
-                    .select_related("author")
-                    .filter(**active_filters)
+                .select_related("author")
+                .filter(**active_filters)
             )
 
         return Archive.objects.select_related("author").all()
@@ -424,10 +424,6 @@ def update_archive_tag(data: dict):
     ids = data.get("ids")
     tag_key = data.get("key")
     new_value = data.get("value")
-    with transaction.atomic():
-        try:
-            Archive.objects.select_for_update(nowait=True).filter(id__in=ids, tags__has_key=tag_key).update(
-                tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]))
-            return True
-        except OperationalError:
-            return False
+    Archive.objects.filter(id__in=ids, tags__has_key=tag_key).update(
+        tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value])
+    )

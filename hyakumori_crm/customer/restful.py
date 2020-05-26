@@ -48,7 +48,9 @@ from .service import (
     get_customer_contacts_forests,
     customercontacts_list_with_search,
     get_list,
-    get_customer_by_business_id, get_customers_by_ids, update_customer_tags,
+    get_customer_by_business_id,
+    get_customers_by_ids,
+    update_customer_tags,
 )
 from ..activity.services import ActivityService, CustomerActions
 from ..api.decorators import action_login_required, api_validate_model, get_or_404
@@ -220,7 +222,7 @@ class CustomerViewSets(ViewSet):
         except ValueError as e:
             return make_error_json(message=str(e))
 
-    @action(detail=False, methods=['PUT'], url_path='ids')
+    @action(detail=False, methods=["PUT"], url_path="ids")
     # currently this api is using change status/tag actions, the permission maybe change later
     @action_login_required(with_permissions=["change_customer"])
     def get_customers_by_ids(self, request):
@@ -231,14 +233,11 @@ class CustomerViewSets(ViewSet):
             customers = get_customers_by_ids(ids)
             return Response(CustomerSerializer(customers, many=True).data)
 
-    @action(detail=False, methods=['PUT'], url_path='tags')
+    @action(detail=False, methods=["PUT"], url_path="tags")
     @action_login_required(with_permissions=["change_customer"])
     def tags(self, request):
-        is_updated = update_customer_tags(request.data)
-        if is_updated:
-            return Response({"msg": "OK"})
-        else:
-            return make_error_json("Transaction is not available")
+        update_customer_tags(request.data)
+        return Response({"msg": "OK"})
 
     @action(detail=False, methods=["GET"])
     def download_csv(self, request):
