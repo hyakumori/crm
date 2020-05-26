@@ -13,7 +13,7 @@
     >
       <template v-slot:activator="{ on }">
         <v-text-field
-          v-model="dateRange"
+          v-model="innerDateRange"
           height="45"
           dense
           placeholder="例：2020-12-24 ～ 2025-12-24"
@@ -21,7 +21,7 @@
           v-mask="'####-##-## ～ ####-##-##'"
           outlined
           v-on="on"
-          :error="hasInvalidDate"
+          :error="!isDefaultDateEmpty && hasInvalidDate"
         ></v-text-field>
       </template>
       <v-date-picker
@@ -43,6 +43,8 @@
 <script>
 import { parse, isValid, format } from "date-fns";
 
+const dateSeparator = " ～ ";
+
 export default {
   name: "range-date-picker",
 
@@ -55,7 +57,7 @@ export default {
     return {
       menu: false,
       innerDates: this.dates,
-      innerDateRange: "",
+      innerDateRange: this.dates.join(dateSeparator),
     };
   },
 
@@ -65,13 +67,14 @@ export default {
         this.$refs.menu.save(this.innerDates);
       }
       this.$emit("newDates", this.innerDates);
+      this.innerDateRange = this.innerDates.join(dateSeparator);
     },
     rangeToInnerDate() {
       if (this.hasInvalidDate) {
         return;
       }
       this.innerDates = this.innerDateRange
-        .split(" ～ ")
+        .split(dateSeparator)
         .map(d => d.trim())
         .map(d => parse(d, "yyyy-MM-dd", new Date()))
         .map(d => format(d, "yyyy-MM-dd"));
@@ -80,11 +83,11 @@ export default {
 
   computed: {
     isDefaultDateEmpty() {
-      return !this.innerDateRange || this.innerDateRange.length === 0;
+      return this.innerDates.every(d => d.length === 0);
     },
     hasInvalidDate() {
       const parts = this.innerDateRange
-        .split(" ～ ")
+        .split(dateSeparator)
         .map(part => part.trim())
         .map(d => parse(d, "yyyy-MM-dd", new Date()));
       const check =
@@ -93,21 +96,8 @@ export default {
         parts[0] > parts[1];
       return check;
     },
-    dateRange: {
-      get() {
-        return this.innerDates.join(" ～ ");
-      },
-      set(val) {
-        this.innerDateRange = val;
-      },
-    },
   },
   watch: {
-    hasInvalidDate(val) {
-      if (val === false) {
-        this.rangeToInnerDate();
-      }
-    },
     innerDateRange() {
       this.rangeToInnerDate();
     },
