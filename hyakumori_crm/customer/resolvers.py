@@ -20,16 +20,16 @@ query = ObjectType("Query")
 def get_customertable_headers(obj: Any, info: GraphQLResolveInfo, **kwargs) -> dict:
     headers = [
         {"text": _("Internal Id"), "value": "business_id", "align": "center"},
-        {"text": _("Fullname Kanji"), "value": "fullname_kanji", "align": "center"},
-        {"text": _("Fullname Kana"), "value": "fullname_kana", "align": "center"},
+        {"text": _("Fullname Kanji"), "value": "fullname_kanji", "align": "left"},
+        {"text": _("Fullname Kana"), "value": "fullname_kana", "align": "left"},
         {"text": _("Postal Code"), "value": "postal_code", "align": "center"},
-        {"text": _("Prefecture"), "value": "prefecture", "align": "center"},
-        {"text": _("Municipality"), "value": "municipality", "align": "center"},
-        {"text": _("Address"), "value": "address", "align": "center"},
+        {"text": _("Prefecture"), "value": "prefecture", "align": "left"},
+        {"text": _("Municipality"), "value": "municipality", "align": "left"},
+        {"text": _("Address"), "value": "address", "align": "left"},
         {"text": _("Telephone"), "value": "telephone", "align": "center"},
         {"text": _("Mobilephone"), "value": "mobilephone", "align": "center"},
         {"text": _("Email"), "value": "email", "align": "center"},
-        {"text": _("Tag"), "value": "tags", "align": "center"},
+        {"text": _("Tag"), "value": "tags", "align": "left"},
     ]
     filters = CustomerFilter.get_filters()
     for header_define in headers:
