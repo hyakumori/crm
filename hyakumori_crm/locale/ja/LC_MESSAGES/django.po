@@ -705,6 +705,10 @@ msgstr ""
 #~ msgid "User is inactive"
 #~ msgstr "代表"
 
+#, python-brace-format
+#~ msgid "{column} error at line {row_num}"
+#~ msgstr "{column}カラムの{row_num}行目の値が不正です。"
+
 #~ msgid "Ranking"
 #~ msgstr "所有者順位"
 
