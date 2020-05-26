@@ -1,5 +1,8 @@
 <template>
   <section-container-wrapper
+    :class="{
+      'hide-save-btn': $refs.tabs && $refs.tabs.selectedTab === 'contactor',
+    }"
     :headerContent="headerContent"
     :toggleEditBtnContent="toggleEditBtnContent"
     :addBtnContent="addBtnContent"
@@ -134,6 +137,7 @@ export default {
         isEmpty(this.defaultCustomersContactsEdit)
       );
     },
+    // isContactorTab() {},
   },
   methods: {
     itemsForAddingResultFilter(item) {
@@ -304,3 +308,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.hide-save-btn ::v-deep {
+  & .update-btn {
+    &__save {
+      display: none;
+    }
+  }
+}
+</style>

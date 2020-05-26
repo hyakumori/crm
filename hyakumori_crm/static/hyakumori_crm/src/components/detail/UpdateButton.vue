@@ -4,15 +4,15 @@
       color="primary"
       :disabled="saveDisabled"
       elevation="0"
-      class="mr-2"
+      class="update-btn__save mr-2"
       @click.stop="save"
       :loading="saving"
       :small="small"
-      >{{ $t("buttons.save") }}</v-btn
-    >
-    <v-btn class="update-btn__cancel" text :small="small" @click.stop="cancel">{{
-      $t("buttons.cancel")
-    }}</v-btn>
+      >{{ $t("buttons.save") }}
+    </v-btn>
+    <v-btn class="update-btn__cancel" text :small="small" @click.stop="cancel"
+      >{{ $t("buttons.cancel") }}
+    </v-btn>
   </div>
 </template>
 
