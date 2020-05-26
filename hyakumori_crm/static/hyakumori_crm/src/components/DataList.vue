@@ -54,6 +54,29 @@
           </p>
         </template>
       </template>
+
+      <!--      TODO: need a way to inject this instead of writing customized logic here    -->
+      <template v-slot:item.contract_status="{ item }" class="text-truncate">
+        <v-chip
+          v-if="item['contract_status']"
+          small
+          outlined
+          :color="colorMaps[item['contract_status']]"
+        >
+          {{ item["contract_status"] }}
+        </v-chip>
+      </template>
+
+      <template v-slot:item.fsc_status="{ item }" class="text-truncate">
+        <v-chip
+          v-if="item['fsc_status']"
+          small
+          outlined
+          :color="colorMaps[item['fsc_status']]"
+        >
+          {{ item["fsc_status"] }}
+        </v-chip>
+      </template>
     </v-data-table>
   </v-layout>
 </template>
@@ -114,6 +137,13 @@ export default {
   },
 
   computed: {
+    colorMaps() {
+      return {
+        未契約: "grey--lighten",
+        期限切: "orange lighten-2",
+        契約済: "primary",
+      };
+    },
     dynamicHeaders() {
       if (this.data && this.headers.length > 1 && this.autoHeaders) {
         const headers = [];
