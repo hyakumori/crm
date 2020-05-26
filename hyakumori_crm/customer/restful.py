@@ -318,7 +318,7 @@ class CustomerViewSets(ViewSet):
         with open(fp, "wb+") as destination:
             for chunk in csv_file.chunks():
                 destination.write(chunk)
-        cache.set("maintain_task_id", f"customers/{file_name}")
+        cache.set("maintain_task_id", f"customers/{file_name}", None)
         result = csv_upload(fp)
         clear_maintain_task_id_cache()
         if type(result) is int:

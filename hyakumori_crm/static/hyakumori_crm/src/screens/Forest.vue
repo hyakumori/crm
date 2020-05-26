@@ -6,7 +6,7 @@
           <div class="forest__csv-section">
             <outline-round-btn
               :content="$t('buttons.csv_upload')"
-              :icon="$t('icon.add')"
+              icon="mdi-upload"
               :loading="uploadCsvLoading"
               @click="uploadCsv"
               class="mr-2"
@@ -201,12 +201,13 @@ export default {
     },
   },
   beforeRouteLeave(to, from, next) {
-    if (this.uploadCsvLoading && !confirm("Do you want to leave?")) next(false);
+    if (this.uploadCsvLoading && !confirm(this.$t("messages.confirm_leave")))
+      next(false);
     else next();
   },
   methods: {
     confirmReload(e) {
-      e.returnValue = "Do you want to leave?";
+      e.returnValue = this.$t("messages.confirm_leave");
     },
     rowData(val) {
       this.$router.push(`forests/${val}`);
@@ -237,6 +238,8 @@ export default {
 
     uploadCsv() {
       if (this.$refs.uploadCsv) {
+        const confirmUpload = confirm(this.$t("messages.confirm_upload_csv"));
+        if (!confirmUpload) return;
         this.$refs.uploadCsv.click();
       }
     },
@@ -257,7 +260,7 @@ export default {
           window.addEventListener("beforeunload", this.confirmReload);
           await this.$rest.post("/forests/upload-csv", requestFile);
           this.$apollo.queries.forestsInfo.refetch();
-          this.$dialog.notify.success("Upload successfully");
+          this.$dialog.notify.success(this.$t("messages.upload_successfully"));
         } catch (error) {
           if (error.response.data) {
             this.$dialog.show(ErrorCard, {

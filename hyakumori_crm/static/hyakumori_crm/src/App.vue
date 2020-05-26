@@ -7,8 +7,7 @@
       :timeout="0"
       multi-line
     >
-      Website is under maintenance mode.<br />Any update operation is not
-      allowed.
+      {{ $t("messages.maintenance_1") }}<br />{{ $t("messages.maintenance_2") }}
     </v-snackbar>
     <router-view></router-view>
   </div>

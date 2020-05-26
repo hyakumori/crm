@@ -6,7 +6,11 @@
           <div>
             <outline-round-btn
               icon="mdi-upload"
-              :content="`upload ${selectedFileName}`"
+              :content="
+                selectedFileName
+                  ? `${selectedFileName}`
+                  : $t('buttons.csv_upload')
+              "
               class="mr-2"
               @click="handleUploadBtnClick"
               :loading="uploadCsvLoading"
@@ -14,8 +18,6 @@
             <input
               ref="csvUploadInput"
               type="file"
-              name=""
-              id="foo"
               style="height:0;width:0;"
               accept=".csv"
               @change="handleFileChange"
@@ -170,18 +172,17 @@ export default {
     },
   },
   beforeRouteLeave(to, from, next) {
-    if (this.uploadCsvLoading && !confirm("Do you want to leave?")) next(false);
+    if (this.uploadCsvLoading && !confirm(this.$t("messages.confirm_leave")))
+      next(false);
     else next();
   },
   methods: {
     confirmReload(e) {
-      e.returnValue = "Do you want to leave?";
+      e.returnValue = this.$t("messages.confirm_leave");
     },
     async handleUploadBtnClick() {
       if (this.selectedFileName !== "") {
-        const confirmUpload = confirm(
-          "Upload will put website in maintain mode. Continue?",
-        );
+        const confirmUpload = confirm(this.$t("messages.confirm_upload_csv"));
         if (!confirmUpload) return;
         this.uploadCsvLoading = true;
         window.addEventListener("beforeunload", this.confirmReload);
@@ -192,7 +193,7 @@ export default {
             headers: { "Content-Type": "multipart/form-data" },
           });
           this.$apollo.queries.customerList.refetch();
-          this.$dialog.notify.success("Upload successfully");
+          this.$dialog.notify.success(this.$t("messages.upload_successfully"));
         } catch (error) {
           if (error.response.data) {
             this.$dialog.show(ErrorCard, {

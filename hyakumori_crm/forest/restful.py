@@ -208,7 +208,7 @@ class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericVi
         with open(fp, "wb+") as destination:
             for chunk in csv_file.chunks():
                 destination.write(chunk)
-        cache.set("maintain_task_id", f"forests/{file_name}")
+        cache.set("maintain_task_id", f"forests/{file_name}", None)
         r = csv_upload(fp)
         clear_maintain_task_id_cache()
         if type(r) is int:
