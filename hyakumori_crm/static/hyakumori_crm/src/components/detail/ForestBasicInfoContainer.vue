@@ -77,7 +77,6 @@ export default {
     },
 
     updateData(updateInfo) {
-      console.log(updateInfo);
       updateBasicInfo(this.info.id, updateInfo)
         .then(res => {
           this.$emit("forest:basic-info-updated", res);
@@ -85,7 +84,11 @@ export default {
           this.isUpdate = false;
         })
         .catch(() => {
-          // TODO: Handle error later
+          this.$dialog.notify.error(
+            this.$t("messages.api_update_general_error"),
+          );
+          this.isSave = false;
+          this.isLoading = false;
         });
     },
   },
@@ -93,7 +96,6 @@ export default {
   watch: {
     info(val) {
       this.mutableInfo = val;
-      console.log(val);
     },
   },
 };

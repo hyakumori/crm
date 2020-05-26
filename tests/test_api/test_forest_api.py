@@ -13,7 +13,7 @@ from hyakumori_crm.crm.models import (
 )
 from hyakumori_crm.crm.schemas.contract import ContractType
 from hyakumori_crm.forest.restful import (
-    update,
+    update_basic_info,
     update_owners_view,
     ForestViewSets,
 )

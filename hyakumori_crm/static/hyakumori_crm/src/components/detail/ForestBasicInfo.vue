@@ -2,7 +2,7 @@
   <ValidationObserver ref="observer">
     <v-container class="forest-basic-info pa-0">
       <template v-if="!isUpdate">
-        <v-row v-if="info" dense>
+        <v-row v-if="innerInfo" dense>
           <v-col cols="6">
             <text-info label="住所" :value="fullAddress" />
           </v-col>
@@ -23,7 +23,7 @@
             <text-info label="契約種類" :value="contractType" />
           </v-col>
           <v-col cols="6">
-            <text-info label="契約期間" :value="fullDate" />
+            <text-info label="契約期間" :value="formattedContractPeriod" />
           </v-col>
         </v-row>
 
@@ -32,12 +32,12 @@
             <text-info label="FSC認証加入" :value="fscStatus" />
           </v-col>
           <v-col cols="6">
-            <text-info label="FSC認証期間" :value="fscPeriod" />
+            <text-info label="FSC認証期間" :value="formattedFscPeriod" />
           </v-col>
         </v-row>
       </template>
       <template v-else>
-        <v-row v-if="info">
+        <v-row v-if="innerInfo">
           <v-col cols="4">
             <text-info
               label="都道府県"
@@ -83,7 +83,7 @@
           <v-col cols="4">
             <range-date-picker
               label="契約期間"
-              :dates="dates"
+              :dates="contractPeriod"
               @newDates="updateContractDate"
             />
           </v-col>
@@ -95,13 +95,14 @@
               :items="contractStatusesSelectItems"
               label="FSC認証加入"
               :value="fscStatus"
+              @input="updateFscStatus"
               :isUpdate="isUpdate"
             />
           </v-col>
           <v-col cols="4">
             <range-date-picker
               label="FSC契約期間"
-              :dates="dates"
+              :dates="fscPeriod"
               @newDates="updateFscDate"
             />
           </v-col>
@@ -117,7 +118,7 @@ import TextInfo from "./TextInfo";
 import SelectInfo from "./SelectInfo";
 import RangeDatePicker from "../RangeDatePicker";
 import { ValidationObserver } from "vee-validate";
-import { get as _get } from "lodash";
+import { get as _get, cloneDeep as _cloneDeep } from "lodash";
 
 export default {
   name: "forest-basic-info",
@@ -135,16 +136,24 @@ export default {
     isSave: Boolean,
   },
 
+  data() {
+    return {
+      contractTypes: [],
+      contractStatuses: {},
+      innerInfo: {
+        contracts: { contract_type: "" },
+      },
+    };
+  },
+
   methods: {
     getRangeDate(val) {
       this.contract.start_date = val[0];
       this.contract.end_date = val[1];
     },
-
     formatDate(date) {
-      return date && date.replace(new RegExp("-", "g"), "/");
+      return date; // && date.replace(new RegExp("-", "g"), "/");
     },
-
     async getContractTypes() {
       try {
         const response = await this.$rest.get("/contract_type");
@@ -172,11 +181,14 @@ export default {
     },
 
     updateContractType(selected) {
-      this.innerInfo.contracts.contact_type = selected.value;
+      this.innerInfo.contracts.contract_type = selected.value;
     },
     updateContractDate(val) {
-      this.innerInfo.contracts.contact_start_date = val[0];
-      this.innerInfo.contracts.contact_end_date = val[1];
+      this.innerInfo.contracts.contract_start_date = val[0];
+      this.innerInfo.contracts.contract_end_date = val[1];
+    },
+    updateFscStatus(selected) {
+      this.innerInfo.contracts.fsc_status = selected.value;
     },
     updateFscDate(val) {
       this.innerInfo.contracts.fsc_start_date = val[0];
@@ -184,43 +196,41 @@ export default {
     },
   },
 
-  data() {
-    return {
-      contractTypes: [],
-      contractStatuses: {},
-    };
-  },
-
   async mounted() {
     await this.getContractTypes();
     await this.getContractStatuses();
+    this.innerInfo = _cloneDeep(this.info);
   },
 
   computed: {
     fscStatus() {
-      return _get(this.innerInfo, "contracts.fsc_status");
+      return _get(this.info, "contracts.fsc_status");
     },
     fscPeriod() {
       let start_date = _get(this.innerInfo, "contracts.fsc_start_date");
       let end_date = _get(this.innerInfo, "contracts.fsc_end_date");
-      return `${start_date || ""} - ${end_date || ""}`;
+      return [start_date || "", end_date || ""];
+    },
+    formattedFscPeriod() {
+      let fullDate = "";
+      const contract = this.contract;
+      if (contract) {
+        fullDate = `${this.formatDate(contract.fsc_start_date) || ""} ${
+          contract.fsc_start_date ? " ～ " : ""
+        }
+        ${this.formatDate(contract.fsc_end_date) || "未入力"}`;
+      }
+      return fullDate;
+    },
+    contractType() {
+      return _get(this.info, "contracts.contract_type");
     },
     address() {
       return this.innerInfo && this.innerInfo.cadastral;
     },
-
-    contractType() {
-      return _get(this.innerInfo, "contracts.contract_type");
-    },
-
     contract() {
       return _get(this.innerInfo, "contracts");
     },
-
-    innerInfo() {
-      return this.info;
-    },
-
     fullAddress() {
       let fullAddress = "";
       const address = this.address;
@@ -230,23 +240,23 @@ export default {
       }
       return fullAddress;
     },
-
-    fullDate() {
+    formattedContractPeriod() {
       let fullDate = "";
       const contract = this.contract;
       if (contract) {
-        fullDate = `${this.formatDate(contract.start_date) || ""} ${
-          contract.start_date ? "-" : ""
+        fullDate = `${this.formatDate(contract.contract_start_date) || ""} ${
+          contract.contract_start_date ? " ～ " : ""
         }
-        ${this.formatDate(contract.end_date) || "未入力"}`;
+        ${this.formatDate(contract.contract_end_date) || "未入力"}`;
       }
       return fullDate;
     },
-
-    dates() {
-      return [this.contract.start_date || "", this.contract.end_date || ""];
+    contractPeriod() {
+      return [
+        this.contract.contract_start_date || "",
+        this.contract.contract_end_date || "",
+      ];
     },
-
     contractStatusesSelectItems() {
       const items = Object.keys(this.contractStatuses).map(key => ({
         text: this.contractStatuses[key],
@@ -266,6 +276,7 @@ export default {
     info: {
       deep: true,
       async handler() {
+        this.innerInfo = _cloneDeep(this.info);
         const isValid = await this.$refs.observer.validate();
         this.$emit("forest:save-disable", !isValid);
       },

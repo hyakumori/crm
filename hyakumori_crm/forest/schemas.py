@@ -13,14 +13,14 @@ from hyakumori_crm.crm.models import (
     CustomerContact,
     ForestCustomerContact,
 )
-from hyakumori_crm.crm.schemas.contract import ContractType
+from hyakumori_crm.crm.schemas.contract import ContractType, ContractTypeStatus
 from hyakumori_crm.crm.schemas.forest import LandAttribute, ForestAttribute
 from hyakumori_crm.crm.common.utils import tags_csv_to_dict
 from hyakumori_crm.forest.filters import ForestFilter
 
 
 class ForestPaginator(Paginator):
-    @validator("filters")
+    @validator("filters", allow_reuse=True)
     def validate_filters(cls, filter_input):
         return ForestFilter(filter_input)
 
@@ -33,18 +33,62 @@ class Cadastral(HyakumoriDanticModel):
 
 
 class Contract(HyakumoriDanticModel):
-    type: ContractType
-    status: Optional[str]
+    type: ContractType = ContractType.long_term
+    status: Optional[str] = ContractTypeStatus.unnegotiated
     start_date: Optional[date]
     end_date: Optional[date]
+
+    class Config:
+        orm_mode = False
+        arbitrary_types_allowed = True
+
+
+class ContractUpdateInput(HyakumoriDanticModel):
+    """
+    {
+        'contract_type': '長期契約',
+        'contract_status': '契約済',
+        'contract_start_date': '2019-04-01',
+        'contract_end_date': None,
+        'fsc_status': '契約済',
+        'fsc_start_date': '2020-05-10',
+        'fsc_end_date': '2020-05-21',
+    }
+    """
+
+    contract_type: Optional[str]
+    contract_status: Optional[str]
+    contract_start_date: Optional[date]
+    contract_end_date: Optional[date]
+    fsc_status: Optional[str]
+    fsc_start_date: Optional[date]
+    fsc_end_date: Optional[date]
+
+    class Config:
+        orm_mode = False
+        arbitrary_types_allowed = True
+
+    @root_validator
+    def validate_contracts_info(cls, v):
+        if v["contract_type"] is None:
+            v["contract_type"] = ContractType.long_term.value
+
+        if v["contract_status"] is None:
+            v["contract_status"] = ContractTypeStatus.unnegotiated
+
+        if v["fsc_status"] is None:
+            v["fsc_status"] = ContractTypeStatus.unnegotiated
+
+        return v
 
 
 class ForestInput(HyakumoriDanticModel):
     forest: Forest
     cadastral: Cadastral
-    contracts: List[Contract]
+    contracts: Optional[ContractUpdateInput] = ContractUpdateInput()
 
     class Config:
+        orm_mode = False
         arbitrary_types_allowed = True
 
 

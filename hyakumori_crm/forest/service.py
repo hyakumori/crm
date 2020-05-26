@@ -12,6 +12,9 @@ from django.utils.translation import gettext_lazy as _
 from .schemas import (
     CustomerDefaultInput,
     CustomerContactDefaultInput,
+    ContractUpdateInput,
+    ContractType as ContractTypeEnum,
+    ForestInput,
     ForestCsvInput,
 )
 from .filters import ForestFilter
@@ -105,6 +108,38 @@ def map_forests_contracts(forest, contract_types):
     return forest
 
 
+def map_input_to_contracts(forest, contracts_in: ContractUpdateInput):
+    fsc = Contract(
+        type=ContractTypeEnum.fsc,
+        status=contracts_in.fsc_status,
+        start_date=contracts_in.fsc_start_date,
+        end_date=contracts_in.fsc_end_date,
+    )
+    update_contracts = []
+    for contract in forest.contracts:
+        if contract.get("type") == ContractTypeEnum.fsc:
+            continue
+        if contract.get("type") == contracts_in.contract_type:
+            contract["start_date"] = contracts_in.contract_start_date
+            contract["end_date"] = contracts_in.contract_end_date
+            contract["status"] = contracts_in.contract_status
+            update_contracts.append(contract)
+
+    if len(update_contracts) == 0:
+        update_contracts.append(
+            Contract(
+                type=contracts_in.contract_type,
+                status=contracts_in.contract_status,
+                start_date=contracts_in.contract_start_date,
+                end_date=contracts_in.contract_end_date,
+            ).dict()
+        )
+
+    update_contracts.append(fsc.dict())
+
+    return update_contracts
+
+
 def get_forests_by_condition(
     page_num: int = 1,
     per_page: int = 10,
@@ -125,10 +160,10 @@ def get_forests_by_condition(
     return results, total
 
 
-def update(forest: Forest, forest_in: dict):
-    forest.cadastral = forest_in["cadastral"]
-    forest.contracts = forest_in["contracts"]
-    forest.save()
+def update_basic_info(forest: Forest, forest_in: ForestInput):
+    forest.cadastral = forest_in.cadastral.dict()
+    forest.contracts = map_input_to_contracts(forest, forest_in.contracts)
+    forest.save(update_fields=["cadastral", "contracts", "updated_at"])
     return forest
 
 
