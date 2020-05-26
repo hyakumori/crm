@@ -15,10 +15,9 @@ class ServiceUnavailable(APIException):
 
 def in_maintain_middleware(get_response):
     def middleware(request):
-        if request.path.startswith("/api/v1") and request.method in [
-            "POST",
-            "PUT",
-            "PATCH",
+        if request.path.startswith("/api/v1") and request.method not in [
+            "GET",
+            "OPTIONS",
         ]:
             if cache.get("maintain_task_id") is not None:
                 return JsonResponse({"detail": "Service Unavailable"}, status=503)

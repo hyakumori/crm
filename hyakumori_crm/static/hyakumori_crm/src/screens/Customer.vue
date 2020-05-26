@@ -216,7 +216,11 @@ export default {
           this.$apollo.queries.customerList.refetch();
           this.$dialog.notify.success(this.$t("messages.upload_successfully"));
         } catch (error) {
-          if (error.response.data) {
+          if (
+            error.response &&
+            error.response.status < 500 &&
+            error.response.data
+          ) {
             this.$dialog.show(ErrorCard, {
               line: error.response.data.line,
               errors: error.response.data.errors,

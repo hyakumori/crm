@@ -71,7 +71,7 @@ const setupRestClient = options => {
           timeout: 5000,
         });
         return new Promise((resolve, reject) => {
-          resolve({});
+          reject(error);
         });
       } else {
         axios.$v.$dialog.notify.error(`${error}`, {
