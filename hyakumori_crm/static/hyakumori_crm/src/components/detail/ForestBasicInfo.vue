@@ -20,7 +20,17 @@
 
         <v-row dense>
           <v-col cols="6">
-            <text-info label="契約種類" :value="contractType" />
+            <text-info label="契約種類" :value="contractType">
+              <template #readonly-extend v-if="contractStatus">
+                <v-chip
+                  small
+                  class="contract-status"
+                  outlined
+                  color="primary"
+                  >{{ contractStatus }}</v-chip
+                >
+              </template>
+            </text-info>
           </v-col>
           <v-col cols="6">
             <text-info label="契約期間" :value="formattedContractPeriod" />
@@ -81,13 +91,21 @@
             />
           </v-col>
           <v-col cols="4">
+            <select-info
+              :items="contractStatusesSelectItems"
+              label="契約ステータス"
+              :value="contractStatus"
+              @input="updateContractStatus"
+              :isUpdate="isUpdate"
+            />
+          </v-col>
+          <v-col cols="4">
             <range-date-picker
               label="契約期間"
               :dates="contractPeriod"
               @newDates="updateContractDate"
             />
           </v-col>
-          <v-col cols="4"> </v-col>
         </v-row>
         <v-row>
           <v-col cols="4">
@@ -187,6 +205,9 @@ export default {
       this.innerInfo.contracts.contract_start_date = val[0];
       this.innerInfo.contracts.contract_end_date = val[1];
     },
+    updateContractStatus(selected) {
+      this.innerInfo.contracts.contract_status = selected.value;
+    },
     updateFscStatus(selected) {
       this.innerInfo.contracts.fsc_status = selected.value;
     },
@@ -224,6 +245,9 @@ export default {
     },
     contractType() {
       return _get(this.info, "contracts.contract_type");
+    },
+    contractStatus() {
+      return _get(this.info, "contracts.contract_status");
     },
     address() {
       return this.innerInfo && this.innerInfo.cadastral;
