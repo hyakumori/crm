@@ -11,7 +11,7 @@ def process_contract_status(forest, logs):
     for contract in forest.contracts:
         if contract.get("end_date") is not None \
            and arrow.get(contract.get("end_date"), "YYYY-MM-DD") < arrow.utcnow()\
-           and contract["status"] != ContractTypeStatus.expired:
+           and contract["status"] == ContractTypeStatus.negotiated:  # only update negotiated status
             old_status = contract.get("status")
             contract["status"] = ContractTypeStatus.expired
             logs.append(
