@@ -77,6 +77,7 @@ export default {
     },
 
     updateData(updateInfo) {
+      console.log(updateInfo);
       updateBasicInfo(this.info.id, updateInfo)
         .then(res => {
           this.$emit("forest:basic-info-updated", res);
@@ -92,6 +93,7 @@ export default {
   watch: {
     info(val) {
       this.mutableInfo = val;
+      console.log(val);
     },
   },
 };

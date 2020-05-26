@@ -7,6 +7,7 @@
       transition="scale-transition"
       min-width="290px"
       offset-y
+      nudge-top="20"
       :close-on-content-click="false"
       :return-value.sync="innerDates"
     >
