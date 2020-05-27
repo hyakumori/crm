@@ -8,11 +8,11 @@
       @click.stop="save"
       :loading="saving"
       :small="small"
-      >{{ $t("buttons.save") }}</v-btn
-    >
-    <v-btn class="update-btn__cancel" text :small="small" @click.stop="cancel">{{
-      $t("buttons.cancel")
-    }}</v-btn>
+      >{{ $t("buttons.save") }}
+    </v-btn>
+    <v-btn class="update-btn__cancel" text :small="small" @click.stop="cancel"
+      >{{ $t("buttons.cancel") }}
+    </v-btn>
   </div>
 </template>
 

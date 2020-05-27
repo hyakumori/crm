@@ -21,7 +21,7 @@
     <template>
       <contact-tab
         ref="tabs"
-        class="mt-5"
+        class="mt-5 tabs"
         :class="{ 'mb-10': !isEditing }"
         :customers="tempCustomers"
         :customersContacts="customersContacts"
@@ -304,3 +304,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.tabs ::v-deep {
+  .v-window-item:last-child {
+    .customer-contact-card {
+      button {
+        display: none;
+      }
+    }
+  }
+}
+</style>
