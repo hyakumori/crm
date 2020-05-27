@@ -75,9 +75,8 @@ export default {
     },
     needLoadOnNearEnd(event) {
       const el = event.target;
-      const reachToBottom =
-        parseInt(el.scrollHeight) - parseInt(el.scrollTop) === el.clientHeight;
-      if (reachToBottom) {
+      // need load more if scroll over 1/3 of scrolled area
+      if (el.scrollHeight - el.scrollTop < (el.clientHeight * 4) / 3) {
         this.$emit("needToLoad");
       }
     },
