@@ -1,7 +1,10 @@
+import operator
 from enum import Enum
+from functools import reduce
 from typing import List, Optional
 from uuid import UUID
 
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError as DjValidationError
 from rest_framework.serializers import ModelSerializer, UUIDField
@@ -66,13 +69,25 @@ class CustomerUpdateSchema(CustomerInputSchema):
 
 class CustomerPaginator(Paginator):
     @validator("filters")
-    def validate_filters(cls, v):
-        defined_filters = CustomerFilter.get_filters()
-        return {
-            field + "__" + defined_filters[field].lookup_expr: value
-            for field, value in v.items()
-            if field in defined_filters
-        }
+    def validate_filters(cls, filters_input):
+        defined_filters = []
+        for k, value in filters_input.items():
+            values = value.split(",")
+            search_field_filter = k + "__icontains"
+            defined_filters.append(
+                reduce(
+                    operator.or_,
+                    (
+                        Q(**{search_field_filter: value.strip()})
+                        for value in values
+                        if len(value) > 0
+                    ),
+                )
+            )
+
+        if len(defined_filters) > 0:
+            return reduce(operator.and_, defined_filters)
+        return defined_filters
 
 
 class ForestSerializer(ModelSerializer):
