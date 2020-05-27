@@ -15,7 +15,7 @@ from .schemas import (
     ContractUpdateInput,
     ContractType as ContractTypeEnum,
     ForestInput,
-    ForestCsvInput,
+    ForestCsvInput, Contract,
 )
 from .filters import ForestFilter
 from ..cache.forest import refresh_customer_forest_cache

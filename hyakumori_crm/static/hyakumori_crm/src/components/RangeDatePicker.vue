@@ -18,7 +18,7 @@
           dense
           placeholder="例：2020-12-24 ～ 2025-12-24"
           single-line
-          v-mask="'####-##-## ～ ####-##-##'"
+          v-mask="'####-##-##～####-##-##'"
           outlined
           v-on="on"
           :error="!isDefaultDateEmpty && hasInvalidDate"
@@ -41,9 +41,8 @@
 </template>
 
 <script>
-import { parse, isValid, format } from "date-fns";
-
-const dateSeparator = " ～ ";
+import { format, isValid, parse } from "date-fns";
+import { dateSeparator } from "../helpers/datetime";
 
 export default {
   name: "range-date-picker",
@@ -73,33 +72,41 @@ export default {
       if (this.hasInvalidDate) {
         return;
       }
-      this.innerDates = this.innerDateRange
+      const parts = this.innerDateRange
         .split(dateSeparator)
         .map(d => d.trim())
         .map(d => parse(d, "yyyy-MM-dd", new Date()))
+        .filter(d => isValid(d))
         .map(d => format(d, "yyyy-MM-dd"));
+      this.innerDates = parts;
     },
   },
 
   computed: {
     isDefaultDateEmpty() {
-      return this.innerDates.every(d => d.length === 0);
+      return (
+        this.innerDates.every(d => d.length === 0) ||
+        this.innerDateRange.length === 0
+      );
     },
     hasInvalidDate() {
       const parts = this.innerDateRange
         .split(dateSeparator)
         .map(part => part.trim())
-        .map(d => parse(d, "yyyy-MM-dd", new Date()));
-      const check =
-        parts.length < 2 ||
-        !parts.every(part => isValid(part)) ||
-        parts[0] > parts[1];
-      return check;
+        .map(d => parse(d, "yyyy-MM-dd", new Date()))
+        .filter(d => isValid(d));
+      return !(
+        (parts.length === 2 && parts[0] < parts[1]) ||
+        parts.length === 1
+      );
     },
   },
   watch: {
     innerDateRange() {
       this.rangeToInnerDate();
+      if (this.innerDateRange.length === 0) {
+        this.$emit("newDates", ["", ""]);
+      }
     },
     innerDates: {
       deep: true,
