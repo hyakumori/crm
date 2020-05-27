@@ -1,17 +1,15 @@
-import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional
 from uuid import UUID
 
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError as DjValidationError
-from django_filters import FilterSet, CharFilter
 from rest_framework.serializers import ModelSerializer, UUIDField
-from pydantic import BaseModel, EmailStr, constr, validator, root_validator
+from pydantic import EmailStr, constr, validator, root_validator
 from pydantic.error_wrappers import ValidationError
-from pydantic.errors import MissingError
 
-from ..core.models import HyakumoriDanticModel, HyakumoriDanticUpdateModel, Paginator
+from .filters import CustomerFilter
+from ..core.models import HyakumoriDanticModel, Paginator
 from ..crm.common import regexes
 from ..crm.common.constants import DEFAULT_EMAIL, EMPTY, UNKNOWN
 from ..crm.common.utils import tags_csv_to_dict
@@ -64,27 +62,6 @@ class CustomerUpdateSchema(CustomerInputSchema):
 
     class Config:
         arbitrary_types_allowed = True
-
-
-class CustomerFilter(FilterSet):
-    internal_id = CharFilter(lookup_expr="icontains")
-    business_id = CharFilter(lookup_expr="icontains")
-    fullname_kanji = CharFilter(lookup_expr="icontains")
-    fullname_kana = CharFilter(lookup_expr="icontains")
-    postal_code = CharFilter(lookup_expr="icontains")
-    address = CharFilter(lookup_expr="icontains")
-    telephone = CharFilter(lookup_expr="icontains")
-    mobilephone = CharFilter(lookup_expr="icontains")
-    prefecture = CharFilter(lookup_expr="icontains")
-    municipality = CharFilter(lookup_expr="icontains")
-    email = CharFilter(lookup_expr="icontains")
-    status = CharFilter(lookup_expr="icontains")
-    ranking = CharFilter(lookup_expr="icontains")
-    same_name = CharFilter(lookup_expr="icontains")
-
-    class Meta:
-        model = Customer
-        fields = []
 
 
 class CustomerPaginator(Paginator):

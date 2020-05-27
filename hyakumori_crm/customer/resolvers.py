@@ -7,9 +7,9 @@ from django.utils.translation import gettext as _
 from hyakumori_crm.graphql.decorators import login_required
 from ..core.decorators import validate_model
 from .schemas import (
-    CustomerFilter,
     CustomerPaginator,
 )
+from .filters import CustomerFilter
 from .service import get_list
 
 query = ObjectType("Query")
