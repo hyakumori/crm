@@ -153,14 +153,18 @@ def get_list(
         {"bank_account_number": RawSQLField("banking->>'account_number'")},
         {"bank_account_name": RawSQLField("banking->>'account_name'")},
         "tags",
-        {"tags_repr": RawSQLField("""
+        {
+            "tags_repr": RawSQLField(
+                """
               (select string_agg(tags_repr, ',') tags_repr
               from (
                 select concat_ws(':', key, value) as tags_repr
                 from jsonb_each_text(tags) as x
                 where value is not null
               ) as ss)::text
-            """)}
+            """
+            )
+        },
     ]
 
     query = (
@@ -404,19 +408,6 @@ def update_forests(data):
 def update_contacts(contacts_in: ContactsInput):
     customer = contacts_in.customer
     adding = contacts_in.adding
-    customercontacts = CustomerContact.objects.filter(
-        contact_id__in=contacts_in.deleting, customer_id=customer.id,
-    ).prefetch_related("contact")
-    for cc in customercontacts:
-        contact = cc.contact
-        if contacts_in.contact_type == ContactType.forest:
-            cc.forestcustomercontact_set.all().delete()
-            if cc.attributes.get("contact_type") == ContactType.forest:
-                cc.force_delete()
-        else:
-            cc.force_delete()
-            contact.force_delete()
-
     for contact_data in adding:
         customer_contact, created = CustomerContact.objects.get_or_create(
             customer_id=customer.id, contact_id=contact_data.contact.pk
@@ -442,6 +433,20 @@ def update_contacts(contacts_in: ContactsInput):
                 "relationship_type"
             ] = contact_data.relationship_type.value
         customer_contact.save(update_fields=["attributes", "updated_at"])
+
+    customercontacts = CustomerContact.objects.filter(
+        contact_id__in=contacts_in.deleting, customer_id=customer.id,
+    ).prefetch_related("contact")
+    for cc in customercontacts:
+        contact = cc.contact
+        if contacts_in.contact_type == ContactType.forest:
+            cc.forestcustomercontact_set.all().delete()
+            if cc.attributes.get("contact_type") == ContactType.forest:
+                cc.force_delete()
+        else:
+            cc.force_delete()
+            contact.force_delete()
+
     customer.save(update_fields=["updated_at"])
     return customer
 
