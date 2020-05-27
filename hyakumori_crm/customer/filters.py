@@ -1,7 +1,8 @@
 from django_filters import CharFilter
 
 from hyakumori_crm.crm.models import Customer
-from hyakumori_crm.tags.filters import TagsFilterSet, MultipleOrFilterSet
+from hyakumori_crm.tags.filters import TagsFilterSet
+from hyakumori_crm.core.filters import MultipleOrFilterSet
 
 
 class CustomerFilter(TagsFilterSet, MultipleOrFilterSet):

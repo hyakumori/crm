@@ -32,13 +32,3 @@ class TagsFilterSet(FilterSet):
         return queryset
 
 
-class MultipleOrFilterSet(FilterSet):
-    def icontains_filter(self, queryset, name, value):
-        values = value.split(",")
-        search_field_filter = name + "__icontains"
-        queryset = queryset.filter(
-            reduce(
-                operator.or_, (Q(**{search_field_filter: value.strip()}) for value in values if len(value) > 0)
-            )
-        )
-        return queryset

@@ -5,7 +5,8 @@ from django.db.models import Q
 from django_filters import CharFilter, DateFilter
 
 from hyakumori_crm.crm.models import Forest
-from hyakumori_crm.tags.filters import TagsFilterSet, MultipleOrFilterSet
+from hyakumori_crm.tags.filters import TagsFilterSet
+from hyakumori_crm.core.filters import MultipleOrFilterSet
 
 
 class ForestFilter(TagsFilterSet, MultipleOrFilterSet):
