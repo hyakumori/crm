@@ -73,7 +73,10 @@ class CustomerPaginator(Paginator):
         defined_filters = []
         for k, value in filters_input.items():
             values = value.split(",")
-            search_field_filter = k + "__icontains"
+            if k == "tags":
+                search_field_filter = "tags_repr__icontains"
+            else:
+                search_field_filter = k + "__icontains"
             defined_filters.append(
                 reduce(
                     operator.or_,

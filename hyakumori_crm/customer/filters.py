@@ -5,7 +5,7 @@ from hyakumori_crm.tags.filters import TagsFilterSet
 from hyakumori_crm.core.filters import MultipleOrFilterSet
 
 
-class CustomerFilter(TagsFilterSet, MultipleOrFilterSet):
+class CustomerFilter(MultipleOrFilterSet):
     internal_id = CharFilter(method="icontains_filter")
     business_id = CharFilter(method="icontains_filter")
     fullname_kanji = CharFilter(method="icontains_filter")
@@ -17,6 +17,7 @@ class CustomerFilter(TagsFilterSet, MultipleOrFilterSet):
     prefecture = CharFilter(method="icontains_filter")
     municipality = CharFilter(method="icontains_filter")
     email = CharFilter(method="icontains_filter")
+    tags = CharFilter(method="icontains_filter")
 
     class Meta:
         model = Customer

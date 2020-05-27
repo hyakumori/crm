@@ -153,6 +153,14 @@ def get_list(
         {"bank_account_number": RawSQLField("banking->>'account_number'")},
         {"bank_account_name": RawSQLField("banking->>'account_name'")},
         "tags",
+        {"tags_repr": RawSQLField("""
+              (select string_agg(tags_repr, ',') tags_repr
+              from (
+                select concat_ws(':', key, value) as tags_repr
+                from jsonb_each_text(tags) as x
+                where value is not null
+              ) as ss)::text
+            """)}
     ]
 
     query = (
