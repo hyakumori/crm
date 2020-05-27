@@ -75,7 +75,9 @@ export default {
     },
     needLoadOnNearEnd(event) {
       const el = event.target;
-      if (el.scrollHeight - el.scrollTop === el.clientHeight) {
+      const reachToBottom =
+        parseInt(el.scrollHeight) - parseInt(el.scrollTop) === el.clientHeight;
+      if (reachToBottom) {
         this.$emit("needToLoad");
       }
     },
