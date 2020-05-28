@@ -44,7 +44,8 @@ def get_archive_by_pk(pk):
 def get_archives_tag_by_ids(ids: list):
     with connection.cursor() as cursor:
         cursor.execute(
-            "select distinct jsonb_object_keys(tags) from crm_archive where id in %(ids)s", {"ids": tuple(ids)}
+            "select distinct jsonb_object_keys(tags) from crm_archive where id in %(ids)s",
+            {"ids": tuple(ids)},
         )
         tags = cursor.fetchall()
     return list(itertools.chain(*tags))
@@ -338,7 +339,7 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
             "associated_forest": "attributes__forest_cache__repr__icontains",
             "our_participants": "attributes__user_cache__repr__icontains",
             "their_participants": "attributes__customer_cache__repr__icontains",
-            "tags": "tags_repr__icontains"
+            "tags": "tags_repr__icontains",
         }
 
         for k, v in archive_filter.items():
@@ -347,19 +348,22 @@ def get_filtered_archive_queryset(archive_filter: ArchiveFilter):
 
         if len(active_filters.keys()) > 0:
             qs = Archive.objects.annotate(
-                    archive_date_text=Func(
-                        F("archive_date"),
-                        Value("YYYY-MM-DD HH24:MI"),
-                        function="to_char",
-                    )
-                ).select_related("author")
+                archive_date_text=Func(
+                    F("archive_date"), Value("YYYY-MM-DD HH24:MI"), function="to_char",
+                )
+            ).select_related("author")
             qs = TagsFilterSet.get_tags_repr_queryset(qs)
             for k, v in active_filters.items():
                 values = v.split(",")
                 if len(values) > 0:
                     qs = qs.filter(
                         reduce(
-                            operator.or_, (Q(**{k: value.strip()}) for value in values if len(value) > 0)
+                            operator.or_,
+                            (
+                                Q(**{k: value.strip()})
+                                for value in values
+                                if len(value) > 0
+                            ),
                         )
                     )
             return qs
