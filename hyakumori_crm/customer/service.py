@@ -305,17 +305,16 @@ def contacts_list_with_search(search_str: str = None):
 
 
 def customercontacts_list_with_search(search_str: str = None):
-    cc = (
-        CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
-        .values("id", "customer_id")
-        .annotate(forests_count=Count("customer__forestcustomer"))
+    cc = CustomerContact.objects.filter(is_basic=True, contact=OuterRef("pk"))
+    cc_forests_count = cc.values("id", "customer_id").annotate(
+        forests_count=Count("customer__forestcustomer")
     )
     queryset = (
         Contact.objects.annotate(
             customer_id=F("customercontact__customer_id"),
             business_id=F("customercontact__customer__business_id"),
             is_basic=F("customercontact__is_basic"),
-            forests_count=Subquery(cc.values("forests_count")[:1]),
+            forests_count=Subquery(cc_forests_count.values("forests_count")[:1]),
             cc_attrs=F("customercontact__attributes"),
             customer_name_kanji=RawSQL(
                 """(select C0.name_kanji
