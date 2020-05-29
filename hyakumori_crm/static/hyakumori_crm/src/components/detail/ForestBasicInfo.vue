@@ -6,7 +6,7 @@
           <text-info
             label="都道府県"
             name="都道府県"
-            rules="max:255"
+            rules="required|max:255"
             :value="address.prefecture"
             :isUpdate="isUpdate"
             @input="val => (address.prefecture = val)"
@@ -14,7 +14,7 @@
           <text-info
             label="市町村"
             name="市町村"
-            rules="max:255"
+            rules="required|max:255"
             :value="address.municipality"
             :isUpdate="isUpdate"
             @input="val => (address.municipality = val)"
@@ -27,24 +27,52 @@
             :isUpdate="isUpdate"
             @input="val => (address.sector = val)"
           />
+          <range-date-picker
+            v-if="isUpdate"
+            label="契約期間"
+            :dates="dates"
+            @newDates="getRangeDate"
+          />
         </template>
-        <text-info v-else label="住所" :value="fullAddress" />
+        <text-info v-if="!isUpdate" label="住所" :value="fullAddress" />
+        <text-info
+          v-if="!isUpdate"
+          label="地番本番"
+          :value="landAttributes['地番本番']"
+        />
         <text-info v-if="!isUpdate" label="契約期間" :value="fullDate" />
       </v-col>
       <v-col v-if="info" cols="6">
         <text-info
-          label="地番"
-          name="地番"
+          label="字"
+          name="字"
           rules="max:255"
           :value="address.subsector"
           :isUpdate="isUpdate"
           @input="val => (address.subsector = val)"
         />
-        <range-date-picker
+        <text-info
+          v-if="!isUpdate"
+          label="地番支番"
+          :value="landAttributes['地番支番']"
+        />
+        <text-info
           v-if="isUpdate"
-          label="契約期間"
-          :dates="dates"
-          @newDates="getRangeDate"
+          label="地番本番"
+          name="地番本番"
+          rules="required|max:255"
+          :value="landAttributes['地番本番']"
+          :isUpdate="isUpdate"
+          @input="val => (landAttributes['地番本番'] = val)"
+        />
+        <text-info
+          v-if="isUpdate"
+          label="地番支番"
+          name="地番支番"
+          rules="max:255"
+          :value="landAttributes['地番支番']"
+          :isUpdate="isUpdate"
+          @input="val => (landAttributes['地番支番'] = val)"
         />
       </v-col>
     </v-row>
@@ -119,6 +147,10 @@ export default {
 
     dates() {
       return [this.contract.start_date || "", this.contract.end_date || ""];
+    },
+
+    landAttributes() {
+      return this.innerInfo && this.innerInfo["land_attributes"];
     },
   },
 

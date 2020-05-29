@@ -87,6 +87,8 @@ def get_forests_by_condition(
 def update(forest: Forest, forest_in: dict):
     forest.cadastral = forest_in["cadastral"]
     forest.contracts = forest_in["contracts"]
+    forest.land_attributes['地番本番'] = forest_in["land_attributes"]["地番本番"]
+    forest.land_attributes['地番支番'] = forest_in["land_attributes"]["地番支番"]
     forest.save()
     return forest
 
