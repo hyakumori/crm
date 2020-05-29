@@ -1,6 +1,8 @@
 from django.core.cache import cache
-from .models import ContractType
+
 from hyakumori_crm.crm.schemas.contract import ContractType as ContractTypeEnum
+
+from .models import ContractType
 
 
 def get_all_contracttypes_map():
@@ -15,6 +17,7 @@ def get_all_contracttypes_map():
 class ContractService:
     @classmethod
     def setup_contracts(cls):
+        cache.delete("get_all_contracttypes_map")
         for contract_type in ContractTypeEnum:
             contract_type_instance, _ = ContractType.objects.get_or_create(
                 name=contract_type.value
