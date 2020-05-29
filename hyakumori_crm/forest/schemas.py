@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from pydantic import validator, root_validator
 
 from hyakumori_crm.core.models import HyakumoriDanticModel, Paginator
+from hyakumori_crm.crm.common.utils import tags_csv_to_dict
 from hyakumori_crm.crm.models import (
     Forest,
     ForestCustomer,
@@ -15,11 +16,13 @@ from hyakumori_crm.crm.models import (
 )
 from hyakumori_crm.crm.schemas.contract import ContractType
 from hyakumori_crm.crm.schemas.forest import LandAttribute, ForestAttribute
-from hyakumori_crm.crm.common.utils import tags_csv_to_dict
 from hyakumori_crm.forest.filters import ForestFilter
 
 
 class ForestPaginator(Paginator):
+    class Config:
+        allow_reuse: True
+
     @validator("filters")
     def validate_filters(cls, filter_input):
         return ForestFilter(filter_input)
@@ -28,7 +31,7 @@ class ForestPaginator(Paginator):
 class Cadastral(HyakumoriDanticModel):
     prefecture: str
     municipality: str
-    sector: str
+    sector: Optional[str]
     subsector: Optional[str]
 
 
@@ -43,9 +46,17 @@ class ForestInput(HyakumoriDanticModel):
     forest: Forest
     cadastral: Cadastral
     contracts: List[Contract]
+    land_attributes: dict
 
     class Config:
         arbitrary_types_allowed = True
+
+    @validator("land_attributes")
+    def check_land_attributes(cls, v):
+        if v is not None and v['地番本番'] is not None and v['地番本番'] != '':
+            return v
+        else:
+            raise ValueError(_("Required"))
 
 
 class OwnerPksInput(HyakumoriDanticModel):
