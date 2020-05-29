@@ -8,7 +8,7 @@
       :dense="dense"
       light
       :height="tableHeight"
-      :fixed-header="true"
+      fixed-header
       :mobile-breakpoint="0"
       :item-key="itemKey"
       :multi-sort="multiSort"
@@ -133,7 +133,7 @@ export default {
   },
 
   mounted() {
-    this.changeSortIcon();
+    // this.changeSortIcon();
   },
 
   computed: {
@@ -232,8 +232,6 @@ export default {
 .v-data-table {
   padding: 10px;
   width: 100%;
-  height: fit-content;
-  overflow: hidden;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
 
   & .icon-mode {
@@ -273,7 +271,6 @@ export default {
     }
 
     th {
-      position: relative;
       @extend %text-overflow-shared;
 
       span {
