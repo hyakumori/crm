@@ -52,6 +52,10 @@ def test_update_forest_basic_info(api_rf, admin_user, forest):
                 "fsc_end_date": "2022-05-20",
                 "fsc_status": ContractTypeStatus.negotiated,
             },
+            "land_attributes": {
+                "地番本番": 'bao dep trai',
+                "地番支番": None
+            }
         },
         format="json",
     )

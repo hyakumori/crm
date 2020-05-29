@@ -28,7 +28,7 @@ class ForestPaginator(Paginator):
 class Cadastral(HyakumoriDanticModel):
     prefecture: str
     municipality: str
-    sector: str
+    sector: Optional[str]
     subsector: Optional[str]
 
 
@@ -86,10 +86,18 @@ class ForestInput(HyakumoriDanticModel):
     forest: Forest
     cadastral: Cadastral
     contracts: Optional[ContractUpdateInput] = ContractUpdateInput()
+    land_attributes: dict
 
     class Config:
         orm_mode = False
         arbitrary_types_allowed = True
+
+    @validator("land_attributes")
+    def check_land_attributes(cls, v):
+        if v is not None and v['地番本番'] is not None and v['地番本番'] != '':
+            return v
+        else:
+            raise ValueError(_("Required"))
 
 
 class OwnerPksInput(HyakumoriDanticModel):

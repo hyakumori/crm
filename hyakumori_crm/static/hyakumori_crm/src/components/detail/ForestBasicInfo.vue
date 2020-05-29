@@ -8,12 +8,27 @@
           </v-col>
           <v-col cols="6">
             <text-info
-              label="地番"
-              name="地番"
+              label="字"
+              name="字"
               rules="max:255"
               :value="address && address.subsector"
               :isUpdate="isUpdate"
               @input="val => (address.subsector = val)"
+            />
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="6">
+            <text-info
+              label="地番本番"
+              :value="landAttributes && landAttributes['地番本番']"
+            />
+          </v-col>
+          <v-col cols="6">
+            <text-info
+              label="地番支番"
+              :value="landAttributes && landAttributes['地番支番']"
             />
           </v-col>
         </v-row>
@@ -52,7 +67,7 @@
             <text-info
               label="都道府県"
               name="都道府県"
-              rules="max:255"
+              rules="required|max:255"
               :value="address.prefecture"
               :isUpdate="isUpdate"
               @input="val => (address.prefecture = val)"
@@ -62,7 +77,7 @@
             <text-info
               label="市町村"
               name="市町村"
-              rules="max:255"
+              rules="required|max:255"
               :value="address.municipality"
               :isUpdate="isUpdate"
               @input="val => (address.municipality = val)"
@@ -79,7 +94,29 @@
             />
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="4">
+            <text-info
+              label="地番本番"
+              name="地番本番"
+              rules="required|max:255"
+              :value="landAttributes['地番本番']"
+              :isUpdate="isUpdate"
+              @input="val => (landAttributes['地番本番'] = val)"
+            />
+          </v-col>
 
+          <v-col cols="4">
+            <text-info
+              label="地番支番"
+              name="地番支番"
+              rules="max:255"
+              :value="landAttributes['地番支番']"
+              :isUpdate="isUpdate"
+              @input="val => (landAttributes['地番支番'] = val)"
+            />
+          </v-col>
+        </v-row>
         <v-row>
           <v-col cols="4">
             <select-info
@@ -287,6 +324,9 @@ export default {
         value: this.contractStatuses[key],
       }));
       return items;
+    },
+    landAttributes() {
+      return this.innerInfo && this.innerInfo["land_attributes"];
     },
   },
 
