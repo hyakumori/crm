@@ -174,7 +174,8 @@ export default {
         let criteria = data.criteria;
         let keyword = data.keyword;
         if (criteria && criteria === "archive_date" && keyword) {
-          keyword = dateTimeKeywordSearchFormat(keyword);
+          const keywords = keyword.split(",");
+          keyword = keywords.map(k => dateTimeKeywordSearchFormat(k)).join(",");
         }
         return {
           criteria,
