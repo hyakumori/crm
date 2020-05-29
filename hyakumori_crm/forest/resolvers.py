@@ -13,7 +13,7 @@ query = QueryType()
 
 
 @query.field("foresttable_headers")
-@login_required(with_policies=['can_view_forests'])
+@login_required(with_policies=["can_view_forests"])
 def get_foresttable_headers(obj: Any, info: GraphQLResolveInfo, **kwargs) -> dict:
     headers = [
         {"text": _("Forest ID"), "align": "right", "value": "internal_id"},
@@ -54,25 +54,25 @@ def get_foresttable_headers(obj: Any, info: GraphQLResolveInfo, **kwargs) -> dic
             "sortable": False,
         },
         {
-            "text": _("contract type"),
+            "text": _("Contract type"),
             "align": "center",
             "value": "contract_type",
             "sortable": False,
         },
         {
-            "text": _("contract status"),
+            "text": _("Contract status"),
             "align": "center",
             "value": "contract_status",
             "sortable": False,
         },
         {
-            "text": _("contract start date"),
+            "text": _("Contract start date"),
             "align": "center",
             "value": "contract_start_date",
             "sortable": False,
         },
         {
-            "text": _("contract end date"),
+            "text": _("Contract end date"),
             "align": "center",
             "value": "contract_end_date",
             "sortable": False,
@@ -95,12 +95,7 @@ def get_foresttable_headers(obj: Any, info: GraphQLResolveInfo, **kwargs) -> dic
             "value": "fsc_end_date",
             "sortable": False,
         },
-        {
-            "text": _("Tag"),
-            "align": "left",
-            "value": "tags",
-            "sortable": False,
-        },
+        {"text": _("Tag"), "align": "left", "value": "tags", "sortable": False},
     ]
     filters = {**ForestFilter.declared_filters, **ForestFilter.get_fields()}
     for header_define in headers:
@@ -112,7 +107,7 @@ def get_foresttable_headers(obj: Any, info: GraphQLResolveInfo, **kwargs) -> dic
 
 
 @query.field("list_forests")
-@login_required(with_policies=['can_view_forests'])
+@login_required(with_policies=["can_view_forests"])
 @validate_model(ForestPaginator)
 def get_list_forests(obj, info, data, **kwargs) -> dict:
     pager_input = data.dict()

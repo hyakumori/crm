@@ -34,7 +34,7 @@ class Cadastral(HyakumoriDanticModel):
 
 class Contract(HyakumoriDanticModel):
     type: ContractType = ContractType.long_term
-    status: Optional[str] = ContractTypeStatus.unnegotiated
+    status: Optional[ContractTypeStatus] = ContractTypeStatus.unnegotiated
     start_date: Optional[date]
     end_date: Optional[date]
 
