@@ -217,7 +217,7 @@
     "migrate_title": "確認",
     "no_tags": "タグがありません。クリックして追加・編集。",
     "no_tags_view_only": "タグがありません。",
-    "required_fields": "`すべてのフィールドに値を入力してください`"
+    "required_fields": "すべてのフィールドに値を入力してください"
   },
   "user_management": {
     "tables": {
