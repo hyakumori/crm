@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-29 16:15+0700\n"
+"POT-Creation-Date: 2020-06-01 09:34+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -139,6 +139,18 @@ msgstr "不正なUUID"
 msgid "Invalid value, choices are: {permitted}"
 msgstr "無効な値です。選択肢は次のとおりです：{permitted}"
 
+#: crm/schemas/forest.py:70
+msgid "地番本番 is required"
+msgstr "地番本番が必要です"
+
+#: crm/schemas/forest.py:74
+msgid "地番本番 must be a number"
+msgstr "地番本番は数字でなければなりません"
+
+#: crm/schemas/forest.py:76
+msgid "地番本番 must be greater than 0"
+msgstr "地番本番は0より大きくなければなりません"
+
 #: customer/resolvers.py:20
 msgid "Internal Id"
 msgstr "ID"
@@ -179,12 +191,12 @@ msgstr "携帯番号"
 msgid "Email"
 msgstr "メールアドレス"
 
-#: customer/resolvers.py:30 customer/restful.py:277 customer/tasks.py:33
+#: customer/resolvers.py:30 customer/restful.py:281 customer/tasks.py:33
 #: forest/resolvers.py:98 forest/service.py:301
 msgid "Tag"
 msgstr "タグ"
 
-#: customer/restful.py:318 customer/restful.py:331 forest/restful.py:190
+#: customer/restful.py:322 customer/restful.py:335 forest/restful.py:190
 #: forest/restful.py:203
 msgid "Please upload a csv file!!"
 msgstr "csvファイルをアップロードしてください!!"
