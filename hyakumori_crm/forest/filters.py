@@ -27,7 +27,7 @@ class ForestFilter(TagsFilterSet, MultipleOrFilterSet):
     contracts__2__start_date = DateFilter(method="exact_date_filter")
     contracts__2__end_date = DateFilter(method="exact_date_filter")
 
-    def _owner_within_icontains(self, queryset, search_field_filter, value):
+    def _filter_name_with_space(self, search_field_filter, value):
         keywords = list(
             filter(lambda item: item is not None,
                    map(lambda item: item if item else None, value.split(" "))))
@@ -49,7 +49,7 @@ class ForestFilter(TagsFilterSet, MultipleOrFilterSet):
         keywords = value.replace("\u3000", "").split(",")
         filters = []
         for keyword in keywords:
-            _f = self._owner_within_icontains(queryset, search_field_filter, keyword)
+            _f = self._filter_name_with_space(search_field_filter, keyword)
             if _f is not None:
                 filters.append(_f)
         query = Q()

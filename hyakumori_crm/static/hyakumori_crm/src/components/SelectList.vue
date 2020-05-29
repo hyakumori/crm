@@ -1,15 +1,13 @@
 <template>
   <v-select
-    :v-model="value || innerValue"
+    v-model="innerValue"
     dense
     ref="selectList"
     append-icon="mdi-chevron-down"
     loading="false"
     :full-width="false"
     :items="actions"
-    :placeholder="placeHolder"
-    @change="onChangeSelectedItem"
-    :value="value"
+    :placeholder="(!hasSelectedValue && placeHolder) || ''"
   ></v-select>
 </template>
 
@@ -28,34 +26,53 @@ export default {
 
   data() {
     return {
-      innerValue: null,
+      innerValue: this.value,
     };
   },
 
   mounted() {
+    this.resizeInputWidth();
     this.resizeInputPlaceholderWidth();
   },
 
   methods: {
     resizeInputPlaceholderWidth() {
-      const additionWidthSize = 3;
+      let additionWidthSize = 6;
       const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
-      const placeHolderLength = input.placeholder.length;
-      input.size = placeHolderLength + additionWidthSize;
+      let placeHolderLength = input.placeholder.length;
+      let inputSize = placeHolderLength + additionWidthSize;
+      if (this.hasSelectedValue) {
+        inputSize = 1;
+      } else {
+        if (inputSize === 6) {
+          inputSize = 14;
+        }
+        input.size = inputSize;
+      }
     },
 
     resizeInputWidth() {
       const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
-      if (this.innerValue) {
+      if (this.hasSelectedValue) {
         input.style.width = "3ch";
       } else {
         input.style.width = "auto";
       }
     },
-
-    onChangeSelectedItem(val) {
+  },
+  computed: {
+    hasSelectedValue() {
+      return this.innerValue || this.innerValue === 0;
+    },
+  },
+  watch: {
+    innerValue() {
       this.resizeInputWidth();
-      this.$emit("selectedAction", val, this.index);
+      this.resizeInputPlaceholderWidth();
+      this.$emit("selectedAction", this.innerValue, this.index);
+    },
+    value() {
+      this.innerValue = this.value;
     },
   },
 };
