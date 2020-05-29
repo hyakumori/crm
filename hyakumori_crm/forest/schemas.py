@@ -226,6 +226,16 @@ class ForestCsvInput(HyakumoriDanticModel):
             raise ValueError(_("Invalid format (tag1:value1; tag2:value2)"))
         return value
 
+    @validator("land_attributes")
+    def validate_land_attributes(cls, v):
+        try:
+            lot_number = next(filter(lambda a: a.key == "地番本番", v))
+            if not lot_number.value:
+                raise ValueError(_("地番本番 is required"))
+        except StopIteration:
+            raise ValueError(_("地番本番 is required"))
+        return v
+
     @property
     def tags_json(self):
         return tags_csv_to_dict(self.tags)

@@ -566,5 +566,6 @@ csv_errors_map = {
     "contracts.2.status": "FSC認証",
     "contracts.2.start_date": "開始日",
     "contracts.2.end_date": "終了日",
+    "land_attributes": "土地属性",
     "tags": "タグ",
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-29 16:15+0700\n"
+"POT-Creation-Date: 2020-05-29 17:41+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,12 +179,12 @@ msgstr "携帯番号"
 msgid "Email"
 msgstr "メールアドレス"
 
-#: customer/resolvers.py:30 customer/restful.py:277 customer/tasks.py:33
+#: customer/resolvers.py:30 customer/restful.py:281 customer/tasks.py:33
 #: forest/resolvers.py:98 forest/service.py:301
 msgid "Tag"
 msgstr "タグ"
 
-#: customer/restful.py:318 customer/restful.py:331 forest/restful.py:190
+#: customer/restful.py:322 customer/restful.py:335 forest/restful.py:190
 #: forest/restful.py:203
 msgid "Please upload a csv file!!"
 msgstr "csvファイルをアップロードしてください!!"
@@ -227,7 +227,7 @@ msgstr "顧客が見つかりません"
 msgid "Customer ID is empty or not available"
 msgstr "お客様IDが空か、使用できません"
 
-#: customer/tasks.py:41 forest/service.py:515 forest/service.py:549
+#: customer/tasks.py:41 forest/service.py:515 forest/service.py:550
 msgid "Invalid csv file!"
 msgstr "無効なcsvファイル！"
 
@@ -305,7 +305,11 @@ msgstr "連絡先が見つかりません"
 msgid "Invalid format (tag1:value1; tag2:value2)"
 msgstr "無効な形式（タグ1：値1; タグ2：値2）"
 
-#: forest/service.py:48 forest/service.py:538
+#: forest/schemas.py:234 forest/schemas.py:236
+msgid "地番本番 is required"
+msgstr "地番本番が必要です"
+
+#: forest/service.py:48 forest/service.py:539
 msgid "Forest not found"
 msgstr "森が見つかりません"
 
