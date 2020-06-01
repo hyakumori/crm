@@ -26,7 +26,7 @@ export default {
 
   props: {
     label: String,
-    value: String,
+    value: [String, Number],
     rules: String,
     name: String,
     isUpdate: Boolean,

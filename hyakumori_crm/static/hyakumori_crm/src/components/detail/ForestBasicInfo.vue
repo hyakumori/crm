@@ -99,7 +99,7 @@
             <text-info
               label="地番本番"
               name="地番本番"
-              rules="required|max:255"
+              rules="required|min_value:1"
               :value="landAttributes['地番本番']"
               :isUpdate="isUpdate"
               @input="val => (landAttributes['地番本番'] = val)"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-01 09:34+0700\n"
+"POT-Creation-Date: 2020-06-01 10:35+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -139,15 +139,15 @@ msgstr "不正なUUID"
 msgid "Invalid value, choices are: {permitted}"
 msgstr "無効な値です。選択肢は次のとおりです：{permitted}"
 
-#: crm/schemas/forest.py:70
+#: crm/schemas/forest.py:70 forest/schemas.py:101
 msgid "地番本番 is required"
 msgstr "地番本番が必要です"
 
-#: crm/schemas/forest.py:74
+#: crm/schemas/forest.py:74 forest/schemas.py:105
 msgid "地番本番 must be a number"
 msgstr "地番本番は数字でなければなりません"
 
-#: crm/schemas/forest.py:76
+#: crm/schemas/forest.py:76 forest/schemas.py:107
 msgid "地番本番 must be greater than 0"
 msgstr "地番本番は0より大きくなければなりません"
 
@@ -192,7 +192,7 @@ msgid "Email"
 msgstr "メールアドレス"
 
 #: customer/resolvers.py:30 customer/restful.py:281 customer/tasks.py:33
-#: forest/resolvers.py:98 forest/service.py:301
+#: forest/resolvers.py:98 forest/service.py:303
 msgid "Tag"
 msgstr "タグ"
 
@@ -239,7 +239,7 @@ msgstr "顧客が見つかりません"
 msgid "Customer ID is empty or not available"
 msgstr "お客様IDが空か、使用できません"
 
-#: customer/tasks.py:41 forest/service.py:515 forest/service.py:549
+#: customer/tasks.py:41 forest/service.py:517 forest/service.py:551
 msgid "Invalid csv file!"
 msgstr "無効なcsvファイル！"
 
@@ -295,29 +295,28 @@ msgstr "FSC開始日"
 msgid "FSC end"
 msgstr "FSC終了日"
 
-#: forest/schemas.py:111 forest/schemas.py:121
+#: forest/schemas.py:128 forest/schemas.py:138
 #, fuzzy
 #| msgid "Customer Id {v} not found"
 msgid "Customer Id {} not found"
 msgstr "カスタマーID {v}が見つかりません"
 
-#: forest/schemas.py:143 forest/schemas.py:168
+#: forest/schemas.py:160 forest/schemas.py:185
 #, fuzzy, python-brace-format
 #| msgid "Customer Id {v} not found"
 msgid "Customer {v} not found"
-msgstr "カスタマーID {v}が見つかりません"
+msgstr "カスタマーID{v}が見つかりません"
 
-#: forest/schemas.py:177
-#, fuzzy, python-brace-format
-#| msgid "Contact not found"
+#: forest/schemas.py:194
+#, python-brace-format
 msgid "Contact {v} not found"
-msgstr "連絡先が見つかりません"
+msgstr "連絡先が{v}見つかりません"
 
-#: forest/schemas.py:226
+#: forest/schemas.py:243
 msgid "Invalid format (tag1:value1; tag2:value2)"
 msgstr "無効な形式（タグ1：値1; タグ2：値2）"
 
-#: forest/service.py:48 forest/service.py:538
+#: forest/service.py:48 forest/service.py:540
 msgid "Forest not found"
 msgstr "森が見つかりません"
 

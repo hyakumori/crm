@@ -102,9 +102,9 @@ class ForestInput(HyakumoriDanticModel):
         try:
             int_val = int(lot_number)
         except ValueError:
-            raise ValueError("地番本番 must be a number")
+            raise ValueError(_("地番本番 must be a number"))
         if int_val < 0:
-            raise ValueError("地番本番 must be greater than 0")
+            raise ValueError(_("地番本番 must be greater than 0"))
         v["地番本番"] = int_val
         return v
 
