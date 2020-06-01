@@ -164,8 +164,10 @@ def get_forests_by_condition(
 
 def update_basic_info(forest: Forest, forest_in: ForestInput):
     forest.cadastral = forest_in.cadastral.dict()
+    forest.land_attributes['地番本番'] = forest_in.land_attributes.get("地番本番")
+    forest.land_attributes['地番支番'] = forest_in.land_attributes.get("地番支番")
     forest.contracts = map_input_to_contracts(forest, forest_in.contracts)
-    forest.save(update_fields=["cadastral", "contracts", "updated_at"])
+    forest.save(update_fields=["cadastral", "contracts", "land_attributes", "updated_at"])
     return forest
 
 
