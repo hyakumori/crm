@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import { select } from "d3-selection";
-
 export default {
   name: "select-list",
 
@@ -38,7 +36,7 @@ export default {
   methods: {
     resizeInputPlaceholderWidth() {
       let additionWidthSize = 6;
-      const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
+      const input = this.$refs.selectList.$el.getElementsByTagName("input")[0];
       let placeHolderLength = input.placeholder.length;
       let inputSize = placeHolderLength + additionWidthSize;
       if (this.hasSelectedValue) {
@@ -52,7 +50,7 @@ export default {
     },
 
     resizeInputWidth() {
-      const input = select(this.$refs.selectList)._groups[0][0].$refs.input;
+      const input = this.$refs.selectList.$el.getElementsByTagName("input")[0];
       if (this.hasSelectedValue) {
         input.style.width = "3ch";
       } else {
