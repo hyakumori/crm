@@ -94,10 +94,19 @@ class ForestInput(HyakumoriDanticModel):
 
     @validator("land_attributes")
     def check_land_attributes(cls, v):
-        if v is not None and v['地番本番'] is not None and v['地番本番'] != '':
+        if not v:
             return v
-        else:
-            raise ValueError(_("Required"))
+        lot_number = v.get("地番本番")
+        if not lot_number:
+            raise ValueError(_("地番本番 is required"))
+        try:
+            int_val = int(lot_number)
+        except ValueError:
+            raise ValueError("地番本番 must be a number")
+        if int_val < 0:
+            raise ValueError("地番本番 must be greater than 0")
+        v["地番本番"] = int_val
+        return v
 
 
 class OwnerPksInput(HyakumoriDanticModel):
