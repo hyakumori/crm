@@ -17,7 +17,8 @@ def get_resource_permissions(
 
 
 @typed_api_view(["GET"])
-def get_groups(request: Request, user: User = CurrentUser(member_of=SystemGroups.GROUP_ADMIN)):
+def get_groups(
+    request: Request, user: User = CurrentUser(member_of=SystemGroups.GROUP_ADMIN)
+):
     groups = PermissionService.get_groups()
     return make_success_json(data=dict(groups=groups))
-

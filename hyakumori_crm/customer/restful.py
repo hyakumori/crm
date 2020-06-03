@@ -354,7 +354,7 @@ def contacts_list(request):
 
 
 @api_view(["GET"])
-@action_login_required(with_permissions=["view_customer"])
+@action_login_required(with_permissions=["view_customer", "manage_archive"])
 def customercontacts_list(request):
     paginator = default_paginator()
     paged_list = paginator.paginate_queryset(

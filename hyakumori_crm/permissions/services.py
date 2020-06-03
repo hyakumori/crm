@@ -170,7 +170,7 @@ class PermissionService:
                 name=SystemGroups.GROUP_LIMITED_USER
             )
             normal_user_group_permissions = Permission.objects.filter(
-                codename__in=["view_forest"]
+                codename__in=["view_forest", "manage_archive"]
             ).all()
             normal_user_group.permissions.add(*normal_user_group_permissions)
             normal_user_group.save()
@@ -237,7 +237,7 @@ class PermissionService:
             except IndexError:
                 continue
 
-        return all([v for _, v in app_permissions_to_check.items()])
+        return any([v for _, v in app_permissions_to_check.items()])
 
     @classmethod
     def get_groups(cls):
