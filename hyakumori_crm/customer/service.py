@@ -529,9 +529,18 @@ def update_customer_tags(data: dict):
     ids = data.get("ids")
     tag_key = data.get("key")
     new_value = data.get("value")
-    Customer.objects.filter(id__in=ids, tags__has_key=tag_key).update(
-        tags=RawSQL("tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value])
-    )
+    if Customer.objects.filter(id__in=ids, tags__has_key=tag_key).exists():
+        Customer.objects.filter(id__in=ids, tags__has_key=tag_key).update(
+            tags=RawSQL(
+                "tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]
+            )
+        )
+    else:
+        Customer.objects.filter(id__in=ids).update(
+            tags=RawSQL(
+                "tags || jsonb_build_object(%s, %s)", params=[tag_key, new_value]
+            )
+        )
 
 
 def save_customer_from_csv_data(customer, data):
