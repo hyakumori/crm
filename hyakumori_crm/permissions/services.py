@@ -237,7 +237,7 @@ class PermissionService:
             except IndexError:
                 continue
 
-        return any([v for _, v in app_permissions_to_check.items()])
+        return all([v for _, v in app_permissions_to_check.items()])
 
     @classmethod
     def get_groups(cls):

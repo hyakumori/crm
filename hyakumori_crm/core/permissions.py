@@ -15,7 +15,6 @@ class IsUserOrReadOnly(permissions.BasePermission):
 
 
 class IsStaffOrListOnly(permissions.BasePermission):
-
     def has_permission(self, request, view):
         if request.user and request.user.is_staff:
             return True
@@ -46,7 +45,7 @@ class IsAdminOrSelf(permissions.BasePermission):
             return True
 
         # current object has `author` field
-        if hasattr(obj, 'author') and obj.author == request_user:
+        if hasattr(obj, "author") and obj.author == request_user:
             return True
 
         return False
@@ -60,7 +59,50 @@ class IsAdminOrSelf(permissions.BasePermission):
 
 class DisallowDeleteAnon(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in ['DELETE'] and isinstance(request.user, type(AnonymousUser)):
+        if request.method in ["DELETE"] and isinstance(
+            request.user, type(AnonymousUser)
+        ):
             return False
 
         return True
+
+
+class ModelPermissions(permissions.DjangoModelPermissions):
+    model_cls = None
+
+    perms_map = {
+        "GET": [
+            "%(app_label)s.view_%(model_name)s",
+            "%(app_label)s.manage_%(model_name)s",
+        ],
+        "OPTIONS": [],
+        "HEAD": [],
+        "POST": [
+            "%(app_label)s.add_%(model_name)s",
+            "%(app_label)s.manage_%(model_name)s",
+        ],
+        "PUT": [
+            "%(app_label)s.change_%(model_name)s",
+            "%(app_label)s.manage_%(model_name)s",
+        ],
+        "PATCH": [
+            "%(app_label)s.change_%(model_name)s",
+            "%(app_label)s.manage_%(model_name)s",
+        ],
+        "DELETE": [
+            "%(app_label)s.delete_%(model_name)s",
+            "%(app_label)s.manage_%(model_name)s",
+        ],
+    }
+
+    def has_permission(self, request, view):
+        if getattr(view, "_ignore_model_permissions", False):
+            return True
+
+        if not request.user or (
+            not request.user.is_authenticated and self.authenticated_users_only
+        ):
+            return False
+
+        perms = self.get_required_permissions(request.method, self.model_cls)
+        return request.user.has_perms(perms)

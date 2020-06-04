@@ -82,7 +82,7 @@ import ActionLog from "../components/detail/ActionLog";
 import TagDetailCard from "../components/tags/TagDetailCard";
 import ArchiveRelatedUserContainer from "../components/detail/ArchiveRelatedUserContainer";
 import { getDate } from "../helpers/datetime";
-import { get as _get, reject } from "lodash";
+import { get as _get } from "lodash";
 
 export default {
   name: "archive-detail",

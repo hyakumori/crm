@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.http import Http404, JsonResponse
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -48,7 +48,7 @@ from ..users.serializers import UserSerializer
 from ..permissions.enums import SystemGroups
 
 
-def archive_permission(f):
+def archive_obj_permission(f):
     def wrapper(*args, **kwargs):
         request = args[0]
         archive = kwargs["archive"]
@@ -65,8 +65,8 @@ def archive_permission(f):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([Archive.model_perm_cls()])
 @api_validate_model(ArchiveInput)
-@action_login_required(with_permissions=["view_archive", "add_archive"])
 def archives(request, data: ArchiveInput = None):
     if request.method == "GET":
         paginator_listing = ListingPagination()
@@ -87,6 +87,7 @@ def archives(request, data: ArchiveInput = None):
 
 
 @api_view(["GET"])
+@permission_classes([Archive.model_perm_cls()])
 @action_login_required(with_permissions=["view_archive"])
 def archive_headers(request):
     headers = [
@@ -119,12 +120,12 @@ def archive_headers(request):
 
 
 @api_view(["GET", "PUT", "PATCH"])
-@api_validate_model(ArchiveInput)
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(
     get_archive_by_pk, to_name="archive", pass_to=["kwargs", "request"], remove=True
 )
-@action_login_required(with_permissions=["view_archive", "change_archive"])
-@archive_permission
+@api_validate_model(ArchiveInput)
+@archive_obj_permission
 def archive(request, *, archive: Archive = None, data: ArchiveInput = None):
     if request.method == "GET":
         return Response({"data": ArchiveSerializer(archive).data})
@@ -135,18 +136,15 @@ def archive(request, *, archive: Archive = None, data: ArchiveInput = None):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([Archive.model_perm_cls()])
 @parser_classes([MultiPartParser])
 @get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
-@action_login_required(with_permissions=["view_archive", "change_archive"])
-@archive_permission
+@archive_obj_permission
 def attachments(request, archive: Archive = None):
     # get list attachments
     if request.method == "GET":
-        try:
-            attachments = get_all_attachments_by_archive_pk(archive.id)
-            return Response({"data": AttachmentSerializer(attachments, many=True).data})
-        except:
-            return Response(dict(data=[]))
+        attachments = get_all_attachments_by_archive_pk(archive.id)
+        return Response({"data": AttachmentSerializer(attachments, many=True).data})
     else:
         try:
             new_attachment = create_attachment(archive, request)
@@ -161,9 +159,10 @@ def attachments(request, archive: Archive = None):
 
 
 @api_view(["GET"])
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
 @get_or_404(get_attachment_by_pk, to_name="attachment", pass_to=["kwargs"], remove=True)
-@archive_permission
+@archive_obj_permission
 def attachment_download(
     request, archive: Archive = None, attachment: Attachment = None
 ):
@@ -181,10 +180,10 @@ def attachment_download(
 
 
 @api_view(["DELETE"])
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
 @get_or_404(get_attachment_by_pk, to_name="attachment", pass_to=["kwargs"], remove=True)
-@action_login_required(with_permissions=["view_archive"])
-@archive_permission
+@archive_obj_permission
 def attachment(request, archive: Archive = None, attachment: Attachment = None):
     is_deleted = delete_attachment_file(archive, attachment)
     if is_deleted:
@@ -195,9 +194,9 @@ def attachment(request, archive: Archive = None, attachment: Attachment = None):
 
 
 @api_view(["GET", "POST", "DELETE"])
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(get_archive_by_pk, pass_to=["kwargs"], to_name="archive", remove=True)
-@action_login_required(with_permissions=["view_archive", "change_archive"])
-@archive_permission
+@archive_obj_permission
 def archive_forests(request, archive: Archive = None):
     if request.method == "GET":
         forests = get_related_forests(archive)
@@ -223,12 +222,12 @@ def archive_forests(request, archive: Archive = None):
 
 
 @api_view(["GET", "PUT"])
-@action_login_required(with_permissions=["view_archive", "change_archive"])
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(
     get_archive_by_pk, pass_to=["kwargs", "request"], to_name="archive", remove=True
 )
 @api_validate_model(ArchiveCustomerInput, methods=["PUT"])
-@archive_permission
+@archive_obj_permission
 def archive_customers(
     request, archive: Archive = None, data: ArchiveCustomerInput = None
 ):
@@ -244,9 +243,9 @@ def archive_customers(
 
 
 @api_view(["GET", "POST", "DELETE"])
+@permission_classes([Archive.model_perm_cls()])
 @get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
-@action_login_required(with_permissions=["view_archive", "change_archive"])
-@archive_permission
+@archive_obj_permission
 def archive_users(request, archive: Archive = None):
     if request.method == "GET":
         paginator = default_paginator()
@@ -277,7 +276,7 @@ def archive_users(request, archive: Archive = None):
 
 
 @api_view(["PUT"])
-@action_login_required(with_permissions=["change_archive"])
+@permission_classes([Archive.model_perm_cls()])
 def archive_ids(request):
     ids = request.data
     if ids is None or len(ids) == 0:
@@ -288,7 +287,7 @@ def archive_ids(request):
 
 
 @api_view(["PUT"])
-@action_login_required(with_permissions=["change_archive"])
+@permission_classes([Archive.model_perm_cls()])
 @api_validate_model(TagBulkUpdate)
 def archive_tags(request, data: TagBulkUpdate):
     update_archive_tag(data.dict())
