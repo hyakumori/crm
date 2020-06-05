@@ -173,7 +173,7 @@ export default {
         this.$emit(
           "toggleContactDefault",
           !this.contact.default,
-          this.contact.owner_customer_id,
+          this.contact.customer_id,
           this.contact.id,
         );
     },
