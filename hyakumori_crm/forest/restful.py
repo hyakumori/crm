@@ -20,6 +20,13 @@ from hyakumori_crm.crm.restful.serializers import (
     ArchiveSerializer,
 )
 from hyakumori_crm.crm.schemas.tag import TagBulkUpdate
+from ..activity.services import ActivityService, ForestActions
+from ..api.decorators import (
+    api_validate_model,
+    get_or_404,
+)
+from ..core.utils import clear_maintain_task_id_cache
+
 from .schemas import (
     ForestInput,
     OwnerPksInput,
@@ -45,19 +52,13 @@ from .service import (
     get_forests_tag_by_ids,
     bulk_update_forest_contact_status,
 )
-from ..activity.services import ActivityService, ForestActions
-from ..api.decorators import (
-    api_validate_model,
-    get_or_404,
-    action_login_required,
-)
-from ..core.utils import clear_maintain_task_id_cache
 from .permissions import DownloadCsvPersmission
 
 
 class ForestViewSets(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     serializer_class = ForestSerializer
     permission_classes = [Forest.model_perm_cls()]
+    queryset = Forest.objects.all()
 
     @action(["GET"], detail=False, url_path="minimal")
     def list_minimal(self, request):

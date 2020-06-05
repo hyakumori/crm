@@ -8,14 +8,11 @@ from djoser.views import UserViewSet
 from rest_framework import serializers, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from ..permissions import IsAdminUser, is_admin_request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_typed_views import Body, typed_action
 
-from .serializers import CustomTokenObtainPairSerializer, UserMinimalSerializer
 from ..activity.services import ActivityService, UserActions
-from ..api.decorators import action_login_required
 from ..core.permissions import IsAdminOrSelf
 from ..core.utils import default_paginator, make_error_json, make_success_json
 from ..crm.restful.serializers import (
@@ -23,7 +20,11 @@ from ..crm.restful.serializers import (
     CustomerSerializer,
     ForestSerializer,
 )
+from ..permissions import IsAdminUser, is_admin_request
 from ..permissions.services import PermissionService
+from ..archive.permissions import ChangeArchivePersmission
+
+from .serializers import CustomTokenObtainPairSerializer, UserMinimalSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -41,8 +42,12 @@ class CustomUserViewSet(UserViewSet):
             .order_by("date_joined")
         )
 
-    @action(detail=False, url_path="minimal", methods=["get"])
-    @action_login_required(with_policies=["can_view_customers"])
+    @action(
+        detail=False,
+        url_path="minimal",
+        methods=["get"],
+        permission_classes=[ChangeArchivePersmission],
+    )
     def list_minimal(self, request):
         queryset = self.get_queryset().prefetch_related("groups")
         keyword = request.GET.get("search")

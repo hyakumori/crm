@@ -32,7 +32,7 @@ from .service import (
     get_archives_tag_by_ids,
 )
 from ..activity.services import ActivityService, ArchiveActions
-from ..api.decorators import action_login_required, api_validate_model, get_or_404
+from ..api.decorators import api_validate_model, get_or_404
 from ..core.utils import default_paginator, make_error_json
 from ..crm.models import Archive, Attachment
 from ..crm.restful.paginations import ListingPagination
@@ -88,7 +88,6 @@ def archives(request, data: ArchiveInput = None):
 
 @api_view(["GET"])
 @permission_classes([Archive.model_perm_cls()])
-@action_login_required(with_permissions=["view_archive"])
 def archive_headers(request):
     headers = [
         {"value": "id", "text": "交渉履歴ID", "align": "center"},

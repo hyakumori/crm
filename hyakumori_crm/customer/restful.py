@@ -27,7 +27,7 @@ from hyakumori_crm.crm.restful.serializers import (
 )
 from hyakumori_crm.crm.schemas.tag import TagBulkUpdate
 from ..activity.services import ActivityService, CustomerActions
-from ..api.decorators import action_login_required, api_validate_model, get_or_404
+from ..api.decorators import api_validate_model, get_or_404
 from ..core.utils import clear_maintain_task_id_cache
 from ..forest.service import parse_tags_for_csv
 
@@ -202,7 +202,6 @@ class CustomerViewSets(ViewSet):
     @get_or_404(
         get_func=get_customer_by_pk, to_name="customer", pass_to="kwargs", remove=True,
     )
-    @action_login_required(with_permissions=["change_customer", "view_customer"])
     def archives(self, request, *, customer=None):
         archives = get_customer_archives(customer.pk)
         return Response(ArchiveSerializer(archives, many=True).data)
