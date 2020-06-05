@@ -1,5 +1,4 @@
 from rest_framework.permissions import BasePermission
-from hyakumori_crm.users.backends import HyakumoriBackend
 
 
 class ChangeArchivePersmission(BasePermission):
