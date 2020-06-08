@@ -26,6 +26,7 @@
         "
         :mode="mode"
         :showDefaultBadge="showDefaultBadge"
+        :allowDelete="allowDelete"
       />
     </v-col>
   </v-row>
@@ -53,6 +54,7 @@ export default {
     customerIdNameMap: Object,
     mode: String,
     showDefaultBadge: { type: Boolean, default: false },
+    allowDelete: { type: Boolean, default: true },
   },
   methods: {
     getCustomerName(customer_id) {
