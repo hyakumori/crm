@@ -202,7 +202,7 @@ export default {
       this.isLoading = false;
       this.data = data.results.map(data => ({
         id: data.id,
-        short_id: data.id.substr(0, 8),
+        // short_id: data.id.substr(0, 8),
         archive_date: commonDatetimeFormat(data.archive_date),
         title: data.title,
         content: data.content,
