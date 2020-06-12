@@ -11,35 +11,12 @@ from rest_framework.exceptions import PermissionDenied
 
 from hyakumori_crm.crm.common.utils import EncryptError, encrypt_string
 from hyakumori_crm.crm.schemas.tag import TagBulkUpdate
-from .schemas import ArchiveFilter, ArchiveInput, ArchiveCustomerInput
-from .service import (
-    add_related_forest,
-    add_related_user,
-    create_archive,
-    create_attachment,
-    delete_attachment_file,
-    add_participants,
-    delete_related_forest,
-    delete_related_user,
-    edit_archive,
-    get_all_attachments_by_archive_pk,
-    get_archive_by_pk,
-    get_attachment_by_pk,
-    get_filtered_archive_queryset,
-    get_participants,
-    get_related_forests,
-    update_archive_tag,
-    get_archives_tag_by_ids,
-    update_archive_other_participants,
-)
-from ..activity.services import ActivityService, ArchiveActions
+from ..activity.services import ActivityService, PostalHistoryActions
 from ..api.decorators import api_validate_model, get_or_404
 from ..core.utils import default_paginator, make_error_json
-from ..crm.models import Archive, Attachment
+from ..crm.models import PostalHistory, Attachment
 from ..crm.restful.paginations import ListingPagination
 from ..crm.restful.serializers import (
-    ArchiveListingSerializer,
-    ArchiveSerializer,
     AttachmentSerializer,
     ForestListingSerializer,
     CustomerContactSerializer,
@@ -47,6 +24,34 @@ from ..crm.restful.serializers import (
 from ..users.models import User
 from ..users.serializers import UserSerializer
 from ..permissions.enums import SystemGroups
+
+from .schemas import (
+    PostalHistoryFilter,
+    PostalHistoryInput,
+    PostalHistoryCustomerInput,
+    PostalHistoryListingSerializer,
+    PostalHistorySerializer,
+)
+from .service import (
+    add_related_forest,
+    add_related_user,
+    create_postal_history,
+    create_attachment,
+    delete_attachment_file,
+    add_participants,
+    delete_related_forest,
+    delete_related_user,
+    edit_postal_history,
+    get_all_attachments_by_postal_history_pk,
+    get_postal_history_by_pk,
+    get_attachment_by_pk,
+    get_filtered_postal_history_queryset,
+    get_participants,
+    get_related_forests,
+    update_postal_history_tag,
+    get_postal_histories_tag_by_ids,
+    update_postal_history_other_participants,
+)
 
 
 def postal_history_obj_permission(f):
@@ -66,35 +71,34 @@ def postal_history_obj_permission(f):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([Archive.model_perm_cls()])
-@api_validate_model(ArchiveInput)
-def archives(request, data: ArchiveInput = None):
+@permission_classes([PostalHistory.model_perm_cls()])
+@api_validate_model(PostalHistoryInput)
+def postal_histories(request, data: PostalHistoryInput = None):
     if request.method == "GET":
         paginator_listing = ListingPagination()
-        qs = get_filtered_archive_queryset(
-            ArchiveFilter(**request.GET.dict()), request.user
+        qs = get_filtered_postal_history_queryset(
+            PostalHistoryFilter(**request.GET.dict()), request.user
         )
         paged_list = paginator_listing.paginate_queryset(
             request=request, queryset=qs.order_by("-created_at")
         )
         return paginator_listing.get_paginated_response(
-            ArchiveListingSerializer(paged_list, many=True).data
+            PostalHistoryListingSerializer(paged_list, many=True).data
         )
     else:
         author = request.user
-        archive = create_archive(author, data)
-        ActivityService.log(ArchiveActions.created, archive, request=request)
-        return Response(data=ArchiveSerializer(archive).data)
+        ph = create_postal_history(author, data)
+        ActivityService.log(PostalHistoryActions.created, ph, request=request)
+        return Response(data=PostalHistorySerializer(ph).data)
 
 
 @api_view(["GET"])
-@permission_classes([Archive.model_perm_cls()])
-def archive_headers(request):
+@permission_classes([PostalHistory.model_perm_cls()])
+def postal_history_headers(request):
     headers = [
         {"value": "id", "text": "交渉履歴ID", "align": "center"},
-        {"value": "archive_date", "text": "日付", "sortable": False, "align": "center"},
+        {"value": "archive_date", "text": "日付", "sortable": False, "align": "center",},
         {"value": "title", "text": "タイトル", "sortable": False, "align": "center"},
-        {"value": "content", "text": "内容", "sortable": False, "align": "center"},
         {"value": "author", "text": "作成者", "sortable": False, "align": "center"},
         {
             "value": "their_participants",
@@ -120,36 +124,45 @@ def archive_headers(request):
 
 
 @api_view(["GET", "PUT", "PATCH"])
-@permission_classes([Archive.model_perm_cls()])
+@permission_classes([PostalHistory.model_perm_cls()])
 @get_or_404(
-    get_archive_by_pk, to_name="archive", pass_to=["kwargs", "request"], remove=True
+    get_postal_history_by_pk,
+    to_name="postal_history",
+    pass_to=["kwargs", "request"],
+    remove=True,
 )
-@api_validate_model(ArchiveInput)
-@archive_obj_permission
-def archive(request, *, archive: Archive = None, data: ArchiveInput = None):
+@api_validate_model(PostalHistoryInput)
+@postal_history_obj_permission
+def postal_history(
+    request, *, postal_history: PostalHistory = None, data: PostalHistoryInput = None
+):
     if request.method == "GET":
-        return Response({"data": ArchiveSerializer(archive).data})
+        return Response({"data": PostalHistorySerializer(postal_history).data})
     else:
-        updated_archive = edit_archive(archive, data)
-        ActivityService.log(ArchiveActions.basic_info_updated, archive, request=request)
-        return Response({"data": ArchiveSerializer(updated_archive).data})
+        updated_postal_history = edit_postal_history(postal_history, data)
+        ActivityService.log(
+            PostalHistoryActions.basic_info_updated, postal_history, request=request
+        )
+        return Response({"data": PostalHistorySerializer(updated_postal_history).data})
 
 
 @api_view(["GET", "POST"])
-@permission_classes([Archive.model_perm_cls()])
+@permission_classes([PostalHistory.model_perm_cls()])
 @parser_classes([MultiPartParser])
-@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
-@archive_obj_permission
-def attachments(request, archive: Archive = None):
+@get_or_404(
+    get_postal_history_by_pk, to_name="postal_history", pass_to=["kwargs"], remove=True
+)
+@postal_history_obj_permission
+def attachments(request, postal_history: PostalHistory = None):
     # get list attachments
     if request.method == "GET":
-        attachments = get_all_attachments_by_archive_pk(archive.id)
+        attachments = get_all_attachments_by_postal_history_pk(postal_history.id)
         return Response({"data": AttachmentSerializer(attachments, many=True).data})
     else:
         try:
-            new_attachment = create_attachment(archive, request)
+            new_attachment = create_attachment(postal_history, request)
             ActivityService.log(
-                ArchiveActions.materials_updated, archive, request=request
+                PostalHistoryActions.materials_updated, postal_history, request=request
             )
             return Response(
                 {"data": AttachmentSerializer(new_attachment, many=True).data}
@@ -159,60 +172,72 @@ def attachments(request, archive: Archive = None):
 
 
 @api_view(["GET"])
-@permission_classes([Archive.model_perm_cls()])
-@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
+@permission_classes([PostalHistory.model_perm_cls()])
+@get_or_404(
+    get_postal_history_by_pk, to_name="postal_history", pass_to=["kwargs"], remove=True
+)
 @get_or_404(get_attachment_by_pk, to_name="attachment", pass_to=["kwargs"], remove=True)
-@archive_obj_permission
+@postal_history_obj_permission
 def attachment_download(
-    request, archive: Archive = None, attachment: Attachment = None
+    request, postal_history: PostalHistory = None, attachment: Attachment = None
 ):
     try:
         encrypt_data = dict(
-            archive_pk=archive.pk,
+            postal_history_pk=postal_history.pk,
             attachment_pk=attachment.pk,
             expired=now() + timedelta(minutes=60),
         )
         download_code = encrypt_string(encrypt_data)
-        download_url = f"/archives/attachment/{download_code}"
+        download_url = f"/postal_histories/attachment/{download_code}"
         return Response({"url": download_url, "filename": attachment.filename})
     except EncryptError:
         return make_error_json(message=_("Could not get download url"))
 
 
 @api_view(["DELETE"])
-@permission_classes([Archive.model_perm_cls()])
-@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
+@permission_classes([PostalHistory.model_perm_cls()])
+@get_or_404(
+    get_postal_history_by_pk, to_name="postal_history", pass_to=["kwargs"], remove=True
+)
 @get_or_404(get_attachment_by_pk, to_name="attachment", pass_to=["kwargs"], remove=True)
-@archive_obj_permission
-def attachment(request, archive: Archive = None, attachment: Attachment = None):
-    is_deleted = delete_attachment_file(archive, attachment)
+@postal_history_obj_permission
+def attachment(
+    request, postal_history: PostalHistory = None, attachment: Attachment = None
+):
+    is_deleted = delete_attachment_file(postal_history, attachment)
     if is_deleted:
-        ActivityService.log(ArchiveActions.materials_updated, archive, request=request)
+        ActivityService.log(
+            PostalHistoryActions.materials_updated, postal_history, request=request
+        )
         return Response({"msg": "OK"})
     else:
         raise Http404()
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([Archive.model_perm_cls()])
-@get_or_404(get_archive_by_pk, pass_to=["kwargs"], to_name="archive", remove=True)
-@archive_obj_permission
-def archive_forests(request, archive: Archive = None):
+@permission_classes([PostalHistory.model_perm_cls()])
+@get_or_404(
+    get_postal_history_by_pk, pass_to=["kwargs"], to_name="postal_history", remove=True
+)
+@postal_history_obj_permission
+def postal_history_forests(request, postal_history: PostalHistory = None):
     if request.method == "GET":
-        forests = get_related_forests(archive)
+        forests = get_related_forests(postal_history)
         return Response({"data": ForestListingSerializer(forests, many=True).data})
     elif request.method == "POST":
-        forests = add_related_forest(archive, request.data)
+        forests = add_related_forest(postal_history, request.data)
         ActivityService.log(
-            ArchiveActions.forest_list_updated, archive, request=request
+            PostalHistoryActions.forest_list_updated, postal_history, request=request
         )
         return Response({"data": ForestListingSerializer(forests, many=True).data})
     else:
         try:
-            is_deleted = delete_related_forest(archive, request.data)
+            is_deleted = delete_related_forest(postal_history, request.data)
             if is_deleted:
                 ActivityService.log(
-                    ArchiveActions.forest_list_updated, archive, request=request
+                    PostalHistoryActions.forest_list_updated,
+                    postal_history,
+                    request=request,
                 )
                 return Response({"msg": "OK"})
             else:
@@ -222,53 +247,67 @@ def archive_forests(request, archive: Archive = None):
 
 
 @api_view(["GET", "PUT"])
-@permission_classes([Archive.model_perm_cls()])
+@permission_classes([PostalHistory.model_perm_cls()])
 @get_or_404(
-    get_archive_by_pk, pass_to=["kwargs", "request"], to_name="archive", remove=True
+    get_postal_history_by_pk,
+    pass_to=["kwargs", "request"],
+    to_name="postal_history",
+    remove=True,
 )
-@api_validate_model(ArchiveCustomerInput, methods=["PUT"])
-@archive_obj_permission
-def archive_customers(
-    request, archive: Archive = None, data: ArchiveCustomerInput = None
+@api_validate_model(PostalHistoryCustomerInput, methods=["PUT"])
+@postal_history_obj_permission
+def postal_history_customers(
+    request,
+    postal_history: PostalHistory = None,
+    data: PostalHistoryCustomerInput = None,
 ):
     if request.method == "GET":
-        participants = get_participants(archive)
+        participants = get_participants(postal_history)
         return Response(CustomerContactSerializer(participants, many=True).data)
     elif request.method == "PUT":
-        customers = add_participants(archive, data)
+        customers = add_participants(postal_history, data)
         ActivityService.log(
-            ArchiveActions.customer_participants_updated, archive, request=request
+            PostalHistoryActions.customer_participants_updated,
+            postal_history,
+            request=request,
         )
-        return Response({"id": data.archive.id})
+        return Response({"id": data.postal_history.id})
 
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([Archive.model_perm_cls()])
-@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
-@archive_obj_permission
-def archive_users(request, archive: Archive = None):
+@permission_classes([PostalHistory.model_perm_cls()])
+@get_or_404(
+    get_postal_history_by_pk, to_name="postal_history", pass_to=["kwargs"], remove=True
+)
+@postal_history_obj_permission
+def postal_history_users(request, postal_history: PostalHistory = None):
     if request.method == "GET":
         paginator = default_paginator()
         paged_list = paginator.paginate_queryset(
             request=request,
             queryset=User.objects.filter(
-                archiveuser__archive__id=archive.id, archiveuser__deleted=None
+                postalhistoryuser__postal_history__id=postal_history.id,
+                postalhistoryuser__deleted=None,
             ).prefetch_related("groups"),
         )
         return paginator.get_paginated_response(
             UserSerializer(paged_list, many=True).data
         )
     elif request.method == "POST":
-        users = add_related_user(archive, request.data)
+        users = add_related_user(postal_history, request.data)
         ActivityService.log(
-            ArchiveActions.staff_participants_updated, archive, request=request
+            PostalHistoryActions.staff_participants_updated,
+            postal_history,
+            request=request,
         )
         return Response({"data": UserSerializer(users, many=True).data})
     else:
-        is_deleted = delete_related_user(archive, request.data)
+        is_deleted = delete_related_user(postal_history, request.data)
         if is_deleted:
             ActivityService.log(
-                ArchiveActions.staff_participants_updated, archive, request=request
+                PostalHistoryActions.staff_participants_updated,
+                postal_history,
+                request=request,
             )
             return Response({"msg": "OK"})
         else:
@@ -276,35 +315,42 @@ def archive_users(request, archive: Archive = None):
 
 
 @api_view(["PUT"])
-@permission_classes([Archive.model_perm_cls()])
-def archive_ids(request):
+@permission_classes([PostalHistory.model_perm_cls()])
+def postal_history_ids(request):
     ids = request.data
     if ids is None or len(ids) == 0:
         return Response({"data": []})
     else:
-        archive_tags = get_archives_tag_by_ids(ids)
-        return JsonResponse(data={"data": archive_tags})
+        postal_history_tags = get_postal_histories_tag_by_ids(ids)
+        return JsonResponse(data={"data": postal_history_tags})
 
 
 @api_view(["PUT"])
-@permission_classes([Archive.model_perm_cls()])
+@permission_classes([PostalHistory.model_perm_cls()])
 @api_validate_model(TagBulkUpdate)
-def archive_tags(request, data: TagBulkUpdate):
-    update_archive_tag(data.dict())
+def postal_history_tags(request, data: TagBulkUpdate):
+    update_postal_history_tag(data.dict())
     for pk in data.ids:
         ActivityService.log(
-            ArchiveActions.tags_bulk_updated, Archive, obj_pk=pk, request=request
+            PostalHistoryActions.tags_bulk_updated,
+            PostalHistory,
+            obj_pk=pk,
+            request=request,
         )
     return Response({"msg": "OK"})
 
 
 @api_view(["PUT"])
-@permission_classes([Archive.model_perm_cls()])
-@get_or_404(get_archive_by_pk, to_name="archive", pass_to=["kwargs"], remove=True)
-def other_participants(request, archive: Archive = None):
+@permission_classes([PostalHistory.model_perm_cls()])
+@get_or_404(
+    get_postal_history_by_pk, to_name="postal_history", pass_to=["kwargs"], remove=True
+)
+def other_participants(request, postal_history: PostalHistory = None):
     other_participants = request.data.get("other_participants", [])
-    update_archive_other_participants(archive, other_participants)
+    update_postal_history_other_participants(postal_history, other_participants)
     ActivityService.log(
-        ArchiveActions.other_staff_participants_updated, archive, request=request
+        PostalHistoryActions.other_staff_participants_updated,
+        postal_history,
+        request=request,
     )
     return Response({"msg": "OK"})

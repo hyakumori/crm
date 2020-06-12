@@ -1,40 +1,40 @@
 from django.urls import path
 
 from .restful import (
-    archives,
-    archive_ids,
-    archive_tags,
-    archive,
-    archive_users,
-    archive_forests,
-    archive_customers,
+    postal_histories,
+    postal_history_ids,
+    postal_history_tags,
+    postal_history,
+    postal_history_users,
+    postal_history_forests,
+    postal_history_customers,
     attachments,
     attachment,
     attachment_download,
-    archive_headers,
+    postal_history_headers,
     other_participants,
 )
 from .views import download_file
 
 api_urls = [
-    path("archives", archives),
-    path("archives/ids", archive_ids),
-    path("archives/ids/tags", archive_tags),
-    path("archives/<uuid:pk>", archive),
-    path("archives/<uuid:pk>/users", archive_users),
-    path("archives/<uuid:pk>/forests", archive_forests),
-    path("archives/<uuid:pk>/customers", archive_customers),
-    path("archives/<uuid:pk>/attachments", attachments),
-    path("archives/<uuid:pk>/attachments/<uuid:attachment_pk>", attachment),
-    path("archives/<uuid:pk>/other-participants", other_participants),
+    path("postal-histories", postal_histories),
+    path("postal-histories/ids", postal_history_ids),
+    path("postal-histories/ids/tags", postal_history_tags),
+    path("postal-histories/<uuid:pk>", postal_history),
+    path("postal-histories/<uuid:pk>/users", postal_history_users),
+    path("postal-histories/<uuid:pk>/forests", postal_history_forests),
+    path("postal-histories/<uuid:pk>/customers", postal_history_customers),
+    path("postal-histories/<uuid:pk>/attachments", attachments),
+    path("postal-histories/<uuid:pk>/attachments/<uuid:attachment_pk>", attachment),
+    path("postal-histories/<uuid:pk>/other-participants", other_participants),
     path(
-        "archives/<uuid:pk>/attachments/<uuid:attachment_pk>/download",
+        "postal-histories/<uuid:pk>/attachments/<uuid:attachment_pk>/download",
         attachment_download,
     ),
-    path("archives/attachment/<str:code>", download_file),
-    path("archives/headers", archive_headers),
+    path("postal-histories/attachment/<str:code>", download_file),
+    path("postal-histories/headers", postal_history_headers),
 ]
 
 view_urls = [
-    path("archives/attachment/<str:code>", download_file),
+    path("postal-histories/attachment/<str:code>", download_file),
 ]

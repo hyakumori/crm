@@ -4,34 +4,80 @@ from uuid import UUID
 from functools import reduce
 
 from django.utils.translation import gettext_lazy as _
+from rest_framework.serializers import SerializerMethodField, ModelSerializer
 from pydantic import validator, root_validator
 
 from pydantic import Field
 
 from ..core.models import HyakumoriDanticModel
 from ..crm.models import (
-    Archive,
+    PostalHistory,
     CustomerContact,
-    ArchiveCustomer,
-    ArchiveCustomerContact,
+    PostalHistoryCustomer,
+    PostalHistoryCustomerContact,
+    Attachment,
 )
+from ..crm.restful.serializers import AttachmentSerializer
+from ..users.serializers import UserSerializer
 
 
-class ArchiveInput(HyakumoriDanticModel):
+class PostalHistoryListingSerializer(ModelSerializer):
+    author_name = SerializerMethodField(method_name="get_author_name")
+
+    def get_author_name(self, obj: PostalHistory):
+        return obj.author.full_name
+
+    class Meta:
+        model = PostalHistory
+        fields = [
+            "id",
+            "title",
+            "author_name",
+            "future_action",
+            "archive_date",
+            "attributes",
+            "tags",
+        ]
+
+
+class PostalHistorySerializer(ModelSerializer):
+    attachments = SerializerMethodField()
+    author = UserSerializer()
+
+    class Meta:
+        model = PostalHistory
+        fields = [
+            "id",
+            "title",
+            "future_action",
+            "archive_date",
+            "author",
+            "attachments",
+            "attributes",
+            "tags",
+        ]
+
+    def get_attachments(self, obj: PostalHistory):
+        try:
+            return AttachmentSerializer(
+                Attachment.objects.filter(object_id=obj.id), many=True
+            ).data
+        except Attachment.DoesNotExist:
+            return []
+
+
+class PostalHistoryInput(HyakumoriDanticModel):
     title: str = Field(..., max_length=255)
-    content: Optional[str]
-    location: str = Field(..., max_length=255)
     # future_action allow None value
     future_action: Optional[str] = Field(None, max_length=255)
     archive_date: Optional[datetime]
 
 
-class ArchiveFilter(HyakumoriDanticModel):
+class PostalHistoryFilter(HyakumoriDanticModel):
     id: str = None
     sys_id: str = None
     archive_date: str = None
     title: str = None
-    content: str = None
     author: str = None
     location: str = None
     their_participants: str = None
@@ -44,15 +90,15 @@ class ArchiveFilter(HyakumoriDanticModel):
         min_anystr_length = 0
 
 
-class ArchiveContact(HyakumoriDanticModel):
+class PostalHistoryContact(HyakumoriDanticModel):
     contact_id: UUID
     customer_id: Optional[UUID]
 
 
-class ArchiveCustomerInput(HyakumoriDanticModel):
-    archive: Archive
-    added: List[ArchiveContact] = []
-    deleted: List[ArchiveContact] = []
+class PostalHistoryCustomerInput(HyakumoriDanticModel):
+    archive: PostalHistory
+    added: List[PostalHistoryContact] = []
+    deleted: List[PostalHistoryContact] = []
 
     class Config:
         arbitrary_types_allowed = True
@@ -92,11 +138,11 @@ class ArchiveCustomerInput(HyakumoriDanticModel):
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
             ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
-        except ArchiveCustomer.DoesNotExist:
+        except PostalHistoryCustomer.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
             ac.archivecustomercontact_set.get(customercontact_id=cc.id)
-        except ArchiveCustomerContact.DoesNotExist:
+        except PostalHistoryCustomerContact.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         return v
 
@@ -114,12 +160,12 @@ class ArchiveCustomerInput(HyakumoriDanticModel):
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
             ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
-        except ArchiveCustomer.DoesNotExist:
+        except PostalHistoryCustomer.DoesNotExist:
             pass
         else:
             try:
                 ac.archivecustomercontact_set.get(customercontact_id=cc.id)
                 raise ValueError(_("Contact {} already exists").format(v.contact_id))
-            except ArchiveCustomerContact.DoesNotExist:
+            except PostalHistoryCustomerContact.DoesNotExist:
                 pass
         return v

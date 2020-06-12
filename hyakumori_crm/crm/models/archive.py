@@ -4,7 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from ...activity.constants import ArchiveActions
-from ...core.models import BaseResourceModel
+from ...core.models import BaseResourceModel, BaseRelationModel
 
 
 class Archive(BaseResourceModel):
@@ -26,3 +26,28 @@ class Archive(BaseResourceModel):
     @property
     def actions(self):
         return ArchiveActions
+
+
+class ArchiveForest(BaseRelationModel):
+    archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
+    forest = models.ForeignKey("Forest", on_delete=models.CASCADE)
+
+    class Meta:
+        permissions = [
+            ("manage_archivecustomer", "All permissions for archive forest"),
+        ]
+
+
+class ArchiveCustomer(BaseRelationModel):
+    archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
+
+
+class ArchiveCustomerContact(BaseRelationModel):
+    archivecustomer = models.ForeignKey("ArchiveCustomer", on_delete=models.CASCADE)
+    customercontact = models.ForeignKey("CustomerContact", on_delete=models.CASCADE)
+
+
+class ArchiveUser(BaseRelationModel):
+    archive = models.ForeignKey("Archive", on_delete=models.PROTECT)
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
