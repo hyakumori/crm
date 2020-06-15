@@ -15,11 +15,11 @@ from django.utils.translation import gettext_lazy as _
 from pydantic import ValidationError
 from rest_framework.request import Request
 
-# from hyakumori_crm.cache.postal_history import (
-#     refresh_customers_cache,
-#     refresh_forest_cache,
-#     refresh_user_participants_cache,
-# )
+from hyakumori_crm.cache.postal_history import (
+    refresh_customers_cache,
+    refresh_forest_cache,
+    refresh_user_participants_cache,
+)
 from ..crm.models import (
     PostalHistory,
     Attachment,
@@ -81,7 +81,7 @@ def get_attachment(postal_history_pk, attachment_pk):
 def postal_history_mapping(postal_history: PostalHistory, data: PostalHistoryInput):
     postal_history.title = data.title
     postal_history.archive_date = data.archive_date
-    postal_history.future_action = data.future_action
+    postal_history.content = data.content
 
 
 def create_postal_history(author: AbstractUser, data: PostalHistoryInput):
@@ -156,14 +156,14 @@ def delete_attachment_file(postal_history: PostalHistory, attachment: Attachment
 
 def get_related_forests(postal_history: PostalHistory):
     return Forest.objects.filter(
-        postal_historyforest__postal_history__id=postal_history.id,
-        postal_historyforest__deleted=None,
+        postalhistoryforest__postalhistory_id=postal_history.id,
+        postalhistoryforest__deleted=None,
     )
 
 
 def is_postal_history_forest_exist(postal_history_pk, forest_pk):
     postal_history_forest = PostalHistoryForest.objects.filter(
-        postal_history__id=postal_history_pk, forest__id=forest_pk, deleted=None
+        postalhistory__id=postal_history_pk, forest__id=forest_pk, deleted=None
     )
     return True if len(postal_history_forest) == 1 else False
 
@@ -184,11 +184,11 @@ def add_related_forest(postal_history: PostalHistory, data: dict):
             continue
         else:
             postal_history_forest = PostalHistoryForest()
-            postal_history_forest.postal_history_id = postal_history.id
+            postal_history_forest.postalhistory_id = postal_history.id
             postal_history_forest.forest_id = forest.id
             postal_history_forest.save()
             forests.append(forest)
-    # refresh_forest_cache(postal_history, save=True)
+    refresh_forest_cache(postal_history, save=True)
     return forests
 
 
@@ -199,18 +199,18 @@ def delete_related_forest(postal_history: PostalHistory, data: dict):
         forest = get_forest_by_pk(forest_id)
         if is_postal_history_forest_exist(postal_history.id, forest_id):
             postal_history_forest = PostalHistoryForest.objects.get(
-                postal_history_id=postal_history.id, forest_id=forest.id, deleted=None
+                postalhistory_id=postal_history.id, forest_id=forest.id, deleted=None
             )
             postal_history_forest.force_delete()
         else:
             continue
-    # refresh_forest_cache(postal_history, save=True)
+    refresh_forest_cache(postal_history, save=True)
     return True
 
 
 def is_postal_history_customer_exist(postal_history_pk, customer_pk):
     postal_history_customer = PostalHistoryCustomer.objects.filter(
-        postal_history__id=postal_history_pk, customer__id=customer_pk, deleted=None
+        postalhistory__id=postal_history_pk, customer__id=customer_pk, deleted=None
     )
     return True if len(postal_history_customer) == 1 else False
 
@@ -277,23 +277,23 @@ def add_participants(postal_history: PostalHistory, data: PostalHistoryCustomerI
             .prefetch_related("postalhistorycustomercontact_set")
             .first()
         )
-        cc.postal_historycustomercontact_set.filter(
+        cc.postalhistorycustomercontact_set.filter(
             customercontact_id=cc.id, postalhistorycustomer_id=ac.id
         ).delete()
 
         ac.refresh_from_db()
 
-        if ac.postal_historycustomercontact_set.count() == 0:
+        if ac.postalhistorycustomercontact_set.count() == 0:
             ac.force_delete()
 
     postal_history.save(update_fields=["updated_at"])
-    # refresh_customers_cache(postal_history, save=True)
+    refresh_customers_cache(postal_history, save=True)
     return postal_history
 
 
-def is_postal_history_user_exist(postal_history_id, user_id):
+def is_postal_history_user_exist(postalhistory_id, user_id):
     postal_history_user = PostalHistoryUser.objects.filter(
-        postalhistory__id=postal_history_id, user__id=user_id, deleted=None
+        postalhistory__id=postalhistory_id, user__id=user_id, deleted=None
     )
     return True if len(postal_history_user) == 1 else False
 
@@ -308,11 +308,11 @@ def add_related_user(postal_history: PostalHistory, data: dict):
             users.append(user)
         else:
             postal_history_user = PostalHistoryUser()
-            postal_history_user.postal_history_id = postal_history.id
+            postal_history_user.postalhistory_id = postal_history.id
             postal_history_user.user_id = user.id
             postal_history_user.save()
             users.append(user)
-    # refresh_user_participants_cache(postal_history, True)
+    refresh_user_participants_cache(postal_history, True)
     return users
 
 
@@ -323,12 +323,12 @@ def delete_related_user(postal_history: PostalHistory, data: dict):
         user = get_user_model().objects.get(pk=user_id)
         if is_postal_history_user_exist(postal_history.id, user_id):
             postal_history_user = PostalHistoryUser.objects.get(
-                postal_history_id=postal_history.id, user_id=user.id, deleted=None
+                postalhistory_id=postal_history.id, user_id=user.id, deleted=None
             )
             postal_history_user.force_delete()
         else:
             continue
-    # refresh_user_participants_cache(postal_history, True)
+    refresh_user_participants_cache(postal_history, True)
     return True
 
 
@@ -341,7 +341,6 @@ def get_filtered_postal_history_queryset(
         "id": "id",
         "archive_date": "archive_date_text",
         "title": "title",
-        "future_action": "future_action",
         "author": "author_fullname",
         "associated_forest": "attributes__forest_cache__repr",
         "our_participants": "attributes__user_cache__repr",

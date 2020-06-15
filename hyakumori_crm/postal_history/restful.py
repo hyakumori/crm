@@ -96,25 +96,30 @@ def postal_histories(request, data: PostalHistoryInput = None):
 @permission_classes([PostalHistory.model_perm_cls()])
 def postal_history_headers(request):
     headers = [
-        {"value": "id", "text": "交渉履歴ID", "align": "center"},
-        {"value": "archive_date", "text": "日付", "sortable": False, "align": "center",},
-        {"value": "title", "text": "タイトル", "sortable": False, "align": "center"},
+        {"value": "id", "text": "ID"},
+        {
+            "value": "archive_date",
+            "text": "書類送付日",
+            "sortable": False,
+            "align": "center",
+        },
+        {"value": "title", "text": "表題", "sortable": False, "align": "center"},
         {"value": "author", "text": "作成者", "sortable": False, "align": "center"},
         {
             "value": "their_participants",
-            "text": "先方参加者",
+            "text": "送付先",
             "sortable": False,
             "align": "center",
         },
         {
             "value": "our_participants",
-            "text": "当方参加者",
+            "text": "送付者",
             "sortable": False,
             "align": "center",
         },
         {
             "value": "associated_forest",
-            "text": "関連する森林",
+            "text": "関連する森",
             "sortable": False,
             "align": "center",
         },
@@ -188,7 +193,7 @@ def attachment_download(
             expired=now() + timedelta(minutes=60),
         )
         download_code = encrypt_string(encrypt_data)
-        download_url = f"/postal_histories/attachment/{download_code}"
+        download_url = f"/postal-histories/attachment/{download_code}"
         return Response({"url": download_url, "filename": attachment.filename})
     except EncryptError:
         return make_error_json(message=_("Could not get download url"))
@@ -286,7 +291,7 @@ def postal_history_users(request, postal_history: PostalHistory = None):
         paged_list = paginator.paginate_queryset(
             request=request,
             queryset=User.objects.filter(
-                postalhistoryuser__postal_history__id=postal_history.id,
+                postalhistoryuser__postalhistory_id=postal_history.id,
                 postalhistoryuser__deleted=None,
             ).prefetch_related("groups"),
         )

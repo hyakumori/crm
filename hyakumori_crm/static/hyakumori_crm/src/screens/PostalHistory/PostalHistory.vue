@@ -4,7 +4,7 @@
       <page-header>
         <template #bottom-right>
           <outline-round-btn
-            :content="$t('buttons.add_archive')"
+            :content="$t('buttons.add_postalhistory')"
             :icon="$t('icon.add')"
             @click="$router.push({ name: 'postalHistoryNew' })"
           />
@@ -91,9 +91,9 @@ export default {
           value: 0,
         },
       ],
-      pageIcon: this.$t("icon.archive_icon"),
-      pageHeader: this.$t("page_header.archive_detail"),
-      tableRowIcon: this.$t("icon.archive_icon"),
+      pageIcon: "mdi-email-send-outline",
+      pageHeader: this.$t("page_header.postalhistory_list"),
+      tableRowIcon: "mdi-email-send-outline",
       data: [],
       isLoading: false,
       totalItems: 0,

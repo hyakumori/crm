@@ -236,9 +236,9 @@ const router = new VueRouter({
           name: "postalHistories",
           component: PostalHistory,
           meta: {
-            title: "page_header.archive_mgmt",
+            title: "page_header.postalhistory_mgmt",
             isPublic: false,
-            scopes: ["manage_archive", "view_archive"],
+            scopes: ["manage_postalhistory", "view_postalhistory"],
           },
         },
         {
@@ -247,9 +247,9 @@ const router = new VueRouter({
           component: PostalHistoryDetail,
           meta: {
             detail: true,
-            title: "page_header.archive_new",
+            title: "page_header.postalhistory_new",
             isPublic: false,
-            scopes: ["manage_archive"],
+            scopes: ["manage_postalhistory"],
           },
         },
         {
@@ -258,9 +258,9 @@ const router = new VueRouter({
           component: PostalHistoryDetail,
           meta: {
             detail: true,
-            title: "page_header.archive_detail",
+            title: "page_header.postalhistory_detail",
             isPublic: false,
-            scopes: ["manage_archive", "view_archive"],
+            scopes: ["manage_postalhistory", "view_postalhistory"],
           },
         },
       ],

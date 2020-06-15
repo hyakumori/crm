@@ -4,11 +4,12 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from ...core.models import BaseResourceModel, BaseRelationModel
+from ...activity.constants import PostalHistoryActions
 
 
 class PostalHistory(BaseResourceModel):
     title = models.CharField(max_length=255, blank=True)
-    future_action = models.CharField(max_length=255, null=True)
+    content = models.TextField(null=True)
     archive_date = models.DateTimeField(null=True)
     author = models.ForeignKey(
         get_user_model(), on_delete=models.DO_NOTHING, default=None, null=True
@@ -17,27 +18,31 @@ class PostalHistory(BaseResourceModel):
 
     class Meta:
         permissions = [
-            ("manage_postal_history", "All permissions for postal history"),
+            ("manage_postalhistory", "All permissions for postal history"),
         ]
+
+    @property
+    def actions(self):
+        return PostalHistoryActions
 
 
 class PostalHistoryForest(BaseRelationModel):
-    archive = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
+    postalhistory = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
     forest = models.ForeignKey("Forest", on_delete=models.CASCADE)
 
 
 class PostalHistoryCustomer(BaseRelationModel):
-    archive = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
+    postalhistory = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
     customer = models.ForeignKey("Customer", on_delete=models.CASCADE)
 
 
 class PostalHistoryCustomerContact(BaseRelationModel):
-    archivecustomer = models.ForeignKey(
+    postalhistorycustomer = models.ForeignKey(
         "PostalHistoryCustomer", on_delete=models.CASCADE
     )
     customercontact = models.ForeignKey("CustomerContact", on_delete=models.CASCADE)
 
 
 class PostalHistoryUser(BaseRelationModel):
-    archive = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
+    postalhistory = models.ForeignKey("PostalHistory", on_delete=models.PROTECT)
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)

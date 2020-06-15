@@ -33,7 +33,7 @@ class PostalHistoryListingSerializer(ModelSerializer):
             "id",
             "title",
             "author_name",
-            "future_action",
+            "content",
             "archive_date",
             "attributes",
             "tags",
@@ -49,7 +49,7 @@ class PostalHistorySerializer(ModelSerializer):
         fields = [
             "id",
             "title",
-            "future_action",
+            "content",
             "archive_date",
             "author",
             "attachments",
@@ -68,9 +68,11 @@ class PostalHistorySerializer(ModelSerializer):
 
 class PostalHistoryInput(HyakumoriDanticModel):
     title: str = Field(..., max_length=255)
-    # future_action allow None value
-    future_action: Optional[str] = Field(None, max_length=255)
+    content: Optional[str]
     archive_date: Optional[datetime]
+
+    class Config:
+        max_anystr_length = None
 
 
 class PostalHistoryFilter(HyakumoriDanticModel):
@@ -96,7 +98,7 @@ class PostalHistoryContact(HyakumoriDanticModel):
 
 
 class PostalHistoryCustomerInput(HyakumoriDanticModel):
-    archive: PostalHistory
+    postal_history: PostalHistory
     added: List[PostalHistoryContact] = []
     deleted: List[PostalHistoryContact] = []
 
@@ -104,7 +106,7 @@ class PostalHistoryCustomerInput(HyakumoriDanticModel):
         arbitrary_types_allowed = True
 
     @root_validator(pre=True)
-    def inject_archive(cls, values):
+    def inject_postalhistory(cls, values):
         added = values.get("added")
         if added is not None:
             added_uniq = reduce(lambda l, x: l if x in l else l + [x], added, [])
@@ -119,9 +121,9 @@ class PostalHistoryCustomerInput(HyakumoriDanticModel):
                     "Some of deleting customer-contact pairs are duplicated"
                 )
 
-        if not values.get("archive"):
+        if not values.get("postal_history"):
             return values
-        cls.archive = values["archive"]
+        cls.postalhistory = values["postal_history"]
         return values
 
     @validator("deleted", each_item=True)
@@ -137,11 +139,13 @@ class PostalHistoryCustomerInput(HyakumoriDanticModel):
         except CustomerContact.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
-            ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
+            ac = cls.postalhistory.postalhistorycustomer_set.get(
+                customer_id=v.customer_id
+            )
         except PostalHistoryCustomer.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
-            ac.archivecustomercontact_set.get(customercontact_id=cc.id)
+            ac.postalhistorycustomercontact_set.get(customercontact_id=cc.id)
         except PostalHistoryCustomerContact.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         return v
@@ -159,12 +163,14 @@ class PostalHistoryCustomerInput(HyakumoriDanticModel):
         except CustomerContact.DoesNotExist:
             raise ValueError(_("Contact {} not found").format(v.contact_id))
         try:
-            ac = cls.archive.archivecustomer_set.get(customer_id=v.customer_id)
+            ac = cls.postalhistory.postalhistorycustomer_set.get(
+                customer_id=v.customer_id
+            )
         except PostalHistoryCustomer.DoesNotExist:
             pass
         else:
             try:
-                ac.archivecustomercontact_set.get(customercontact_id=cc.id)
+                ac.postalhistorycustomercontact_set.get(customercontact_id=cc.id)
                 raise ValueError(_("Contact {} already exists").format(v.contact_id))
             except PostalHistoryCustomerContact.DoesNotExist:
                 pass

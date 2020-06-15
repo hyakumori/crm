@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import actionLogs from "../assets/dump/action_log.json";
 import MainSection from "../components/MainSection";
 import ScreenMixin from "./ScreenMixin";
 import ArchiveBasicInfoContainer from "../components/detail/ArchiveBasicInfoContainer";
@@ -192,10 +191,6 @@ export default {
   computed: {
     id() {
       return this.$route.params.id;
-    },
-
-    getActionLogs() {
-      return actionLogs;
     },
 
     isDetail() {

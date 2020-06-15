@@ -4,8 +4,8 @@
       <v-col cols="6">
         <text-info
           :isUpdate="!isDetail || isUpdate"
-          :label="$t('forms.labels.archive.title')"
-          :name="$t('forms.labels.archive.title')"
+          :label="$t('forms.labels.postalhistory.title')"
+          :name="$t('forms.labels.postalhistory.title')"
           :value="info.title"
           @input="val => (info.title = val)"
           rules="required|max:255"
@@ -17,29 +17,21 @@
       <v-col cols="6">
         <single-date-picker
           :date="date"
-          :label="$t('forms.labels.archive.consultant_date')"
+          :label="$t('forms.labels.postalhistory.consultant_date')"
           @newDate="val => (innerDate = val)"
           v-if="isUpdate || !isDetail"
         />
         <text-info
           :isUpdate="isUpdate"
-          :label="$t('forms.labels.archive.consultant_date_and_time')"
+          :label="$t('forms.labels.postalhistory.consultant_date_and_time')"
           :value="displayDatetimeFormat"
           v-else
-        />
-        <text-info
-          :isUpdate="isUpdate || !isDetail"
-          :label="$t('forms.labels.archive.future_action')"
-          :name="$t('forms.labels.archive.future_action')"
-          :value="info.future_action"
-          rules="max:255"
-          @input="val => (info.future_action = val)"
         />
       </v-col>
 
       <v-col cols="6">
         <time-picker
-          :label="$t('forms.labels.archive.consultant_time')"
+          :label="$t('forms.labels.postalhistory.consultant_time')"
           :time="time"
           @newTime="val => (innerTime = val)"
           v-if="isUpdate || !isDetail"
@@ -51,6 +43,21 @@
           v-if="isUpdate || isDetail"
         />
       </v-col>
+    </v-row>
+    <v-row>
+      <div class="container content">
+        <h5>{{ $t("forms.labels.postalhistory.content") }}</h5>
+        <v-textarea
+          :outlined="isUpdate || !isDetail"
+          :value="info.content"
+          dense
+          v-if="isUpdate || !isDetail"
+          v-model="info.content"
+        />
+        <p v-else>
+          {{ info.content }}
+        </p>
+      </div>
     </v-row>
     <slot
       :info="info"

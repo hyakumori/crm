@@ -25,6 +25,9 @@ class ArchiveInput(HyakumoriDanticModel):
     future_action: Optional[str] = Field(None, max_length=255)
     archive_date: Optional[datetime]
 
+    class Config:
+        max_anystr_length = None
+
 
 class ArchiveFilter(HyakumoriDanticModel):
     id: str = None
