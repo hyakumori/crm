@@ -141,30 +141,30 @@ class UserActions:
 
 
 class PostalHistoryActions:
-    created = ("postal_history.created", "協議データが作成されました。", "mdi-calendar-text")
+    created = ("postal_history.created", "書類郵送データが作成されました。", "mdi-calendar-text")
     basic_info_updated = (
         "postal_history.basic_info_updated",
-        "協議情報が更新されました。",
+        "書類郵送情報が更新されました。",
         "mdi-launch",
     )
     materials_updated = (
         "postal_history.materials_updated",
-        "配布資料が更新されました。",
+        "送付資料が更新されました。",
         "mdi-clipboard-multiple-outline",
     )
     customer_participants_updated = (
         "postal_history.customer_participants_updated",
-        "先方参加者が更新されました。",
+        "送付先が更新されました。",
         "mdi-face",
     )
     staff_participants_updated = (
         "postal_history.staff_participants_updated",
-        "当方参加者が更新されました。",
+        "送付者が更新されました。",
         "mdi-account-check-outline",
     )
     other_staff_participants_updated = (
         "postal_history.other_staff_participants_updated",
-        "その他当方参加者が更新されました。",
+        "その送付者が更新されました。",
         "mdi-account-check-outline",
     )
     forest_list_updated = (
