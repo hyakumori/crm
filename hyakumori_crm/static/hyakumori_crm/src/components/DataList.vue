@@ -41,7 +41,27 @@
           </p>
         </div>
       </template>
-
+      <template
+        v-if="showSelect"
+        v-slot:header.data-table-select="{ on, props }"
+      >
+        <v-simple-checkbox
+          :ripple="false"
+          v-bind="props"
+          v-on="on"
+        ></v-simple-checkbox>
+      </template>
+      <template
+        v-if="showSelect"
+        v-slot:item.data-table-select="{ isSelected, select }"
+      >
+        <v-simple-checkbox
+          :ripple="false"
+          :value="isSelected"
+          @input="select($event)"
+          class="datalist__checkbox"
+        ></v-simple-checkbox>
+      </template>
       <template v-slot:item.tags="{ item }" class="text-truncate">
         <template v-for="(tag, name, index) in item['tags']">
           <p class="tag" v-if="tag && name" :key="index">
@@ -254,7 +274,15 @@ export default {
   color: #444444;
   font-weight: normal;
 }
-
+.datalist__checkbox {
+  // only work on chrome
+  width: 100%;
+  height: 100%;
+  i {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
 .v-data-table {
   padding: 10px;
   width: 100%;
