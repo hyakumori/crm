@@ -327,3 +327,6 @@ Q_CLUSTER = {"name": "hyakumori-q", "django_redis": "default"}
 
 # for mitm.html downloading sw.js in firefox
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+SLACK_CLIENT_ID = os.environ.get("SLACK_CLIENT_ID")
+SLACK_CLIENT_SECRET = os.environ.get("SLACK_CLIENT_SECRET")
