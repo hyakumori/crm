@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "hyakumori_crm.tasks",
     "hyakumori_crm.cache",
     "hyakumori_crm.contracts",
+    "hyakumori_crm.slack",
 ]
 
 MIDDLEWARE = [
