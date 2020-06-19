@@ -13,7 +13,6 @@ export default {
   components: { AuthForm },
   methods: {
     async slackOauth() {
-      console.log(this.$refs.authForm.form);
       await this.$rest.post("slack/oauth", {
         ...this.$refs.authForm.form,
         code: this.code,

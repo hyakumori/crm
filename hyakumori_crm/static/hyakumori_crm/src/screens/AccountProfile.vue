@@ -70,7 +70,7 @@
                 <v-col cols="2">
                   <a
                     :href="
-                      `https://slack.com/oauth/v2/authorize?scope=incoming-webhook,chat:write,channels:read&client_id=1201426909361.1188806865714&redirect_uri=${redirectUri}`
+                      `https://slack.com/oauth/v2/authorize?scope=channels:read,chat:write,files:write&client_id=1201426909361.1188806865714&redirect_uri=${redirectUri}`
                     "
                     ><img
                       alt="Add to Slack"
@@ -84,13 +84,10 @@
                   /></a>
                 </v-col>
                 <v-col>
-                  Install or reinstall slack app to your workspace.
-                  <br />
-                  Reinstall if you want to change the channel for bot user posts
-                  messages to.
+                  Slackアプリをワークスペースにインストールまたは再インストールします。
                 </v-col>
               </v-row>
-              <v-row v-if="slackInstalls.length > 0">
+              <v-row>
                 <v-col>
                   <v-simple-table>
                     <template v-slot:default>
@@ -106,7 +103,13 @@
                           <td>{{ item.team_name }}</td>
                           <td>{{ item.updated_at }}</td>
                           <td>
-                            <v-btn small outlined color="red">Uninstall</v-btn>
+                            <v-btn
+                              small
+                              outlined
+                              color="red"
+                              @click="() => uninstallSlackApp(item.id)"
+                              >Uninstall</v-btn
+                            >
                           </td>
                         </tr>
                       </tbody>
@@ -187,6 +190,10 @@ export default {
   },
 
   methods: {
+    async uninstallSlackApp(id) {
+      await this.$rest.post("/slack/revoke", { id: id });
+      this.getSlackInstalls();
+    },
     async getUserPermission(callback) {
       const response = await this.$rest.get(
         `/users/${this.userInfo && this.userInfo.id}/permissions`,

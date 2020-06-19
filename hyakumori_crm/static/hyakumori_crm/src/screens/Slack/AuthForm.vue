@@ -1,9 +1,9 @@
 <template>
   <v-card class="pa-0 elevation-24">
-    <ValidationObserver v-slot="{ invalid }">
+    <ValidationObserver ref="form" v-slot="{ invalid }">
       <form @submit.prevent="doSubmit" v-on:keyup.enter="doSubmit">
         <v-card-title class="justify-start pb-0 px-6 pt-6 text-color-444444">
-          {{ $t("page_header.login") }}
+          続行するには認証してください
         </v-card-title>
 
         <v-card-text class="pa-6">
@@ -13,6 +13,7 @@
                 <v-alert dense outlined type="error">
                   {{ formError }}
                 </v-alert>
+                戻る...
               </v-col>
             </v-row>
             <v-row no-gutters>
@@ -58,7 +59,7 @@
                   :loading="loading"
                   @click="doSubmit"
                   :disabled="invalid || loading"
-                  >{{ $t("page_header.login") }}
+                  >認証する
                 </v-btn>
               </v-col>
             </v-row>
@@ -96,13 +97,18 @@ export default {
   },
   methods: {
     async doSubmit() {
-      console.log("dadasd");
       this.loading = true;
       try {
-        await this.onSubmit();
+        const resp = await this.onSubmit();
         this.success = true;
+        this.$router.push({ name: "my-profile" });
       } catch (e) {
-        console.log(e);
+        this.$refs.form.setErrors(e.response.data);
+        this.success = false;
+        this.formError = e.response.data.error;
+        setTimeout(() => {
+          this.$router.push({ name: "my-profile" });
+        }, 1500);
       } finally {
         this.loading = false;
       }

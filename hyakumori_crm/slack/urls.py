@@ -1,10 +1,10 @@
 from django.urls import path
 
-from .restful import oauth, test, list_installs
+from .restful import oauth, list_installs, revoke
 
 
 api_urls = [
     path("slack/oauth", oauth),
-    path("slack/test", test),
     path("slack/installs", list_installs),
+    path("slack/revoke", revoke),
 ]

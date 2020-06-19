@@ -9,27 +9,44 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Oauth',
+            name="Oauth",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('attributes', django.contrib.postgres.fields.jsonb.JSONField(default=dict, encoder=django.core.serializers.json.DjangoJSONEncoder)),
-                ('access_token', models.CharField(max_length=255)),
-                ('team_id', models.CharField(db_index=True, max_length=11)),
-                ('team_name', models.CharField(max_length=255)),
-                ('scope', models.CharField(max_length=255)),
-                ('incoming_webhook', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('bot_user_id', models.CharField(max_length=11)),
-                ('authed_user_id', models.CharField(max_length=11)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "attributes",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=dict,
+                        encoder=django.core.serializers.json.DjangoJSONEncoder,
+                    ),
+                ),
+                ("access_token", models.CharField(max_length=255)),
+                ("team_id", models.CharField(db_index=True, max_length=11)),
+                ("team_name", models.CharField(max_length=255)),
+                ("scope", models.CharField(max_length=255)),
+                (
+                    "incoming_webhook",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        null=True,
+                        encoder=django.core.serializers.json.DjangoJSONEncoder,
+                    ),
+                ),
+                ("bot_user_id", models.CharField(max_length=11)),
+                ("authed_user_id", models.CharField(max_length=11)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
     ]
