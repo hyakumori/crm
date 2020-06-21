@@ -173,7 +173,9 @@ export default {
       },
       errors: [],
       redirectUri:
-        process.env.SLACK_REDIRECT_URI || "http://localhost:8080/slack/oauth",
+        process.env.VUE_APP_SLACK_REDIRECT_URI ||
+        (window._env && window._env.VUE_APP_SLACK_REDIRECT_URI) ||
+        "http://localhost:8080/slack/oauth",
       slackInstalls: [],
     };
   },
