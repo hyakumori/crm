@@ -14,6 +14,7 @@ from subprocess import check_output
 from setuptools import find_packages, setup
 from setuptools.command.develop import develop as DevelopCommand
 from setuptools.command.sdist import sdist as SDistCommand
+from setuptools.command.install import install as InstallCommand
 
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -186,7 +187,7 @@ class BaseBuildCommand(Command):
                     files.append(filename[len(base) :].lstrip(os.path.sep))
 
         for file in self.get_manifest_additions():
-            files.append(file)
+            files.append(file[len(base) :].lstrip(os.path.sep))
 
     def run(self):
         if self.force or self._needs_built():
