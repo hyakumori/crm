@@ -17,6 +17,7 @@ from distutils.util import strtobool
 
 import dj_database_url
 from django.utils.translation import gettext_lazy as _
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -225,6 +226,7 @@ DJOSER = {
         "user": "hyakumori_crm.users.serializers.UserSerializer",
         "current_user": "hyakumori_crm.users.serializers.UserSerializer",
         "user_create": "hyakumori_crm.users.serializers.UserCreateSerializer",
+        "set_password_retype": "hyakumori_crm.users.serializers.HyakumoriSetPasswordRetypeSerializer",
     },
     "EMAIL": {"activation": "hyakumori_crm.users.emails.ActivationEmail"},
     "PERMISSIONS": {
@@ -233,6 +235,7 @@ DJOSER = {
     },
     "LOGIN_FIELD": "email",
     "HIDE_USERS": False,
+    "SET_PASSWORD_RETYPE": True,
 }
 
 # Simple JWT
