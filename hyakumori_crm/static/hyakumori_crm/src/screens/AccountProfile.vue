@@ -27,25 +27,32 @@
                     </v-col>
                   </v-row>
                   <v-row>
-                    <template v-for="(info, index) in basicInfo">
-                      <v-col cols="6" :key="index">
-                        <text-info
-                          v-if="!info.type || info.type === 'text'"
-                          :label="info.label"
-                          :rules="info.rules"
-                          :name="info.name"
-                          v-model="form[info.key]"
-                          :isUpdate="isUpdate.basicInfo && !info.disabled"
-                        />
-                        <select-info
-                          v-if="info.type && info.type === 'select'"
-                          :items="info.items"
-                          :label="info.label"
-                          v-model="form[info.key]"
-                          :isUpdate="isUpdate.basicInfo && !info.disabled"
-                        />
-                      </v-col>
-                    </template>
+                    <v-col
+                      cols="6"
+                      :key="index"
+                      v-for="(info, index) in basicInfo"
+                    >
+                      <text-info
+                        v-if="!info.type || info.type === 'text'"
+                        :label="info.label"
+                        :rules="info.rules"
+                        :name="info.name"
+                        v-model="form[info.key]"
+                        :isUpdate="isUpdate.basicInfo && !info.disabled"
+                      />
+                      <select-info
+                        v-if="info.type && info.type === 'select'"
+                        :items="info.items"
+                        :label="info.label"
+                        v-model="form[info.key]"
+                        :isUpdate="isUpdate.basicInfo && !info.disabled"
+                      />
+                    </v-col>
+                    <v-col v-if="isUpdate.basicInfo"
+                      ><router-link :to="{ name: 'change-password' }"
+                        ><v-btn text>パスワードを変更する</v-btn></router-link
+                      ></v-col
+                    >
                   </v-row>
 
                   <update-button
