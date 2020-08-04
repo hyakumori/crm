@@ -29,6 +29,16 @@ const UserProfileRoutes = [
         },
         component: () => import("./screens/AccountProfile.vue"),
       },
+      {
+        path: "change-password",
+        name: "change-password",
+        meta: {
+          title: "page_header.user_profile",
+          isPublic: false,
+          detail: true,
+        },
+        component: () => import("./screens/AccountChangePassword.vue"),
+      },
     ],
   },
 ];

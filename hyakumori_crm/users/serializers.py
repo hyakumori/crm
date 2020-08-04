@@ -8,6 +8,7 @@ from djoser.serializers import (
     UserSerializer as DjUserSerializer,
     UidAndTokenSerializer,
     PasswordRetypeSerializer,
+    CurrentPasswordSerializer,
 )
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -239,5 +240,22 @@ class CustomTokenObtainSerializer(TokenObtainSerializer):
 # noinspection PyAbstractClass
 class CustomTokenObtainPairSerializer(
     CustomerTokenObtainPairSerializer, CustomTokenObtainSerializer
+):
+    pass
+
+
+class HyakumoriPasswordRetypeSerializer(PasswordRetypeSerializer):
+    def validate(self, attrs):
+        attrs = PasswordRetypeSerializer.__base__.validate(self, attrs)
+        if attrs["new_password"] == attrs["re_new_password"]:
+            return attrs
+        else:
+            raise ValidationError(
+                {"re_new_password": self.error_messages["password_mismatch"]}
+            )
+
+
+class HyakumoriSetPasswordRetypeSerializer(
+    HyakumoriPasswordRetypeSerializer, CurrentPasswordSerializer
 ):
     pass
