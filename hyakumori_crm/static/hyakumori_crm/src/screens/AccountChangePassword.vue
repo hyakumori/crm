@@ -43,7 +43,7 @@
                   </v-row>
                   <v-row>
                     <v-col style="flex-grow:0;">
-                      <v-btn color="primary" @click="onSave">変更する<v-btn>
+                      <v-btn color="primary" @click="onSave">変更する</v-btn>
                     </v-col>
                     <v-col v-if="!dirty && savedSuccess"
                       >パスワードは正常に変更されました</v-col
