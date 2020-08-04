@@ -593,6 +593,13 @@ msgstr ""
 msgid "パスワードリセット"
 msgstr ""
 
+# djoser messages
+msgid "The two password fields didn't match."
+msgstr "パスワードが一致しませんでした。"
+
+msgid "Invalid password."
+msgstr "パスワードが正しくありません。"
+
 #~ msgid "Internal Id"
 #~ msgstr "ID"
 
