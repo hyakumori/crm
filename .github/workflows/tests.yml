@@ -14,11 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7]
+
+    services:
+      postgres:
+        image: postgres:11-alpine
+        env:
+          POSTGRES_DB: hyakumori
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: "youC4nP4ass"
+          POSTGRES_HOST_AUTH_METHOD: trust
+
 
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -27,10 +37,11 @@ jobs:
     - name: Install dependencies
       run: |
         export HYAKUMORI_LIGHT_BUILD=1
+        export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
         python -m pip install --upgrade pip
         pip install -U pip setuptools
         pip install '.[dev]'
-        
+
     - name: Test with pytest
       run: |
         pytest tests
