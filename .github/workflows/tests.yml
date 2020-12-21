@@ -31,6 +31,17 @@ jobs:
     services:
       postgres:
         image: postgres:11-alpine
+        env:
+          POSTGRES_DB: hyakumori
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: "youC4nP4ass"
+          POSTGRES_HOST_AUTH_METHOD: trust
+        
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5 
 
     steps:
     - uses: actions/checkout@v2
@@ -49,10 +60,6 @@ jobs:
 
     - name: Test with pytest
       env:
-        POSTGRES_DB: hyakumori
-        POSTGRES_USER: runner
-        POSTGRES_PASSWORD: "youC4nP4ass"
-        POSTGRES_HOST_AUTH_METHOD: trust
         DATABASE_URL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
       run: |
         pytest tests
