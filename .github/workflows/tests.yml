@@ -41,7 +41,7 @@ jobs:
     env:
       POSTGRES_DB: hyakumori
       POSTGRES_USER: runner
-      POSTGRES_PASSWORD: "youC4nP4ass"
+      POSTGRES_PASSWORD: youC4nP4ass
       POSTGRES_HOST_AUTH_METHOD: trust
           
     steps:
@@ -62,7 +62,7 @@ jobs:
     - name: Test with pytest
       env:
         POSTGRES_HOST_AUTH_METHOD: trust
-        DATABASE_URL: postgres://${{ POSTGRES_USER }}:${{ POSTGRES_PASSWORD }}@postgres:5432/${{ POSTGRES_DB }}
+        DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@postgres:5432/${{ env.POSTGRES_DB }}
       run: |
         echo $DATABASE_URL
         coverage run -m pytest tests
