@@ -67,7 +67,7 @@ jobs:
     - name: Test with pytest
       env:
         POSTGRES_HOST_AUTH_METHOD: trust
-        DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@postgres:5432/${{ env.POSTGRES_DB }}
+        DATABASE_URL: 'postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@postgres:5432/${{ env.POSTGRES_DB }}'
       run: |
         echo $DATABASE_URL
         coverage run -m pytest tests
