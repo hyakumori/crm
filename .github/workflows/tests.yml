@@ -28,22 +28,27 @@ jobs:
       matrix:
         python-version: [3.7]
 
-    services:
-      postgres:
-        image: postgres:11-alpine
-        
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5 
-
     env:
       POSTGRES_DB: hyakumori
       POSTGRES_USER: runner
       POSTGRES_PASSWORD: youC4nP4ass
       POSTGRES_HOST_AUTH_METHOD: trust
           
+    services:
+      postgres:
+        image: postgres:11-alpine
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_HOST_AUTH_METHOD: ${{ env.POSTGRES_HOST_AUTH_METHOD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5 
+
+
     steps:
     - uses: actions/checkout@v2
 
