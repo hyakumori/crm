@@ -65,10 +65,8 @@ jobs:
         pip install '.[dev]'
 
     - name: Test with pytest
-      env:
-        POSTGRES_HOST_AUTH_METHOD: trust
-        DATABASE_URL: 'postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@postgres:5432/${{ env.POSTGRES_DB }}'
       run: |
+        export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
         echo $DATABASE_URL
         coverage run -m pytest tests
         coverage report -m
