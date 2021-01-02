@@ -38,8 +38,7 @@
 
         <map-container
           class="mt-12"
-          headerContent="Map"
-          :forests="forests">
+          headerContent="Map">
         </map-container>
 
         <customer-list-container
