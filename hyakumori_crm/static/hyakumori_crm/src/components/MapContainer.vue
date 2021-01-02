@@ -1,21 +1,19 @@
 <template>
   <div>
-    <content-header
-      :content="headerContent"
-    />
+    <content-header :content="headerContent" />
   </div>
 </template>
 <script>
-import ContainerMixin from "./ContainerMixin";
-import ContentHeader from "./ContentHeader";
+import ContainerMixin from "./detail/ContainerMixin.js";
+import ContentHeader from "./detail/ContentHeader";
 
 export default {
   name: "map-container",
 
-  mixins: [ContainerMixin, SelectListModalMixin],
+  mixins: [ContainerMixin],
 
   components: {
     ContentHeader,
-  }
+  },
 }
 </script>
