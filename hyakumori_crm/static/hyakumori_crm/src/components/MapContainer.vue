@@ -2,8 +2,17 @@
   <div>
     <content-header :content="headerContent" />
     <div>
-      <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" data-projection="EPSG:4326" style="height: 400px">
-        <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
+      <vl-map
+        :load-tiles-while-animating="true"
+        :load-tiles-while-interacting="true"
+        data-projection="EPSG:4326"
+        style="height: 400px"
+      >
+        <vl-view
+          :zoom.sync="zoom"
+          :center.sync="center"
+          :rotation.sync="rotation"
+        ></vl-view>
 
         <vl-layer-tile>
           <vl-source-osm></vl-source-osm>
@@ -22,7 +31,8 @@
         Loading features, please wait...
       </p>
       <p v-if="features.length > 0">
-        Loaded features: {{ features.map(feature => feature.id) }}
+        Features: {{ forests }}
+        <!-- Loaded features: {{ features.map(feature => feature.id) }} -->
       </p>
     </div>
   </div>
@@ -30,11 +40,11 @@
 <script>
 import ContainerMixin from "./detail/ContainerMixin.js";
 import ContentHeader from "./detail/ContentHeader";
-import Vue from 'vue'
-import VueLayers from 'vuelayers'
-import 'vuelayers/lib/style.css' // needs css-loader
+import Vue from "vue";
+import VueLayers from "vuelayers";
+import "vuelayers/lib/style.css"; // needs css-loader
 
-Vue.use(VueLayers)
+Vue.use(VueLayers);
 
 export default {
   name: "map-container",
@@ -43,6 +53,13 @@ export default {
 
   components: {
     ContentHeader,
+  },
+
+  props: {
+    forests: {
+      type: Array,
+      required: true,
+    },
   },
 
   data() {
@@ -57,19 +74,19 @@ export default {
       rotation,
       features,
       loading,
-    }
+    };
   },
 
-  mounted () {
-      this.loading = true
-      this.loadFeatures().then(features => {
-        this.features = features.map(Object.freeze)
-        this.loading = false
-      })
-    },
+  mounted() {
+    this.loading = true;
+    this.loadFeatures().then(features => {
+      this.features = features.map(Object.freeze);
+      this.loading = false;
+    });
+  },
   methods: {
     // emulates external source
-    loadFeatures () {
+    loadFeatures() {
       return new Promise(resolve => {
         setTimeout(() => {
           // generate GeoJSON random features
@@ -78,41 +95,23 @@ export default {
               type: "Feature",
               id: 1232,
               geometry: {
-                type: 'Polygon',
+                type: "Polygon",
                 coordinates: [
                   [
-                    [
-                      -23.37890625,
-                      45.336701909968134,
-                    ],
-                    [
-                      -49.39453125,
-                      33.137551192346145,
-                    ],
-                    [
-                      -47.4609375,
-                      3.6888551431470478,
-                    ],
-                    [
-                      -20.390625,
-                      -8.059229627200192,
-                    ],
-                    [
-                      -13.0078125,
-                      20.138470312451155,
-                    ],
-                    [
-                      -23.37890625,
-                      45.336701909968134,
-                    ],
+                    [-23.37890625, 45.336701909968134],
+                    [-49.39453125, 33.137551192346145],
+                    [-47.4609375, 3.6888551431470478],
+                    [-20.390625, -8.059229627200192],
+                    [-13.0078125, 20.138470312451155],
+                    [-23.37890625, 45.336701909968134],
                   ],
                 ],
               },
               properties: {
-                name: 'Null Country22',
-                country:  'Japan22',
-                city: 'osak22a',
-                street: 'M2inamitanabe',
+                name: "Null Country22",
+                country: "Japan22",
+                city: "osak22a",
+                street: "M2inamitanabe",
               },
             },
             {
@@ -121,47 +120,26 @@ export default {
               geometry: {
                 type: "LineString",
                 coordinates: [
-                  [
-                    44.47265625,
-                    -1.7575368113083125,
-                  ],
-                  [
-                    23.5546875,
-                    9.795677582829743,
-                  ],
-                  [
-                    47.109375,
-                    23.241346102386135,
-                  ],
-                  [
-                    22.8515625,
-                    33.137551192346145,
-                  ],
-                  [
-                    48.33984375,
-                    42.032974332441405,
-                  ],
-                  [
-                    19.86328125,
-                    48.574789910928864,
-                  ],
-                  [
-                    47.8125,
-                    56.65622649350222,
-                  ],
+                  [44.47265625, -1.7575368113083125],
+                  [23.5546875, 9.795677582829743],
+                  [47.109375, 23.241346102386135],
+                  [22.8515625, 33.137551192346145],
+                  [48.33984375, 42.032974332441405],
+                  [19.86328125, 48.574789910928864],
+                  [47.8125, 56.65622649350222],
                 ],
               },
               properties: {
-                name: 'Null Country',
-                country:  'Japan',
-                city: 'osaka',
-                street: 'Minamitanabe',
+                name: "Null Country",
+                country: "Japan",
+                city: "osaka",
+                street: "Minamitanabe",
               },
             },
-          ])
-        }, 5000)
-      })
+          ]);
+        }, 5000);
+      });
     },
   },
-}
+};
 </script>
