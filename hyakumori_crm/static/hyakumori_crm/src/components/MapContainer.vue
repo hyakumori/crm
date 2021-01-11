@@ -5,7 +5,7 @@
       <vl-map
         :load-tiles-while-animating="true"
         :load-tiles-while-interacting="true"
-        data-projection="EPSG:4326"
+        data-projection="EPSG:3856"
         style="height: 400px"
       >
         <vl-view

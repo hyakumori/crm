@@ -123,6 +123,7 @@ class ForestSerializer(ModelSerializer):
             "land_attributes",
             "tags",
             "attributes",
+            "geodata",
         ]
 
 
