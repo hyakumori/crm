@@ -37,7 +37,7 @@ class Forest(BaseResourceModel):
     tags = JSONField(default=DefaultForest.tags)
     land_attributes = JSONField(default=dict)
     forest_attributes = JSONField(default=dict)
-    geodata = models.MultiPolygonField(null=True, srid=2447)
+    geodata = models.MultiPolygonField(null=True, srid=4326)
 
     REPR_FIELD = "internal_id"
     REPR_NAME = "森林ID"
