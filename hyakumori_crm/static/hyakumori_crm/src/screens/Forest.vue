@@ -139,7 +139,7 @@
       <map-container
         class="mt-12"
         headerContent="Map"
-        :forests="getData"
+        :forests="[]"
         :big="true">
       </map-container>
     </template>
@@ -162,7 +162,7 @@ import { get as _get } from "lodash";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
 import TableAction from "../components/TableAction";
 import MapContainer from "../components/MapContainer";
-import MapContainer from '../components/MapContainer.vue';
+
 
 export default {
   name: "forest",
@@ -178,8 +178,7 @@ export default {
     PageHeader,
     OutlineRoundBtn,
     UpdateActionsDialog,
-    MapContaine
-    MapContainerr,
+    MapContainer,
   },
 
   data() {

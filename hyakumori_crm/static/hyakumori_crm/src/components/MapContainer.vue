@@ -19,12 +19,11 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector :features.sync="features"></vl-source-vector>
-
-          <vl-style-box>
+          <vl-source-vector :url="urlFunction"></vl-source-vector>
+          <!-- <vl-style-box>
             <vl-style-stroke color="green" :width="3"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
+          </vl-style-box> -->
         </vl-layer-vector>
       </vl-map>
       <p v-if="loading">
@@ -38,13 +37,17 @@
   </div>
 </template>
 <script>
+import axios from "../plugins/http";
+import * as olExt from 'vuelayers/lib/ol-ext'
 import ContainerMixin from "./detail/ContainerMixin.js";
 import ContentHeader from "./detail/ContentHeader";
 import Vue from "vue";
 import VueLayers from "vuelayers";
+import VectorSource from "vuelayers";
 import "vuelayers/lib/style.css"; // needs css-loader
 
 Vue.use(VueLayers);
+Vue.use(VectorSource);
 
 export default {
   name: "map-container",
@@ -63,7 +66,7 @@ export default {
     big: {
       type: Boolean,
       default: false,
-    }
+    },
   },
 
   data() {
@@ -83,8 +86,9 @@ export default {
 
   mounted() {
     this.loading = true;
-    if(this.big){
-      console.log(this.forests)
+    if (this.big) {
+      console.log('big!')
+      // this.getWfsData()
     } else {
       this.loadFeatures().then(features => {
         this.features = features.map(Object.freeze);
@@ -93,21 +97,35 @@ export default {
     }
   },
   methods: {
+    urlFunction (extent, resolution, projection) {
+      return 'http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson'
+    },
+    // loadingStrategyFactory () {
+    //   // VueLayers.olExt available only in UMD build
+    //   // in ES build it should be imported explicitly from 'vuelayers/lib/ol-ext'
+    //   return olExt.loadingBBox
+    // },
     // emulates external source
     loadMapFeatures() {
-      const features = []
+      const features = [];
       const featureObject = {
         type: "Feature",
         id: null,
         geometry: null,
-      }
+      };
       for (f in this.forests) {
-        console.log(f, 'FOrest?')
-        featureObject.id = f.id
-        featureObject.geometry = f.geodata
-        features.push(featureObject)
+        console.log(f, "FOrest?");
+        featureObject.id = f.id;
+        featureObject.geometry = f.geodata;
+        features.push(featureObject);
       }
-      console.log(features)
+      console.log(features);
+    },
+
+    getWfsData() {
+      // const forestData = axios.get('http://localhost:8600/geoserver/crm/ows?service=WFS')
+      const forestData = axios.get('http://localhost:8600/geoserver/crm/wms?service=WMS&version=1.1.0&request=GetMap&layers=crm%3AForests&bbox=-180.0%2C-90.0%2C180.0%2C90.0&width=768&height=384&srs=EPSG%3A4326&styles=&format=application/openlayers')
+      console.log(forestData)
     },
 
     loadFeatures() {

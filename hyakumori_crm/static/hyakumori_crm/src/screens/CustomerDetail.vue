@@ -36,10 +36,7 @@
           itemClickable
         />
 
-        <map-container
-          class="mt-12"
-          headerContent="Map"
-          :forests="forests">
+        <map-container class="mt-12" headerContent="Map" :forests="forests">
         </map-container>
 
         <customer-list-container

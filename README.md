@@ -1,6 +1,6 @@
 # Hyakumori crm
 
-This repository holds the source code for the hyakumori CRM. It contains the source code for both the backend (written 
+This repository holds the source code for the hyakumori CRM. It contains the source code for both the backend (written
 in Python using the Django framework) and the frontend (written in javascript using the Vue framework). It also
 contains data import functions for adding dummy data for development.
 
@@ -41,9 +41,10 @@ VUE_APP_REST_HTTP=http://localhost:8000/api/v1
 COMMUNITY_EXTENSIONS=s3-geotiff-plugin
 AWS_ACCESS_KEY_ID=************
 AWS_SECRET_ACCESS_KEY=***********************
+GEOSERVER_CSRF_WHITELIST=http://localhost:8080
 ```
 
-Note, `EMAIL` settings are removed until proper configuration settings are understood. AWS keys will be moved to 
+Note, `EMAIL` settings are removed until proper configuration settings are understood. AWS keys will be moved to
  GitHub secrets soon.
 
 2. Copy `.env.example` to `hyakumori_crm/static/hyakumori_crm/.env` and fill necessary variables for both backend and frontend:
