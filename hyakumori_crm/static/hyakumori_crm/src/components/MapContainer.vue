@@ -60,6 +60,10 @@ export default {
       type: Array,
       required: true,
     },
+    big: {
+      type: Boolean,
+      default: false,
+    }
   },
 
   data() {
@@ -79,10 +83,14 @@ export default {
 
   mounted() {
     this.loading = true;
-    this.loadFeatures().then(features => {
-      this.features = features.map(Object.freeze);
-      this.loading = false;
-    });
+    if(this.big){
+      console.log(this.forests)
+    } else {
+      this.loadFeatures().then(features => {
+        this.features = features.map(Object.freeze);
+        this.loading = false;
+      });
+    }
   },
   methods: {
     // emulates external source

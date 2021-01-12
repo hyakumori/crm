@@ -135,6 +135,14 @@
         @toggle-show-dialog="val => (showChangeTagDialog = val)"
       />
     </template>
+    <template #forestmap>
+      <map-container
+        class="mt-12"
+        headerContent="Map"
+        :forests="getData"
+        :big="true">
+      </map-container>
+    </template>
   </main-section>
 </template>
 
@@ -153,6 +161,8 @@ import { saveAs } from "file-saver";
 import { get as _get } from "lodash";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
 import TableAction from "../components/TableAction";
+import MapContainer from "../components/MapContainer";
+import MapContainer from '../components/MapContainer.vue';
 
 export default {
   name: "forest",
@@ -168,6 +178,8 @@ export default {
     PageHeader,
     OutlineRoundBtn,
     UpdateActionsDialog,
+    MapContaine
+    MapContainerr,
   },
 
   data() {
