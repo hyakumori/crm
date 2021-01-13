@@ -5,8 +5,10 @@
       <vl-map
         :load-tiles-while-animating="true"
         :load-tiles-while-interacting="true"
+        ref="map"
         data-projection="EPSG:4326"
-        style="height: 900px"
+        @mounted="onMapMounted"
+        style="height: 600px; width: 100%"
       >
         <vl-view
           :zoom.sync="zoom"
@@ -46,18 +48,7 @@
             </component>
           </component>
         </div>
-        <!-- <vl-layer-image>
-          <vl-source-image-wms
-            :url.sync="getWmsData"
-            :version.sync='version'
-            :projection='projection'
-            :cross-origin='crossOrigin'
-            :ratio='ratio'
-            :server-type='serverType'
-            />
-        </vl-layer-image> -->
-        <vl-layer-vector>
-          <!-- <vl-source-vector v-if="big" render-mode="image" url='http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson'></vl-source-vector> -->
+        <vl-layer-vector v-else>
           <vl-source-vector :features.sync="features"></vl-source-vector>
           <vl-style-box>
             <vl-style-stroke color="red" :width="3"></vl-style-stroke>
@@ -76,16 +67,11 @@ import ContentHeader from "./detail/ContentHeader";
 import Vue from "vue";
 import VueLayers from "vuelayers";
 import VectorSource from "vuelayers";
-import ImageWmsSource from "vuelayers";
-import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css"; // needs css-loader
-import { ScaleLine, FullScreen, OverviewMap, ZoomSlider } from "ol/control";
-import { Projection, addProjection } from "ol/proj";
+import { ScaleLine, ZoomSlider } from "ol/control";
 
 Vue.use(VueLayers);
 Vue.use(VectorSource);
-Vue.use(ImageWmsSource);
-Vue.use(WmsSource);
 
 export default {
   name: "map-container",
@@ -113,7 +99,6 @@ export default {
     const rotation = 0;
     const features = [];
     const loading = false;
-    const ratio = 1;
     const layers = [];
 
     return {
@@ -123,7 +108,6 @@ export default {
       features,
       loading,
       layers,
-      ratio,
     };
   },
 
@@ -132,7 +116,6 @@ export default {
     if (!this.big) {
       this.loadMapFeatures().then(features => {
         this.features = features.map(Object.freeze);
-        console.log(features, 'features')
         this.loading = false;
       });
     } else {
@@ -155,13 +138,17 @@ export default {
       );
     }
   },
+
   methods: {
     geometryTypeToCmpName(type) {
       return "vl-geom-" + kebabCase(type);
     },
 
-    urlFunction() {
-      return "http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&maxFeatures=50&outputFormat=application%2Fjson";
+    onMapMounted() {
+      this.$refs.map.$map.getControls().extend([
+        new ScaleLine(),
+        new ZoomSlider(),
+      ])
     },
     // emulates external source
     loadMapFeatures() {
@@ -171,39 +158,16 @@ export default {
         id: null,
         geometry: null,
       };
+
       for (let f of this.forests) {
-        console.log(f, "FOrest?");
         featureObject.id = f.id;
         featureObject.geometry = f.geodata;
         features.push(featureObject);
       }
-      console.log(features);
+
       return new Promise(resolve => {
         resolve(features)
       })
-    },
-
-    loadFeatures() {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          // generate GeoJSON random features
-          const features = [];
-          const featureObject = {
-            type: "Feature",
-            id: null,
-            geometry: null,
-          };
-          console.log(this.forests)
-          for (let f of this.forests) {
-            console.log(f, "FOrest?");
-            featureObject.id = f.id;
-            featureObject.geometry = f.geodata;
-            features.push(featureObject);
-          }
-          console.log(features);
-          resolve(features);
-        }, 5000);
-      });
     },
   },
 };
