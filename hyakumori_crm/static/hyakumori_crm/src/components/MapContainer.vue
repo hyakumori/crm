@@ -51,8 +51,8 @@
         <vl-layer-vector v-else>
           <vl-source-vector :features.sync="features"></vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke color="red" :width="3"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+            <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
+            <vl-style-fill color="rgba(21,198,166, 0.2)"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
       </vl-map>
