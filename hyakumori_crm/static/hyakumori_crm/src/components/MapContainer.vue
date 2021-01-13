@@ -17,33 +17,35 @@
         <vl-layer-tile>
           <vl-source-osm></vl-source-osm>
         </vl-layer-tile>
-        <component
-          v-for="layer in layers"
-          :is="layer.cmp"
-          :key="layer.id"
-          v-bind="layer"
-        >
-          <component :is="layer.source.cmp" v-bind="layer.source">
-            <template
-              v-if="
-                layer.source.staticFeatures &&
-                  layer.source.staticFeatures.length
-              "
-            >
-              <vl-feature
-                v-for="feature in layer.source.staticFeatures"
-                :key="feature.id"
-                :id="feature.id"
-                :properties="feature.properties"
+        <div v-if="big">
+          <component
+            v-for="layer in layers"
+            :is="layer.cmp"
+            :key="layer.id"
+            v-bind="layer"
+          >
+            <component :is="layer.source.cmp" v-bind="layer.source">
+              <template
+                v-if="
+                  layer.source.staticFeatures &&
+                    layer.source.staticFeatures.length
+                "
               >
-                <component
-                  :is="geometryTypeToCmpName(feature.geometry.type)"
-                  v-bind="feature.geometry"
-                />
-              </vl-feature>
-            </template>
+                <vl-feature
+                  v-for="feature in layer.source.staticFeatures"
+                  :key="feature.id"
+                  :id="feature.id"
+                  :properties="feature.properties"
+                >
+                  <component
+                    :is="geometryTypeToCmpName(feature.geometry.type)"
+                    v-bind="feature.geometry"
+                  />
+                </vl-feature>
+              </template>
+            </component>
           </component>
-        </component>
+        </div>
         <!-- <vl-layer-image>
           <vl-source-image-wms
             :url.sync="getWmsData"
@@ -54,15 +56,14 @@
             :server-type='serverType'
             />
         </vl-layer-image> -->
-
-        <!-- <vl-layer-vector> -->
-        <!-- <vl-source-vector v-if="big" :url="getWmsData"></vl-source-vector> -->
-        <!-- <vl-source-vector v-else :features.sync="features"></vl-source-vector>
+        <vl-layer-vector>
+          <!-- <vl-source-vector v-if="big" render-mode="image" url='http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson'></vl-source-vector> -->
+          <vl-source-vector :features.sync="features"></vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke color="green" :width="3"></vl-style-stroke>
+            <vl-style-stroke color="red" :width="3"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box> -->
-        <!-- </vl-layer-vector> -->
+          </vl-style-box>
+        </vl-layer-vector>
       </vl-map>
     </div>
   </div>
@@ -113,23 +114,7 @@ export default {
     const features = [];
     const loading = false;
     const ratio = 1;
-    const layers = [
-      {
-        id: "wfs",
-        title: "WFS",
-        cmp: "vl-layer-vector",
-        visible: true,
-        renderMode: 'image',
-        features: [],
-        source: {
-          cmp: "vl-source-vector",
-          url: 'http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson',
-          layers: "crm:forests",
-          extParams: { TILED: true },
-          serverType: "geoserver",
-        },
-      },
-    ];
+    const layers = [];
 
     return {
       zoom,
@@ -145,14 +130,30 @@ export default {
   mounted() {
     this.loading = true;
     if (!this.big) {
-      this.loadFeatures().then(features => {
+      this.loadMapFeatures().then(features => {
         this.features = features.map(Object.freeze);
+        console.log(features, 'features')
         this.loading = false;
       });
+    } else {
+      this.layers.push(
+        {
+          id: "wfs",
+          title: "WFS",
+          cmp: "vl-layer-vector",
+          visible: true,
+          renderMode: 'image',
+          features: [],
+          source: {
+            cmp: "vl-source-vector",
+            url: 'http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson',
+            layers: "crm:forests",
+            extParams: { TILED: true },
+            serverType: "geoserver",
+          },
+        },
+      );
     }
-    // } else {
-    //   this.layers.push(this.getWmsData());
-    // }
   },
   methods: {
     geometryTypeToCmpName(type) {
@@ -170,91 +171,37 @@ export default {
         id: null,
         geometry: null,
       };
-      for (f in this.forests) {
+      for (let f of this.forests) {
         console.log(f, "FOrest?");
         featureObject.id = f.id;
         featureObject.geometry = f.geodata;
         features.push(featureObject);
       }
       console.log(features);
-    },
-
-    getWmsData() {
-      // const forestData = axios.get('http://localhost:8600/geoserver/crm/ows?service=WFS')
-      // const forestData = axios.get('http://localhost:8600/geoserver/crm/wms?service=WMS&version=1.1.0&request=GetMap&layers=crm%3AForests&bbox=-180.0%2C-90.0%2C180.0%2C90.0&width=768&height=384&srs=EPSG%3A4326&styles=&format=application%2Fopenlayers3').then(res => {
-      //   return res
-      // })
-      // console.log(forestData)
-      // return 'http://localhost:8600/geoserver/crm/wms?service=WMS&version=1.1.0&request=GetMap&layers=crm%3AForests&bbox=-180.0%2C-90.0%2C180.0%2C90.0&width=768&height=384&srs=EPSG%3A4326&styles=&format=application%2Fopenlayers3'
-      // Tile layer with WMS source
-      return {
-        id: "wms",
-        title: "WMS",
-        cmp: "vl-layer-tile",
-        visible: true,
-        source: {
-          cmp: "vl-source-wms",
-          url: "http://localhost:8600/geoserver/crm/wms",
-          extParams: { TILED: true },
-          serverType: "geoserver",
-          layers: "topp:states",
-          // format:"geojson"
-          // format: "application/openlayers3",
-        },
-      };
+      return new Promise(resolve => {
+        resolve(features)
+      })
     },
 
     loadFeatures() {
       return new Promise(resolve => {
         setTimeout(() => {
           // generate GeoJSON random features
-          resolve([
-            {
-              type: "Feature",
-              id: 1232,
-              geometry: {
-                type: "Polygon",
-                coordinates: [
-                  [
-                    [-23.37890625, 45.336701909968134],
-                    [-49.39453125, 33.137551192346145],
-                    [-47.4609375, 3.6888551431470478],
-                    [-20.390625, -8.059229627200192],
-                    [-13.0078125, 20.138470312451155],
-                    [-23.37890625, 45.336701909968134],
-                  ],
-                ],
-              },
-              properties: {
-                name: "Null Country22",
-                country: "Japan22",
-                city: "osak22a",
-                street: "M2inamitanabe",
-              },
-            },
-            {
-              type: "Feature",
-              id: 112,
-              geometry: {
-                type: "LineString",
-                coordinates: [
-                  [44.47265625, -1.7575368113083125],
-                  [23.5546875, 9.795677582829743],
-                  [47.109375, 23.241346102386135],
-                  [22.8515625, 33.137551192346145],
-                  [48.33984375, 42.032974332441405],
-                  [19.86328125, 48.574789910928864],
-                  [47.8125, 56.65622649350222],
-                ],
-              },
-              properties: {
-                name: "Null Country",
-                country: "Japan",
-                city: "osaka",
-                street: "Minamitanabe",
-              },
-            },
-          ]);
+          const features = [];
+          const featureObject = {
+            type: "Feature",
+            id: null,
+            geometry: null,
+          };
+          console.log(this.forests)
+          for (let f of this.forests) {
+            console.log(f, "FOrest?");
+            featureObject.id = f.id;
+            featureObject.geometry = f.geodata;
+            features.push(featureObject);
+          }
+          console.log(features);
+          resolve(features);
         }, 5000);
       });
     },

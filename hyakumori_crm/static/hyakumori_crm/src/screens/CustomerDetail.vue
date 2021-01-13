@@ -36,7 +36,7 @@
           itemClickable
         />
 
-        <map-container class="mt-12" headerContent="Map" :forests="forests">
+        <map-container v-if="forests.length > 0" class="mt-12" headerContent="Map" :forests="forests">
         </map-container>
 
         <customer-list-container
