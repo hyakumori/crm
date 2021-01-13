@@ -94,8 +94,8 @@ export default {
   },
 
   data() {
-    const zoom = 5;
-    const center = [-223.11344101316652, 33.82734357069114];
+    const zoom = 13;
+    const center = [134.3182913187339, 35.18596859977893];
     const rotation = 0;
     const features = [];
     const loading = false;
@@ -114,8 +114,8 @@ export default {
   mounted() {
     this.loading = true;
     if (!this.big) {
-      this.loadMapFeatures().then(features => {
-        this.features = features.map(Object.freeze);
+      this.loadMapFeatures().then(f => {
+        this.features = f.map(Object.freeze);
         this.loading = false;
       });
     } else {
@@ -150,23 +150,18 @@ export default {
         new ZoomSlider(),
       ])
     },
-    // emulates external source
-    loadMapFeatures() {
-      const features = [];
-      const featureObject = {
-        type: "Feature",
-        id: null,
-        geometry: null,
-      };
 
-      for (let f of this.forests) {
-        featureObject.id = f.id;
-        featureObject.geometry = f.geodata;
-        features.push(featureObject);
-      }
+    loadMapFeatures() {
+      const mapItems = this.forests.map(f => {
+        return {
+          type: "Feature",
+          id: f.id,
+          geometry: f.geodata,
+        }
+      })
 
       return new Promise(resolve => {
-        resolve(features)
+        resolve(mapItems)
       })
     },
   },
