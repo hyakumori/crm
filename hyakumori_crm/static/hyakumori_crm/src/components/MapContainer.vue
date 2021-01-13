@@ -49,11 +49,19 @@
           </component>
         </div>
         <vl-layer-vector v-else>
-          <vl-source-vector :features.sync="features"></vl-source-vector>
-          <vl-style-box>
-            <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-            <vl-style-fill color="rgba(21,198,166, 0.2)"></vl-style-fill>
-          </vl-style-box>
+          <vl-source-vector>
+            <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" v-bind="feature">
+              <component
+                :is="geometryTypeToCmpName(feature.geometry.type)"
+                v-bind="feature.geometry"
+              />
+              <vl-style-box>
+                <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
+                <vl-style-fill color="rgba(21,198,166, 0.2)"></vl-style-fill>
+                <vl-style-text :text="feature.properties.nametag"></vl-style-text>
+              </vl-style-box>
+            </vl-feature>
+          </vl-source-vector>
         </vl-layer-vector>
       </vl-map>
     </div>
@@ -69,6 +77,7 @@ import VueLayers from "vuelayers";
 import VectorSource from "vuelayers";
 import "vuelayers/lib/style.css"; // needs css-loader
 import { ScaleLine, ZoomSlider } from "ol/control";
+import { kebabCase } from "lodash";
 
 Vue.use(VueLayers);
 Vue.use(VectorSource);
@@ -116,26 +125,26 @@ export default {
     if (!this.big) {
       this.loadMapFeatures().then(f => {
         this.features = f.map(Object.freeze);
+        console.log(this.features)
         this.loading = false;
       });
     } else {
-      this.layers.push(
-        {
-          id: "wfs",
-          title: "WFS",
-          cmp: "vl-layer-vector",
-          visible: true,
-          renderMode: 'image',
-          features: [],
-          source: {
-            cmp: "vl-source-vector",
-            url: 'http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson',
-            layers: "crm:forests",
-            extParams: { TILED: true },
-            serverType: "geoserver",
-          },
+      this.layers.push({
+        id: "wfs",
+        title: "WFS",
+        cmp: "vl-layer-vector",
+        visible: true,
+        renderMode: "image",
+        features: [],
+        source: {
+          cmp: "vl-source-vector",
+          url:
+            "http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson",
+          layers: "crm:forests",
+          extParams: { TILED: true },
+          serverType: "geoserver",
         },
-      );
+      });
     }
   },
 
@@ -145,10 +154,9 @@ export default {
     },
 
     onMapMounted() {
-      this.$refs.map.$map.getControls().extend([
-        new ScaleLine(),
-        new ZoomSlider(),
-      ])
+      this.$refs.map.$map
+        .getControls()
+        .extend([new ScaleLine(), new ZoomSlider()]);
     },
 
     loadMapFeatures() {
@@ -157,12 +165,17 @@ export default {
           type: "Feature",
           id: f.id,
           geometry: f.geodata,
-        }
-      })
+          properties: {
+            customer: f.attributes.customer_cache,
+            internal_id: f.internal_id,
+            nametag: f.tags["団地"] + " " + f.internal_id,
+          },
+        };
+      });
 
       return new Promise(resolve => {
-        resolve(mapItems)
-      })
+        resolve(mapItems);
+      });
     },
   },
 };
