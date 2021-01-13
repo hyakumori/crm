@@ -140,7 +140,8 @@
         class="mt-12"
         headerContent="Map"
         :forests="[]"
-        :big="true">
+        :big="true"
+      >
       </map-container>
     </template>
   </main-section>
@@ -162,7 +163,6 @@ import { get as _get } from "lodash";
 import UpdateActionsDialog from "../components/dialogs/UpdateActionsDialog";
 import TableAction from "../components/TableAction";
 import MapContainer from "../components/MapContainer";
-
 
 export default {
   name: "forest",
