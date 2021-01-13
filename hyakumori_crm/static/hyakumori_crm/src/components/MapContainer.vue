@@ -112,26 +112,21 @@ export default {
     const rotation = 0;
     const features = [];
     const loading = false;
-    // const serverType = "geoserver";
-    // const version = "1.0.0";
-    // const crossOrigin = "anonymous";
     const ratio = 1;
-    // const projection = "EPSG:4326";
     const layers = [
       {
-        id: "wms",
-        title: "WMS",
+        id: "wfs",
+        title: "WFS",
         cmp: "vl-layer-vector",
         visible: true,
+        renderMode: 'image',
+        features: [],
         source: {
           cmp: "vl-source-vector",
-          // url: "http://localhost:8600/geoserver/crm/wms",
-          // url: 'http://localhost:8600/geoserver/crm/wms?service=WMS&version=1.1.0&request=GetMap&layers=crm%3AForests&bbox=-180.0%2C-90.0%2C180.0%2C90.0&width=768&height=384&srs=EPSG%3A4326&styles=&format=application%2Fopenlayers3',
           url: 'http://localhost:8600/geoserver/crm/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=crm%3AForests&outputFormat=application%2Fjson',
           layers: "crm:forests",
           extParams: { TILED: true },
           serverType: "geoserver",
-          // crossOrigin: "anonymous",
         },
       },
     ];
