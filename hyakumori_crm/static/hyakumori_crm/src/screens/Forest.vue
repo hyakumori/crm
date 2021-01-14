@@ -72,6 +72,13 @@
           </div>
         </template>
       </page-header>
+      <map-container
+        class="px-7"
+        headerContent="地図"
+        :forests="[]"
+        :big="true"
+      >
+      </map-container>
     </template>
 
     <template #section>
@@ -135,16 +142,8 @@
         @toggle-show-dialog="val => (showChangeTagDialog = val)"
       />
     </template>
-    <template #forestmap>
-      <map-container
-        class="mt-12"
-        headerContent="Map"
-        :forests="[]"
-        :big="true"
-      >
-      </map-container>
-    </template>
   </main-section>
+
 </template>
 
 <script>

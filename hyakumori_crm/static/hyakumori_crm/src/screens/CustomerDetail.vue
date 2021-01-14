@@ -39,7 +39,7 @@
         <map-container
           v-if="forests.length > 0"
           class="mt-12"
-          headerContent="Map"
+          headerContent="地図"
           :forests="forests"
         >
         </map-container>
