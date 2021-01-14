@@ -50,7 +50,12 @@
         </div>
         <vl-layer-vector v-else>
           <vl-source-vector>
-            <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" v-bind="feature">
+            <vl-feature
+              v-for="feature in features"
+              :key="feature.id"
+              :id="feature.id"
+              v-bind="feature"
+            >
               <component
                 :is="geometryTypeToCmpName(feature.geometry.type)"
                 v-bind="feature.geometry"
@@ -58,7 +63,9 @@
               <vl-style-box>
                 <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
                 <vl-style-fill color="rgba(21,198,166, 0.2)"></vl-style-fill>
-                <vl-style-text :text="feature.properties.nametag"></vl-style-text>
+                <vl-style-text
+                  :text="feature.properties.nametag"
+                ></vl-style-text>
               </vl-style-box>
             </vl-feature>
           </vl-source-vector>
@@ -123,7 +130,7 @@ export default {
     if (!this.big) {
       this.loadMapFeatures().then(f => {
         this.features = f.map(Object.freeze);
-        console.log(this.features)
+        console.log(this.features);
         this.loading = false;
       });
     } else {
