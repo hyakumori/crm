@@ -68,8 +68,6 @@
   </div>
 </template>
 <script>
-import axios from "../plugins/http";
-import * as olExt from "vuelayers/lib/ol-ext";
 import ContainerMixin from "./detail/ContainerMixin.js";
 import ContentHeader from "./detail/ContentHeader";
 import Vue from "vue";
