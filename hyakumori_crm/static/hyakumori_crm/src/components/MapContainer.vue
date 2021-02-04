@@ -287,9 +287,15 @@ export default {
     },
 
     echoedForestIdFromTable(val, prev) {
-      const featuresSource = this.vLayers.find(l => l.values_.id === "tableLayer").getSource()
-      const filteredFeature = featuresSource.getFeatures().find(f => f.id_ === val)
-      const prevFilteredFeature = featuresSource.getFeatures().find(f => f.id_ === prev)
+      const featuresSource = this.vLayers
+        .find(l => l.values_.id === "tableLayer")
+        .getSource();
+      const filteredFeature = featuresSource
+        .getFeatures()
+        .find(f => f.id_ === val);
+      const prevFilteredFeature = featuresSource
+        .getFeatures()
+        .find(f => f.id_ === prev);
 
       if (filteredFeature) {
         const style = new Style({
@@ -300,7 +306,7 @@ export default {
           }),
         });
 
-        filteredFeature.setStyle(style)
+        filteredFeature.setStyle(style);
       }
 
       if (prev) {
@@ -312,7 +318,7 @@ export default {
           }),
         });
 
-        prevFilteredFeature.setStyle(unstyle)
+        prevFilteredFeature.setStyle(unstyle);
       }
     },
   },
@@ -333,9 +339,9 @@ export default {
           text: val.values_.nametag,
         }),
       });
-      console.log(val)
-      val.setStyle(style)
-      this.$emit("echoSelectedFeature", val.id_)
+      console.log(val);
+      val.setStyle(style);
+      this.$emit("echoSelectedFeature", val.id_);
     },
 
     unSelectPoly(val) {
@@ -347,7 +353,7 @@ export default {
         }),
       });
       val.setStyle(style);
-      this.$emit("echoSelectedFeature", null)
+      this.$emit("echoSelectedFeature", null);
     },
 
     returnLayerLabel(layerId) {

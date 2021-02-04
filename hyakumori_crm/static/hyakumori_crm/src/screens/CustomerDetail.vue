@@ -34,7 +34,7 @@
           @saved="handleForestsSaved"
           :selectingForestId.sync="selectingForestId"
           itemClickable
-          @echoSelectedFeature="echoAndSetSelectedFeature"
+          @echoSelectedFeature="setSelectedFeatureFromTable"
           :echoedForestIdFromMap="echoedForest"
         />
 
@@ -43,7 +43,7 @@
           style="margin-top: -20px; margin-bottom: 62px"
           :forests="forests"
           :echoedForestIdFromTable="echoedForest"
-          @echoSelectedFeature="echoAndSetSelectedFeature"
+          @echoSelectedFeature="setSelectedFeatureFromMap"
         >
         </map-container>
 
@@ -390,10 +390,13 @@ export default {
       this.fetchContactsForests();
     },
 
-    echoAndSetSelectedFeature(val){
-      this.echoedForest = val
+    setSelectedFeatureFromMap(val) {
+      this.echoedForest = val;
     },
 
+    setSelectedFeatureFromTable(val) {
+      this.echoedForest = val;
+    },
   },
 
   computed: {

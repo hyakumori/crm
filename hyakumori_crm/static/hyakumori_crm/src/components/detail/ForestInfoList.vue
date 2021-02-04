@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       selectedForestId: null,
-    }
+    };
   },
 
   methods: {
@@ -56,13 +56,12 @@ export default {
 
   watch: {
     echoedForestId(val) {
-      this.selectedForestId = val
+      this.selectedForestId = val;
     },
 
     selectedId(val) {
-      this.selectedForestId = val
+      this.selectedForestId = val;
     },
   },
-
 };
 </script>
