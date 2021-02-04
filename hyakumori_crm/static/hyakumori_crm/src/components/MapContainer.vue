@@ -73,13 +73,13 @@
           </vl-source-image-wms>
         </vl-layer-image>
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector :features.sync="features" ident="poly-source"> </vl-source-vector>
+          <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
             <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
-        <vl-interaction-select type="Polygon" source="poly-source">
+        <vl-interaction-select>
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -96,36 +96,36 @@
           >
           </vl-source-image-wms>
         </vl-layer-image>
-        <vl-layer-vector
-          id="tableLayer"
-          render-mode="vector"
-          :z-index="10001"
-          :visible="true"
-        >
-          <vl-source-vector ident="poly-source">
+        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+          <vl-source-vector>
             <vl-feature
               v-for="feature in features"
               :key="feature.id"
               :id="feature.id"
               v-bind="feature"
+              :properties="feature.properties"
             >
               <component
                 :is="`vl-geom-multi-polygon`"
                 v-bind="feature.geometry"
-              />
+              >
+                {{ feature.properties.nametag }}
+              </component>
               <vl-style-box>
                 <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
                 <vl-style-fill color="red"></vl-style-fill>
-                <vl-style-text :text="feature.properties.nametag"></vl-style-text>
+                <vl-style-text
+                  :text="feature.properties.nametag"
+                ></vl-style-text>
               </vl-style-box>
             </vl-feature>
           </vl-source-vector>
         </vl-layer-vector>
-        <vl-interaction-select type="Polygon" source="poly-source">
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
+        <vl-interaction-select
+          @select="selectPoly"
+          @unselect="unSelectPoly"
+          :features.sync="selectedFeatures"
+        >
         </vl-interaction-select>
       </div>
     </vl-map>
@@ -139,9 +139,10 @@ import VectorSource from "vuelayers";
 import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
-import { SelectInteraction } from 'vuelayers'
+import { SelectInteraction } from "vuelayers";
+import { Fill, Stroke, Text, Style } from "ol/style";
 
-Vue.use(SelectInteraction)
+Vue.use(SelectInteraction);
 Vue.use(WmsSource);
 Vue.use(VueLayers);
 Vue.use(VectorSource);
@@ -168,6 +169,8 @@ export default {
     const mapLayers = [];
     const panelOpen = false;
     const mapVisible = true;
+    const selectedFeatures = [];
+    const layerSS = "";
 
     const baseLayers = [
       {
@@ -217,6 +220,8 @@ export default {
       mapVisible,
       baseLayers,
       rasterLayers,
+      selectedFeatures,
+      layerSS,
     };
   },
 
@@ -285,6 +290,30 @@ export default {
       this.returnMapLayers().then(l => {
         this.mapLayers = l;
       });
+    },
+
+    selectPoly(val) {
+      console.log(val, this.selectedFeatures)
+      const style = new Style({
+        stroke: new Stroke({ color: "blue" }),
+        fill: new Fill({ color: "gray" }),
+        text: new Text({
+          text: val.values_.nametag,
+        }),
+      });
+      val.setStyle(style);
+    },
+
+    unSelectPoly(val) {
+      console.log(val)
+      const style = new Style({
+        stroke: new Stroke({ color: "FFF" }),
+        fill: new Fill({ color: "red" }),
+        text: new Text({
+          text: val.values_.nametag,
+        }),
+      });
+      val.setStyle(style);
     },
 
     returnLayerLabel(layerId) {
