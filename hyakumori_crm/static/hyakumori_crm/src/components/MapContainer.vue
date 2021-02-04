@@ -108,9 +108,7 @@
               <component
                 :is="`vl-geom-multi-polygon`"
                 v-bind="feature.geometry"
-              >
-                {{ feature.properties.nametag }}
-              </component>
+              />
               <vl-style-box>
                 <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
                 <vl-style-fill color="red"></vl-style-fill>
@@ -301,7 +299,8 @@ export default {
           text: val.values_.nametag,
         }),
       });
-      val.setStyle(style);
+      val.setStyle(style)
+      this.$emit("echoSelectedFeature", val.id_)
     },
 
     unSelectPoly(val) {
@@ -314,6 +313,7 @@ export default {
         }),
       });
       val.setStyle(style);
+      this.$emit("echoSelectedFeature", null)
     },
 
     returnLayerLabel(layerId) {
