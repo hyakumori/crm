@@ -35,7 +35,7 @@
           :selectingForestId.sync="selectingForestId"
           itemClickable
           @echoSelectedFeature="echoSelectedFeature"
-          :echoedForestId="selectedForest"
+          :echoedForestId="echoedForest"
         />
 
         <map-container
@@ -253,7 +253,7 @@ export default {
       postalHistoriesLoading: this.checkAndShowLoading(),
       contactsForests: [],
       contactsForestsLoading: this.checkAndShowLoading(),
-      selectedForest: null,
+      echoedForest: null,
     };
   },
 
@@ -391,7 +391,7 @@ export default {
 
     echoSelectedFeature(val){
       console.log(val)
-      this.selectedForest = val
+      this.echoedForest = val
     },
 
   },
