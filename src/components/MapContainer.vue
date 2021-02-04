@@ -292,14 +292,14 @@ export default {
         .getSource();
       const filteredFeature = featuresSource
         .getFeatures()
-        .find(f => f.id_ === val);
+        .find(f => f.getId() === val);
       const prevFilteredFeature = featuresSource
         .getFeatures()
-        .find(f => f.id_ === prev);
+        .find(f => f.getId() === prev);
 
       if (filteredFeature) {
         const style = new Style({
-          stroke: new Stroke({ color: "blue" }),
+          stroke: new Stroke({ color: "FFF" }),
           fill: new Fill({ color: "gray" }),
           text: new Text({
             text: filteredFeature.values_.nametag,
@@ -333,15 +333,14 @@ export default {
 
     selectPoly(val) {
       const style = new Style({
-        stroke: new Stroke({ color: "blue" }),
+        stroke: new Stroke({ color: "FFF" }),
         fill: new Fill({ color: "gray" }),
         text: new Text({
           text: val.values_.nametag,
         }),
       });
-      console.log(val);
       val.setStyle(style);
-      this.$emit("echoSelectedFeature", val.id_);
+      this.$emit("echoSelectedFeature", val.getId());
     },
 
     unSelectPoly(val) {
