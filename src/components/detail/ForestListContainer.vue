@@ -20,6 +20,7 @@
         }
       "
       :itemClickable="itemClickable"
+      :echoedForestId="echoedForestId"
     />
     <addition-button
       ref="addBtn"
@@ -144,9 +145,9 @@ export default {
       );
     },
 
-    selectedForestId() {
-      return this.echoedForestId
-    },
+    // selectedForestId() {
+    //   return this.echoedForestId
+    // },
   },
   methods: {
     getForestDisplayName,
@@ -229,11 +230,11 @@ export default {
       }
     },
 
-    selectedForestId(val) {
-      console.log(val)
-      this.selectedForestId_ = val
-      console.log(this.selectedForestId_, 'foresgt_id_')
-    },
+    // selectedForestId(val) {
+    //   console.log(val)
+    //   this.selectedForestId_ = val
+    //   console.log(this.selectedForestId_, 'foresgt_id_')
+    // },
   },
 };
 </script>
