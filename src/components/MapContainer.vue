@@ -173,7 +173,6 @@ export default {
     const panelOpen = false;
     const mapVisible = true;
     const selectedFeatures = [];
-    const layerSS = "";
 
     const baseLayers = [
       {
@@ -224,7 +223,6 @@ export default {
       baseLayers,
       rasterLayers,
       selectedFeatures,
-      layerSS,
     };
   },
 
