@@ -115,6 +115,7 @@ export default {
     displayAdditionBtn: Boolean,
     selectingForestId: String,
     itemClickable: { type: Boolean, default: false },
+    echoedForestId: { type: String, default: null },
   },
   data() {
     return {
@@ -141,6 +142,10 @@ export default {
       return (
         this.forestIdsToDelete.length === 0 && this.forestIdsToAdd.length === 0
       );
+    },
+
+    selectedForestId() {
+      return this.echoedForestId
     },
   },
   methods: {
@@ -222,6 +227,12 @@ export default {
           this.itemsForAdding = { results: [] };
         }
       }
+    },
+
+    selectedForestId(val) {
+      console.log(val)
+      this.selectedForestId_ = val
+      console.log(this.selectedForestId_, 'foresgt_id_')
     },
   },
 };
