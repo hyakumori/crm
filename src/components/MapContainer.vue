@@ -157,6 +157,11 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    echoedForestIdFromTable: {
+      type: String,
+      default: null,
+    },
   },
 
   data() {
@@ -280,6 +285,36 @@ export default {
         });
       },
     },
+
+    echoedForestIdFromTable(val, prev) {
+      const featuresSource = this.vLayers.find(l => l.values_.id === "tableLayer").getSource()
+      const filteredFeature = featuresSource.getFeatures().find(f => f.id_ === val)
+      const prevFilteredFeature = featuresSource.getFeatures().find(f => f.id_ === prev)
+
+      if (filteredFeature) {
+        const style = new Style({
+          stroke: new Stroke({ color: "blue" }),
+          fill: new Fill({ color: "gray" }),
+          text: new Text({
+            text: filteredFeature.values_.nametag,
+          }),
+        });
+
+        filteredFeature.setStyle(style)
+      }
+
+      if (prev) {
+        const unstyle = new Style({
+          stroke: new Stroke({ color: "FFF" }),
+          fill: new Fill({ color: "red" }),
+          text: new Text({
+            text: prevFilteredFeature.values_.nametag,
+          }),
+        });
+
+        prevFilteredFeature.setStyle(unstyle)
+      }
+    },
   },
 
   methods: {
@@ -291,7 +326,6 @@ export default {
     },
 
     selectPoly(val) {
-      console.log(val, this.selectedFeatures)
       const style = new Style({
         stroke: new Stroke({ color: "blue" }),
         fill: new Fill({ color: "gray" }),
@@ -299,12 +333,12 @@ export default {
           text: val.values_.nametag,
         }),
       });
+      console.log(val)
       val.setStyle(style)
       this.$emit("echoSelectedFeature", val.id_)
     },
 
     unSelectPoly(val) {
-      console.log(val)
       const style = new Style({
         stroke: new Stroke({ color: "FFF" }),
         fill: new Fill({ color: "red" }),

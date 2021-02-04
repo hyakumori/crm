@@ -20,7 +20,7 @@
         }
       "
       :itemClickable="itemClickable"
-      :echoedForestId="echoedForestId"
+      :echoedForestId="echoedForestIdFromMap"
     />
     <addition-button
       ref="addBtn"
@@ -116,7 +116,7 @@ export default {
     displayAdditionBtn: Boolean,
     selectingForestId: String,
     itemClickable: { type: Boolean, default: false },
-    echoedForestId: { type: String, default: null },
+    echoedForestIdFromMap: { type: String, default: null },
   },
   data() {
     return {
@@ -213,6 +213,7 @@ export default {
   watch: {
     selectingForestId_(val) {
       this.$emit("update:selectingForestId", val);
+      this.$emit("echoSelectedFeature", val)
     },
     isEditing(val) {
       if (!val) {
@@ -230,7 +231,7 @@ export default {
       }
     },
 
-    echoedForestId(val) {
+    echoedForestIdFromMap(val) {
       this.selectingForestId_ = val
     },
   },
