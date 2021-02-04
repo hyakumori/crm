@@ -73,53 +73,61 @@
           </vl-source-image-wms>
         </vl-layer-image>
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector :features.sync="features"> </vl-source-vector>
+          <vl-source-vector :features.sync="features" ident="poly-source"> </vl-source-vector>
           <vl-style-box>
             <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
+        <vl-interaction-select type="Polygon" source="poly-source">
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+        </vl-interaction-select>
       </div>
-      <vl-layer-image v-else id="wmsLayer" :z-index="1000" :visible="false">
-        <vl-source-image-wms
-          url="http://localhost:8000/geoserver/crm/wms"
-          :image-load-function="imageLoader"
-          layers="crm:Forests"
-          projection="EPSG:4326"
-        >
-        </vl-source-image-wms>
-      </vl-layer-image>
-      <vl-layer-vector
-        id="tableLayer"
-        render-mode="vector"
-        :z-index="10001"
-        :visible="true"
-      >
-        <vl-source-vector ident="poly-source">
-          <vl-feature
-            v-for="feature in features"
-            :key="feature.id"
-            :id="feature.id"
-            v-bind="feature"
+      <div v-else>
+        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+          <vl-source-image-wms
+            url="http://localhost:8000/geoserver/crm/wms"
+            :image-load-function="imageLoader"
+            layers="crm:Forests"
+            projection="EPSG:4326"
           >
-            <component
-              :is="`vl-geom-multi-polygon`"
-              v-bind="feature.geometry"
-            />
-            <vl-style-box>
-              <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-              <vl-style-fill color="red"></vl-style-fill>
-              <vl-style-text :text="feature.properties.nametag"></vl-style-text>
-            </vl-style-box>
-          </vl-feature>
-        </vl-source-vector>
-      </vl-layer-vector>
-      <vl-interaction-select type="Polygon" source="poly-source">
-        <vl-style-box>
-          <vl-style-stroke color="blue"></vl-style-stroke>
-          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-        </vl-style-box>
-      </vl-interaction-select>
+          </vl-source-image-wms>
+        </vl-layer-image>
+        <vl-layer-vector
+          id="tableLayer"
+          render-mode="vector"
+          :z-index="10001"
+          :visible="true"
+        >
+          <vl-source-vector ident="poly-source">
+            <vl-feature
+              v-for="feature in features"
+              :key="feature.id"
+              :id="feature.id"
+              v-bind="feature"
+            >
+              <component
+                :is="`vl-geom-multi-polygon`"
+                v-bind="feature.geometry"
+              />
+              <vl-style-box>
+                <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
+                <vl-style-fill color="red"></vl-style-fill>
+                <vl-style-text :text="feature.properties.nametag"></vl-style-text>
+              </vl-style-box>
+            </vl-feature>
+          </vl-source-vector>
+        </vl-layer-vector>
+        <vl-interaction-select type="Polygon" source="poly-source">
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+        </vl-interaction-select>
+      </div>
     </vl-map>
   </div>
 </template>
