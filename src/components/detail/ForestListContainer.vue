@@ -230,11 +230,9 @@ export default {
       }
     },
 
-    // selectedForestId(val) {
-    //   console.log(val)
-    //   this.selectedForestId_ = val
-    //   console.log(this.selectedForestId_, 'foresgt_id_')
-    // },
+    echoedForestId(val) {
+      this.selectingForestId_ = val
+    },
   },
 };
 </script>
