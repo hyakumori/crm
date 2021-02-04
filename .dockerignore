@@ -1,14 +1,9 @@
-venv
+.github
 .vscode
-dist
-docker
-hyakumori_crm/static/hyakumori_crm/node_modules
+.editorconfig
+node_modules
 .env
 .env.example
-docker-compose.infra.yml
 Dockerfile
 .dockerignore
 .gitignore
-.gitlab-ci.yml
-hyakumori_crm.egg-info
-docker
