@@ -213,7 +213,7 @@ export default {
   watch: {
     selectingForestId_(val) {
       this.$emit("update:selectingForestId", val);
-      this.$emit("echoSelectedFeature", val)
+      this.$emit("echoSelectedFeature", val);
     },
     isEditing(val) {
       if (!val) {
@@ -232,7 +232,7 @@ export default {
     },
 
     echoedForestIdFromMap(val) {
-      this.selectingForestId_ = val
+      this.selectingForestId_ = val;
     },
   },
 };
