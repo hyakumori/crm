@@ -95,7 +95,7 @@
         :z-index="10001"
         :visible="true"
       >
-        <vl-source-vector>
+        <vl-source-vector ident="poly-source">
           <vl-feature
             v-for="feature in features"
             :key="feature.id"
@@ -114,6 +114,12 @@
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
+      <vl-interaction-select type="Polygon" source="poly-source">
+        <vl-style-box>
+          <vl-style-stroke color="blue"></vl-style-stroke>
+          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+        </vl-style-box>
+      </vl-interaction-select>
     </vl-map>
   </div>
 </template>
@@ -125,7 +131,9 @@ import VectorSource from "vuelayers";
 import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
+import { SelectInteraction } from 'vuelayers'
 
+Vue.use(SelectInteraction)
 Vue.use(WmsSource);
 Vue.use(VueLayers);
 Vue.use(VectorSource);
