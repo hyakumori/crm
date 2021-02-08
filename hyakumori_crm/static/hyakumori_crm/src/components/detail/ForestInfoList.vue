@@ -14,7 +14,7 @@
           @undoDeleteForest="$emit('undoDeleteForest', forest)"
           :added="forest.added"
           :deleted="forest.deleted"
-          :selectedId="selectedId"
+          :selectedId="selectedForestId"
           @selected="(fId, inx) => $emit('selected', fId, inx)"
           :clickable="itemClickable"
           :forestReprOwner="getForestReprOwner(forest)"
@@ -40,10 +40,28 @@ export default {
     isUpdate: Boolean,
     selectedId: String,
     itemClickable: { type: Boolean, default: false },
+    echoedForestId: String,
   },
+
+  data() {
+    return {
+      selectedForestId: null,
+    };
+  },
+
   methods: {
     getForestDisplayName,
     getForestReprOwner,
+  },
+
+  watch: {
+    echoedForestId(val) {
+      this.selectedForestId = val;
+    },
+
+    selectedId(val) {
+      this.selectedForestId = val;
+    },
   },
 };
 </script>

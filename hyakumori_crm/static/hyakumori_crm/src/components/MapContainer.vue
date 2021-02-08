@@ -79,41 +79,53 @@
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
+        <vl-interaction-select>
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+        </vl-interaction-select>
       </div>
-      <vl-layer-image v-else id="wmsLayer" :z-index="1000" :visible="false">
-        <vl-source-image-wms
-          url="http://localhost:8000/geoserver/crm/wms"
-          :image-load-function="imageLoader"
-          layers="crm:Forests"
-          projection="EPSG:4326"
-        >
-        </vl-source-image-wms>
-      </vl-layer-image>
-      <vl-layer-vector
-        id="tableLayer"
-        render-mode="vector"
-        :z-index="10001"
-        :visible="true"
-      >
-        <vl-source-vector>
-          <vl-feature
-            v-for="feature in features"
-            :key="feature.id"
-            :id="feature.id"
-            v-bind="feature"
+      <div v-else>
+        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+          <vl-source-image-wms
+            url="http://localhost:8000/geoserver/crm/wms"
+            :image-load-function="imageLoader"
+            layers="crm:Forests"
+            projection="EPSG:4326"
           >
-            <component
-              :is="`vl-geom-multi-polygon`"
-              v-bind="feature.geometry"
-            />
-            <vl-style-box>
-              <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-              <vl-style-fill color="red"></vl-style-fill>
-              <vl-style-text :text="feature.properties.nametag"></vl-style-text>
-            </vl-style-box>
-          </vl-feature>
-        </vl-source-vector>
-      </vl-layer-vector>
+          </vl-source-image-wms>
+        </vl-layer-image>
+        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+          <vl-source-vector>
+            <vl-feature
+              v-for="feature in features"
+              :key="feature.id"
+              :id="feature.id"
+              v-bind="feature"
+              :properties="feature.properties"
+            >
+              <component
+                :is="`vl-geom-multi-polygon`"
+                v-bind="feature.geometry"
+              />
+              <vl-style-box>
+                <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
+                <vl-style-fill color="red"></vl-style-fill>
+                <vl-style-text
+                  :text="feature.properties.nametag"
+                ></vl-style-text>
+              </vl-style-box>
+            </vl-feature>
+          </vl-source-vector>
+        </vl-layer-vector>
+        <vl-interaction-select
+          @select="selectPoly"
+          @unselect="unSelectPoly"
+          :features.sync="selectedFeatures"
+        >
+        </vl-interaction-select>
+      </div>
     </vl-map>
   </div>
 </template>
@@ -125,7 +137,10 @@ import VectorSource from "vuelayers";
 import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
+import { SelectInteraction } from "vuelayers";
+import { Fill, Stroke, Text, Style } from "ol/style";
 
+Vue.use(SelectInteraction);
 Vue.use(WmsSource);
 Vue.use(VueLayers);
 Vue.use(VectorSource);
@@ -142,6 +157,11 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    echoedForestIdFromTable: {
+      type: String,
+      default: null,
+    },
   },
 
   data() {
@@ -152,6 +172,7 @@ export default {
     const mapLayers = [];
     const panelOpen = false;
     const mapVisible = true;
+    const selectedFeatures = [];
 
     const baseLayers = [
       {
@@ -201,6 +222,7 @@ export default {
       mapVisible,
       baseLayers,
       rasterLayers,
+      selectedFeatures,
     };
   },
 
@@ -261,6 +283,42 @@ export default {
         });
       },
     },
+
+    echoedForestIdFromTable(val, prev) {
+      const featuresSource = this.vLayers
+        .find(l => l.values_.id === "tableLayer")
+        .getSource();
+      const filteredFeature = featuresSource
+        .getFeatures()
+        .find(f => f.getId() === val);
+      const prevFilteredFeature = featuresSource
+        .getFeatures()
+        .find(f => f.getId() === prev);
+
+      if (filteredFeature) {
+        const style = new Style({
+          stroke: new Stroke({ color: "FFF" }),
+          fill: new Fill({ color: "gray" }),
+          text: new Text({
+            text: filteredFeature.values_.nametag,
+          }),
+        });
+
+        filteredFeature.setStyle(style);
+      }
+
+      if (prev) {
+        const unstyle = new Style({
+          stroke: new Stroke({ color: "FFF" }),
+          fill: new Fill({ color: "red" }),
+          text: new Text({
+            text: prevFilteredFeature.values_.nametag,
+          }),
+        });
+
+        prevFilteredFeature.setStyle(unstyle);
+      }
+    },
   },
 
   methods: {
@@ -269,6 +327,30 @@ export default {
       this.returnMapLayers().then(l => {
         this.mapLayers = l;
       });
+    },
+
+    selectPoly(val) {
+      const style = new Style({
+        stroke: new Stroke({ color: "FFF" }),
+        fill: new Fill({ color: "gray" }),
+        text: new Text({
+          text: val.values_.nametag,
+        }),
+      });
+      val.setStyle(style);
+      this.$emit("echoSelectedFeature", val.getId());
+    },
+
+    unSelectPoly(val) {
+      const style = new Style({
+        stroke: new Stroke({ color: "FFF" }),
+        fill: new Fill({ color: "red" }),
+        text: new Text({
+          text: val.values_.nametag,
+        }),
+      });
+      val.setStyle(style);
+      this.$emit("echoSelectedFeature", null);
     },
 
     returnLayerLabel(layerId) {

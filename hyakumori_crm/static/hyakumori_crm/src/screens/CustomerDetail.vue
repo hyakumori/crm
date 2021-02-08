@@ -34,12 +34,16 @@
           @saved="handleForestsSaved"
           :selectingForestId.sync="selectingForestId"
           itemClickable
+          @echoSelectedFeature="setSelectedFeatureFromTable"
+          :echoedForestIdFromMap="echoedForest"
         />
 
         <map-container
           v-if="forests.length > 0"
           style="margin-top: -20px; margin-bottom: 62px"
           :forests="forests"
+          :echoedForestIdFromTable="echoedForest"
+          @echoSelectedFeature="setSelectedFeatureFromMap"
         >
         </map-container>
 
@@ -250,6 +254,7 @@ export default {
       postalHistoriesLoading: this.checkAndShowLoading(),
       contactsForests: [],
       contactsForestsLoading: this.checkAndShowLoading(),
+      echoedForest: null,
     };
   },
 
@@ -383,6 +388,14 @@ export default {
       this.fetchForests();
       this.fetchContacts();
       this.fetchContactsForests();
+    },
+
+    setSelectedFeatureFromMap(val) {
+      this.echoedForest = val;
+    },
+
+    setSelectedFeatureFromTable(val) {
+      this.echoedForest = val;
     },
   },
 
