@@ -105,7 +105,6 @@
         </vl-interaction-select>
         <vl-interaction-select
           :features.sync="selectedFeatures"
-          :multi="true"
           :condition="singleClick">
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
@@ -151,6 +150,30 @@
           @unselect="unSelectPoly"
           :features.sync="selectedFeatures"
         >
+        </vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="hoveredFeatures"
+          :condition="pointerMove">
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+          <vl-overlay
+            v-for="feature in hoveredFeatures"
+            :key="feature.id"
+            :id="feature.id"
+            class="feature-popup"
+            :position="pointOnSurface(feature.geometry)"
+          >
+            <template>
+              <v-card>
+                <v-card-title>
+                  <v-card-text>大茅: {{ feature.properties }}</v-card-text>
+                </v-card-title>
+                <v-card-text> 所有者: {{ feature.properties.customer.repr_name_kanji }}</v-card-text>
+              </v-card>
+            </template>
+          </vl-overlay>
         </vl-interaction-select>
       </div>
     </vl-map>
