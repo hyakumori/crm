@@ -1,34 +1,42 @@
-# hyakumori_crm
+# Hyakumori CRM
 
-## Project setup
+This repository holds the source code for the Hyakumori CRM. It 
 
-### Add env variables
+## Requirements
+
+- yarn >= 1.22.10
+
+## Installation
+
+1. Copy `.env.example` to `.env` and fill necessary variables.
 
 ```
 cp .env.example .env
 ```
 
-then update the variables to match the root `.env` file (used in backend environment).
-
-### install
+2. Install yarn dependencies.
 
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+## Usage
+
+Compile the app and launch with hot-reload for development with:
 
 ```
 yarn serve
 ```
 
-### Compiles and minifies for production
+Or compile and minify for production with:
 
 ```
 yarn build
 ```
 
-### Lints and fixes files
+## Development Tips
+
+Linting:
 
 ```
 yarn lint
