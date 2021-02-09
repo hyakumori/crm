@@ -81,7 +81,8 @@
         </vl-layer-vector>
         <vl-interaction-select
           :features.sync="hoveredFeatures"
-          :condition="pointerMove">
+          :condition="pointerMove"
+        >
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -96,16 +97,20 @@
             <template>
               <v-card>
                 <v-card-title>
-                  <v-card-text>大茅: {{ feature.properties }}</v-card-text>
+                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
                 </v-card-title>
-                <v-card-text> 所有者: {{ feature.properties.customer.repr_name_kanji }}</v-card-text>
+                <v-card-text>
+                  所有者:
+                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
+                >
               </v-card>
             </template>
           </vl-overlay>
         </vl-interaction-select>
         <vl-interaction-select
           :features.sync="selectedFeatures"
-          :condition="singleClick">
+          :condition="singleClick"
+        >
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -153,7 +158,8 @@
         </vl-interaction-select>
         <vl-interaction-select
           :features.sync="hoveredFeatures"
-          :condition="pointerMove">
+          :condition="pointerMove"
+        >
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -168,9 +174,12 @@
             <template>
               <v-card>
                 <v-card-title>
-                  <v-card-text>大茅: {{ feature.properties }}</v-card-text>
+                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
                 </v-card-title>
-                <v-card-text> 所有者: {{ feature.properties.customer.repr_name_kanji }}</v-card-text>
+                <v-card-text>
+                  所有者:
+                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
+                >
               </v-card>
             </template>
           </vl-overlay>
@@ -189,8 +198,8 @@ import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
-import { singleClick, pointerMove } from 'ol/events/condition';
-import {findPointOnSurface} from 'vuelayers/src/ol-ext/geom'
+import { singleClick, pointerMove } from "ol/events/condition";
+import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
 
 Vue.use(SelectInteraction);
 Vue.use(WmsSource);
@@ -225,7 +234,7 @@ export default {
     const panelOpen = false;
     const mapVisible = true;
     const selectedFeatures = [];
-    const hoveredFeatures = null
+    const hoveredFeatures = [];
 
     const baseLayers = [
       {
@@ -323,11 +332,11 @@ export default {
     },
 
     singleClick() {
-      return singleClick
+      return singleClick;
     },
 
     pointerMove() {
-      return pointerMove
+      return pointerMove;
     },
   },
 
@@ -444,6 +453,7 @@ export default {
             customer: f.attributes.customer_cache,
             internal_id: f.internal_id,
             nametag: f.tags["団地"] + " " + f.internal_id,
+            land_attributes: f.land_attributes,
           },
         };
       });
@@ -487,8 +497,13 @@ export default {
       newLayer.visible = true;
     },
 
-    pointOnSurface: findPointOnSurface,
+    returnPopupText(feature) {
+      const textOne = feature.properties.land_attributes['地番本番']
+      const textTwo = feature.properties.land_attributes['地番支番']
+      return textTwo ? textOne + ' - ' + textTwo : textOne
+    },
 
+    pointOnSurface: findPointOnSurface,
   },
 };
 </script>
