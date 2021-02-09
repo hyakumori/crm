@@ -4,7 +4,7 @@ This repository holds the source code for the Hyakumori CRM. It
 
 ## Requirements
 
-- yarn >= 1.22.10
+- yarn >= 1.22.5
 
 ## Installation
 
@@ -28,7 +28,7 @@ Compile the app and launch with hot-reload for development with:
 yarn serve
 ```
 
-Or compile and minify for production with:
+Or build for production with:
 
 ```
 yarn build
