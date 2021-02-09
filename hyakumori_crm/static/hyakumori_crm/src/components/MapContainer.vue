@@ -79,7 +79,18 @@
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
-        <vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="hoveredFeatures"
+          :condition="pointerMove">
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+        </vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="selectedFeatures"
+          :multi="true"
+          :condition="singleClick">
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -139,6 +150,7 @@ import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
+import { singleClick, pointerMove } from 'ol/events/condition';
 
 Vue.use(SelectInteraction);
 Vue.use(WmsSource);
@@ -173,6 +185,7 @@ export default {
     const panelOpen = false;
     const mapVisible = true;
     const selectedFeatures = [];
+    const hoveredFeatures = null
 
     const baseLayers = [
       {
@@ -223,6 +236,7 @@ export default {
       baseLayers,
       rasterLayers,
       selectedFeatures,
+      hoveredFeatures,
     };
   },
 
@@ -266,6 +280,14 @@ export default {
       return allLayers.filter(function(el) {
         return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
       });
+    },
+
+    singleClick() {
+      return singleClick
+    },
+
+    pointerMove() {
+      return pointerMove
     },
   },
 
