@@ -92,13 +92,11 @@
             :id="feature.id"
             class="feature-popup"
             :position="pointOnSurface(feature.geometry)"
-            :auto-pan="true"
-            :auto-pan-animation="{duration: 300}"
           >
             <template>
               <v-card>
                 <v-card-title>
-                  <v-card-text>大茅: {{ feature.properties.internal_id }}</v-card-text>
+                  <v-card-text>大茅: {{ feature.properties }}</v-card-text>
                 </v-card-title>
                 <v-card-text> 所有者: {{ feature.properties.customer.repr_name_kanji }}</v-card-text>
               </v-card>
@@ -169,6 +167,7 @@ import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
 import { singleClick, pointerMove } from 'ol/events/condition';
+import {findPointOnSurface} from 'vuelayers/src/ol-ext/geom'
 
 Vue.use(SelectInteraction);
 Vue.use(WmsSource);
@@ -464,6 +463,9 @@ export default {
         this.rasterLayers.find(layer => layer.id === id);
       newLayer.visible = true;
     },
+
+    pointOnSurface: findPointOnSurface,
+
   },
 };
 </script>
