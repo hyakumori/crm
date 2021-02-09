@@ -248,11 +248,11 @@ export default {
   },
 
   watch: {
-    // features: _.debounce(function() {
-    //   this.zoom =
-    //     this.calculatedBoundingBox[1] > 18 ? 18 : this.calculatedBoundingBox[1];
-    //   this.center = this.calculatedBoundingBox[0];
-    // }, 100),
+    features: _.debounce(function() {
+      this.zoom =
+        this.calculatedBoundingBox[1] > 18 ? 18 : this.calculatedBoundingBox[1];
+      this.center = this.calculatedBoundingBox[0];
+    }, 100),
 
     forests: {
       handler() {
