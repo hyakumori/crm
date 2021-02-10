@@ -1,0 +1,17 @@
+query getForestList($filter: ForestListFilterInput!) {
+  list_forests(data: $filter) {
+    ok
+    total
+    forests {
+      id
+      internal_id
+      geodata
+      attributes
+      cadastral
+      owner
+      contracts_json
+      tags
+      land_attributes
+    }
+  }
+}

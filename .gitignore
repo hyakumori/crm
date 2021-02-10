@@ -209,3 +209,5 @@ wpdevserver.lock
 
 media/**/*
 static/**/*
+
+.yarnrc
