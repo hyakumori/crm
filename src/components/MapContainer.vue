@@ -69,7 +69,6 @@
             url="http://localhost:8000/geoserver/crm/wms"
             :image-load-function="imageLoader"
             ref="hyakumoriSource"
-            :ext-params="{TILED: true, 'INFO_FORMAT': 'text/html'}"
             layers="crm:Forests"
             projection="EPSG:4326"
           >
@@ -203,7 +202,8 @@ import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
 import { singleClick, pointerMove } from "ol/events/condition";
 import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
-import { getPixelFromCoordinate } from "ol/PluggableMap"
+// import { getPixelFromCoordinate } from "ol/PluggableMap"
+import { getFeatureInfoUrl } from "ol/source/ImageWMS"
 
 Vue.use(SelectInteraction);
 Vue.use(WmsSource);
@@ -508,16 +508,18 @@ export default {
     },
 
     mapClicked(event) {
-      const viewResolution = this.$refs.hyakumoriView.currentResolution
-      const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, viewResolution)
+      const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, 0.00001, "EPSG:4326", {'INFO_FORMAT': 'application/json', 'feature_count': 1})
+
+      console.log(loggedURL)
+
+      let xhr = null
       if (loggedURL) {
-        const xhr = new XMLHttpRequest();
+        xhr = new XMLHttpRequest();
         xhr.open("GET", loggedURL);
         xhr.setRequestHeader(
           "Authorization",
           "Bearer " + localStorage.getItem("accessToken"),
         );
-        // xhr.responseType = "arraybuffer";
         // xhr.onload = function() {
         //   const arrayBufferView = new Uint8Array(this.response);
         //   const blob = new Blob([arrayBufferView], { type: "image/png" });
@@ -525,12 +527,18 @@ export default {
         //   im.getImage().src = urlCreator.createObjectURL(blob);
         // };
         xhr.send();
-        console.log(xhr.response)
         console.log(xhr)
         // fetch(loggedURL).then(response => {
         //   console.log(response.text())
         // })
+
       }
+
+      const itemr = this.$rest(loggedURL).then(x => {
+        return x
+      })
+
+      console.log(xhr.responseText)
 
       // console.log(this.$refs.hyakumoriSource.getPixelFromCoordinate(loggedURL))
       console.log(loggedURL)
