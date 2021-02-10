@@ -17,6 +17,5 @@ jobs:
 
       - name: Lint Vue
         run: |
-          cd hyakumori_crm/static/hyakumori_crm
           yarn install
           yarn lint --no-fix
