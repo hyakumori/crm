@@ -79,7 +79,38 @@
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
-        <vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="hoveredFeatures"
+          :condition="pointerMove"
+        >
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+          <vl-overlay
+            v-for="feature in hoveredFeatures"
+            :key="feature.id"
+            :id="feature.id"
+            class="feature-popup"
+            :position="pointOnSurface(feature.geometry)"
+          >
+            <template>
+              <v-card>
+                <v-card-title>
+                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
+                </v-card-title>
+                <v-card-text>
+                  所有者:
+                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
+                >
+              </v-card>
+            </template>
+          </vl-overlay>
+        </vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="selectedFeatures"
+          :condition="singleClick"
+        >
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
@@ -125,6 +156,34 @@
           :features.sync="selectedFeatures"
         >
         </vl-interaction-select>
+        <vl-interaction-select
+          :features.sync="hoveredFeatures"
+          :condition="pointerMove"
+        >
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
+          <vl-overlay
+            v-for="feature in hoveredFeatures"
+            :key="feature.id"
+            :id="feature.id"
+            class="feature-popup"
+            :position="pointOnSurface(feature.geometry)"
+          >
+            <template>
+              <v-card>
+                <v-card-title>
+                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
+                </v-card-title>
+                <v-card-text>
+                  所有者:
+                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
+                >
+              </v-card>
+            </template>
+          </vl-overlay>
+        </vl-interaction-select>
       </div>
     </vl-map>
   </div>
@@ -139,6 +198,8 @@ import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
+import { singleClick, pointerMove } from "ol/events/condition";
+import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
 
 Vue.use(SelectInteraction);
 Vue.use(WmsSource);
@@ -173,6 +234,7 @@ export default {
     const panelOpen = false;
     const mapVisible = true;
     const selectedFeatures = [];
+    const hoveredFeatures = [];
 
     const baseLayers = [
       {
@@ -223,6 +285,7 @@ export default {
       baseLayers,
       rasterLayers,
       selectedFeatures,
+      hoveredFeatures,
     };
   },
 
@@ -266,6 +329,14 @@ export default {
       return allLayers.filter(function(el) {
         return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
       });
+    },
+
+    singleClick() {
+      return singleClick;
+    },
+
+    pointerMove() {
+      return pointerMove;
     },
   },
 
@@ -382,6 +453,7 @@ export default {
             customer: f.attributes.customer_cache,
             internal_id: f.internal_id,
             nametag: f.tags["団地"] + " " + f.internal_id,
+            land_attributes: f.land_attributes,
           },
         };
       });
@@ -424,6 +496,14 @@ export default {
         this.rasterLayers.find(layer => layer.id === id);
       newLayer.visible = true;
     },
+
+    returnPopupText(feature) {
+      const textOne = feature.properties.land_attributes['地番本番']
+      const textTwo = feature.properties.land_attributes['地番支番']
+      return textTwo ? textOne + ' - ' + textTwo : textOne
+    },
+
+    pointOnSurface: findPointOnSurface,
   },
 };
 </script>
