@@ -74,6 +74,19 @@
           >
           </vl-source-image-wms>
         </vl-layer-image>
+        <vl-overlay :position="overlayCoordinate">
+          <template>
+            <v-card>
+              <v-card-title>
+                <v-card-text>大茅: {{ selectedFeature }}</v-card-text>
+              </v-card-title>
+              <!-- <v-card-text>
+                所有者:
+                {{ feature.properties.customer.repr_name_kanji }}</v-card-text
+              > -->
+            </v-card>
+          </template>
+        </vl-overlay>
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
@@ -237,8 +250,10 @@ export default {
     const mapLayers = [];
     const panelOpen = false;
     const mapVisible = true;
+    const selectedFeature = ''
     const selectedFeatures = [];
     const hoveredFeatures = [];
+    const overlayCoordinate = []
 
     const baseLayers = [
       {
@@ -288,8 +303,10 @@ export default {
       mapVisible,
       baseLayers,
       rasterLayers,
+      selectedFeature,
       selectedFeatures,
       hoveredFeatures,
+      overlayCoordinate,
     };
   },
 
@@ -507,12 +524,23 @@ export default {
       return textTwo ? textOne + ' - ' + textTwo : textOne
     },
 
-    mapClicked(event) {
-      const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, 0.00001, "EPSG:4326", {'INFO_FORMAT': 'application/json', 'feature_count': 1})
+    async mapClicked(event) {
+      const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, 0.00001, "EPSG:4326", {'INFO_FORMAT': 'application/json', 'feature_count': 1, 'query_layers': 'crm_Forests'})
+      // const areaf = this.$refs.map.getLayerById('wmsLayer')
+      // var hit = false;
+      // getFeatures, getLayersById['wmsLayer'] getFeaturesAtPixel, forEachLayerAtPixel, getLayers,  //.hyakumoriSource.forEachFeatureAtPixel(event.pixel)
+      this.overlayCoordinate = event.coordinate
 
-      console.log(loggedURL)
+      const returnResponseText = function(text) {
+        const jsoned = JSON.parse(text)
+        console.log(jsoned)
+        if (jsoned.features.length > 0) {
+          this.selectedFeature = text
+        }
+      }
 
       let xhr = null
+      const result = await xhr
       if (loggedURL) {
         xhr = new XMLHttpRequest();
         xhr.open("GET", loggedURL);
@@ -520,12 +548,13 @@ export default {
           "Authorization",
           "Bearer " + localStorage.getItem("accessToken"),
         );
-        // xhr.onload = function() {
-        //   const arrayBufferView = new Uint8Array(this.response);
-        //   const blob = new Blob([arrayBufferView], { type: "image/png" });
-        //   const urlCreator = window.URL || window.webkitURL;
-        //   im.getImage().src = urlCreator.createObjectURL(blob);
-        // };
+        xhr.onload = function() {
+          // const arrayBufferView = new Uint8Array(this.response);
+          // const blob = new Blob([arrayBufferView], { type: "image/png" });
+          // const urlCreator = window.URL || window.webkitURL;
+          // im.getImage().src = urlCreator.createObjectURL(blob);
+          returnResponseText(xhr.responseText)
+        };
         xhr.send();
         console.log(xhr)
         // fetch(loggedURL).then(response => {
@@ -533,16 +562,12 @@ export default {
         // })
 
       }
-
-      const itemr = this.$rest(loggedURL).then(x => {
-        return x
-      })
-
-      console.log(xhr.responseText)
-
       // console.log(this.$refs.hyakumoriSource.getPixelFromCoordinate(loggedURL))
       console.log(loggedURL)
+      // this.selectedFeature = xhr.response
     },
+
+
 
     pointOnSurface: findPointOnSurface,
   },
