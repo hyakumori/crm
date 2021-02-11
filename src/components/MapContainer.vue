@@ -79,8 +79,8 @@
           </vl-source-image-wms>
         </vl-layer-image>
 
-        <vl-overlay v-if="showCard" :position="overlayCoordinate">
-          <template>
+        <vl-overlay :position="overlayCoordinate">
+          <template v-if="showCard">
             <v-card>
               <v-card-title>
                 <v-card-text v-if="selectedFeature.textTwo">大茅: {{ selectedFeature.textOne }} - {{selectedFeature.textTwo}} </v-card-text>
@@ -206,7 +206,7 @@ export default {
     const selectedFeature = ''
     const showCard = false
     const selectedFeatures = [];
-    const overlayCoordinate = []
+    const overlayCoordinate = [0,0]
 
     const baseLayers = [
       {
