@@ -62,6 +62,7 @@
             prepend-icon="mdi-invert-colors"
             v-model="opacity"
             thumb-label
+            values="100"
           >
           </v-slider>
           <v-radio-group mandatory>
@@ -225,7 +226,7 @@ export default {
     const showCard = false;
     const selectedFeatures = [];
     const overlayCoordinate = [0, 0];
-    const opacity = 0;
+    const opacity = 50;
 
     const baseLayers = [
       {
