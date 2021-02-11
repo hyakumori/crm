@@ -103,8 +103,8 @@
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke color="green" :width="2"></vl-style-stroke>
-            <vl-style-fill color="#FF000000"></vl-style-fill>
+            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+            <vl-style-fill :color="color"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
 
@@ -144,7 +144,7 @@
                 v-bind="feature.geometry"
               />
               <vl-style-box>
-                <vl-style-stroke color="blue" :width="2"></vl-style-stroke>
+                <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
                 <vl-style-fill :color="color"></vl-style-fill>
                 <vl-style-text
                   :text="feature.properties.nametag"
@@ -281,7 +281,7 @@ export default {
 
   computed: {
     color() {
-      return "rgba(0,0,0,".concat(String(this.opacity/100)).concat(")");
+      return "rgba(39,78,19,".concat(String(this.opacity/100)).concat(")");
     },
 
     calculatedBoundingBox() {
@@ -362,8 +362,8 @@ export default {
 
       if (prev) {
         const unstyle = new Style({
-          stroke: new Stroke({ color: "FFF" }),
-          fill: new Fill({ color: "red" }),
+          stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
+          fill: new Fill({ color: this.color }),
           text: new Text({
             text: prevFilteredFeature.values_.nametag,
           }),
@@ -396,8 +396,8 @@ export default {
 
     unSelectPoly(val) {
       const style = new Style({
-        stroke: new Stroke({ color: "FFF" }),
-        fill: new Fill({ color: "red" }),
+        stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
+        fill: new Fill({ color: this.color }),
         text: new Text({
           text: val.values_.nametag,
         }),
