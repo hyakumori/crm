@@ -54,6 +54,12 @@
             :label="returnLayerLabel(layer.getProperties().id)"
           >
           </v-switch>
+          <v-slider
+            prepend-icon="mdi-invert-colors"
+            v-model="opacity"
+            thumb-label
+          >
+          </v-slider>
           <v-radio-group mandatory>
             <v-radio
               v-for="layer of rLayers"
@@ -97,8 +103,8 @@
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-            <vl-style-fill color="red"></vl-style-fill>
+            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+            <vl-style-fill :color="color"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
 
@@ -138,8 +144,8 @@
                 v-bind="feature.geometry"
               />
               <vl-style-box>
-                <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-                <vl-style-fill color="red"></vl-style-fill>
+                <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+                <vl-style-fill :color="color"></vl-style-fill>
                 <vl-style-text
                   :text="feature.properties.nametag"
                 ></vl-style-text>
@@ -207,6 +213,7 @@ export default {
     const showCard = false
     const selectedFeatures = [];
     const overlayCoordinate = [0,0]
+    const opacity = 0;
 
     const baseLayers = [
       {
@@ -260,6 +267,7 @@ export default {
       selectedFeatures,
       overlayCoordinate,
       showCard,
+      opacity,
     };
   },
 
@@ -272,6 +280,10 @@ export default {
   },
 
   computed: {
+    color() {
+      return "rgba(106,168,79,".concat(String(this.opacity/100)).concat(")");
+    },
+
     calculatedBoundingBox() {
       const coordinates = this.forests
         .map(f => f.geodata.coordinates)
@@ -350,8 +362,8 @@ export default {
 
       if (prev) {
         const unstyle = new Style({
-          stroke: new Stroke({ color: "FFF" }),
-          fill: new Fill({ color: "red" }),
+          stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
+          fill: new Fill({ color: this.color }),
           text: new Text({
             text: prevFilteredFeature.values_.nametag,
           }),
@@ -384,8 +396,8 @@ export default {
 
     unSelectPoly(val) {
       const style = new Style({
-        stroke: new Stroke({ color: "FFF" }),
-        fill: new Fill({ color: "red" }),
+        stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
+        fill: new Fill({ color: this.color }),
         text: new Text({
           text: val.values_.nametag,
         }),
