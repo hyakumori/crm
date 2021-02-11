@@ -97,8 +97,8 @@
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
-            <vl-style-fill color="red"></vl-style-fill>
+            <vl-style-stroke color="green" :width="2"></vl-style-stroke>
+            <vl-style-fill color="#FF000000"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
 
@@ -138,7 +138,7 @@
                 v-bind="feature.geometry"
               />
               <vl-style-box>
-                <vl-style-stroke color="#FFF" :width="1"></vl-style-stroke>
+                <vl-style-stroke color="green" :width="2"></vl-style-stroke>
                 <vl-style-fill color="red"></vl-style-fill>
                 <vl-style-text
                   :text="feature.properties.nametag"
