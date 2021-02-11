@@ -281,7 +281,7 @@ export default {
 
   computed: {
     color() {
-      return "rgba(39,78,19,".concat(String(this.opacity/100)).concat(")");
+      return "rgba(106,168,79,".concat(String(this.opacity/100)).concat(")");
     },
 
     calculatedBoundingBox() {
