@@ -4,9 +4,11 @@
       ref="map"
       data-projection="EPSG:4326"
       @mounted="onMapMounted"
+      @singleclick="mapClicked"
       style="height: 400px; width: 100%;"
     >
-      <vl-view :zoom.sync="zoom" :center.sync="center"></vl-view>
+      <vl-view :zoom.sync="zoom" :center.sync="center" ref="hyakumoriView"></vl-view>
+
       <vl-layer-tile
         v-for="baseLayer in baseLayers"
         :key="baseLayer.name"
@@ -19,6 +21,7 @@
           :attributions="baseLayer.attributions"
         />
       </vl-layer-tile>
+
       <vl-layer-image
         v-for="raster in rasterLayers"
         :key="raster.name"
@@ -33,6 +36,7 @@
         >
         </vl-source-image-wms>
       </vl-layer-image>
+
       <v-menu offset-y :z-index="1005" :close-on-content-click="false">
         <template v-slot:activator="{ on, attrs }">
           <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
@@ -62,16 +66,34 @@
           </v-radio-group>
         </div>
       </v-menu>
+
       <div v-if="big">
         <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
           <vl-source-image-wms
             url="http://localhost:8000/geoserver/crm/wms"
             :image-load-function="imageLoader"
+            ref="hyakumoriSource"
             layers="crm:Forests"
             projection="EPSG:4326"
           >
           </vl-source-image-wms>
         </vl-layer-image>
+
+        <vl-overlay :position="overlayCoordinate">
+          <template v-if="showCard">
+            <v-card>
+              <v-card-title>
+                <v-card-text v-if="selectedFeature.textTwo">大茅: {{ selectedFeature.textOne }} - {{selectedFeature.textTwo}} </v-card-text>
+                <v-card-text v-else>大茅: {{ selectedFeature.textOne }} </v-card-text>
+              </v-card-title>
+              <v-card-text>
+                所有者:
+                {{ selectedFeature.textName }}</v-card-text
+              >
+            </v-card>
+          </template>
+        </vl-overlay>
+
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector :features.sync="features"> </vl-source-vector>
           <vl-style-box>
@@ -79,34 +101,7 @@
             <vl-style-fill color="red"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
-        <vl-interaction-select
-          :features.sync="hoveredFeatures"
-          :condition="pointerMove"
-        >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-          <vl-overlay
-            v-for="feature in hoveredFeatures"
-            :key="feature.id"
-            :id="feature.id"
-            class="feature-popup"
-            :position="pointOnSurface(feature.geometry)"
-          >
-            <template>
-              <v-card>
-                <v-card-title>
-                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
-                </v-card-title>
-                <v-card-text>
-                  所有者:
-                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
-                >
-              </v-card>
-            </template>
-          </vl-overlay>
-        </vl-interaction-select>
+
         <vl-interaction-select
           :features.sync="selectedFeatures"
           :condition="singleClick"
@@ -117,6 +112,7 @@
           </vl-style-box>
         </vl-interaction-select>
       </div>
+
       <div v-else>
         <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
           <vl-source-image-wms
@@ -127,6 +123,7 @@
           >
           </vl-source-image-wms>
         </vl-layer-image>
+
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
           <vl-source-vector>
             <vl-feature
@@ -150,39 +147,12 @@
             </vl-feature>
           </vl-source-vector>
         </vl-layer-vector>
+
         <vl-interaction-select
           @select="selectPoly"
           @unselect="unSelectPoly"
           :features.sync="selectedFeatures"
         >
-        </vl-interaction-select>
-        <vl-interaction-select
-          :features.sync="hoveredFeatures"
-          :condition="pointerMove"
-        >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-          <vl-overlay
-            v-for="feature in hoveredFeatures"
-            :key="feature.id"
-            :id="feature.id"
-            class="feature-popup"
-            :position="pointOnSurface(feature.geometry)"
-          >
-            <template>
-              <v-card>
-                <v-card-title>
-                  <v-card-text>大茅: {{ returnPopupText(feature) }}</v-card-text>
-                </v-card-title>
-                <v-card-text>
-                  所有者:
-                  {{ feature.properties.customer.repr_name_kanji }}</v-card-text
-                >
-              </v-card>
-            </template>
-          </vl-overlay>
         </vl-interaction-select>
       </div>
     </vl-map>
@@ -198,7 +168,7 @@ import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
 import { Fill, Stroke, Text, Style } from "ol/style";
-import { singleClick, pointerMove } from "ol/events/condition";
+import { singleClick } from "ol/events/condition";
 import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
 
 Vue.use(SelectInteraction);
@@ -233,8 +203,10 @@ export default {
     const mapLayers = [];
     const panelOpen = false;
     const mapVisible = true;
+    const selectedFeature = ''
+    const showCard = false
     const selectedFeatures = [];
-    const hoveredFeatures = [];
+    const overlayCoordinate = [0,0]
 
     const baseLayers = [
       {
@@ -284,8 +256,10 @@ export default {
       mapVisible,
       baseLayers,
       rasterLayers,
+      selectedFeature,
       selectedFeatures,
-      hoveredFeatures,
+      overlayCoordinate,
+      showCard,
     };
   },
 
@@ -333,10 +307,6 @@ export default {
 
     singleClick() {
       return singleClick;
-    },
-
-    pointerMove() {
-      return pointerMove;
     },
   },
 
@@ -498,9 +468,25 @@ export default {
     },
 
     returnPopupText(feature) {
-      const textOne = feature.properties.land_attributes['地番本番']
-      const textTwo = feature.properties.land_attributes['地番支番']
-      return textTwo ? textOne + ' - ' + textTwo : textOne
+      const textOne = JSON.parse(feature.properties.land_attributes)['地番本番']
+      const textTwo = JSON.parse(feature.properties.land_attributes)['地番支番']
+      const textName = JSON.parse(feature.properties.attributes).customer_cache.repr_name_kanji
+      return {textTwo, textOne, textName}
+    },
+
+    async mapClicked(event) {
+      if (this.$refs.hyakumoriSource) {
+        const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, 0.000001, "EPSG:4326", {'INFO_FORMAT': 'application/json', 'feature_count': 1, 'query_layers': 'crm_Forests'})
+        this.overlayCoordinate = event.coordinate
+
+        let featureRequest = await this.$rest(loggedURL)
+        if (featureRequest.numberReturned > 0){
+          this.selectedFeature = this.returnPopupText(featureRequest.features[0])
+          this.showCard = true
+        } else {
+          this.showCard = false
+        }
+      }
     },
 
     pointOnSurface: findPointOnSurface,
