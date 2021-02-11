@@ -54,6 +54,12 @@
             :label="returnLayerLabel(layer.getProperties().id)"
           >
           </v-switch>
+          <v-slider
+            prepend-icon="mdi-invert-colors"
+            v-model="opacity"
+            thumb-label
+          >
+          </v-slider>
           <v-radio-group mandatory>
             <v-radio
               v-for="layer of rLayers"
@@ -138,8 +144,8 @@
                 v-bind="feature.geometry"
               />
               <vl-style-box>
-                <vl-style-stroke color="green" :width="2"></vl-style-stroke>
-                <vl-style-fill color="red"></vl-style-fill>
+                <vl-style-stroke color="blue" :width="2"></vl-style-stroke>
+                <vl-style-fill :color="color"></vl-style-fill>
                 <vl-style-text
                   :text="feature.properties.nametag"
                 ></vl-style-text>
@@ -207,6 +213,7 @@ export default {
     const showCard = false
     const selectedFeatures = [];
     const overlayCoordinate = [0,0]
+    const opacity = 0;
 
     const baseLayers = [
       {
@@ -260,6 +267,7 @@ export default {
       selectedFeatures,
       overlayCoordinate,
       showCard,
+      opacity,
     };
   },
 
@@ -272,6 +280,10 @@ export default {
   },
 
   computed: {
+    color() {
+      return "rgba(0,0,0,".concat(String(this.opacity/100)).concat(")");
+    },
+
     calculatedBoundingBox() {
       const coordinates = this.forests
         .map(f => f.geodata.coordinates)
