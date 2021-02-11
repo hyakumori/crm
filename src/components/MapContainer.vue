@@ -7,7 +7,11 @@
       @singleclick="mapClicked"
       style="height: 400px; width: 100%;"
     >
-      <vl-view :zoom.sync="zoom" :center.sync="center" ref="hyakumoriView"></vl-view>
+      <vl-view
+        :zoom.sync="zoom"
+        :center.sync="center"
+        ref="hyakumoriView"
+      ></vl-view>
 
       <vl-layer-tile
         v-for="baseLayer in baseLayers"
@@ -58,6 +62,7 @@
             prepend-icon="mdi-invert-colors"
             v-model="opacity"
             thumb-label
+            values="100"
           >
           </v-slider>
           <v-radio-group mandatory>
@@ -88,14 +93,19 @@
         <vl-overlay :position="overlayCoordinate">
           <template v-if="showCard">
             <v-card>
-              <v-card-title>
-                <v-card-text v-if="selectedFeature.textTwo">大茅: {{ selectedFeature.textOne }} - {{selectedFeature.textTwo}} </v-card-text>
-                <v-card-text v-else>大茅: {{ selectedFeature.textOne }} </v-card-text>
-              </v-card-title>
-              <v-card-text>
-                所有者:
-                {{ selectedFeature.textName }}</v-card-text
-              >
+              <v-card-text v-if="selectedFeature.textTwo" class="text-center">
+                大茅: {{ selectedFeature.textOne }} -
+                {{ selectedFeature.textTwo }}
+                <v-icon color="primary" v-on:click="routeForest(selectedFeature.forestID)"> mdi-arrow-right-circle</v-icon>
+                <br>
+                所有者: {{ selectedFeature.textName }}
+              </v-card-text>
+              <v-card-text v-else class="text-center">
+                大茅: {{ selectedFeature.textOne }}
+                <v-icon color="primary" v-on:click="routeForest(selectedFeature.forestID)"> mdi-arrow-right-circle</v-icon>
+                <br>
+                所有者: {{ selectedFeature.textName }}
+              </v-card-text>
             </v-card>
           </template>
         </vl-overlay>
@@ -144,7 +154,10 @@
                 v-bind="feature.geometry"
               />
               <vl-style-box>
-                <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+                <vl-style-stroke
+                  color="rgb(39,78,19)"
+                  :width="2"
+                ></vl-style-stroke>
                 <vl-style-fill :color="color"></vl-style-fill>
                 <vl-style-text
                   :text="feature.properties.nametag"
@@ -209,11 +222,11 @@ export default {
     const mapLayers = [];
     const panelOpen = false;
     const mapVisible = true;
-    const selectedFeature = ''
-    const showCard = false
+    const selectedFeature = "";
+    const showCard = false;
     const selectedFeatures = [];
-    const overlayCoordinate = [0,0]
-    const opacity = 0;
+    const overlayCoordinate = [0, 0];
+    const opacity = 50;
 
     const baseLayers = [
       {
@@ -281,7 +294,7 @@ export default {
 
   computed: {
     color() {
-      return "rgba(106,168,79,".concat(String(this.opacity/100)).concat(")");
+      return "rgba(106,168,79,".concat(String(this.opacity / 100)).concat(")");
     },
 
     calculatedBoundingBox() {
@@ -375,6 +388,10 @@ export default {
   },
 
   methods: {
+    routeForest(val) {
+      this.$router.push(`forests/${val}`);
+    },
+
     onMapMounted() {
       this.$refs.map.$map.getControls().extend([new ScaleLine()]);
       this.returnMapLayers().then(l => {
@@ -480,23 +497,40 @@ export default {
     },
 
     returnPopupText(feature) {
-      const textOne = JSON.parse(feature.properties.land_attributes)['地番本番']
-      const textTwo = JSON.parse(feature.properties.land_attributes)['地番支番']
-      const textName = JSON.parse(feature.properties.attributes).customer_cache.repr_name_kanji
-      return {textTwo, textOne, textName}
+      const forestID = feature.properties.id;
+      const textOne = JSON.parse(feature.properties.land_attributes)[
+        "地番本番"
+      ];
+      const textTwo = JSON.parse(feature.properties.land_attributes)[
+        "地番支番"
+      ];
+      const textName = JSON.parse(feature.properties.attributes).customer_cache
+        .repr_name_kanji;
+      return { textTwo, textOne, textName, forestID };
     },
 
     async mapClicked(event) {
       if (this.$refs.hyakumoriSource) {
-        const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(event.coordinate, 0.000001, "EPSG:4326", {'INFO_FORMAT': 'application/json', 'feature_count': 1, 'query_layers': 'crm_Forests'})
-        this.overlayCoordinate = event.coordinate
+        const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
+          event.coordinate,
+          0.000001,
+          "EPSG:4326",
+          {
+            INFO_FORMAT: "application/json",
+            feature_count: 1,
+            query_layers: "crm_Forests",
+          },
+        );
+        this.overlayCoordinate = event.coordinate;
 
-        let featureRequest = await this.$rest(loggedURL)
-        if (featureRequest.numberReturned > 0){
-          this.selectedFeature = this.returnPopupText(featureRequest.features[0])
-          this.showCard = true
+        let featureRequest = await this.$rest(loggedURL);
+        if (featureRequest.numberReturned > 0) {
+          this.selectedFeature = this.returnPopupText(
+            featureRequest.features[0],
+          );
+          this.showCard = true;
         } else {
-          this.showCard = false
+          this.showCard = false;
         }
       }
     },
