@@ -532,11 +532,9 @@ export default {
 
         let featureRequest = await this.$rest(loggedURL);
         if (featureRequest.numberReturned > 0) {
-          console.log(featureRequest)
           this.selectedFeature = this.returnPopupText(
             featureRequest.features[0],
           );
-          console.log(this.selectedFeature)
           this.showCard = true;
         } else {
           this.showCard = false;
