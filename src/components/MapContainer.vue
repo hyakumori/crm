@@ -497,7 +497,14 @@ export default {
     },
 
     returnPopupText(feature) {
-      const forestID = feature.properties.id;
+      let forestID = feature.id;
+      let parsedID = null
+      if (forestID.indexOf('.')) {
+        console.log(forestID.indexOf('.')+1)
+        parsedID = forestID.substring(forestID.indexOf('.') + 1)
+        forestID = parsedID
+      }
+
       const textOne = JSON.parse(feature.properties.land_attributes)[
         "地番本番"
       ];
@@ -525,9 +532,11 @@ export default {
 
         let featureRequest = await this.$rest(loggedURL);
         if (featureRequest.numberReturned > 0) {
+          console.log(featureRequest)
           this.selectedFeature = this.returnPopupText(
             featureRequest.features[0],
           );
+          console.log(this.selectedFeature)
           this.showCard = true;
         } else {
           this.showCard = false;
