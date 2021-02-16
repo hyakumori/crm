@@ -342,19 +342,9 @@ export default {
     },
     rLayers() {
       const allLayers = this.mapLayers;
-      const sortedLayers = allLayers.filter(function(el) {
+      return allLayers.filter(function(el) {
         return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
       });
-
-      return sortedLayers.sort(function (a, b) {
-        if (a.getProperties().id < b.getProperties().id) {
-          return -1
-        }
-        if (a.getProperties().id > b.getProperties().id) {
-          return 1
-        }
-        return 0
-      })
     },
 
     singleClick() {
