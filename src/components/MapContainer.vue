@@ -238,7 +238,7 @@ export default {
     const selectedFeatures = [];
     const overlayCoordinate = [0, 0];
     const opacity = 50;
-    const layerRadio = "std"
+    const layerRadio = "std";
 
     const geoserver_baseUrl =
       process.env.VUE_APP_GEOSERVER ?? "http://localhost:8000/geoserver";
@@ -297,7 +297,7 @@ export default {
       showCard,
       opacity,
       geoserver_baseUrl,
-      layerRadio,
+      layerRadio
     };
   },
 
