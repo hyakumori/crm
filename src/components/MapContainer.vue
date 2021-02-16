@@ -81,7 +81,7 @@
       <div v-if="big">
         <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
           <vl-source-image-wms
-            url="http://localhost:8000/geoserver/crm/wms"
+            :url="geoserver_baseUrl.concat('/crm/wms')"
             :image-load-function="imageLoader"
             ref="hyakumoriSource"
             layers="crm:Forests"
@@ -132,7 +132,7 @@
       <div v-else>
         <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
           <vl-source-image-wms
-            url="http://localhost:8000/geoserver/crm/wms"
+            :url="geoserver_baseUrl.concat('/crm/wms')"
             :image-load-function="imageLoader"
             layers="crm:Forests"
             projection="EPSG:4326"
@@ -228,6 +228,9 @@ export default {
     const overlayCoordinate = [0, 0];
     const opacity = 50;
 
+    const geoserver_baseUrl =
+      process.env.VUE_APP_GEOSERVER ?? "http://localhost:8000/geoserver";
+
     const baseLayers = [
       {
         name: "標準地図",
@@ -281,6 +284,7 @@ export default {
       overlayCoordinate,
       showCard,
       opacity,
+      geoserver_baseUrl,
     };
   },
 
