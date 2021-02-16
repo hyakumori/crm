@@ -24,13 +24,13 @@ setupRouter(router);
 
 Vue.use(HttpClientPlugin);
 Vue.use(VeeValidate, {
-  i18n,
+  i18n
 });
 Vue.use(AclSetup);
 Vue.use(VuetifyDialog, {
   context: {
-    vuetify,
-  },
+    vuetify
+  }
 });
 Vue.use(ActionLog);
 Vue.use(VueMask);
@@ -41,7 +41,7 @@ const vm = new Vue({
   i18n,
   router,
   apolloProvider: createProvider(),
-  render: h => h(App),
+  render: h => h(App)
 });
 
 vm.$mount("#app");

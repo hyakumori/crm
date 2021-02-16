@@ -38,7 +38,7 @@ export default {
   name: "content-header",
 
   components: {
-    AdditionButton,
+    AdditionButton
   },
 
   props: {
@@ -47,16 +47,16 @@ export default {
     toggleEditBtnContent: String,
     displayAdditionBtn: {
       type: Boolean,
-      default: true,
+      default: true
     },
-    permissions: Array,
+    permissions: Array
   },
 
   methods: {
     enableEdit() {
       this.$emit("toggleEdit", true);
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -74,12 +74,12 @@ export default {
   name: "contact-tab",
 
   components: {
-    CustomerContactList,
+    CustomerContactList
   },
 
   data() {
     return {
-      selectedTab: "owner",
+      selectedTab: "owner"
     };
   },
 
@@ -88,7 +88,7 @@ export default {
     customersContacts: Array,
     isEditing: Boolean,
     selectingCustomerId: String,
-    customerIdNameMap: Object,
+    customerIdNameMap: Object
   },
 
   methods: {
@@ -98,7 +98,7 @@ export default {
 
     contactorTabClick() {
       this.selectedTab = "contactor";
-    },
+    }
   },
 
   computed: {
@@ -108,8 +108,8 @@ export default {
 
     representativeNote() {
       return this.selectedTab === "owner" ? "代表連絡者" : "主要連絡者";
-    },
-  },
+    }
+  }
 };
 </script>
 

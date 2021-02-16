@@ -156,7 +156,7 @@ export default {
   props: {
     appName: { type: String, required: true },
     objectType: { type: String, required: true },
-    showDialog: { type: Boolean, default: false },
+    showDialog: { type: Boolean, default: false }
   },
   components: { TagSettingColorItem },
   data() {
@@ -169,29 +169,29 @@ export default {
       tagValues: [],
       colorMaps: [],
       selectedTag: {
-        ...this.buildTagSetting(),
+        ...this.buildTagSetting()
       },
       originalSelectedTag: {
-        ...this.buildTagSetting(),
+        ...this.buildTagSetting()
       },
       selectedTagMigrateInfo: null,
       addingColorItem: {
         value: "",
-        color: "#FF0000",
-      },
+        color: "#FF0000"
+      }
     };
   },
   created() {
     this.debouncedGetMigrateInfo = debounce(
       async () => await this.getTagMigrateInfo(),
-      300,
+      300
     );
   },
   methods: {
     updateTagItemColor(colorVal, item) {
       const colors = this.selectedTag.attributes.colors || [];
       const itemIndex = colors.findIndex(
-        setting => setting.value === item.value,
+        setting => setting.value === item.value
       );
       if (itemIndex > -1) {
         colors[itemIndex].color = colorVal.hex;
@@ -208,12 +208,12 @@ export default {
         width: "20px",
         marginTop: "3px",
         borderRadius: menu ? "50%" : "4px",
-        transition: "border-radius 200ms ease-in-out",
+        transition: "border-radius 200ms ease-in-out"
       };
     },
     async getTagValues() {
       const tags = await this.$rest.get(
-        `/tags/${this.appName}/${this.objectType}`,
+        `/tags/${this.appName}/${this.objectType}`
       );
       if (tags && tags.results) {
         this.tagValues = tags.results;
@@ -221,12 +221,12 @@ export default {
     },
     async getTagSettings() {
       const response = await this.$rest.get(
-        `/tags/settings/${this.appName}/${this.objectType}`,
+        `/tags/settings/${this.appName}/${this.objectType}`
       );
       if (response && response.results) {
         this.tagSettings = response.results.map(item => ({
           ...item,
-          original_name: item.name,
+          original_name: item.name
         }));
       }
     },
@@ -236,10 +236,10 @@ export default {
     buildTagSetting() {
       return {
         attributes: {
-          colors: [],
+          colors: []
         },
         code: "",
-        name: "",
+        name: ""
       };
     },
     switchToAddNew() {
@@ -266,8 +266,8 @@ export default {
         const confirm = await this.$dialog.confirm({
           title: this.$t("tags.migrate_title"),
           text: this.$t("tags.confirm_migrate", {
-            total: this.selectedTagMigrateInfo,
-          }),
+            total: this.selectedTagMigrateInfo
+          })
         });
         if (!confirm) {
           return;
@@ -283,17 +283,17 @@ export default {
             id: this.selectedTag.id,
             name: this.selectedTag.name,
             code: this.selectedTag.code,
-            color_maps: this.colorMaps,
+            color_maps: this.colorMaps
           },
           {
-            no_activity: true,
-          },
+            no_activity: true
+          }
         );
         if (response) {
           await this.getTagSettings();
           this.selectedTag = {
             ...response.results,
-            original_name: response.results.name,
+            original_name: response.results.name
           };
           this.onSelectedTagIdChanged();
         }
@@ -320,11 +320,11 @@ export default {
           {
             name: this.selectedTag.name,
             code: this.selectedTag.code,
-            color_maps: this.colorMaps,
+            color_maps: this.colorMaps
           },
           {
-            no_activity: true,
-          },
+            no_activity: true
+          }
         );
         if (response && response.results) {
           await this.getTagSettings();
@@ -341,11 +341,11 @@ export default {
         const response = await this.$rest.post(
           `/tags/${this.appName}/${this.objectType}/delete`,
           {
-            id: this.selectedTag.id,
+            id: this.selectedTag.id
           },
           {
-            no_activity: true,
-          },
+            no_activity: true
+          }
         );
         if (response) {
           await this.getTagSettings();
@@ -363,11 +363,11 @@ export default {
           {
             from_key: this.selectedTag.original_name,
             to_key: this.selectedTag.name,
-            do_update: false,
+            do_update: false
           },
           {
-            no_activity: true,
-          },
+            no_activity: true
+          }
         );
         if (response) {
           this.selectedTagMigrateInfo = response.total;
@@ -394,14 +394,14 @@ export default {
       }
       if (
         this.colorMaps.findIndex(
-          item => item.value === this.addingColorItem.value,
+          item => item.value === this.addingColorItem.value
         ) > -1
       ) {
         return;
       }
       this.colorMaps.push({
         ...this.addingColorItem,
-        menu: false,
+        menu: false
       });
       this.initAddingColorItem();
     },
@@ -416,7 +416,7 @@ export default {
         this.selectedTag = { ...tag };
       }
       this.originalSelectedTag = cloneDeep(this.selectedTag);
-    },
+    }
   },
   computed: {
     isEditing() {
@@ -425,10 +425,10 @@ export default {
     hasChanged() {
       const colors = this.colorMaps.map(item => ({
         color: item.color,
-        value: item.value,
+        value: item.value
       }));
       const originalColorsAttrs = JSON.parse(
-        JSON.stringify(_get(this.originalSelectedTag, "attributes.colors", [])),
+        JSON.stringify(_get(this.originalSelectedTag, "attributes.colors", []))
       );
       return (
         !isEqual(this.selectedTag, this.originalSelectedTag) ||
@@ -437,7 +437,7 @@ export default {
     },
     canSave() {
       return this.selectedTag.name && this.selectedTag.name.length > 0;
-    },
+    }
   },
   watch: {
     async showDialog(val) {
@@ -460,13 +460,13 @@ export default {
         ) {
           this.colorMaps = this.selectedTag.attributes.colors.map(item => ({
             ...item,
-            menu: false,
+            menu: false
           }));
         } else {
           this.initAddingColorItem();
           this.colorMaps = [];
         }
-      },
+      }
     },
     "selectedTag.name"(val) {
       if (
@@ -491,8 +491,8 @@ export default {
       } else {
         this.selectedTagId = null;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

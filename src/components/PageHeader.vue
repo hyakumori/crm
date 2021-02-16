@@ -112,14 +112,14 @@
                 <div
                   class="white--text page-header__detail__data"
                   :class="{
-                    'default-height': isDetail,
+                    'default-height': isDetail
                   }"
                 >
                   <p
                     class="text-truncate page-header__detail__data__title font-weight-bold"
                     :class="{
                       'mb-2': !headerInfo.desc,
-                      'mb-0': !!headerInfo.desc,
+                      'mb-0': !!headerInfo.desc
                     }"
                   >
                     {{ headerInfo.title }}
@@ -172,7 +172,7 @@ export default {
 
   data() {
     return {
-      user: null,
+      user: null
     };
   },
   methods: {
@@ -188,7 +188,7 @@ export default {
       } catch {
         this.user = null;
       }
-    },
+    }
   },
 
   computed: {
@@ -225,14 +225,14 @@ export default {
         this.$store.state.backBtnContent &&
         this.$store.state.backBtnContent.length > 0
       );
-    },
+    }
   },
 
   created() {
     this.getUserInfo();
     busEvent.$off("profile:refresh");
     busEvent.$on("profile:refresh", () => this.getUserInfo());
-  },
+  }
 };
 </script>
 

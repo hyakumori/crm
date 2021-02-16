@@ -58,12 +58,12 @@ export default {
     cancel: Function,
     ripple: {
       type: Boolean,
-      default: true,
+      default: true
     },
     routeName: {
       type: String,
-      default: "archive-detail",
-    },
+      default: "archive-detail"
+    }
   },
 
   methods: {
@@ -92,13 +92,13 @@ export default {
           results +=
             " " +
             this.$t("tables.another_item_human_kanji", {
-              count: list.length - 1,
+              count: list.length - 1
             });
         }
         return results;
       }
       return "";
-    },
+    }
   },
 
   computed: {
@@ -108,8 +108,8 @@ export default {
       } else {
         return "mdi-chevron-right";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

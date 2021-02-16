@@ -8,14 +8,14 @@ setInteractionMode("eager");
 export default {
   components: {
     ValidationObserver,
-    TextInput,
+    TextInput
   },
   props: ["formData", "id", "toggleEditing"],
   data() {
     return {
       shown: false,
       submiting: false,
-      form: {},
+      form: {}
     };
   },
   mounted() {
@@ -42,8 +42,8 @@ export default {
     handleCancel() {
       this.form = { ...this.formData };
       this.toggleEditing();
-    },
-  },
+    }
+  }
 };
 </script>
 

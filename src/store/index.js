@@ -12,7 +12,7 @@ export default new Vuex.Store({
     headerInfo: {},
     headerTagColor: "transparent",
     backBtnContent: "",
-    inMaintain: false,
+    inMaintain: false
   },
   mutations: {
     setPageHeader(state, pageHeader) {
@@ -35,7 +35,7 @@ export default new Vuex.Store({
     },
     setInMaintain(state, value) {
       state.inMaintain = value;
-    },
+    }
   },
   actions: {
     setPageHeader({ commit }, pageHeader) {
@@ -61,9 +61,9 @@ export default new Vuex.Store({
         const status = await api.getMaintenanceStatus();
         commit("setInMaintain", status.in_maintain);
       } catch {}
-    },
+    }
   },
   modules: {
-    forest,
-  },
+    forest
+  }
 });

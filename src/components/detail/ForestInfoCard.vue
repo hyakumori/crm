@@ -63,7 +63,7 @@ export default {
     mode: { type: String, default: "view" },
     handleDeleteClick: Function,
     clickable: { type: Boolean, default: false },
-    forestReprOwner: { type: String },
+    forestReprOwner: { type: String }
   },
   computed: {
     actionIcon() {
@@ -71,8 +71,8 @@ export default {
     },
     selected() {
       return this.selectedId === this.card_id;
-    },
-  },
+    }
+  }
 };
 </script>
 

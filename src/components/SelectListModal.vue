@@ -54,12 +54,12 @@ export default {
     "loading",
     "handleSubmitClick",
     "disableAdditionBtn",
-    "handleCancelClick",
+    "handleCancelClick"
   ],
   data() {
     return {
       shown_: false,
-      keyword: "",
+      keyword: ""
     };
   },
   mounted() {
@@ -73,7 +73,7 @@ export default {
       if (val != this.shown) {
         this.$emit("update:shown", val);
       }
-    },
+    }
   },
   methods: {
     onCancel() {
@@ -89,19 +89,19 @@ export default {
       if (el.scrollHeight - el.scrollTop < (el.clientHeight * 4) / 3) {
         this.$emit("needToLoad");
       }
-    },
+    }
   },
   computed: {
     isSearchEmpty() {
       return this.keyword === "";
-    },
+    }
   },
   beforeDestroy() {
     this.$refs.listContent.removeEventListener(
       "scroll",
-      this.needLoadOnNearEnd,
+      this.needLoadOnNearEnd
     );
-  },
+  }
 };
 </script>
 

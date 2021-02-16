@@ -28,8 +28,8 @@ export default {
     cancel: Function,
     saveDisabled: Boolean,
     saving: Boolean,
-    small: Boolean,
-  },
+    small: Boolean
+  }
 };
 </script>
 

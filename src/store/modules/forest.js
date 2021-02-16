@@ -12,7 +12,7 @@ const state = {
   archives: [],
   postalHistories: [],
   archivesLoading: false,
-  postalHistoriesLoading: false,
+  postalHistoriesLoading: false
 };
 
 const getters = {
@@ -23,12 +23,12 @@ const getters = {
       subTitle: getters.owner_repr,
       desc: state.forest.internal_id,
       tags: tags_to_array(state.forest.tags),
-      backUrl: { name: "forests" },
+      backUrl: { name: "forests" }
     };
   },
   owner_repr(state) {
     const names = state.forest.attributes.customer_cache.repr_name_kanji.split(
-      ",",
+      ","
     );
     if (names.length === 0) return "";
     return `${names[0]}${names.length > 1 ? ` 他${names.length - 1}名` : ""}`;
@@ -50,13 +50,13 @@ const getters = {
   customerIdNameMap(state) {
     if (state.customers.length === 0) return {};
     return Object.fromEntries(
-      state.customers.map(c => [c.id, c.self_contact?.name_kanji]),
+      state.customers.map(c => [c.id, c.self_contact?.name_kanji])
     );
   },
   taggedCustomers(state) {
     if (state.customers.length === 0) return [];
     return state.customers.filter(c => some(Object.values(c.tags), Boolean));
-  },
+  }
 };
 
 const actions = {
@@ -95,12 +95,12 @@ const actions = {
   },
   toggleDefaultCustomerContactLocal(
     { commit },
-    { customer_id, contact_id, val },
+    { customer_id, contact_id, val }
   ) {
     commit("toggleDefaultCustomerContactLocal", {
       customer_id,
       contact_id,
-      val,
+      val
     });
   },
   async toggleDefaultCustomer({}, { id, customer_id, val }) {
@@ -111,9 +111,9 @@ const actions = {
       id,
       customer_id,
       contact_id,
-      val,
+      val
     );
-  },
+  }
 };
 
 const mutations = {
@@ -172,11 +172,11 @@ const mutations = {
     const newCustomersContacts = [...state.customersContacts];
     const c = find(newCustomersContacts, {
       id: contact_id,
-      customer_id: customer_id,
+      customer_id: customer_id
     });
     c.default = val;
     state.customersContacts = newCustomersContacts;
-  },
+  }
 };
 
 export default {
@@ -184,5 +184,5 @@ export default {
   state,
   getters,
   actions,
-  mutations,
+  mutations
 };

@@ -71,7 +71,7 @@ export default {
   components: {
     ValidationObserver,
     ValidationProvider,
-    TextInput,
+    TextInput
   },
 
   props: {
@@ -80,14 +80,14 @@ export default {
     showDialog: Boolean,
     loadingItems: Boolean,
     updating: Boolean,
-    cancel: Function,
+    cancel: Function
   },
 
   data() {
     return {
       selectedItem: "",
       newValue: "",
-      isShowDialog: null,
+      isShowDialog: null
     };
   },
 
@@ -113,7 +113,7 @@ export default {
     onCancel() {
       this.cancel();
       this.setDefault();
-    },
+    }
   },
 
   watch: {
@@ -123,8 +123,8 @@ export default {
 
     showDialog(val) {
       this.isShowDialog = cloneDeep(val);
-    },
-  },
+    }
+  }
 };
 </script>
 

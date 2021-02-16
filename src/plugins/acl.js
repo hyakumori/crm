@@ -11,9 +11,9 @@ const AclSetup = {
         ) {
           vnode.elm.parentElement.removeChild(vnode.elm);
         }
-      },
+      }
     });
-  },
+  }
 };
 
 export default AclSetup;

@@ -28,6 +28,6 @@ export default {
       localStorage.clear();
       this.$router.replace({ name: "auth-login" });
     }, 1000);
-  },
+  }
 };
 </script>

@@ -154,7 +154,7 @@ export default {
     ContentHeader,
     ValidationObserver,
     UpdateButton,
-    SettingsContainer,
+    SettingsContainer
   },
 
   data() {
@@ -170,18 +170,18 @@ export default {
         group: "",
         username: "",
         email: "",
-        is_active: false,
+        is_active: false
       },
       isLoading: false,
       isUpdate: {
-        basicInfo: false,
+        basicInfo: false
       },
       errors: [],
       redirectUri:
         process.env.VUE_APP_SLACK_REDIRECT_URI ||
         (window._env && window._env.VUE_APP_SLACK_REDIRECT_URI) ||
         "http://localhost:8080/slack/oauth",
-      slackInstalls: [],
+      slackInstalls: []
     };
   },
 
@@ -204,7 +204,7 @@ export default {
     },
     async getUserPermission(callback) {
       const response = await this.$rest.get(
-        `/users/${this.userInfo && this.userInfo.id}/permissions`,
+        `/users/${this.userInfo && this.userInfo.id}/permissions`
       );
       if (response) {
         this.userPermissions = response;
@@ -241,7 +241,7 @@ export default {
       Object.keys(errors).forEach(errorKey => {
         formatedErrors.push({
           loc: errorKey,
-          message: errors[errorKey].join(", "),
+          message: errors[errorKey].join(", ")
         });
       });
 
@@ -256,7 +256,7 @@ export default {
       try {
         this.isLoading = true;
         const response = await this.$rest.put(`/users/me`, {
-          ...this.form,
+          ...this.form
         });
         if (response) {
           await this.getUserPermission();
@@ -291,8 +291,8 @@ export default {
         subTitle:
           fromNowText &&
           `${this.$t(
-            "user_management.tables.headers.last_login",
-          )} ${fromNowText}`,
+            "user_management.tables.headers.last_login"
+          )} ${fromNowText}`
       };
       this.$store.dispatch("setHeaderInfo", info);
       this.$store.dispatch("setBackBtnContent", "");
@@ -304,8 +304,7 @@ export default {
 
     copyToForm(basicInfo) {
       Object.keys(this.form).forEach(
-        key =>
-          (this.form[key] = basicInfo.find(item => item.key === key).value),
+        key => (this.form[key] = basicInfo.find(item => item.key === key).value)
       );
     },
 
@@ -314,7 +313,7 @@ export default {
         return (
           this.userPermissions.groups.map(group => ({
             text: group.name,
-            value: group.id,
+            value: group.id
           }))[0].text || {}
         );
       }
@@ -331,14 +330,14 @@ export default {
             label: this.$t("user_management.tables.headers.last_name"),
             value: userInfo.last_name,
             rules: "required",
-            name: "user_management.tables.headers.last_name",
+            name: "user_management.tables.headers.last_name"
           },
           {
             key: "first_name",
             label: this.$t("user_management.tables.headers.first_name"),
             value: userInfo.first_name,
             rules: "required",
-            name: "user_management.tables.headers.first_name",
+            name: "user_management.tables.headers.first_name"
           },
           {
             key: "username",
@@ -346,7 +345,7 @@ export default {
             value: userInfo.username,
             rules: "required",
             disabled: true,
-            name: "user_management.tables.headers.username",
+            name: "user_management.tables.headers.username"
           },
           {
             key: "email",
@@ -354,13 +353,13 @@ export default {
             value: userInfo.email,
             rules: "required|email",
             disabled: true,
-            name: "user_management.tables.headers.email",
+            name: "user_management.tables.headers.email"
           },
           {
             key: "group",
             label: this.$t("user_management.tables.headers.roles"),
             value: this.mapUserPermissions(),
-            disabled: true,
+            disabled: true
           },
           {
             key: "is_active",
@@ -368,14 +367,14 @@ export default {
             value: userInfo.is_active
               ? this.$t("enums.user_status.active")
               : this.$t("enums.user_status.inactive"),
-            disabled: true,
-          },
+            disabled: true
+          }
         ];
         this.copyToForm(basicInfo);
       }
 
       return basicInfo;
-    },
+    }
   },
 
   computed: {
@@ -385,8 +384,8 @@ export default {
 
     getActionLogs() {
       return actionLogs;
-    },
-  },
+    }
+  }
 };
 </script>
 

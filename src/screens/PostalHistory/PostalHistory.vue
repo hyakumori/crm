@@ -79,7 +79,7 @@ export default {
     PageHeader,
     OutlineRoundBtn,
     TableAction,
-    UpdateActionsDialog,
+    UpdateActionsDialog
   },
 
   data() {
@@ -87,8 +87,8 @@ export default {
       actions: [
         {
           text: this.$t("action.change_tag_value"),
-          value: 0,
-        },
+          value: 0
+        }
       ],
       pageIcon: "mdi-email-send-outline",
       pageHeader: this.$t("page_header.postalhistory_list"),
@@ -102,7 +102,7 @@ export default {
       filterQueryString: "",
       options: {},
       headers: [],
-      newTagValue: null,
+      newTagValue: null
     };
   },
 
@@ -117,7 +117,7 @@ export default {
   computed: {
     searchCriteria() {
       return this.headers.filter(h => h.text);
-    },
+    }
   },
 
   methods: {
@@ -130,7 +130,7 @@ export default {
           results +=
             " " +
             this.$t("tables.another_item_human_kanji", {
-              count: list.length - 1,
+              count: list.length - 1
             });
         }
         return results;
@@ -146,7 +146,7 @@ export default {
           results +=
             " " +
             this.$t("tables.another_item_human_kanji", {
-              count: list.length - 1,
+              count: list.length - 1
             });
         }
         return results;
@@ -179,7 +179,7 @@ export default {
         }
         return {
           criteria,
-          keyword,
+          keyword
         };
       });
       this.filterQueryString = this.arrayToQueryString(filter);
@@ -212,7 +212,7 @@ export default {
         their_participants: this.renderParticipants(data),
         our_participants: this.renderUsers(data),
         associated_forest: this.renderForests(data),
-        tags: data.tags,
+        tags: data.tags
       }));
     },
 
@@ -237,7 +237,7 @@ export default {
       const params = {
         ids: this.selectedRowIds,
         key: this.selectedTagForUpdate,
-        value: this.newTagValue,
+        value: this.newTagValue
       };
       try {
         this.updatingTags = true;
@@ -264,8 +264,8 @@ export default {
         default:
           return;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

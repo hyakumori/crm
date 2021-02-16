@@ -30,12 +30,12 @@ export default {
   props: {
     appName: { type: String },
     objectType: { type: String },
-    objectId: { type: String },
+    objectId: { type: String }
   },
   data() {
     return {
       isLoading: false,
-      results: [],
+      results: []
     };
   },
   created() {
@@ -52,7 +52,7 @@ export default {
 
         this.isLoading = true;
         const response = await this.$rest.get(
-          `/activity/ja_JP/${this.appName}/${this.objectType}/${this.objectId}`,
+          `/activity/ja_JP/${this.appName}/${this.objectType}/${this.objectId}`
         );
         if (response) {
           this.results = response.results;
@@ -63,8 +63,8 @@ export default {
           this.isLoading = false;
         }, 400);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

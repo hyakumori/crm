@@ -32,16 +32,16 @@ export default {
     });
   },
   methods: {
-    ...mapActions({ getMaintenanceStatus: "getMaintenanceStatus" }),
+    ...mapActions({ getMaintenanceStatus: "getMaintenanceStatus" })
   },
   computed: {
     ...mapState({
-      inMaintain: "inMaintain",
-    }),
+      inMaintain: "inMaintain"
+    })
   },
   watch: {
-    $route: "getMaintenanceStatus",
-  },
+    $route: "getMaintenanceStatus"
+  }
 };
 </script>
 

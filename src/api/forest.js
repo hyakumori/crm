@@ -44,7 +44,7 @@ export function toggleDefaultCustomer(id, customer_id, val) {
   try {
     return axios.put(`forests/${id}/customers/set-default`, {
       customer_id,
-      default: val,
+      default: val
     });
   } catch (error) {}
 }
@@ -54,7 +54,7 @@ export function toggleDefaultCustomerContact(id, customer_id, contact_id, val) {
     return axios.put(`forests/${id}/customers/set-default-contact`, {
       customer_id,
       contact_id,
-      default: val,
+      default: val
     });
   } catch (error) {}
 }
