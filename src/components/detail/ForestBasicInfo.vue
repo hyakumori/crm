@@ -161,7 +161,7 @@
             <select-info
               :items="[
                 { text: '加入', value: '加入' },
-                { text: '未加入', value: '未加入' },
+                { text: '未加入', value: '未加入' }
               ]"
               label="FSC認証加入"
               :value="fscStatus"
@@ -217,14 +217,14 @@ export default {
     RangeDatePicker,
     SingleDatePicker,
     ValidationObserver,
-    UpdateButton,
+    UpdateButton
   },
 
   props: {
     info: Object,
     isUpdate: Boolean,
     isSave: Boolean,
-    formErrors: Object,
+    formErrors: Object
   },
 
   data() {
@@ -235,8 +235,8 @@ export default {
       colorsMap: {
         未契約: "grey--lighten",
         期限切: "orange lighten-2",
-        契約済: "primary",
-      },
+        契約済: "primary"
+      }
     };
   },
 
@@ -254,7 +254,7 @@ export default {
         if (response) {
           this.contractTypes = response.map(item => ({
             text: item.name,
-            value: item.name,
+            value: item.name
           }));
         }
       } catch {
@@ -287,7 +287,7 @@ export default {
       if (this.innerInfo.contracts.fsc_status !== "加入") {
         const errors = {
           ...this.$refs.observer.errors,
-          "contracts.fsc_start_date": [],
+          "contracts.fsc_start_date": []
         };
         this.$refs.observer.setErrors(errors);
       }
@@ -295,7 +295,7 @@ export default {
     updateFscDate(val) {
       this.innerInfo.contracts.fsc_start_date = val[0];
       this.innerInfo.contracts.fsc_end_date = val[1];
-    },
+    }
   },
 
   async mounted() {
@@ -347,18 +347,18 @@ export default {
     contractPeriod() {
       return [
         this.contract.contract_start_date || "",
-        this.contract.contract_end_date || "",
+        this.contract.contract_end_date || ""
       ];
     },
     contractStatusesSelectItems() {
       return Object.keys(this.contractStatuses).map(key => ({
         text: this.contractStatuses[key],
-        value: this.contractStatuses[key],
+        value: this.contractStatuses[key]
       }));
     },
     landAttributes() {
       return this.innerInfo && this.innerInfo["land_attributes"];
-    },
+    }
   },
 
   watch: {
@@ -374,8 +374,8 @@ export default {
       if (!val && this.$refs.observer.flags.dirty) {
         this.innerInfo = _cloneDeep(this.info);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

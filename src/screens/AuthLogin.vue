@@ -16,6 +16,6 @@ export default {
     if (accessToken && accessToken !== "undefined") {
       this.$router.replace("/");
     }
-  },
+  }
 };
 </script>

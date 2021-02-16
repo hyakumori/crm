@@ -25,7 +25,7 @@ const setupRouter = router => {
     if (localStorage.getItem("accessToken") == null) {
       return next({
         path: "/auth/login",
-        params: { nextUrl: to.fullPath },
+        params: { nextUrl: to.fullPath }
       });
     }
 
@@ -39,11 +39,11 @@ const setupRouter = router => {
 
     if (
       to.matched.some(
-        record => record.meta.scopes && record.meta.scopes.length > 0,
+        record => record.meta.scopes && record.meta.scopes.length > 0
       )
     ) {
       const scopes = uniq(
-        flattenDeep(to.matched.map(record => record.meta.scopes)),
+        flattenDeep(to.matched.map(record => record.meta.scopes))
       );
       const matchedScopes = intersection(scopes, getScopes());
 

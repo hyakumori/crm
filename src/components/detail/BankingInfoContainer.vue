@@ -31,17 +31,17 @@ export default {
   components: {
     ContentHeader,
     BasicInfo,
-    UpdateButton,
+    UpdateButton
   },
 
   props: {
-    info: Array,
+    info: Array
   },
 
   data() {
     return {
-      isUpdate: false,
+      isUpdate: false
     };
-  },
+  }
 };
 </script>

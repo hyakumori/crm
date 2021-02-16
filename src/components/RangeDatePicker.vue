@@ -66,26 +66,26 @@ extend("daterange", {
       (result.length === 2 && result[0] < result[1]) || result.length === 1
     );
   },
-  message: i18n.t("validations.daterange"),
+  message: i18n.t("validations.daterange")
 });
 
 export default {
   name: "range-date-picker",
 
   components: {
-    ValidationProvider,
+    ValidationProvider
   },
 
   props: {
     label: String,
-    dates: Array,
+    dates: Array
   },
 
   data() {
     return {
       menu: false,
       innerDates: this.dates,
-      innerDateRange: this.dates.join(dateSeparator),
+      innerDateRange: this.dates.join(dateSeparator)
     };
   },
 
@@ -108,7 +108,7 @@ export default {
         .filter(d => isValid(d))
         .map(d => format(d, "yyyy-MM-dd"));
       this.innerDates = parts;
-    },
+    }
   },
 
   computed: {
@@ -128,7 +128,7 @@ export default {
         (parts.length === 2 && parts[0] < parts[1]) ||
         parts.length === 1
       );
-    },
+    }
   },
   watch: {
     innerDateRange() {
@@ -141,15 +141,15 @@ export default {
       deep: true,
       handler(val) {
         this.$emit("newDates", val);
-      },
+      }
     },
     menu() {
       if (this.menu === false) {
         this.rangeToInnerDate();
         this.$refs.menu.save(this.innerDates);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

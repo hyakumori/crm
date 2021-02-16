@@ -104,7 +104,7 @@ export default {
     SectionContainerWrapper,
     ContactTab,
     SelectListModal,
-    CustomerContactCard,
+    CustomerContactCard
   },
 
   props: {
@@ -112,7 +112,7 @@ export default {
     customersContacts: Array,
     permissions: Array,
     id: String,
-    customerIdNameMap: Object,
+    customerIdNameMap: Object
   },
   data() {
     return {
@@ -121,7 +121,7 @@ export default {
       selectingCustomerId: null,
       defaultCustomersEdit: {},
       defaultCustomersContactsEdit: {},
-      itemsForAddingUrl: "/customers",
+      itemsForAddingUrl: "/customers"
     };
   },
   computed: {
@@ -144,7 +144,7 @@ export default {
         isEmpty(this.defaultCustomersEdit) &&
         isEmpty(this.defaultCustomersContactsEdit)
       );
-    },
+    }
   },
   methods: {
     itemsForAddingResultFilter(item) {
@@ -159,7 +159,7 @@ export default {
     handleAdd() {
       const c = this.itemsForAdding.results.splice(
         this.modalSelectingIndex,
-        1,
+        1
       )[0];
       c.added = true;
       this.customersToAdd.push(c);
@@ -189,7 +189,7 @@ export default {
       this.$set(c, "deleted", undefined);
       this.$store.commit("forest/setCustomers", newCustomers);
       this.customersToDelete = reject(this.customersToDelete, {
-        id: customer.id,
+        id: customer.id
       });
     },
     async handleSave() {
@@ -201,30 +201,30 @@ export default {
         ) {
           await this.$rest.put(`/forests/${this.id}/customers/update`, {
             added: this.customerIdsToAdd,
-            deleted: this.customerIdsToDelete,
+            deleted: this.customerIdsToDelete
           });
         }
         if (!isEmpty(this.defaultCustomersEdit)) {
           for (let [customer_id, val] of Object.entries(
-            this.defaultCustomersEdit,
+            this.defaultCustomersEdit
           )) {
             await this.$store.dispatch("forest/toggleDefaultCustomer", {
               id: this.id,
               customer_id,
-              val,
+              val
             });
           }
         }
         if (!isEmpty(this.defaultCustomersContactsEdit)) {
           for (let [customercontact_id, val] of Object.entries(
-            this.defaultCustomersContactsEdit,
+            this.defaultCustomersContactsEdit
           )) {
             const [customer_id, contact_id] = customercontact_id.split(",");
             await this.$store.dispatch("forest/toggleDefaultCustomerContact", {
               id: this.id,
               customer_id,
               contact_id,
-              val,
+              val
             });
           }
           this.$emit("savedCustomersContacts");
@@ -239,7 +239,7 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 400) {
           this.$dialog.notify.error(
-            this.$t("messages.record_updated_before_please_reload_first"),
+            this.$t("messages.record_updated_before_please_reload_first")
           );
         }
         this.saving = false;
@@ -263,22 +263,22 @@ export default {
         this.$set(
           this.defaultCustomersContactsEdit,
           `${customer_id},${contact_id}`,
-          val,
+          val
         );
       else {
         delete this.defaultCustomersContactsEdit[
           `${customer_id},${contact_id}`
         ];
         this.defaultCustomersContactsEdit = {
-          ...this.defaultCustomersContactsEdit,
+          ...this.defaultCustomersContactsEdit
         };
       }
       const c = find(this.customersContacts, {
         id: contact_id,
-        customer_id: customer_id,
+        customer_id: customer_id
       });
       this.$set(c, "default", val);
-    },
+    }
   },
   watch: {
     isEditing(val) {
@@ -300,23 +300,23 @@ export default {
         for (let [cid, val] of Object.entries(this.defaultCustomersEdit)) {
           this.$store.commit("forest/toggleDefaultCustomerLocal", {
             customer_id: cid,
-            val: !val,
+            val: !val
           });
         }
         this.defaultCustomersEdit = {};
         for (let [ccid, val] of Object.entries(
-          this.defaultCustomersContactsEdit,
+          this.defaultCustomersContactsEdit
         )) {
           const [customer_id, contact_id] = ccid.split(",");
           this.$store.commit("forest/toggleDefaultCustomerContactLocal", {
             customer_id: customer_id,
             contact_id: contact_id,
-            val: !val,
+            val: !val
           });
         }
         this.defaultCustomersContactsEdit = {};
       }
-    },
-  },
+    }
+  }
 };
 </script>

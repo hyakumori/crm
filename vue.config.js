@@ -9,18 +9,18 @@ module.exports = {
       "^/api": {
         target: process.env.BACKEND_URL ?? "http://localhost:8000",
         ws: false,
-        changeOrigin: true,
+        changeOrigin: true
       },
       "^/graphql": {
         target: process.env.BACKEND_URL ?? "http://localhost:8000",
         ws: false,
-        changeOrigin: true,
-      },
+        changeOrigin: true
+      }
     },
     overlay: {
       warnings: false,
-      errors: true,
-    },
+      errors: true
+    }
   },
   configureWebpack: config => {
     if (!config.plugins) config.plugins = [];
@@ -31,7 +31,7 @@ module.exports = {
           algorithm: "gzip",
           test: /\.js$|\.css$|\.html$/,
           exclude: "index.html",
-          minRatio: 0.8,
+          minRatio: 0.8
         }),
         new CompressionPlugin({
           filename: "[path].br[query]",
@@ -40,12 +40,12 @@ module.exports = {
           exclude: "index.html",
           compressionOptions: {
             // zlib’s `level` option matches Brotli’s `BROTLI_PARAM_QUALITY` option.
-            level: 11,
+            level: 11
           },
           threshold: 10240,
           minRatio: 0.8,
-          deleteOriginalAssets: false,
-        }),
+          deleteOriginalAssets: false
+        })
       );
     }
   },
@@ -62,5 +62,5 @@ module.exports = {
       });
     }
   },
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ["vuetify"]
 };

@@ -33,10 +33,10 @@ export default {
   data() {
     return {
       cssProps: {
-        backgroundImage: `url(${background})`,
-      },
+        backgroundImage: `url(${background})`
+      }
     };
-  },
+  }
 };
 </script>
 

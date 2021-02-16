@@ -8,7 +8,7 @@
       flat: flat,
       deleted: deleted,
       added: added,
-      'show-pointer': showPointer,
+      'show-pointer': showPointer
     }"
     @click="$emit('selected', card_id, index)"
   >
@@ -66,13 +66,13 @@ export default {
     deleted: { type: Boolean, default: false },
     added: { type: Boolean, default: false },
     index: Number,
-    showPointer: { type: Boolean, default: false },
+    showPointer: { type: Boolean, default: false }
   },
 
   methods: {
     onNavigation() {
       this.$router.push(`/users/${this.card_id}`);
-    },
+    }
   },
 
   computed: {
@@ -81,8 +81,8 @@ export default {
     },
     hasPermission() {
       return hasScope("admin") || hasScope("group_admin");
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -40,7 +40,7 @@ export default {
   name: "customer-contact-list",
 
   components: {
-    CustomerContactCard,
+    CustomerContactCard
   },
 
   props: {
@@ -54,7 +54,7 @@ export default {
     customerIdNameMap: Object,
     mode: String,
     showDefaultBadge: { type: Boolean, default: false },
-    allowDelete: { type: Boolean, default: true },
+    allowDelete: { type: Boolean, default: true }
   },
   methods: {
     getCustomerName(customer_id) {
@@ -71,7 +71,7 @@ export default {
     },
     handleRelationshipChange(contact_id, val) {
       this.$emit("relationshipChange", contact_id, val);
-    },
-  },
+    }
+  }
 };
 </script>

@@ -92,7 +92,7 @@ export default {
     UpdateButton,
     AdditionButton,
     SelectListModal,
-    ForestInfoCard,
+    ForestInfoCard
   },
 
   data() {
@@ -111,7 +111,7 @@ export default {
       selectingForestIndex: null,
       addRelatedForestLoading: false,
       searchNext: null,
-      showNotFoundMsg: false,
+      showNotFoundMsg: false
     };
   },
 
@@ -170,14 +170,14 @@ export default {
         const isDeleted = await this.$rest.delete(
           `/postal-histories/${this.id}/forests`,
           {
-            data: deleteRequest,
-          },
+            data: deleteRequest
+          }
         );
         if (isDeleted) {
           this.selectingForestId = null;
           this.relatedForests = this.removeDuplicateForests(
             this.relatedForests,
-            this.deletedForests,
+            this.deletedForests
           );
           const pureForests = cloneDeep(this.deletedForests);
           pureForests.forEach(f => (f.deleted = false));
@@ -193,16 +193,16 @@ export default {
         const addRequest = { ids: addedIds };
         const newRelatedForests = await this.$rest.post(
           `/postal-histories/${this.id}/forests`,
-          addRequest,
+          addRequest
         );
         if (newRelatedForests) {
           const tempForest = this.removeDuplicateForests(
             this.relatedForests,
-            newRelatedForests.data,
+            newRelatedForests.data
           );
           this.allForests = this.removeDuplicateForests(
             this.allForests,
-            this.addedForests,
+            this.addedForests
           );
           this.immutableAllForest = cloneDeep(this.allForests);
           tempForest.push(...newRelatedForests.data);
@@ -231,7 +231,7 @@ export default {
     async fetchRelatedForests() {
       this.loading = true;
       const response = await this.$rest.get(
-        `/postal-histories/${this.id}/forests`,
+        `/postal-histories/${this.id}/forests`
       );
       if (response) {
         this.relatedForests = response.data;
@@ -243,17 +243,17 @@ export default {
       if (this.next !== null) {
         this.fetchAllForestLoading = true;
         const response = await this.$rest.get(
-          next !== "" ? next : "/forests/minimal",
+          next !== "" ? next : "/forests/minimal"
         );
         if (response) {
           this.fetchAllForestLoading = false;
           const filteredForests = this.removeDuplicateForests(
             response.results,
-            this.relatedForests,
+            this.relatedForests
           );
           const allForests = this.removeDuplicateForests(
             filteredForests,
-            this.allForests,
+            this.allForests
           );
           this.allForests.push(...allForests);
           this.immutableAllForest.push(...allForests);
@@ -303,8 +303,8 @@ export default {
       this.fetchAllForestLoading = true;
       const response = await this.$rest.get("/forests/minimal", {
         params: {
-          search: keyword || "",
-        },
+          search: keyword || ""
+        }
       });
       if (response) {
         this.showNotFoundMsg =
@@ -313,14 +313,14 @@ export default {
         this.immutableAllForest = [];
         const tempSearchData = this.removeDuplicateForests(
           response.results,
-          this.relatedForests,
+          this.relatedForests
         );
         this.next = response.next;
         this.allForests.push(...tempSearchData);
         this.immutableAllForest.push(...tempSearchData);
         this.fetchAllForestLoading = false;
       }
-    },
+    }
   },
 
   computed: {
@@ -330,7 +330,7 @@ export default {
 
     deletedForests() {
       return this.relatedForests.filter(forest => forest.deleted);
-    },
+    }
   },
 
   watch: {
@@ -346,8 +346,8 @@ export default {
         if (allForests.length <= 3 && this.next !== null) {
           this.handleLoadMore();
         }
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>

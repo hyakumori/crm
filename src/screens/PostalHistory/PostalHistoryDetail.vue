@@ -107,7 +107,7 @@ export default {
     PostalHistoryRelatedUserContainer,
     PostalHistoryOtherRelatedUsersContainer,
     TagDetailCard,
-    ActionLog,
+    ActionLog
   },
 
   data() {
@@ -119,10 +119,10 @@ export default {
       headerInfo: {
         title: this.$t("page_header.postalhistory_new"),
         subTitle: "",
-        backUrl: "/postal-histories",
+        backUrl: "/postal-histories"
       },
       participants: [],
-      participantsLoading: false,
+      participantsLoading: false
     };
   },
   created() {
@@ -145,7 +145,7 @@ export default {
         this.$rest.post(
           `/cache/postal-histories/${this.id}`,
           {},
-          { no_activity: true },
+          { no_activity: true }
         );
       } catch {
         //ignore
@@ -155,7 +155,7 @@ export default {
       this.participantsLoading = true;
       try {
         this.participants = await this.$rest.get(
-          `/postal-histories/${this.id}/customers`,
+          `/postal-histories/${this.id}/customers`
         );
       } catch (error) {}
       this.participantsLoading = false;
@@ -169,7 +169,7 @@ export default {
           results +=
             " " +
             this.$t("tables.another_item_human_kanji", {
-              count: list.length - 1,
+              count: list.length - 1
             });
         }
         return results;
@@ -184,9 +184,9 @@ export default {
           " " +
           this.renderParticipants(this.archive),
         backUrl: "/postal-histories",
-        tags: this.archive.tags,
+        tags: this.archive.tags
       });
-    },
+    }
   },
   computed: {
     id() {
@@ -207,7 +207,7 @@ export default {
       )
         return false;
       return true;
-    },
+    }
   },
   watch: {
     archive: {
@@ -215,9 +215,9 @@ export default {
       handler() {
         this.archiveTags = this.archive.tags;
         this.setHeaderInfo();
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 

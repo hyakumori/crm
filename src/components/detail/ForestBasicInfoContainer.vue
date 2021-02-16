@@ -33,11 +33,11 @@ export default {
 
   components: {
     ContentHeader,
-    ForestBasicInfo,
+    ForestBasicInfo
   },
 
   props: {
-    info: Object,
+    info: Object
   },
 
   data() {
@@ -45,7 +45,7 @@ export default {
       isUpdate: false,
       isSave: false,
       saveDisabled: false,
-      formErrors: null,
+      formErrors: null
     };
   },
 
@@ -66,13 +66,13 @@ export default {
             this.formErrors = e.response.data.errors;
           } else {
             this.$dialog.notify.error(
-              this.$t("messages.api_update_general_error"),
+              this.$t("messages.api_update_general_error")
             );
           }
           this.isSave = false;
           this.isLoading = false;
         });
-    },
-  },
+    }
+  }
 };
 </script>

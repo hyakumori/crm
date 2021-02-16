@@ -30,33 +30,33 @@ import { ValidationProvider } from "vee-validate";
 export default {
   name: "text-input",
   components: {
-    ValidationProvider,
+    ValidationProvider
   },
   props: {
     vid: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     name: {
       type: String,
-      default: "",
+      default: ""
     },
     label: {
       type: String,
-      default: "",
+      default: ""
     },
     rules: {
       type: [Object, String],
-      default: "",
+      default: ""
     },
     placeholder: {
       type: String,
-      default: "",
+      default: ""
     },
     disabled: { type: Boolean, default: false },
     hideDetails: {
       type: [String, Boolean],
-      default: "auto",
+      default: "auto"
     },
     type: {
       type: String,
@@ -69,27 +69,27 @@ export default {
           "tel",
           "search",
           "number",
-          "email",
+          "email"
         ].includes(value);
-      },
+      }
     },
     value: {
       type: null,
-      default: "",
+      default: ""
     },
     maxLength: Number,
     clearable: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data: () => ({
-    innerValue: "",
+    innerValue: ""
   }),
   computed: {
     hasValue() {
       return !!this.innerValue;
-    },
+    }
   },
   watch: {
     innerValue(value) {
@@ -99,12 +99,12 @@ export default {
       if (val !== this.innerValue) {
         this.innerValue = val;
       }
-    },
+    }
   },
   created() {
     if (this.value) {
       this.innerValue = this.value;
     }
-  },
+  }
 };
 </script>

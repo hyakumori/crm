@@ -21,7 +21,7 @@
       :server-items-length="serverItemsLength"
       :footer-props="{
         itemsPerPageOptions: [25, 50, 100, 250, 500, 1000],
-        itemsPerPageText: $t('raw_text.rows_per_page'),
+        itemsPerPageText: $t('raw_text.rows_per_page')
       }"
       @click:row="clickRow"
       :sort-by="sortBy"
@@ -39,7 +39,7 @@
                 item[iconRowValue] &&
                 (!iconRowValueSlice.shouldSlice ||
                   (iconRowValueSlice.shouldSlice &&
-                    iconRowValueSlice.length !== 0)),
+                    iconRowValueSlice.length !== 0))
             }"
           >
             {{
@@ -127,30 +127,30 @@ export default {
     tableRowIcon: String,
     iconRowValue: {
       type: String,
-      default: "internal_id",
+      default: "internal_id"
     },
     iconRowValueSlice: {
       type: Object,
       default: () => ({
         shouldSlice: true,
-        length: 8,
-      }),
+        length: 8
+      })
     },
     itemKey: {
       type: String,
-      default: "id",
+      default: "id"
     },
     multiSort: {
       type: Boolean,
-      default: false,
+      default: false
     },
     autoHeaders: {
       type: Boolean,
-      default: true,
+      default: true
     },
     disableSort: { type: Boolean, default: true },
     sortBy: { type: [String, Array], default: () => [] },
-    sortDesc: { type: [Boolean, Array], default: () => [] },
+    sortDesc: { type: [Boolean, Array], default: () => [] }
   },
 
   data() {
@@ -159,7 +159,7 @@ export default {
       innerOptions: {},
       tableHeight: window.innerHeight,
       isRowMouseDown: false,
-      isRowDrag: false,
+      isRowDrag: false
     };
   },
 
@@ -168,7 +168,7 @@ export default {
       return {
         未契約: "grey--lighten",
         期限切: "orange lighten-2",
-        契約済: "primary",
+        契約済: "primary"
       };
     },
     dynamicHeaders() {
@@ -187,10 +187,10 @@ export default {
         ? [
             { value: "data-table-select", width: 100, align: "center" },
             ...this.headers,
-            headerSelection,
+            headerSelection
           ]
         : [...this.headers, headerSelection];
-    },
+    }
   },
   created() {
     this.throttleRowMouseMoveHandler = throttle(this.rowMouseMoveHandler, 50);
@@ -249,7 +249,7 @@ export default {
       const innerHeight = window.innerHeight < 835 ? 835 : window.innerHeight;
       this.tableHeight =
         innerHeight - 270 <= 625 ? innerHeight : innerHeight - 270 - (56 + 16);
-    },
+    }
   },
   beforeUpdate() {
     this.unregisterMouseEventToRows();
@@ -269,7 +269,7 @@ export default {
     innerOptions: {
       handler() {
         this.$emit("update:options", this.innerOptions);
-      },
+      }
     },
 
     "innerOptions.page": {
@@ -277,15 +277,15 @@ export default {
         var table = this.$refs.dataTable;
         var wrapper = table.$el.querySelector("div.v-data-table__wrapper");
         this.$vuetify.goTo(table, { container: wrapper });
-      },
+      }
     },
 
     selected(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.$emit("selectedRow", newVal);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

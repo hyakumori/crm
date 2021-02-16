@@ -5,9 +5,9 @@ const ActionLogSetup = {
     Vue.prototype.$actionLog = {
       reload() {
         busEvent.$emit("action-log:reload");
-      },
+      }
     };
-  },
+  }
 };
 
 export default ActionLogSetup;

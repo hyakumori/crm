@@ -37,14 +37,14 @@ export default {
 
   props: {
     label: String,
-    time: String,
+    time: String
   },
 
   data() {
     return {
       menu: false,
       innerTime: this.time,
-      rules: [val => !!val || `${this.label}は必須項目です`],
+      rules: [val => !!val || `${this.label}は必須項目です`]
     };
   },
 
@@ -52,8 +52,8 @@ export default {
     save() {
       this.$refs.menu.save(this.innerTime);
       this.$emit("newTime", this.innerTime);
-    },
-  },
+    }
+  }
 };
 </script>
 

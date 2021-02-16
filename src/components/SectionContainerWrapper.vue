@@ -37,7 +37,7 @@ export default {
   components: {
     ContentHeader,
     AdditionButton,
-    UpdateButton,
+    UpdateButton
   },
   props: {
     headerContent: String,
@@ -52,7 +52,7 @@ export default {
     isEditing: Boolean,
     cancelEdit: Function,
     showAddBtn: { type: Boolean, default: true },
-    displayAdditionBtn: { type: Boolean, default: true },
-  },
+    displayAdditionBtn: { type: Boolean, default: true }
+  }
 };
 </script>

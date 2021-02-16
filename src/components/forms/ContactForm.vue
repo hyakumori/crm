@@ -160,7 +160,7 @@ setInteractionMode("eager");
 export default {
   components: {
     ValidationObserver,
-    TextInput,
+    TextInput
   },
   props: {
     formData: { type: Object, default: () => {} },
@@ -168,13 +168,13 @@ export default {
     toggleEditing: { type: Function },
     showCancel: { type: Boolean },
     handleSubmit: { type: Function },
-    errors: { type: Object, default: () => {} },
+    errors: { type: Object, default: () => {} }
   },
   data() {
     return {
       shown: false,
       form: this.formData,
-      submiting: false,
+      submiting: false
     };
   },
   mounted() {
@@ -185,7 +185,7 @@ export default {
   computed: {
     fieldNamePrefix() {
       return this.handleSubmit ? "" : "basic_contact.";
-    },
+    }
   },
   watch: {
     errors: {
@@ -193,14 +193,14 @@ export default {
         if (isEmpty(val)) this.$refs.form.reset();
         else this.$refs.form.setErrors(val);
       },
-      deep: true,
+      deep: true
     },
     form(val) {
       this.$emit("update:formData", val);
     },
     formData(val) {
       if (val !== this.form) this.form = val;
-    },
+    }
   },
   methods: {
     handleCancel() {
@@ -221,22 +221,22 @@ export default {
         basic_contact: {
           name_kanji: {
             last_name: this.form.last_name_kanji,
-            first_name: this.form.first_name_kanji,
+            first_name: this.form.first_name_kanji
           },
           name_kana: {
             last_name: this.form.last_name_kana,
-            first_name: this.form.first_name_kana,
+            first_name: this.form.first_name_kana
           },
           address: {
             sector: this.form.sector,
             prefecture: this.form.prefecture,
-            municipality: this.form.municipality,
+            municipality: this.form.municipality
           },
           postal_code: this.form.postal_code,
           telephone: this.form.telephone,
           mobilephone: this.form.mobilephone,
-          email: this.form.email,
-        },
+          email: this.form.email
+        }
       };
       try {
         if (!this.id) {
@@ -244,7 +244,7 @@ export default {
           this.submiting = false;
           this.$router.push({
             name: "customer-detail",
-            params: { id: data.business_id },
+            params: { id: data.business_id }
           });
         } else {
           await this.$rest.put(`/customers/${this.id}`, customerInput);
@@ -258,7 +258,7 @@ export default {
       } finally {
         this.submiting = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>

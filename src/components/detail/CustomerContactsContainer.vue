@@ -64,7 +64,7 @@ export default {
   components: {
     SectionContainerWrapper,
     CustomerContactList,
-    ContactForm,
+    ContactForm
   },
 
   props: {
@@ -72,7 +72,7 @@ export default {
     permissions: Array,
     id: String,
     contactIdNameMap: Object,
-    contactType: String,
+    contactType: String
   },
   data() {
     return {
@@ -83,7 +83,7 @@ export default {
       form: this.initForm(),
       formErrors: {},
       relationshipChanges: [],
-      contacts_: [],
+      contacts_: []
     };
   },
   computed: {
@@ -101,12 +101,12 @@ export default {
     },
     contactsAddData() {
       return reject(this.relationshipChanges, i =>
-        this.contactIdsToDelete.includes(i.contact),
+        this.contactIdsToDelete.includes(i.contact)
       ).map(i => ({
         contact: i.contact,
-        relationship_type: i.val,
+        relationship_type: i.val
       }));
-    },
+    }
   },
   methods: {
     handleCancelEdit() {
@@ -116,7 +116,7 @@ export default {
     },
     handleRelationshipChange(contact_id, val) {
       const others = reject(this.relationshipChanges, {
-        contact: contact_id,
+        contact: contact_id
       });
       const contact = find(this.contacts, { id: contact_id });
       if (contact.cc_attrs.relationship_type === val) {
@@ -144,7 +144,7 @@ export default {
         await this.$rest.put(`/customers/${this.id}/contacts`, {
           adding: this.contactsAddData,
           deleting: this.contactIdsToDelete,
-          contact_type: this.contactType,
+          contact_type: this.contactType
         });
         this.$emit("saved");
         this.saving = false;
@@ -154,7 +154,7 @@ export default {
         this.saving = false;
         if (error.response && error.response.status === 400) {
           this.$dialog.notify.error(
-            this.$t("messages.record_updated_before_please_reload_first"),
+            this.$t("messages.record_updated_before_please_reload_first")
           );
         }
       }
@@ -171,29 +171,29 @@ export default {
         municipality: "",
         telephone: "",
         mobilephone: "",
-        email: "",
+        email: ""
       };
     },
     async handleAdd() {
       const data = {
         name_kanji: {
           last_name: this.form.last_name_kanji,
-          first_name: this.form.first_name_kanji,
+          first_name: this.form.first_name_kanji
         },
         name_kana: {
           last_name: this.form.last_name_kana,
-          first_name: this.form.first_name_kana,
+          first_name: this.form.first_name_kana
         },
         address: {
           sector: this.form.sector,
           prefecture: this.form.prefecture,
-          municipality: this.form.municipality,
+          municipality: this.form.municipality
         },
         postal_code: this.form.postal_code,
         telephone: this.form.telephone,
         mobilephone: this.form.mobilephone,
         email: this.form.email,
-        contact_type: this.contactType,
+        contact_type: this.contactType
       };
       try {
         await this.$rest.post(`/customers/${this.id}/contacts`, data);
@@ -204,14 +204,14 @@ export default {
         if (error.response && error.response.status < 500)
           this.formErrors = error.response.data.errors;
       }
-    },
+    }
   },
   watch: {
     contacts: {
       deep: true,
       handler(val) {
         this.contacts_ = cloneDeep(val);
-      },
+      }
     },
     isEditing(val) {
       if (!val) {
@@ -222,7 +222,7 @@ export default {
         this.showNewContactDialog = false;
         this.relationshipChanges = [];
       }
-    },
-  },
+    }
+  }
 };
 </script>

@@ -44,17 +44,17 @@ export default {
   components: {
     ContentHeader,
     UpdateButton,
-    TextInput,
+    TextInput
   },
   props: {
-    archive: { type: Object },
+    archive: { type: Object }
   },
   data() {
     return {
       loading: false,
       id: this.$route.params.id,
       tempParticipants: [],
-      participants: [],
+      participants: []
     };
   },
 
@@ -69,13 +69,13 @@ export default {
       this.loading = true;
       try {
         await this.$rest.put(`postal-histories/${this.id}/other-participants`, {
-          other_participants: this.tempParticipants,
+          other_participants: this.tempParticipants
         });
         this.participants = this.tempParticipants;
         this.isEditing = false;
       } catch (error) {}
       this.loading = false;
-    },
+    }
   },
 
   computed: {
@@ -85,11 +85,11 @@ export default {
       },
       set(val) {
         this.tempParticipants = reject(val.split(","), isEmpty);
-      },
+      }
     },
     saveDisabled() {
       return this.participantsText === this.participants.join(",");
-    },
+    }
   },
 
   watch: {
@@ -103,8 +103,8 @@ export default {
         ? this.archive.attributes.other_participants || []
         : [];
       this.tempParticipants = [...this.participants];
-    },
-  },
+    }
+  }
 };
 </script>
 

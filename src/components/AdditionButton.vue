@@ -12,7 +12,7 @@ export default {
   props: {
     content: String,
     click: Function,
-    id: String,
+    id: String
   },
 
   methods: {
@@ -20,7 +20,7 @@ export default {
       if (this.click) {
         this.click();
       }
-    },
-  },
+    }
+  }
 };
 </script>

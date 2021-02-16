@@ -105,20 +105,20 @@ export default {
     ArchiveParticipantCard,
     SingleDatePicker,
     TimePicker,
-    ValidationObserver,
+    ValidationObserver
   },
 
   props: {
     info: Object,
     isUpdate: Boolean,
     isSave: Boolean,
-    isDetail: Boolean,
+    isDetail: Boolean
   },
 
   data() {
     return {
       innerDate: "",
-      innerTime: "",
+      innerTime: ""
     };
   },
 
@@ -145,7 +145,7 @@ export default {
 
     datetimePickerInvalid() {
       return !this.date || !this.time;
-    },
+    }
   },
 
   watch: {
@@ -154,7 +154,7 @@ export default {
       async handler() {
         const isValid = await this.$refs.observer.validate();
         this.$emit("archive:save-disable", !isValid);
-      },
+      }
     },
 
     innerDate(val) {
@@ -177,8 +177,8 @@ export default {
         this.info.archive_date = `${date} ${time}`;
         this.$emit("archive:update-basic-info", this.info);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

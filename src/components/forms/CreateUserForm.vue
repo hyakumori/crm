@@ -83,19 +83,19 @@ import TextInput from "../forms/TextInput";
 export default {
   components: {
     TextInput,
-    ValidationObserver,
+    ValidationObserver
   },
   props: {
-    show: { type: Boolean },
+    show: { type: Boolean }
   },
   data() {
     return {
       form: {
-        email: "",
+        email: ""
       },
       formError: "",
       loading: false,
-      successfulEmail: null,
+      successfulEmail: null
     };
   },
   methods: {
@@ -132,7 +132,7 @@ export default {
         const password = this.randomPassword();
         const response = await this.$rest.post("/users", {
           ...this.form,
-          password,
+          password
         });
 
         if (response) {
@@ -148,7 +148,7 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
+    }
   },
   watch: {
     show(val) {
@@ -157,12 +157,12 @@ export default {
         this.successfulEmail = null;
         this.formError = "";
         this.form = {
-          email: "",
+          email: ""
         };
         this.$refs.form.reset();
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

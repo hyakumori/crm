@@ -25,12 +25,12 @@ const UserProfileRoutes = [
         meta: {
           title: "page_header.user_profile",
           isPublic: false,
-          detail: true,
+          detail: true
         },
-        component: () => import("./screens/AccountProfile.vue"),
-      },
-    ],
-  },
+        component: () => import("./screens/AccountProfile.vue")
+      }
+    ]
+  }
 ];
 
 const AdminRoutes = [
@@ -44,9 +44,9 @@ const AdminRoutes = [
         meta: {
           title: "page_header.user_mgmt",
           isPublic: false,
-          scopes: ["group_admin"],
+          scopes: ["group_admin"]
         },
-        component: () => import("./screens/UserList.vue"),
+        component: () => import("./screens/UserList.vue")
       },
       {
         path: ":id",
@@ -54,12 +54,12 @@ const AdminRoutes = [
         meta: {
           title: "page_header.user_detail",
           isPublic: false,
-          scopes: ["group_admin"],
+          scopes: ["group_admin"]
         },
-        component: () => import("./screens/UserDetail.vue"),
-      },
-    ],
-  },
+        component: () => import("./screens/UserDetail.vue")
+      }
+    ]
+  }
 ];
 
 const AuthRoutes = [
@@ -70,65 +70,65 @@ const AuthRoutes = [
       {
         path: "",
         redirect: {
-          name: "auth-login",
-        },
+          name: "auth-login"
+        }
       },
       {
         path: "login",
         name: "auth-login",
         meta: {
           title: "page_header.login",
-          isPublic: true,
+          isPublic: true
         },
-        component: () => import("./screens/AuthLogin.vue"),
+        component: () => import("./screens/AuthLogin.vue")
       },
       {
         path: "logout",
         name: "auth-logout",
         meta: {
           title: "page_header.logout",
-          isPublic: false,
+          isPublic: false
         },
-        component: () => import("./screens/AuthLogout.vue"),
+        component: () => import("./screens/AuthLogout.vue")
       },
       {
         path: "forgot-password",
         name: "auth-forgot-password",
         meta: {
           title: "page_header.forgot_password",
-          isPublic: true,
+          isPublic: true
         },
-        component: () => import("./screens/AuthResetPassword.vue"),
+        component: () => import("./screens/AuthResetPassword.vue")
       },
       {
         path: "reset-password/:uid/:token",
         name: "auth-reset-password",
         meta: {
           title: "page_header.forgot_password",
-          isPublic: true,
+          isPublic: true
         },
-        component: () => import("./screens/AuthResetPasswordConfirm.vue"),
+        component: () => import("./screens/AuthResetPasswordConfirm.vue")
       },
       {
         path: "activate/:uid/:token",
         name: "auth-activate",
         meta: {
           title: "page_header.activate_account",
-          isPublic: true,
+          isPublic: true
         },
-        component: () => import("./screens/AuthActivation.vue"),
+        component: () => import("./screens/AuthActivation.vue")
       },
       {
         path: "no-permission",
         name: "error-403",
         meta: {
           title: "page_header.no_permission",
-          isPublic: true,
+          isPublic: true
         },
-        component: () => import("./screens/AuthInsufficientPermission.vue"),
-      },
-    ],
-  },
+        component: () => import("./screens/AuthInsufficientPermission.vue")
+      }
+    ]
+  }
 ];
 
 const router = new VueRouter({
@@ -141,9 +141,9 @@ const router = new VueRouter({
         {
           path: "",
           meta: {
-            isPublic: false,
+            isPublic: false
           },
-          redirect: { name: "forests" },
+          redirect: { name: "forests" }
         },
         {
           path: "/forests",
@@ -152,8 +152,8 @@ const router = new VueRouter({
           meta: {
             title: "page_header.forest_mgmt",
             isPublic: false,
-            scopes: ["manage_forest", "view_forest"],
-          },
+            scopes: ["manage_forest", "view_forest"]
+          }
         },
         {
           path: "/forests/:id",
@@ -163,8 +163,8 @@ const router = new VueRouter({
           meta: {
             title: "page_header.forest_detail",
             isPublic: false,
-            scopes: ["manage_forest", "view_forest"],
-          },
+            scopes: ["manage_forest", "view_forest"]
+          }
         },
         {
           path: "/customers",
@@ -173,8 +173,8 @@ const router = new VueRouter({
           meta: {
             title: "page_header.customer_mgmt",
             isPublic: false,
-            scopes: ["manage_customer", "view_customer"],
-          },
+            scopes: ["manage_customer", "view_customer"]
+          }
         },
         {
           path: "/customers/new",
@@ -184,8 +184,8 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.customer_new",
             isPublic: false,
-            scopes: ["manage_customer", "add_customer"],
-          },
+            scopes: ["manage_customer", "add_customer"]
+          }
         },
         {
           path: "/customers/:id",
@@ -196,8 +196,8 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.customer_detail",
             isPublic: false,
-            scopes: ["manage_customer", "view_customer", "admin"],
-          },
+            scopes: ["manage_customer", "view_customer", "admin"]
+          }
         },
         {
           path: "/archives",
@@ -206,8 +206,8 @@ const router = new VueRouter({
           meta: {
             title: "page_header.archive_mgmt",
             isPublic: false,
-            scopes: ["manage_archive", "view_archive"],
-          },
+            scopes: ["manage_archive", "view_archive"]
+          }
         },
         {
           path: "/archives/new",
@@ -217,8 +217,8 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.archive_new",
             isPublic: false,
-            scopes: ["manage_archive"],
-          },
+            scopes: ["manage_archive"]
+          }
         },
         {
           path: "/archives/:id",
@@ -228,8 +228,8 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.archive_detail",
             isPublic: false,
-            scopes: ["manage_archive", "view_archive"],
-          },
+            scopes: ["manage_archive", "view_archive"]
+          }
         },
         {
           path: "/postal-histories",
@@ -238,8 +238,8 @@ const router = new VueRouter({
           meta: {
             title: "page_header.postalhistory_mgmt",
             isPublic: false,
-            scopes: ["manage_postalhistory", "view_postalhistory"],
-          },
+            scopes: ["manage_postalhistory", "view_postalhistory"]
+          }
         },
         {
           path: "/postal-histories/new",
@@ -249,8 +249,8 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.postalhistory_new",
             isPublic: false,
-            scopes: ["manage_postalhistory"],
-          },
+            scopes: ["manage_postalhistory"]
+          }
         },
         {
           path: "/postal-histories/:id",
@@ -260,10 +260,10 @@ const router = new VueRouter({
             detail: true,
             title: "page_header.postalhistory_detail",
             isPublic: false,
-            scopes: ["manage_postalhistory", "view_postalhistory"],
-          },
-        },
-      ],
+            scopes: ["manage_postalhistory", "view_postalhistory"]
+          }
+        }
+      ]
     },
     ...AdminRoutes,
     ...AuthRoutes,
@@ -277,11 +277,11 @@ const router = new VueRouter({
           name: "not-found",
           meta: {
             title: "page_header.not_found",
-            isPublic: true,
+            isPublic: true
           },
-          component: () => import("./screens/PageNotFound.vue"),
-        },
-      ],
+          component: () => import("./screens/PageNotFound.vue")
+        }
+      ]
     },
     {
       path: "/slack/oauth",
@@ -292,17 +292,17 @@ const router = new VueRouter({
           name: "slack-oauth",
           meta: {
             title: "Slack Oauth",
-            isPublic: true,
+            isPublic: true
           },
-          component: () => import("./screens/Slack/Oauth.vue"),
-        },
-      ],
+          component: () => import("./screens/Slack/Oauth.vue")
+        }
+      ]
     },
     {
       path: "*",
-      redirect: { name: "not-found" },
-    },
-  ],
+      redirect: { name: "not-found" }
+    }
+  ]
 });
 
 // Override for processing NavigationDuplicated exception

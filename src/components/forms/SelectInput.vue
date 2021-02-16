@@ -30,61 +30,61 @@ import { ValidationProvider } from "vee-validate";
 
 export default {
   components: {
-    ValidationProvider,
+    ValidationProvider
   },
   props: {
     vid: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     items: {
-      type: Array,
+      type: Array
     },
     name: {
       type: String,
-      default: "",
+      default: ""
     },
     label: {
       type: String,
-      default: "",
+      default: ""
     },
     rules: {
       type: [Object, String],
-      default: "",
+      default: ""
     },
     placeholder: {
       type: String,
-      default: "",
+      default: ""
     },
     hideDetails: {
       type: [String, Boolean],
-      default: "auto",
+      default: "auto"
     },
     value: {
       type: null,
-      default: "",
+      default: ""
     },
-    clearable: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false }
   },
   data: () => ({
-    innerValue: "",
+    innerValue: ""
   }),
   computed: {
     hasValue() {
       return !!this.innerValue;
-    },
+    }
   },
   watch: {
     value(val) {
       if (val !== this.innerValue) {
         this.innerValue = val;
       }
-    },
+    }
   },
   created() {
     if (this.value) {
       this.innerValue = this.value;
     }
-  },
+  }
 };
 </script>
