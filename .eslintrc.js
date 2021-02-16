@@ -9,7 +9,7 @@ module.exports = {
   },
   rules: {
     "no-unused-vars": "warn",
-    "comma-dangle": ["error", "always-multiline"],
+    "comma-dangle": ["error"],
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
   },
