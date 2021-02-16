@@ -49,7 +49,7 @@
         <div
           class="d-flex align-center"
           :class="{
-            'show-add-criteria': conditions.length === searchCriteria.length,
+            'show-add-criteria': conditions.length === searchCriteria.length
           }"
           @click="addSearchField"
         >
@@ -83,12 +83,12 @@ export default {
   name: "search-card",
 
   components: {
-    SelectList,
+    SelectList
   },
 
   props: {
     searchCriteria: Array,
-    onSearch: Function,
+    onSearch: Function
   },
 
   data() {
@@ -99,9 +99,9 @@ export default {
         {
           fields: [...this.searchCriteria],
           criteria: null,
-          keyword: null,
-        },
-      ],
+          keyword: null
+        }
+      ]
     };
   },
   computed: {
@@ -118,7 +118,7 @@ export default {
       }
 
       return true;
-    },
+    }
   },
   watch: {
     searchCriteria(val) {
@@ -131,11 +131,11 @@ export default {
           con,
           "fields",
           this.searchCriteria.filter(
-            f => !val.has(f.value) || f.value === con.criteria,
-          ),
+            f => !val.has(f.value) || f.value === con.criteria
+          )
         );
       }
-    },
+    }
   },
   methods: {
     resetSearch() {
@@ -143,8 +143,8 @@ export default {
         {
           fields: [...this.originalSearchCriteria],
           criteria: null,
-          keyword: null,
-        },
+          keyword: null
+        }
       ];
       this.usedFields = new Set();
 
@@ -162,9 +162,7 @@ export default {
         this.conditions.push({
           keyword: null,
           criteria: null,
-          fields: this.searchCriteria.filter(
-            f => !this.usedFields.has(f.value),
-          ),
+          fields: this.searchCriteria.filter(f => !this.usedFields.has(f.value))
         });
       }
     },
@@ -189,8 +187,8 @@ export default {
       } else {
         this.$emit("unableDelete", true);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

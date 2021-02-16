@@ -9,7 +9,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_forest',
+                'manage_forest'
               ]"
               icon="mdi-upload"
               :content="
@@ -26,7 +26,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_forest',
+                'manage_forest'
               ]"
               ref="csvUploadInput"
               type="file"
@@ -41,7 +41,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_forest',
+                'manage_forest'
               ]"
             >
               <template v-slot:activator="{ on }">
@@ -94,7 +94,7 @@
             'admin',
             'group_admin',
             'group_normal_user',
-            'manage_forest',
+            'manage_forest'
           ]"
           ref="actionRef"
           :actions="actions"
@@ -176,7 +176,7 @@ export default {
     PageHeader,
     OutlineRoundBtn,
     UpdateActionsDialog,
-    MapContainer,
+    MapContainer
   },
 
   data() {
@@ -184,20 +184,20 @@ export default {
       actions: [
         {
           text: this.$t("action.contract_status_to_contracted"),
-          value: 0,
+          value: 0
         },
         {
           text: this.$t("action.contract_status_to_unsigned"),
-          value: 1,
+          value: 1
         },
         {
           text: this.$t("action.contract_status_to_expired"),
-          value: 2,
+          value: 2
         },
         {
           text: this.$t("action.change_tag_value"),
-          value: 3,
-        },
+          value: 3
+        }
       ],
       pageIcon: this.$t("icon.forest_icon"),
       pageHeader: this.$t("page_header.forest_mgmt"),
@@ -215,7 +215,7 @@ export default {
       uploadCsvLoading: false,
       contractTypes: [],
       bulkUpdateLoading: false,
-      forestsForMap: null,
+      forestsForMap: null
     };
   },
 
@@ -230,20 +230,20 @@ export default {
       `,
       update(data) {
         return data.foresttable_headers.headers;
-      },
+      }
     },
     forestsInfo: {
       query: GetForestList,
       update: data => data.list_forests,
       variables() {
         return {
-          filter: this.filter,
+          filter: this.filter
         };
       },
       skip() {
         return !this.filter || this.headers.length === 0;
-      },
-    },
+      }
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (this.uploadCsvLoading && !confirm(this.$t("messages.confirm_leave")))
@@ -307,7 +307,7 @@ export default {
         formData.append("file", this.$refs.csvUploadInput.files[0]);
         try {
           await this.$rest.post("/forests/upload-csv", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: { "Content-Type": "multipart/form-data" }
           });
           this.$apollo.queries.forestsInfo.refetch();
           this.$dialog.notify.success(this.$t("messages.upload_successfully"));
@@ -319,7 +319,7 @@ export default {
           ) {
             this.$dialog.show(ErrorCard, {
               line: error.response.data.line,
-              errors: error.response.data.errors,
+              errors: error.response.data.errors
             });
           }
         } finally {
@@ -337,7 +337,7 @@ export default {
       try {
         this.downloadCsvLoading = true;
         let csvData = await this.$rest.get("/forests/download-csv", {
-          responseType: "blob",
+          responseType: "blob"
         });
         const blob = new Blob([csvData], { type: "text/csv;charset=UTF-8" });
         saveAs(blob, "all-forests.csv");
@@ -354,8 +354,8 @@ export default {
           "/forests/download-csv",
           this.selectedRowIds,
           {
-            responseType: "blob",
-          },
+            responseType: "blob"
+          }
         );
         const blob = new Blob([csvData], { type: "text/csv;charset=UTF-8" });
         saveAs(blob, "selected_forests.csv");
@@ -369,7 +369,7 @@ export default {
       const names = _get(
         data,
         `attributes.customer_cache.repr_name_${nameType}`,
-        "",
+        ""
       );
       const nameList = names.split(",");
       const itemCount = nameList.length;
@@ -380,7 +380,7 @@ export default {
           results +=
             " " +
             this.$t(`tables.another_item_human_${nameType}`, {
-              count: itemCount - 1,
+              count: itemCount - 1
             });
         }
         return results;
@@ -392,7 +392,7 @@ export default {
       const params = {
         ids: this.selectedRowIds,
         key: this.selectedTagForUpdate,
-        value: this.newTagValue,
+        value: this.newTagValue
       };
       try {
         this.updatingTags = true;
@@ -409,7 +409,7 @@ export default {
     },
     async updateContractStatus(status) {
       const ok = confirm(
-        `選択した森林の契約ステータスを${status}に変更しますか？`,
+        `選択した森林の契約ステータスを${status}に変更しますか？`
       );
       if (!ok) return;
       this.bulkUpdateLoading = true;
@@ -417,7 +417,7 @@ export default {
       try {
         await this.$rest.put("/forests/contracts/status", {
           pks: ids,
-          status: status,
+          status: status
         });
       } catch {}
       this.bulkUpdateLoading = false;
@@ -443,7 +443,7 @@ export default {
         default:
           return;
       }
-    },
+    }
   },
 
   watch: {
@@ -456,17 +456,17 @@ export default {
           page,
           itemsPerPage,
           preItemsPerPage: old.itemsPerPage || null,
-          filters: this.requestFilters,
+          filters: this.requestFilters
         };
       },
-      deep: true,
+      deep: true
     },
 
     forestsInfo: {
       handler() {
         this.forestsForMap = this.forestsInfo.forests;
-      },
-    },
+      }
+    }
   },
 
   computed: {
@@ -490,7 +490,7 @@ export default {
             land_attributes__地番支番: element.land_attributes["地番支番"],
             owner__name_kanji: this.renderCustomers(element, "kanji"),
             owner__name_kana: this.renderCustomers(element, "kana"),
-            tags: tags,
+            tags: tags
           };
           if (contracts) {
             item = { ...item, ...contracts };
@@ -518,8 +518,8 @@ export default {
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))
         .filter(f => f.value !== undefined);
-    },
-  },
+    }
+  }
 };
 </script>
 

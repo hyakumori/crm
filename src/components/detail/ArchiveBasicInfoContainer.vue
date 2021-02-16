@@ -57,15 +57,15 @@ export default {
   components: {
     ContentHeader,
     ArchiveBasicInfo,
-    UpdateButton,
+    UpdateButton
   },
 
   props: {
     isDetail: {
       type: Boolean,
-      default: true,
+      default: true
     },
-    id: String,
+    id: String
   },
 
   data() {
@@ -77,7 +77,7 @@ export default {
       updateLoading: false,
       saveDisabled: false,
       info: {},
-      immutableInfo: {},
+      immutableInfo: {}
     };
   },
 
@@ -111,7 +111,7 @@ export default {
         content: basicInfo.content,
         title: basicInfo.title,
         attributes: basicInfo.attributes,
-        tags: basicInfo.tags,
+        tags: basicInfo.tags
       };
     },
 
@@ -161,10 +161,10 @@ export default {
             this.isSave = false;
           });
       }
-    },
+    }
   },
   watch: {
-    $route: "fetchBasicInfo",
-  },
+    $route: "fetchBasicInfo"
+  }
 };
 </script>

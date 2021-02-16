@@ -225,7 +225,7 @@ export default {
     ActionLog,
     MemoInput,
     TagDetailCard,
-    MapContainer,
+    MapContainer
   },
   props: ["id"],
   data() {
@@ -235,7 +235,7 @@ export default {
         desc: "",
         subtitle: "",
         tag: "",
-        backUrl: { name: "customers" },
+        backUrl: { name: "customers" }
       },
       pageIcon: this.$t("icon.customer_icon"),
       backBtnContent: this.$t("page_header.customer_mgmt"),
@@ -254,7 +254,7 @@ export default {
       postalHistoriesLoading: this.checkAndShowLoading(),
       contactsForests: [],
       contactsForestsLoading: this.checkAndShowLoading(),
-      echoedForest: null,
+      echoedForest: null
     };
   },
 
@@ -268,13 +268,13 @@ export default {
       info = {
         title: this.$t("page_header.customer_new"),
         subTitle: "",
-        backUrl: "/customers",
+        backUrl: "/customers"
       };
     } else {
       info = {
         title: this.$t("page_header.customer_mgmt"),
         subTitle: "",
-        backUrl: "/customers",
+        backUrl: "/customers"
       };
     }
 
@@ -289,7 +289,7 @@ export default {
       }
       try {
         const customer = await this.$rest.get("/customers/by-business-id", {
-          params: { business_id: this.id },
+          params: { business_id: this.id }
         });
         if (customer && customer.business_id && customer.id) {
           this.customer = customer;
@@ -369,14 +369,14 @@ export default {
     async fetchPostalHistories() {
       this.postalHistoriesLoading = true;
       this.postalHistories = await this.$rest.get(
-        `/customers/${this.pk}/postal-histories`,
+        `/customers/${this.pk}/postal-histories`
       );
       this.postalHistoriesLoading = false;
     },
     async fetchContactsForests() {
       this.contactsForestsLoading = true;
       this.contactsForests = await this.$rest.get(
-        `/customers/${this.pk}/contacts-forests`,
+        `/customers/${this.pk}/contacts-forests`
       );
       this.contactsForestsLoading = false;
     },
@@ -396,7 +396,7 @@ export default {
 
     setSelectedFeatureFromTable(val) {
       this.echoedForest = val;
-    },
+    }
   },
 
   computed: {
@@ -412,18 +412,18 @@ export default {
       if (!this.selectingForestCustomerId)
         return filter(this.contacts, c => c.forestcustomer_id);
       return filter(this.contacts, {
-        forestcustomer_id: this.selectingForestCustomerId,
+        forestcustomer_id: this.selectingForestCustomerId
       });
     },
 
     familyContacts() {
       return filter(this.contacts, {
-        cc_attrs: { contact_type: "FAMILY" },
+        cc_attrs: { contact_type: "FAMILY" }
       });
     },
     otherContacts() {
       return filter(this.contacts, {
-        cc_attrs: { contact_type: "OTHERS" },
+        cc_attrs: { contact_type: "OTHERS" }
       });
     },
     selfContactFormData() {
@@ -439,7 +439,7 @@ export default {
         municipality: this.customer?.self_contact.address.municipality || "",
         telephone: this.customer?.self_contact.telephone || "",
         mobilephone: this.customer?.self_contact.mobilephone || "",
-        email: this.customer?.self_contact.email || "",
+        email: this.customer?.self_contact.email || ""
       };
     },
     bankingInfoFormData() {
@@ -449,22 +449,22 @@ export default {
         branch_name: this.customer?.banking?.branch_name || "",
         account_type: this.customer?.banking?.account_type || "",
         account_number: this.customer?.banking?.account_number || "",
-        account_name: this.customer?.banking?.account_name || "",
+        account_name: this.customer?.banking?.account_name || ""
       };
     },
     basicInfo() {
       return [
         {
           label: this.$t("forms.labels.customer.fullname_kanji"),
-          value: this.getPersonFullname(this.customer?.self_contact.name_kanji),
+          value: this.getPersonFullname(this.customer?.self_contact.name_kanji)
         },
         {
           label: this.$t("forms.labels.customer.fullname_kana"),
-          value: this.getPersonFullname(this.customer?.self_contact.name_kana),
+          value: this.getPersonFullname(this.customer?.self_contact.name_kana)
         },
         {
           label: this.$t("forms.labels.customer.postal_code"),
-          value: this.customer?.self_contact.postal_code || "",
+          value: this.customer?.self_contact.postal_code || ""
         },
         {
           label: this.$t("forms.labels.address"),
@@ -473,20 +473,20 @@ export default {
             " " +
             (this.customer?.self_contact.address.municipality || "") +
             " " +
-            (this.customer?.self_contact.address.sector || ""),
+            (this.customer?.self_contact.address.sector || "")
         },
         {
           label: this.$t("forms.labels.customer.phone_number"),
-          value: this.customer?.self_contact.telephone || "",
+          value: this.customer?.self_contact.telephone || ""
         },
         {
           label: this.$t("forms.labels.customer.mobile_number"),
-          value: this.customer?.self_contact.mobilephone || "",
+          value: this.customer?.self_contact.mobilephone || ""
         },
         {
           label: this.$t("forms.labels.email"),
-          value: this.customer?.self_contact.email || "",
-        },
+          value: this.customer?.self_contact.email || ""
+        }
       ];
     },
 
@@ -494,28 +494,28 @@ export default {
       return [
         {
           label: "口座指定者",
-          value: this.customer?.banking?.account_designator || "",
+          value: this.customer?.banking?.account_designator || ""
         },
         {
           label: "銀行名",
-          value: this.customer?.banking?.bank_name || "",
+          value: this.customer?.banking?.bank_name || ""
         },
         {
           label: "支店名",
-          value: this.customer?.banking?.branch_name || "",
+          value: this.customer?.banking?.branch_name || ""
         },
         {
           label: "預金種類",
-          value: this.customer?.banking?.account_type || "",
+          value: this.customer?.banking?.account_type || ""
         },
         {
           label: "口座番号",
-          value: this.customer?.banking?.account_number || "",
+          value: this.customer?.banking?.account_number || ""
         },
         {
           label: "口座名義",
-          value: this.customer?.banking?.account_name || "",
-        },
+          value: this.customer?.banking?.account_name || ""
+        }
       ];
     },
     selectingForestCustomerId() {
@@ -525,7 +525,7 @@ export default {
     taggedForests() {
       if (this.forests.length === 0) return [];
       return this.forests.filter(f => some(Object.values(f.tags), Boolean));
-    },
+    }
   },
 
   watch: {
@@ -537,9 +537,9 @@ export default {
           ...this.headerInfo,
           title: this.getPersonFullname(this.customer?.self_contact.name_kanji),
           desc: this.customer.business_id,
-          tags: tags_to_array(this.customer?.tags),
+          tags: tags_to_array(this.customer?.tags)
         };
-      },
+      }
     },
     forests: {
       deep: true,
@@ -547,9 +547,9 @@ export default {
         this.headerInfo = {
           ...this.headerInfo,
           subTitle: `${(this.forests && this.forests.length) ||
-            0}件の森林を所有`,
+            0}件の森林を所有`
         };
-      },
+      }
     },
     headerInfo: {
       deep: true,
@@ -557,9 +557,9 @@ export default {
         if (this.headerInfo.title && this.headerInfo.subTitle) {
           this.$store.dispatch("setHeaderInfo", this.headerInfo);
         }
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 

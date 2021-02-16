@@ -4,7 +4,7 @@ export default {
   created() {
     this.debounceLoadInitItemsForAdding = debounce(
       this.loadInitItemsForAdding,
-      500,
+      500
     );
   },
   data() {
@@ -18,7 +18,7 @@ export default {
       modalSelectingId: null,
       modalSelectingIndex: null,
       showNotFoundMsg: false,
-      showOutOfDataMsg: false,
+      showOutOfDataMsg: false
     };
   },
   methods: {
@@ -30,8 +30,8 @@ export default {
       let reqConfig = keyword
         ? {
             params: {
-              search: keyword || "",
-            },
+              search: keyword || ""
+            }
           }
         : {};
       this.itemsForAddingLoading = true;
@@ -41,7 +41,7 @@ export default {
         this.itemsForAdding = {
           next: resp.next,
           previous: resp.previous,
-          results: reject(resp.results, this.itemsForAddingResultFilter),
+          results: reject(resp.results, this.itemsForAddingResultFilter)
         };
         this.showNotFoundMsg =
           !resp.next && !resp.previous && resp.results.length === 0;
@@ -59,11 +59,11 @@ export default {
         previous: resp.previous,
         results: [
           ...this.itemsForAdding.results,
-          ...reject(resp.results, this.itemsForAddingResultFilter),
-        ],
+          ...reject(resp.results, this.itemsForAddingResultFilter)
+        ]
       };
       this.itemsForAddingLoading = false;
-    },
+    }
   },
   watch: {
     showSelect(val) {
@@ -75,6 +75,6 @@ export default {
           this.$refs.selectListModal.clearSearch();
         }
       }
-    },
-  },
+    }
+  }
 };

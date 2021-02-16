@@ -11,7 +11,7 @@ export default {
     return {
       isLoading_: false,
       contractTypes: [],
-      contractTypeInput: "",
+      contractTypeInput: ""
     };
   },
   created() {
@@ -26,13 +26,13 @@ export default {
   computed: {
     contractTypeNames() {
       return this.contractTypes.map(ct => ct.name);
-    },
+    }
   },
   methods: {
     async addContractTypeBtnClick() {
       try {
         const newType = await this.$rest.post("/contract_type", {
-          name: this.contractTypeInput,
+          name: this.contractTypeInput
         });
         this.contractTypes.push(newType);
         this.contractTypeInput = "";
@@ -47,8 +47,8 @@ export default {
     },
     toggleActive(id, val) {
       this.$rest.put(`contract_type/${id}/toggle-active`, { active: val });
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -19,7 +19,7 @@ export default {
     isShow: Boolean,
     msg: String,
     color: String,
-    timeout: Number,
+    timeout: Number
   },
 
   methods: {
@@ -29,7 +29,7 @@ export default {
 
     onDismiss(val) {
       this.$emit("dismiss", val);
-    },
-  },
+    }
+  }
 };
 </script>

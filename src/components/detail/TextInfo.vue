@@ -21,7 +21,7 @@ export default {
   name: "text-info",
 
   components: {
-    TextInput,
+    TextInput
   },
 
   props: {
@@ -29,14 +29,14 @@ export default {
     value: [String, Number],
     rules: String,
     name: String,
-    isUpdate: Boolean,
+    isUpdate: Boolean
   },
 
   data() {
     return {
-      innerValue: "",
+      innerValue: ""
     };
-  },
+  }
 };
 </script>
 

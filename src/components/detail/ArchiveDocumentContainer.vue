@@ -112,7 +112,7 @@ export default {
     ContentHeader,
     DocumentCard,
     UpdateButton,
-    AdditionButton,
+    AdditionButton
   },
 
   data() {
@@ -129,7 +129,7 @@ export default {
       duplicateUploadFiles: [],
       invalidUploadFilesExtension: [],
       acceptFileExtensions:
-        ".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif, .txt",
+        ".xlsx, .xls, .csv, .doc, .docx, .pdf, .zip, .png, .jpg, .gif, .bmp, .tif, .txt"
     };
   },
 
@@ -187,7 +187,7 @@ export default {
       return intersectionWith(
         files1,
         files2,
-        (f1, f2) => (f1.attributes?.original_file_name || f1.name) === f2.name,
+        (f1, f2) => (f1.attributes?.original_file_name || f1.name) === f2.name
       );
     },
 
@@ -218,11 +218,11 @@ export default {
       const originalDocs = [...this.documents, ...validFiles];
       this.duplicateUploadFiles = this.getDuplicateFiles(
         this.documents,
-        validFiles,
+        validFiles
       );
       const filteredDocs = this.removeDuplicateFiles(
         this.documents,
-        validFiles,
+        validFiles
       );
       if (
         originalDocs.length !== filteredDocs.length ||
@@ -252,13 +252,13 @@ export default {
         if (newDocs.length > 0) {
           const newDocuments = await this.$rest.post(
             `archives/${this.id}/attachments`,
-            data,
+            data
           );
           if (newDocuments) {
             this.documents.splice(
               this.documents.length - 1 - (newDocs.length - 1),
               newDocs.length,
-              ...newDocuments.data,
+              ...newDocuments.data
             );
           }
         }
@@ -277,7 +277,7 @@ export default {
     handleUndoDelete(doc, index) {
       this.$set(doc, "deleted", false);
       this.deleteDocuments.splice(index, 1);
-    },
+    }
   },
 
   computed: {
@@ -285,7 +285,7 @@ export default {
       return (
         this.documents.filter(doc => doc.added || doc.deleted).length === 0
       );
-    },
+    }
   },
 
   watch: {
@@ -295,8 +295,8 @@ export default {
         this.invalidUploadFilesExtension = [];
         this.$refs.fileInput.value = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

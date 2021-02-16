@@ -30,13 +30,13 @@ export default {
     date: String,
     editor: Object,
     type: String,
-    noRightAction: { type: Boolean, default: false },
+    noRightAction: { type: Boolean, default: false }
   },
 
   methods: {
     onClick() {
       // Handle click navigate
-    },
+    }
   },
 
   computed: {
@@ -55,8 +55,8 @@ export default {
       } else {
         return "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

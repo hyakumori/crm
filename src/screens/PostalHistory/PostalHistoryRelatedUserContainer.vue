@@ -92,7 +92,7 @@ export default {
     UpdateButton,
     AdditionButton,
     SelectListModal,
-    ArchiveParticipantCard,
+    ArchiveParticipantCard
   },
 
   data() {
@@ -102,7 +102,7 @@ export default {
       addedParticipants: [],
       deletedParticipants: [],
       itemsForAddingUrl: "/users/minimal",
-      isLoading_: false,
+      isLoading_: false
     };
   },
 
@@ -136,9 +136,9 @@ export default {
           `/postal-histories/${this.archive_id}/users`,
           {
             data: {
-              ids: deletedIds,
-            },
-          },
+              ids: deletedIds
+            }
+          }
         );
         if (isDeleted) {
           this.modalSelectingId = null;
@@ -151,7 +151,7 @@ export default {
         const addedIds = this.addedParticipants.map(p => p.id);
         const newParticipants = await this.$rest.post(
           `/postal-histories/${this.archive_id}/users`,
-          { ids: addedIds },
+          { ids: addedIds }
         );
         if (newParticipants) {
         }
@@ -180,7 +180,7 @@ export default {
     submitRelatedParticipant() {
       const participant = this.itemsForAdding.results.splice(
         this.modalSelectingIndex,
-        1,
+        1
       )[0];
       participant.added = true;
       this.addedParticipants.push(participant);
@@ -194,7 +194,7 @@ export default {
       if (participant.added) {
         delete participant.added;
         this.addedParticipants = reject(this.addedParticipants, {
-          id: participant.id,
+          id: participant.id
         });
         this.itemsForAdding = { results: [] };
       } else {
@@ -205,9 +205,9 @@ export default {
     handleUndoDelete(participant) {
       this.$set(participant, "deleted", undefined);
       this.deletedParticipants = reject(this.deletedParticipants, {
-        id: participant.id,
+        id: participant.id
       });
-    },
+    }
   },
 
   computed: {
@@ -216,7 +216,7 @@ export default {
     },
     userIdsMap() {
       return Object.fromEntries(
-        this.tempUserParticipants.map(u => [u.id, true]),
+        this.tempUserParticipants.map(u => [u.id, true])
       );
     },
     saveDisabled() {
@@ -224,7 +224,7 @@ export default {
         this.addedParticipants.length === 0 &&
         this.deletedParticipants.length === 0
       );
-    },
+    }
   },
 
   watch: {
@@ -242,8 +242,8 @@ export default {
           this.itemsForAdding = { results: [] };
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

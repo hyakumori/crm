@@ -45,20 +45,20 @@ export default {
 
   components: {
     ContentHeader,
-    AttachmentCard,
+    AttachmentCard
   },
 
   props: {
     id: String,
     archives: { type: Array, default: () => [] },
-    routeName: { type: String, default: "archive-detail" },
+    routeName: { type: String, default: "archive-detail" }
   },
 
   data() {
     return {
       loading: false,
       isExpand: false,
-      isUpdate: false,
+      isUpdate: false
     };
   },
   computed: {
@@ -72,8 +72,8 @@ export default {
 
     isRequiredExpand() {
       return this.archives.length > 3;
-    },
-  },
+    }
+  }
 };
 </script>
 

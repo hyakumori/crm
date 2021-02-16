@@ -9,7 +9,7 @@
 import ActivateAccountForm from "../components/forms/ActivateAccountForm";
 export default {
   components: {
-    ActivateAccountForm,
-  },
+    ActivateAccountForm
+  }
 };
 </script>

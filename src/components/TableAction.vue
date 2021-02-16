@@ -22,19 +22,19 @@ export default {
   name: "table-action",
 
   components: {
-    SelectList,
+    SelectList
   },
 
   props: {
     selectedCount: Number,
-    actions: Array,
+    actions: Array
   },
 
   methods: {
     onSelected(val) {
       this.$emit("selected-action", val);
-    },
-  },
+    }
+  }
 };
 </script>
 

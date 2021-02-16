@@ -10,7 +10,7 @@
 import ForgotPasswordForm from "../components/forms/ForgotPasswordForm";
 export default {
   components: {
-    ForgotPasswordForm,
-  },
+    ForgotPasswordForm
+  }
 };
 </script>

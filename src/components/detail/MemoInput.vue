@@ -73,18 +73,18 @@ export default {
   props: {
     apiUrl: { type: String, required: true },
     value: { type: Object },
-    objectType: { type: String, required: true },
+    objectType: { type: String, required: true }
   },
   components: {
     ValidationProvider,
-    UpdateButton,
+    UpdateButton
   },
   data() {
     return {
       isLoading: false,
       isUpdate: false,
       memo: _get(this.value, "attributes.memo") || "",
-      originalMemo: "",
+      originalMemo: ""
     };
   },
   methods: {
@@ -92,7 +92,7 @@ export default {
       try {
         this.isLoading = true;
         const response = await this.$rest.post(this.apiUrl, {
-          memo: this.memo,
+          memo: this.memo
         });
         if (response) {
           this.memo = response.memo;
@@ -112,7 +112,7 @@ export default {
       this.memo = this.value.attributes["memo"] || "";
       this.isLoading = false;
       this.isUpdate = false;
-    },
+    }
   },
   computed: {
     hasPermission() {
@@ -126,14 +126,14 @@ export default {
     },
     hasChanged() {
       return this.originalMemo !== this.memo;
-    },
+    }
   },
   watch: {
     "value.attributes.memo"() {
       this.memo = this.value.attributes["memo"] || "";
       this.originalMemo = this.memo;
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -155,11 +155,11 @@ export default {
     objectType: { type: String, required: true },
     objectId: { type: String },
     title: { type: String, default: "タグ情報" },
-    editable: { type: Boolean, default: true },
+    editable: { type: Boolean, default: true }
   },
   components: {
     UpdateButton,
-    TagSettingManage,
+    TagSettingManage
   },
   data() {
     return {
@@ -172,7 +172,7 @@ export default {
       tagValueSearchInput: "",
       editingTags: this.mapTagsToEditingValues(this.tags),
       originalTags: { ...this.tags },
-      tagSettingDialog: false,
+      tagSettingDialog: false
     };
   },
   async mounted() {
@@ -206,9 +206,9 @@ export default {
               .filter(item => item.value && !item.deleted)
               .map(item => ({
                 tag_name: item.key,
-                value: item.value,
-              })),
-          },
+                value: item.value
+              }))
+          }
         );
         if (results) {
           this.$emit("input", results.tags);
@@ -224,7 +224,7 @@ export default {
     },
     async getTagSettings() {
       const tagSettings = await this.$rest.get(
-        `/tags/settings/${this.appName}/${this.objectType}`,
+        `/tags/settings/${this.appName}/${this.objectType}`
       );
       if (tagSettings && tagSettings.results) {
         this.settings = tagSettings.results;
@@ -232,7 +232,7 @@ export default {
     },
     async getTagValues() {
       const tags = await this.$rest.get(
-        `/tags/${this.appName}/${this.objectType}`,
+        `/tags/${this.appName}/${this.objectType}`
       );
       if (tags && tags.results) {
         this.tagValues = tags.results;
@@ -263,7 +263,7 @@ export default {
           key: this.selectedTagKey,
           value: this.trimmedTagValueSearchInput,
           added: true,
-          deleted: false,
+          deleted: false
         });
       }
       this.tagValueSearchInput = "";
@@ -278,12 +278,12 @@ export default {
             value: tags[tagKey],
             added: false,
             edited: false,
-            deleted: false,
+            deleted: false
           });
         }
       }
       return results;
-    },
+    }
   },
   computed: {
     availableEditingTags() {
@@ -297,9 +297,7 @@ export default {
       return (
         this.editingTags.filter(
           item =>
-            item.added === true ||
-            item.edited === true ||
-            item.deleted === true,
+            item.added === true || item.edited === true || item.deleted === true
         ).length > 0
       );
     },
@@ -320,7 +318,7 @@ export default {
     },
     trimmedSelectedTagKey() {
       return this.selectedTagKey && this.selectedTagKey.trim();
-    },
+    }
   },
   watch: {
     tags: {
@@ -328,7 +326,7 @@ export default {
       handler(val) {
         this.originalTags = { ...val };
         this.editingTags = this.mapTagsToEditingValues(this.originalTags);
-      },
+      }
     },
     selectedTagKey() {
       this.selectedTagValue = "";
@@ -338,8 +336,8 @@ export default {
         await this.getTagSettings();
         await this.getTagValues();
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss">

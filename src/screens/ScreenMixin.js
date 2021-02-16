@@ -6,7 +6,7 @@ export default {
       showChangeTagDialog: false,
       fetchTagsLoading: false,
       updatingTags: false,
-      selectedTagForUpdate: null,
+      selectedTagForUpdate: null
     };
   },
   mounted() {
@@ -41,7 +41,7 @@ export default {
       this.selectedTagForUpdate = null;
       actionListRefChild.reset();
       actionListRef.resizeInputWidth();
-    },
+    }
   },
   computed: {
     requestFilters() {
@@ -49,7 +49,7 @@ export default {
         ? this.$refs.filter.conditions.map(condition => {
             return {
               criteria: condition.criteria,
-              keyword: condition.keyword,
+              keyword: condition.keyword
             };
           })
         : [];
@@ -60,6 +60,6 @@ export default {
         this.tableSelectedRows.length > 0 &&
         this.tableSelectedRows.map(row => row.id)
       );
-    },
-  },
+    }
+  }
 };

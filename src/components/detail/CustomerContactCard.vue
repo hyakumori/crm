@@ -115,7 +115,7 @@
         owner: isOwner,
         contactor: isContactor,
         default: this.contact.default,
-        pointer: this.isUpdate,
+        pointer: this.isUpdate
       }"
       @click.stop="onTagClick"
     ></div>
@@ -142,7 +142,7 @@ export default {
     customerName: String,
     showDefaultBadge: { type: Boolean, default: false },
     clickable: { type: Boolean, default: false },
-    allowDelete: { type: Boolean, default: true },
+    allowDelete: { type: Boolean, default: true }
   },
 
   data() {
@@ -157,8 +157,8 @@ export default {
         "孫",
         "友人",
         "その他親族",
-        "その他",
-      ],
+        "その他"
+      ]
     };
   },
 
@@ -172,9 +172,9 @@ export default {
           "toggleContactDefault",
           !this.contact.default,
           this.contact.customer_id,
-          this.contact.id,
+          this.contact.id
         );
-    },
+    }
   },
 
   computed: {
@@ -232,8 +232,8 @@ export default {
     },
     relationshipType() {
       return this.contact.cc_attrs?.relationship_type || "本人";
-    },
-  },
+    }
+  }
 };
 </script>
 

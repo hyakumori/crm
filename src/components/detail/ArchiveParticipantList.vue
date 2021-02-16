@@ -23,12 +23,12 @@ export default {
   name: "archive-participant-list",
 
   components: {
-    ArchiveParticipantCard,
+    ArchiveParticipantCard
   },
 
   props: {
     participants: Array,
-    isUpdate: Boolean,
-  },
+    isUpdate: Boolean
+  }
 };
 </script>

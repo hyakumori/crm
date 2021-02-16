@@ -20,7 +20,7 @@
                 <v-alert dense outlined type="success">
                   {{
                     $t("messages.reset_password_success", {
-                      seconds: redirectCount,
+                      seconds: redirectCount
                     })
                   }}
                 </v-alert>
@@ -99,20 +99,20 @@ import TextInput from "../forms/TextInput";
 export default {
   components: {
     TextInput,
-    ValidationObserver,
+    ValidationObserver
   },
   data() {
     return {
       form: {
         password: "",
-        password_retype: "",
+        password_retype: ""
       },
       formError: "",
       loading: false,
       showPassword: false,
       success: false,
       redirectInterval: null,
-      redirectCount: 3,
+      redirectCount: 3
     };
   },
   methods: {
@@ -123,7 +123,7 @@ export default {
           uid: this.$route.params.uid,
           token: this.$route.params.token,
           new_password: this.form.password,
-          re_new_password: this.form.password_retype,
+          re_new_password: this.form.password_retype
         });
         this.success = true;
         this.redirectInterval = setInterval(() => {
@@ -146,8 +146,8 @@ export default {
         if (val) {
           this.formError = "";
         }
-      },
-    },
+      }
+    }
   },
   created() {
     extend("password", {
@@ -155,9 +155,9 @@ export default {
       validate(value, { target }) {
         return value === target;
       },
-      message: this.$t("reset_password_form.password_not_match"),
+      message: this.$t("reset_password_form.password_not_match")
     });
-  },
+  }
 };
 </script>
 

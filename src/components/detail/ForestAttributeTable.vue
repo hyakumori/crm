@@ -38,14 +38,14 @@ export default {
 
   props: {
     isLoading: Boolean,
-    attributes: Array,
+    attributes: Array
   },
 
   computed: {
     getHeaders() {
       return headers;
-    },
-  },
+    }
+  }
 };
 </script>
 

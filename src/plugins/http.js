@@ -9,7 +9,7 @@ const setupRestClient = options => {
 
   axios.defaults = {
     ...axios.defaults,
-    ...options,
+    ...options
   };
 
   axios.interceptors.request.use(
@@ -27,7 +27,7 @@ const setupRestClient = options => {
       return new Promise((resolve, reject) => {
         reject(error);
       });
-    },
+    }
   );
 
   axios.interceptors.response.use(
@@ -56,8 +56,8 @@ const setupRestClient = options => {
             axios.$v.$t("messages.permission_denied"),
             {
               position: "top-right",
-              timeout: 5000,
-            },
+              timeout: 5000
+            }
           );
           reject(error);
         });
@@ -68,7 +68,7 @@ const setupRestClient = options => {
       } else if (error.response && error.response.status === 503) {
         axios.$v.$dialog.notify.error("Maintain", {
           position: "top-right",
-          timeout: 5000,
+          timeout: 5000
         });
         return new Promise((resolve, reject) => {
           reject(error);
@@ -76,13 +76,13 @@ const setupRestClient = options => {
       } else {
         axios.$v.$dialog.notify.error(`${error}`, {
           position: "top-right",
-          timeout: 5000,
+          timeout: 5000
         });
         return new Promise((resolve, reject) => {
           reject(error);
         });
       }
-    },
+    }
   );
 
   return axios;
@@ -91,7 +91,7 @@ const setupRestClient = options => {
 const HttpClientPlugin = {
   install: (Vue, options) => {
     Vue.prototype.$rest = setupRestClient(options);
-  },
+  }
 };
 
 export { HttpClientPlugin };

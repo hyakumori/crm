@@ -96,14 +96,24 @@
               <v-card-text v-if="selectedFeature.textTwo" class="text-center">
                 大茅: {{ selectedFeature.textOne }} -
                 {{ selectedFeature.textTwo }}
-                <v-icon color="primary" v-on:click="routeForest(selectedFeature.forestID)"> mdi-arrow-right-circle</v-icon>
-                <br>
+                <v-icon
+                  color="primary"
+                  v-on:click="routeForest(selectedFeature.forestID)"
+                >
+                  mdi-arrow-right-circle</v-icon
+                >
+                <br />
                 所有者: {{ selectedFeature.textName }}
               </v-card-text>
               <v-card-text v-else class="text-center">
                 大茅: {{ selectedFeature.textOne }}
-                <v-icon color="primary" v-on:click="routeForest(selectedFeature.forestID)"> mdi-arrow-right-circle</v-icon>
-                <br>
+                <v-icon
+                  color="primary"
+                  v-on:click="routeForest(selectedFeature.forestID)"
+                >
+                  mdi-arrow-right-circle</v-icon
+                >
+                <br />
                 所有者: {{ selectedFeature.textName }}
               </v-card-text>
             </v-card>
@@ -201,17 +211,17 @@ export default {
   props: {
     forests: {
       type: Array,
-      required: true,
+      required: true
     },
     big: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     echoedForestIdFromTable: {
       type: String,
-      default: null,
-    },
+      default: null
+    }
   },
 
   data() {
@@ -235,8 +245,8 @@ export default {
         visible: true,
         url: "https://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20201001a",
         attributions:
-          '<a href="https://maps.gsi.go.jp/development/ichiran.html"> 国土地理院 </a>',
-      },
+          '<a href="https://maps.gsi.go.jp/development/ichiran.html"> 国土地理院 </a>'
+      }
     ];
 
     const rasterLayers = [
@@ -246,7 +256,7 @@ export default {
         visible: false,
         url: "http://localhost:8000/geoserver/raster/wms",
         layer: "raster:赤色立体図データ",
-        projection: "EPSG:4326",
+        projection: "EPSG:4326"
       },
       {
         name: "DEM",
@@ -254,7 +264,7 @@ export default {
         visible: false,
         url: "http://localhost:8000/geoserver/raster/wms",
         layer: "raster:DEMデータ",
-        projection: "EPSG:4326",
+        projection: "EPSG:4326"
       },
       {
         name: "航空写真",
@@ -262,8 +272,8 @@ export default {
         visible: false,
         url: "http://localhost:8000/geoserver/raster/wms",
         layer: "raster:航空写真データ",
-        projection: "EPSG:4326",
-      },
+        projection: "EPSG:4326"
+      }
     ];
 
     return {
@@ -280,7 +290,7 @@ export default {
       selectedFeatures,
       overlayCoordinate,
       showCard,
-      opacity,
+      opacity
     };
   },
 
@@ -332,7 +342,7 @@ export default {
 
     singleClick() {
       return singleClick;
-    },
+    }
   },
 
   watch: {
@@ -347,7 +357,7 @@ export default {
         this.loadMapFeatures().then(f => {
           this.features = f;
         });
-      },
+      }
     },
 
     echoedForestIdFromTable(val, prev) {
@@ -366,8 +376,8 @@ export default {
           stroke: new Stroke({ color: "FFF" }),
           fill: new Fill({ color: "gray" }),
           text: new Text({
-            text: filteredFeature.values_.nametag,
-          }),
+            text: filteredFeature.values_.nametag
+          })
         });
 
         filteredFeature.setStyle(style);
@@ -378,13 +388,13 @@ export default {
           stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
           fill: new Fill({ color: this.color }),
           text: new Text({
-            text: prevFilteredFeature.values_.nametag,
-          }),
+            text: prevFilteredFeature.values_.nametag
+          })
         });
 
         prevFilteredFeature.setStyle(unstyle);
       }
-    },
+    }
   },
 
   methods: {
@@ -404,8 +414,8 @@ export default {
         stroke: new Stroke({ color: "FFF" }),
         fill: new Fill({ color: "gray" }),
         text: new Text({
-          text: val.values_.nametag,
-        }),
+          text: val.values_.nametag
+        })
       });
       val.setStyle(style);
       this.$emit("echoSelectedFeature", val.getId());
@@ -416,8 +426,8 @@ export default {
         stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
         fill: new Fill({ color: this.color }),
         text: new Text({
-          text: val.values_.nametag,
-        }),
+          text: val.values_.nametag
+        })
       });
       val.setStyle(style);
       this.$emit("echoSelectedFeature", null);
@@ -430,7 +440,7 @@ export default {
         dem: "DEM",
         red: "赤色立体図",
         std: "標準地図",
-        rgb: "航空写真",
+        rgb: "航空写真"
       };
       return names[layerId];
     },
@@ -452,8 +462,8 @@ export default {
             customer: f.attributes.customer_cache,
             internal_id: f.internal_id,
             nametag: f.tags["団地"] + " " + f.internal_id,
-            land_attributes: f.land_attributes,
-          },
+            land_attributes: f.land_attributes
+          }
         };
       });
 
@@ -467,7 +477,7 @@ export default {
       xhr.open("GET", src);
       xhr.setRequestHeader(
         "Authorization",
-        "Bearer " + localStorage.getItem("accessToken"),
+        "Bearer " + localStorage.getItem("accessToken")
       );
       xhr.responseType = "arraybuffer";
       xhr.onload = function() {
@@ -518,15 +528,15 @@ export default {
           {
             INFO_FORMAT: "application/json",
             feature_count: 1,
-            query_layers: "crm_Forests",
-          },
+            query_layers: "crm_Forests"
+          }
         );
         this.overlayCoordinate = event.coordinate;
 
         let featureRequest = await this.$rest(loggedURL);
         if (featureRequest.numberReturned > 0) {
           this.selectedFeature = this.returnPopupText(
-            featureRequest.features[0],
+            featureRequest.features[0]
           );
           this.showCard = true;
         } else {
@@ -535,8 +545,8 @@ export default {
       }
     },
 
-    pointOnSurface: findPointOnSurface,
-  },
+    pointOnSurface: findPointOnSurface
+  }
 };
 </script>
 

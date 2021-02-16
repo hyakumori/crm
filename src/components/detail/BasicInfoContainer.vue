@@ -30,18 +30,18 @@ export default {
 
   components: {
     ContentHeader,
-    BasicInfo,
+    BasicInfo
   },
   props: {
     businessId: String,
     id: String,
     info: Array,
-    displayAdditionBtn: { type: Boolean, default: true },
+    displayAdditionBtn: { type: Boolean, default: true }
   },
   data() {
     return {
       isUpdate: false,
-      isSave: false,
+      isSave: false
     };
   },
 
@@ -52,7 +52,7 @@ export default {
 
     handleToggleEdit() {
       this.isUpdate = !this.isUpdate;
-    },
-  },
+    }
+  }
 };
 </script>

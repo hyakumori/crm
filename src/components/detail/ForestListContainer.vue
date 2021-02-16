@@ -107,7 +107,7 @@ export default {
     UpdateButton,
     AdditionButton,
     SelectListModal,
-    ForestInfoCard,
+    ForestInfoCard
   },
 
   props: {
@@ -116,14 +116,14 @@ export default {
     displayAdditionBtn: Boolean,
     selectingForestId: String,
     itemClickable: { type: Boolean, default: false },
-    echoedForestIdFromMap: { type: String, default: null },
+    echoedForestIdFromMap: { type: String, default: null }
   },
   data() {
     return {
       selectingForestId_: null,
       forestsToAdd: [],
       forestsToDelete: [],
-      itemsForAddingUrl: "/forests/minimal",
+      itemsForAddingUrl: "/forests/minimal"
     };
   },
   computed: {
@@ -143,7 +143,7 @@ export default {
       return (
         this.forestIdsToDelete.length === 0 && this.forestIdsToAdd.length === 0
       );
-    },
+    }
 
     // selectedForestId() {
     //   return this.echoedForestId
@@ -158,7 +158,7 @@ export default {
     handleAdd() {
       const forestItem = this.itemsForAdding.results.splice(
         this.modalSelectingIndex,
-        1,
+        1
       )[0];
       forestItem.added = true;
       this.forestsToAdd.push(forestItem);
@@ -187,7 +187,7 @@ export default {
         this.saving = true;
         await this.$rest.put(`/customers/${this.id}/forests`, {
           added: this.forestIdsToAdd,
-          deleted: this.forestIdsToDelete,
+          deleted: this.forestIdsToDelete
         });
         this.$emit("saved");
         this.saving = false;
@@ -201,14 +201,14 @@ export default {
         this.saving = false;
         if (error.response && error.response.status === 400) {
           this.$dialog.notify.error(
-            this.$t("messages.record_updated_before_please_reload_first"),
+            this.$t("messages.record_updated_before_please_reload_first")
           );
         } else if (error.response && error.response.status < 500)
           this.$dialog.notify.error(
-            error.response.data.detail || error.response.statusText,
+            error.response.data.detail || error.response.statusText
           );
       }
-    },
+    }
   },
   watch: {
     selectingForestId_(val) {
@@ -233,7 +233,7 @@ export default {
 
     echoedForestIdFromMap(val) {
       this.selectingForestId_ = val;
-    },
-  },
+    }
+  }
 };
 </script>

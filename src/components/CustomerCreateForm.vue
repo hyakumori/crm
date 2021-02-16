@@ -158,12 +158,12 @@ export default {
   components: {
     ValidationObserver,
     TextInput,
-    OutlineRoundBtn,
+    OutlineRoundBtn
   },
   data() {
     return {
       shown: false,
-      form: this.initForm(),
+      form: this.initForm()
     };
   },
   methods: {
@@ -177,7 +177,7 @@ export default {
         address: "",
         phone_number: "",
         mobile_number: "",
-        email: "",
+        email: ""
       };
     },
     submit() {
@@ -185,20 +185,20 @@ export default {
         basic_contact: {
           name_kanji: {
             last_name: this.form.last_name_kanji,
-            first_name: this.form.first_name_kanji,
+            first_name: this.form.first_name_kanji
           },
           name_kana: {
             last_name: this.form.last_name_kana,
-            first_name: this.form.first_name_kana,
+            first_name: this.form.first_name_kana
           },
           address: {
-            sector: this.form.address,
+            sector: this.form.address
           },
           postal_code: this.form.postal_code,
           telephone: this.form.phone_number,
           mobilephone: this.form.mobile_number,
-          email: this.form.email,
-        },
+          email: this.form.email
+        }
       };
       this.$apollo.mutate({
         mutation: gql`
@@ -210,7 +210,7 @@ export default {
           }
         `,
         variables: {
-          input: customerInput,
+          input: customerInput
         },
         update: (store, { data: { create_customer } }) => {
           if (!create_customer.ok) {
@@ -221,9 +221,9 @@ export default {
             BusEvent.$emit("customersChanged");
             this.shown = false;
           }
-        },
+        }
       });
-    },
-  },
+    }
+  }
 };
 </script>
