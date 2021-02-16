@@ -65,12 +65,13 @@
             values="100"
           >
           </v-slider>
-          <v-radio-group mandatory>
+          <v-radio-group mandatory v-model="layerRadio">
             <v-radio
               v-for="layer of rLayers"
-              :key="layer.name"
+              :key="String(layer.getProperties(name))"
               :label="returnLayerLabel(layer.getProperties().id)"
-              :value="layer.name"
+              :value="String(layer.getProperties().id)"
+              :name="String(layer.getProperties().id)"
               @change="showBaseLayer(layer.getProperties().id)"
             >
             </v-radio>
@@ -237,6 +238,7 @@ export default {
     const selectedFeatures = [];
     const overlayCoordinate = [0, 0];
     const opacity = 50;
+    const layerRadio = "std"
 
     const geoserver_baseUrl =
       process.env.VUE_APP_GEOSERVER ?? "http://localhost:8000/geoserver";
@@ -294,7 +296,8 @@ export default {
       overlayCoordinate,
       showCard,
       opacity,
-      geoserver_baseUrl
+      geoserver_baseUrl,
+      layerRadio,
     };
   },
 
@@ -339,9 +342,19 @@ export default {
     },
     rLayers() {
       const allLayers = this.mapLayers;
-      return allLayers.filter(function(el) {
+      const sortedLayers = allLayers.filter(function(el) {
         return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
       });
+
+      return sortedLayers.sort(function (a, b) {
+        if (a.getProperties().id < b.getProperties().id) {
+          return -1
+        }
+        if (a.getProperties().id > b.getProperties().id) {
+          return 1
+        }
+        return 0
+      })
     },
 
     singleClick() {
