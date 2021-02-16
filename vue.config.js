@@ -7,12 +7,12 @@ module.exports = {
     staticOptions: { index: "index-dev.html" },
     proxy: {
       "^/api": {
-        target: "http://localhost:8000",
+        target: process.env.BACKEND_URL ?? "http://localhost:8000",
         ws: false,
         changeOrigin: true,
       },
       "^/graphql": {
-        target: "http://localhost:8000",
+        target: process.env.BACKEND_URL ?? "http://localhost:8000",
         ws: false,
         changeOrigin: true,
       },
