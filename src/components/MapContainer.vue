@@ -532,7 +532,7 @@ export default {
           {
             INFO_FORMAT: "application/json",
             feature_count: 1,
-            query_layers: "crm_Forests"
+            query_layers: "crm:Forests"
           }
         );
         this.overlayCoordinate = event.coordinate;
