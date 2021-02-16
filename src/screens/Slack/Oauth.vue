@@ -15,14 +15,14 @@ export default {
     async slackOauth() {
       await this.$rest.post("slack/oauth", {
         ...this.$refs.authForm.form,
-        code: this.code,
+        code: this.code
       });
-    },
+    }
   },
   computed: {
     code() {
       return this.$route.query.code;
-    },
-  },
+    }
+  }
 };
 </script>

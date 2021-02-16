@@ -15,13 +15,13 @@ export default {
   name: "basic-info",
 
   components: {
-    TextInfo,
+    TextInfo
   },
 
   props: {
     isUpdate: Boolean,
     isSave: Boolean,
-    infos: Array,
+    infos: Array
   },
 
   watch: {
@@ -31,7 +31,7 @@ export default {
           this.$emit("updateInfo", this.infos);
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>

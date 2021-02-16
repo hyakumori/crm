@@ -9,7 +9,7 @@ export function fromNow(dateTimeString) {
   }
   return formatDistanceToNow(parseISO(dateTimeString), {
     addSuffix: true,
-    locale: ja,
+    locale: ja
   });
 }
 

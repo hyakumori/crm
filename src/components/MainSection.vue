@@ -19,7 +19,7 @@ import PageHeader from "./PageHeader";
 
 export default {
   name: "main-section",
-  components: { PageHeader },
+  components: { PageHeader }
 };
 </script>
 

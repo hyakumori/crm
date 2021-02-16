@@ -20,7 +20,7 @@ export default {
     on: Object,
     icon: String,
     content: String,
-    loading: Boolean,
-  },
+    loading: Boolean
+  }
 };
 </script>

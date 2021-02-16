@@ -49,7 +49,7 @@ export default {
     loading: Boolean,
     flat: { type: Boolean, default: false },
     deleted: { type: Boolean, default: false },
-    added: { type: Boolean, default: false },
+    added: { type: Boolean, default: false }
   },
 
   methods: {
@@ -59,7 +59,7 @@ export default {
 
     onDownload() {
       this.downloadClick();
-    },
+    }
   },
 
   computed: {
@@ -70,8 +70,8 @@ export default {
           this.attachment.attributes["original_file_name"]) ||
         this.fileName
       );
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -9,7 +9,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_customer',
+                'manage_customer'
               ]"
               icon="mdi-upload"
               :content="
@@ -26,7 +26,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_customer',
+                'manage_customer'
               ]"
               ref="csvUploadInput"
               type="file"
@@ -41,7 +41,7 @@
                 'admin',
                 'group_admin',
                 'group_normal_user',
-                'manage_customer',
+                'manage_customer'
               ]"
             >
               <template v-slot:activator="{ on }">
@@ -149,7 +149,7 @@ export default {
     PageHeader,
     OutlineRoundBtn,
     UpdateActionsDialog,
-    TableAction,
+    TableAction
   },
   mixins: [ScreenMixin],
   data() {
@@ -157,8 +157,8 @@ export default {
       actions: [
         {
           text: this.$t("action.change_tag_value"),
-          value: 0,
-        },
+          value: 0
+        }
       ],
       customerList: {},
       pageIcon: "mdi-account-outline",
@@ -170,7 +170,7 @@ export default {
       downloadCsvLoading: false,
       newTagValue: null,
       selectedFileName: "",
-      uploadCsvLoading: false,
+      uploadCsvLoading: false
     };
   },
   mounted() {
@@ -189,7 +189,7 @@ export default {
       return this.headers
         .map(h => ({ text: h.text, value: h.filter_name }))
         .filter(f => f.value !== undefined);
-    },
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (this.uploadCsvLoading && !confirm(this.$t("messages.confirm_leave")))
@@ -214,7 +214,7 @@ export default {
         formData.append("file", this.$refs.csvUploadInput.files[0]);
         try {
           await this.$rest.post("/customers/upload_csv", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: { "Content-Type": "multipart/form-data" }
           });
           this.$apollo.queries.customerList.refetch();
           this.$dialog.notify.success(this.$t("messages.upload_successfully"));
@@ -226,7 +226,7 @@ export default {
           ) {
             this.$dialog.show(ErrorCard, {
               line: error.response.data.line,
-              errors: error.response.data.errors,
+              errors: error.response.data.errors
             });
           }
         } finally {
@@ -251,8 +251,8 @@ export default {
         ...config,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          ...(config.headers || {}),
-        },
+          ...(config.headers || {})
+        }
       }).then(res => {
         window.writer = fileStream.getWriter();
 
@@ -261,7 +261,7 @@ export default {
           reader
             .read()
             .then(res =>
-              res.done ? writer.close() : writer.write(res.value).then(pump),
+              res.done ? writer.close() : writer.write(res.value).then(pump)
             );
 
         pump();
@@ -276,20 +276,20 @@ export default {
         {
           method: "POST",
           body: JSON.stringify({ ids }),
-          headers: { "Content-Type": "application/json" },
-        },
+          headers: { "Content-Type": "application/json" }
+        }
       );
     },
     handleDownloadAll() {
       this.downloadCsv(
         "customers.csv",
-        `${this.$rest.defaults.baseURL}/customers/download_csv`,
+        `${this.$rest.defaults.baseURL}/customers/download_csv`
       );
     },
     rowData(val) {
       this.$router.push({
         name: "customer-detail",
-        params: { id: val.business_id },
+        params: { id: val.business_id }
       });
     },
     onSearch() {
@@ -301,7 +301,7 @@ export default {
       const params = {
         ids: this.selectedRowIds,
         key: this.selectedTagForUpdate,
-        value: this.newTagValue,
+        value: this.newTagValue
       };
       try {
         this.updatingTags = true;
@@ -326,7 +326,7 @@ export default {
         default:
           return;
       }
-    },
+    }
   },
   watch: {
     options: {
@@ -338,11 +338,11 @@ export default {
           page,
           itemsPerPage,
           preItemsPerPage: old.itemsPerPage || null,
-          filters: this.requestFilters,
+          filters: this.requestFilters
         };
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   apollo: {
     headers: {
@@ -355,7 +355,7 @@ export default {
       `,
       update(data) {
         return data.customertable_headers.headers;
-      },
+      }
     },
     customerList: {
       query: gql`
@@ -382,20 +382,20 @@ export default {
       `,
       variables() {
         return {
-          filter: this.filter,
+          filter: this.filter
         };
       },
       update: data => {
         return {
           customers: data.list_customers.items,
-          total: data.list_customers.total,
+          total: data.list_customers.total
         };
       },
       skip() {
         return !this.filter || this.headers.length === 0;
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 

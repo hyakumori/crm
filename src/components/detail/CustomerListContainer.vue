@@ -100,7 +100,7 @@ export default {
     UpdateButton,
     AdditionButton,
     CustomerContactCard,
-    SelectListModal,
+    SelectListModal
   },
 
   props: {
@@ -109,7 +109,7 @@ export default {
     selectingForestCustomerId: { type: String, default: null },
     id: String,
     customer: Object,
-    contactType: String,
+    contactType: String
   },
   data() {
     return {
@@ -118,7 +118,7 @@ export default {
       contactsToDelete: [],
       relationshipChanges: [],
       contacts_: [],
-      itemsForAddingUrl: "/contacts",
+      itemsForAddingUrl: "/contacts"
     };
   },
   computed: {
@@ -131,7 +131,7 @@ export default {
     contactsAddData() {
       return [...this.contactsToAdd, ...this.relationshipChanges].map(c => ({
         contact: c.id,
-        relationship_type: c.relationship_type,
+        relationship_type: c.relationship_type
       }));
     },
     contactIdsToDelete() {
@@ -142,7 +142,7 @@ export default {
         this.contactIdsToDelete.length === 0 &&
         this.contactsAddData.length === 0
       );
-    },
+    }
   },
   methods: {
     itemsForAddingResultFilter(c) {
@@ -159,7 +159,7 @@ export default {
     handleAdd() {
       const contactItem = this.itemsForAdding.results.splice(
         this.modalSelectingIndex,
-        1,
+        1
       )[0];
       if (contactItem) {
         contactItem.added = true;
@@ -182,7 +182,7 @@ export default {
         this.$set(contact, "relationship_type", undefined);
         this.$set(this.contacts, index, contact);
         this.relationshipChanges = reject(this.relationshipChanges, {
-          id: contact.id,
+          id: contact.id
         });
         this.contactsToDelete.push(contact);
       }
@@ -198,7 +198,7 @@ export default {
           adding: this.contactsAddData,
           deleting: this.contactIdsToDelete,
           contact_type: this.contactType || "FOREST",
-          forest_id: this.selectingForestId,
+          forest_id: this.selectingForestId
         });
         this.$emit("saved");
         this.saving = false;
@@ -210,11 +210,11 @@ export default {
         this.saving = false;
         if (error.response && error.response.status === 400) {
           this.$dialog.notify.error(
-            this.$t("messages.record_updated_before_please_reload_first"),
+            this.$t("messages.record_updated_before_please_reload_first")
           );
         }
       }
-    },
+    }
   },
   watch: {
     selectingForestId() {
@@ -225,7 +225,7 @@ export default {
       deep: true,
       handler(val) {
         this.contacts_ = cloneDeep(val);
-      },
+      }
     },
     isEditing(val) {
       if (!val) {
@@ -245,7 +245,7 @@ export default {
     },
     selectingForestCustomerId(val) {
       if (this.contactType === "FOREST" && !val) this.isEditing = false;
-    },
-  },
+    }
+  }
 };
 </script>

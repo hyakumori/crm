@@ -41,7 +41,7 @@ import { ValidationProvider } from "vee-validate";
 export default {
   name: "single-date-picker",
   components: {
-    ValidationProvider,
+    ValidationProvider
   },
 
   props: {
@@ -49,13 +49,13 @@ export default {
     label: String,
     date: String,
     readonly: { type: Boolean, default: true },
-    rules: String,
+    rules: String
   },
 
   data() {
     return {
       menu: false,
-      innerDate: this.date,
+      innerDate: this.date
     };
   },
 
@@ -63,8 +63,8 @@ export default {
     save() {
       this.$refs.menu.save(this.innerDate);
       this.$emit("newDate", this.innerDate);
-    },
-  },
+    }
+  }
 };
 </script>
 

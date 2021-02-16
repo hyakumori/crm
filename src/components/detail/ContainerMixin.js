@@ -3,17 +3,17 @@ export default {
     isLoading: Boolean,
     headerContent: String,
     toggleEditBtnContent: String,
-    addBtnContent: String,
+    addBtnContent: String
   },
   data() {
     return {
       isEditing: false,
-      saving: false,
+      saving: false
     };
   },
   methods: {
     cancel() {
       this.isEditing = false;
-    },
-  },
+    }
+  }
 };

@@ -32,7 +32,7 @@ export default {
   name: "forest-info-list",
 
   components: {
-    ForestInfoCard,
+    ForestInfoCard
   },
 
   props: {
@@ -40,18 +40,18 @@ export default {
     isUpdate: Boolean,
     selectedId: String,
     itemClickable: { type: Boolean, default: false },
-    echoedForestId: String,
+    echoedForestId: String
   },
 
   data() {
     return {
-      selectedForestId: null,
+      selectedForestId: null
     };
   },
 
   methods: {
     getForestDisplayName,
-    getForestReprOwner,
+    getForestReprOwner
   },
 
   watch: {
@@ -61,7 +61,7 @@ export default {
 
     selectedId(val) {
       this.selectedForestId = val;
-    },
-  },
+    }
+  }
 };
 </script>

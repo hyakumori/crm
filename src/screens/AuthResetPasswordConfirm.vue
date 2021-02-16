@@ -9,7 +9,7 @@
 import ResetPasswordConfirmForm from "../components/forms/ResetPasswordConfirmForm";
 export default {
   components: {
-    ResetPasswordConfirmForm,
-  },
+    ResetPasswordConfirmForm
+  }
 };
 </script>

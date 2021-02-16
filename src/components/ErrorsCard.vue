@@ -29,8 +29,8 @@
 export default {
   props: {
     line: Number,
-    errors: Object,
-  },
+    errors: Object
+  }
 };
 </script>
 >

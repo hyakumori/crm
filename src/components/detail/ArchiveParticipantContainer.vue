@@ -103,11 +103,11 @@ export default {
     AdditionButton,
     SelectListModal,
     CustomerContactList,
-    CustomerContactCard,
+    CustomerContactCard
   },
   props: {
     id: { type: String },
-    participants: { type: Array, default: () => [] },
+    participants: { type: Array, default: () => [] }
   },
   data() {
     return {
@@ -116,7 +116,7 @@ export default {
       selectingContactId: null,
       selectingCustomerId: null,
       customerIdNameMap: {},
-      itemsForAddingUrl: "/customercontacts",
+      itemsForAddingUrl: "/customercontacts"
     };
   },
   computed: {
@@ -131,20 +131,20 @@ export default {
     contactsToAddData() {
       return this.contactsToAdd.map(c => ({
         contact_id: c.id,
-        customer_id: c.customer_id,
+        customer_id: c.customer_id
       }));
     },
     contactsToDeleteData() {
       return this.contactsToDelete.map(c => ({
         contact_id: c.id,
-        customer_id: c.customer_id,
+        customer_id: c.customer_id
       }));
     },
     contactIdsMap() {
       return Object.fromEntries(
-        this.tempParticipants.map(c => [`${c.id},${c.customer_id}`, true]),
+        this.tempParticipants.map(c => [`${c.id},${c.customer_id}`, true])
       );
-    },
+    }
   },
   methods: {
     renderCustomerName(item) {
@@ -173,7 +173,7 @@ export default {
         this.saving = true;
         await this.$rest.put(`/archives/${this.id}/customers`, {
           added: this.contactsToAddData,
-          deleted: this.contactsToDeleteData,
+          deleted: this.contactsToDeleteData
         });
         this.$emit("saved");
         this.saving = false;
@@ -187,12 +187,12 @@ export default {
     async handleAdd() {
       const item = this.itemsForAdding.results.splice(
         this.modalSelectingIndex,
-        1,
+        1
       )[0];
       this.$set(
         this.customerIdNameMap,
         item.customer_id,
-        item.customer_name_kanji,
+        item.customer_name_kanji
       );
       item.added = true;
       if (this.selectingCustomerId) {
@@ -211,7 +211,7 @@ export default {
         delete contact.added;
         this.contactsToAdd = reject(this.contactsToAdd, {
           id: contact.id,
-          customer_id: contact.customer_id,
+          customer_id: contact.customer_id
         });
         this.itemsForAdding = { results: [] };
       } else {
@@ -223,9 +223,9 @@ export default {
       this.$set(contact, "deleted", undefined);
       this.contactsToDelete = reject(this.contactsToDelete, {
         id: contact.id,
-        customer_id: contact.customer_id,
+        customer_id: contact.customer_id
       });
-    },
+    }
   },
   watch: {
     isEditing(val) {
@@ -249,7 +249,7 @@ export default {
         customerIdNameMap[c.customer_id] = c.customer_name_kanji;
       }
       this.customerIdNameMap = customerIdNameMap;
-    },
-  },
+    }
+  }
 };
 </script>

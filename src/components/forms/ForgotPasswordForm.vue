@@ -82,16 +82,16 @@ import TextInput from "../forms/TextInput";
 export default {
   components: {
     TextInput,
-    ValidationObserver,
+    ValidationObserver
   },
   data() {
     return {
       form: {
-        email: "",
+        email: ""
       },
       formError: "",
       success: false,
-      loading: false,
+      loading: false
     };
   },
   methods: {
@@ -99,7 +99,7 @@ export default {
       try {
         this.loading = true;
         await this.$rest.post(`/users/reset_password`, {
-          email: this.form.email,
+          email: this.form.email
         });
         this.success = true;
       } catch (err) {
@@ -108,20 +108,20 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
+    }
   },
   computed: {
     mailSent: function() {
       return this.success;
-    },
+    }
   },
   watch: {
     success(val) {
       if (val) {
         this.formError = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

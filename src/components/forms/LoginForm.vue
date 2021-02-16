@@ -84,17 +84,17 @@ import TextInput from "../forms/TextInput";
 export default {
   components: {
     TextInput,
-    ValidationObserver,
+    ValidationObserver
   },
   data() {
     return {
       form: {
         email: "",
-        password: "",
+        password: ""
       },
       formError: "",
       loading: false,
-      success: false,
+      success: false
     };
   },
   methods: {
@@ -129,11 +129,11 @@ export default {
         const response = await this.$rest.post(
           "/token/create/",
           {
-            ...this.form,
+            ...this.form
           },
           {
-            no_activity: true,
-          },
+            no_activity: true
+          }
         );
 
         if (response) {
@@ -158,15 +158,15 @@ export default {
           this.loading = false;
         }, 500);
       }
-    },
+    }
   },
   watch: {
     success(val) {
       if (val) {
         this.formError = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

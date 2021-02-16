@@ -21,12 +21,12 @@ export default {
     placeHolder: String,
     index: Number,
     value: String,
-    hideDetails: { type: Boolean, default: false },
+    hideDetails: { type: Boolean, default: false }
   },
 
   data() {
     return {
-      innerValue: this.value,
+      innerValue: this.value
     };
   },
 
@@ -58,12 +58,12 @@ export default {
       } else {
         input.style.width = "auto";
       }
-    },
+    }
   },
   computed: {
     hasSelectedValue() {
       return this.innerValue || this.innerValue === 0;
-    },
+    }
   },
   watch: {
     innerValue() {
@@ -73,8 +73,8 @@ export default {
     },
     value() {
       this.innerValue = this.value;
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -60,7 +60,7 @@ export default {
     PageHeader,
     MainSection,
     CreateUserForm,
-    OutlineRoundBtn,
+    OutlineRoundBtn
   },
   data() {
     return {
@@ -74,7 +74,7 @@ export default {
       results: [],
       isLoading: false,
       options: {},
-      showCreationForm: false,
+      showCreationForm: false
     };
   },
   methods: {
@@ -94,7 +94,7 @@ export default {
         is_active:
           item.is_active === true
             ? this.$t("enums.user_status.active")
-            : this.$t("enums.user_status.inactive"),
+            : this.$t("enums.user_status.inactive")
       }));
     },
 
@@ -108,12 +108,12 @@ export default {
       ) {
         response = await this.$rest.get(
           `/users?page_size=${perPage}&page=${page}&sort_by=${sortBy.join(
-            ",",
-          )}&sort_desc=${sortDesc.join(",")}`,
+            ","
+          )}&sort_desc=${sortDesc.join(",")}`
         );
       } else {
         response = await this.$rest.get(
-          `/users?page_size=${perPage}&page=${page}`,
+          `/users?page_size=${perPage}&page=${page}`
         );
       }
 
@@ -128,12 +128,12 @@ export default {
 
     async onUserCreated() {
       await this.getData(this.filter.preItemsPerPage, this.filter.page);
-    },
+    }
   },
   async mounted() {
     this.$store.dispatch("setHeaderInfo", {
       title: this.$t("page_header.user_mgmt"),
-      subtitle: "",
+      subtitle: ""
     });
   },
 
@@ -147,11 +147,11 @@ export default {
           sortDesc,
           page,
           itemsPerPage,
-          preItemsPerPage: old.itemsPerPage || null,
+          preItemsPerPage: old.itemsPerPage || null
         };
         await this.getData(itemsPerPage, page, sortBy, sortDesc);
-      },
-    },
+      }
+    }
   },
 
   computed: {
@@ -161,47 +161,47 @@ export default {
           text: "",
           align: "center",
           value: "internal_id",
-          sortable: false,
+          sortable: false
         },
         {
           text: this.$t("user_management.tables.headers.username"),
           align: "center",
           value: "username",
-          sortable: false,
+          sortable: false
         },
         {
           text: this.$t("user_management.tables.headers.full_name"),
           align: "center",
           value: "full_name",
-          sortable: false,
+          sortable: false
         },
         {
           text: this.$t("user_management.tables.headers.roles"),
           align: "center",
           value: "roles",
-          sortable: false,
+          sortable: false
         },
         {
           text: this.$t("user_management.tables.headers.email"),
           align: "center",
           value: "email",
-          sortable: false,
+          sortable: false
         },
         {
           text: this.$t("user_management.tables.headers.status"),
           align: "center",
           value: "is_active",
-          sortable: true,
+          sortable: true
         },
         {
           text: this.$t("user_management.tables.headers.last_login"),
           align: "center",
           value: "last_login_text",
-          sortable: false,
-        },
+          sortable: false
+        }
       ];
-    },
-  },
+    }
+  }
 };
 </script>
 

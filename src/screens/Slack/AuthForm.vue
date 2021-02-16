@@ -77,22 +77,22 @@ import TextInput from "@/components/forms/TextInput";
 export default {
   components: {
     TextInput,
-    ValidationObserver,
+    ValidationObserver
   },
   props: {
     onSubmit: {
-      type: Function,
-    },
+      type: Function
+    }
   },
   data() {
     return {
       form: {
         email: "",
-        password: "",
+        password: ""
       },
       formError: "",
       loading: false,
-      success: false,
+      success: false
     };
   },
   methods: {
@@ -112,15 +112,15 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
+    }
   },
   watch: {
     success(val) {
       if (val) {
         this.formError = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

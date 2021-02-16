@@ -68,7 +68,7 @@ export default {
     updateTagItemColor: { type: Function, required: true },
     item: { type: Object, required: true },
     id: { type: [String, Number] },
-    showDelete: { type: Boolean, default: false },
+    showDelete: { type: Boolean, default: false }
   },
   methods: {
     _getItemStyle(item) {
@@ -79,7 +79,7 @@ export default {
     },
     _onDeleteColorSetting(item) {
       return this.$emit("setting-deleted", { item, id: this.id });
-    },
-  },
+    }
+  }
 };
 </script>

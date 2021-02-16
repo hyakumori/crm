@@ -20,7 +20,7 @@ export default {
   name: "text-info",
 
   components: {
-    SelectInput,
+    SelectInput
   },
 
   props: {
@@ -28,8 +28,8 @@ export default {
     label: String,
     value: [String, Number, Object],
     isUpdate: Boolean,
-    clearable: { type: Boolean, default: false },
-  },
+    clearable: { type: Boolean, default: false }
+  }
 };
 </script>
 
