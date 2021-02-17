@@ -68,7 +68,7 @@
           <v-radio-group mandatory v-model="layerRadio">
             <v-radio
               v-for="layer of rLayers"
-              :key="String(layer.getProperties(name))"
+              :key="layer.getProperties().name"
               :label="returnLayerLabel(layer.getProperties().id)"
               :value="String(layer.getProperties().id)"
               :name="String(layer.getProperties().id)"
