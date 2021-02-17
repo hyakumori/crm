@@ -122,7 +122,8 @@
         </vl-overlay>
 
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector :features.sync="features"> </vl-source-vector>
+          <vl-source-vector ref="jsonSource" :features.sync="features">
+          </vl-source-vector>
           <vl-style-box>
             <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
             <vl-style-fill :color="color"></vl-style-fill>
@@ -152,30 +153,15 @@
         </vl-layer-image>
 
         <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector>
-            <vl-feature
-              v-for="feature in features"
-              :key="feature.id"
-              :id="feature.id"
-              v-bind="feature"
-              :properties="feature.properties"
-            >
-              <component
-                :is="`vl-geom-multi-polygon`"
-                v-bind="feature.geometry"
-              />
-              <vl-style-box>
-                <vl-style-stroke
-                  color="rgb(39,78,19)"
-                  :width="2"
-                ></vl-style-stroke>
-                <vl-style-fill :color="color"></vl-style-fill>
-                <vl-style-text
-                  :text="feature.properties.nametag"
-                ></vl-style-text>
-              </vl-style-box>
-            </vl-feature>
+          <vl-source-vector ref="jsonSource" :features.sync="features">
           </vl-source-vector>
+          <vl-style-box>
+            <vl-style-stroke
+              color="rgb(39,78,19)"
+              :width="2"
+            ></vl-style-stroke>
+            <vl-style-fill :color="color"></vl-style-fill>
+          </vl-style-box>
         </vl-layer-vector>
 
         <vl-interaction-select
@@ -183,6 +169,10 @@
           @unselect="unSelectPoly"
           :features.sync="selectedFeatures"
         >
+          <vl-style-box>
+            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+          </vl-style-box>
         </vl-interaction-select>
       </div>
     </vl-map>
@@ -354,9 +344,12 @@ export default {
 
   watch: {
     features: _.debounce(function() {
-      this.zoom =
-        this.calculatedBoundingBox[1] > 18 ? 18 : this.calculatedBoundingBox[1];
-      this.center = this.calculatedBoundingBox[0];
+      this.$refs.hyakumoriView.$view.fit(
+        this.$refs.jsonSource.$source.getExtent(),
+        {
+          duration: 1000
+        }
+      );
     }, 100),
 
     forests: {
