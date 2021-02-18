@@ -535,9 +535,6 @@ export default {
     },
 
     zoomToSelectedFeature(feat) {
-      // let vectorSource = new ol.source.Vector()
-      // vectorSource.addFeature(feat)
-
       this.$refs.hyakumoriView.$view.fit(feat.getGeometry().getExtent(), {
         duration: 1000
       });
