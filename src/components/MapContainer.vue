@@ -304,26 +304,6 @@ export default {
       return "rgba(106,168,79,".concat(String(this.opacity / 100)).concat(")");
     },
 
-    calculatedBoundingBox() {
-      const coordinates = this.forests
-        .map(f => f.geodata.coordinates)
-        .flat(Infinity);
-
-      const latitudes = coordinates.filter((a, i) => i % 2);
-      const longitudes = coordinates.filter((a, i) => !(i % 2));
-
-      const xmin = Math.min(...longitudes);
-      const xmax = Math.max(...longitudes);
-      const ymin = Math.min(...latitudes);
-      const ymax = Math.max(...latitudes);
-
-      const c_lon = xmin + (xmax - xmin) / 2;
-      const c_lat = ymin + (ymax - ymin) / 2;
-      const z_lon = Math.log(180 / Math.abs(c_lon - xmin)) / Math.log(2);
-      const z_lat = Math.log(90 / Math.abs(c_lat - ymin)) / Math.log(2);
-      const z_center = Math.floor((z_lon + z_lat) / 2);
-      return [[xmin, ymin, xmax, ymax], z_center];
-    },
     vLayers() {
       const allLayers = this.mapLayers;
       return allLayers.filter(function(el) {
