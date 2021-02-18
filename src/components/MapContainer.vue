@@ -398,6 +398,7 @@ export default {
         })
       });
       val.setStyle(style);
+      this.zoomToSelectedFeature(val)
       this.$emit("echoSelectedFeature", val.getId());
     },
 
@@ -523,6 +524,18 @@ export default {
           this.showCard = false;
         }
       }
+    },
+
+    zoomToSelectedFeature(feat) {
+      // let vectorSource = new ol.source.Vector()
+      // vectorSource.addFeature(feat)
+
+      this.$refs.hyakumoriView.$view.fit(
+        feat.getGeometry().getExtent(),
+        {
+          duration: 1000
+        }
+      )
     },
 
     pointOnSurface: findPointOnSurface
