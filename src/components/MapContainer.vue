@@ -156,10 +156,7 @@
           <vl-source-vector ref="jsonSource" :features.sync="features">
           </vl-source-vector>
           <vl-style-box>
-            <vl-style-stroke
-              color="rgb(39,78,19)"
-              :width="2"
-            ></vl-style-stroke>
+            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
             <vl-style-fill :color="color"></vl-style-fill>
           </vl-style-box>
         </vl-layer-vector>
@@ -271,7 +268,7 @@ export default {
       }
     ];
 
-    const timeout = null
+    const timeout = null;
 
     return {
       zoom,
@@ -300,7 +297,7 @@ export default {
       this.features = f;
       this.initialFeatures = f;
       this.loading = false;
-    })
+    });
   },
 
   computed: {
@@ -381,23 +378,23 @@ export default {
       this.$refs.map.$map.getControls().extend([new ScaleLine()]);
       this.returnMapLayers().then(l => {
         this.mapLayers = l;
-      })
+      });
 
-      this.zoomToFeatures()
+      this.zoomToFeatures();
     },
 
     zoomToFeatures() {
-        if (this.timeout) {
-          clearTimeout(this.timeout)
-        }
-        this.timeout = setTimeout(() => {
-          this.$refs.hyakumoriView.$view.fit(
-            this.$refs.jsonSource.$source.getExtent(),
-            {
-              duration: 1000
-            }
-          );
-        }, 100)
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timeout = setTimeout(() => {
+        this.$refs.hyakumoriView.$view.fit(
+          this.$refs.jsonSource.$source.getExtent(),
+          {
+            duration: 1000
+          }
+        );
+      }, 100);
     },
 
     selectPoly(val) {
@@ -409,7 +406,7 @@ export default {
         })
       });
       val.setStyle(style);
-      this.zoomToSelectedFeature(val)
+      this.zoomToSelectedFeature(val);
       this.$emit("echoSelectedFeature", val.getId());
     },
 
@@ -541,12 +538,9 @@ export default {
       // let vectorSource = new ol.source.Vector()
       // vectorSource.addFeature(feat)
 
-      this.$refs.hyakumoriView.$view.fit(
-        feat.getGeometry().getExtent(),
-        {
-          duration: 1000
-        }
-      )
+      this.$refs.hyakumoriView.$view.fit(feat.getGeometry().getExtent(), {
+        duration: 1000
+      });
     },
 
     pointOnSurface: findPointOnSurface
