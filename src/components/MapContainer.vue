@@ -271,6 +271,8 @@ export default {
       }
     ];
 
+    const timeout = null
+
     return {
       zoom,
       center,
@@ -287,7 +289,8 @@ export default {
       showCard,
       opacity,
       geoserver_baseUrl,
-      layerRadio
+      layerRadio,
+      timeout
     };
   },
 
@@ -295,8 +298,9 @@ export default {
     this.loading = true;
     this.loadMapFeatures().then(f => {
       this.features = f;
+      this.initialFeatures = f;
       this.loading = false;
-    });
+    })
   },
 
   computed: {
@@ -323,15 +327,6 @@ export default {
   },
 
   watch: {
-    features: _.debounce(function() {
-      this.$refs.hyakumoriView.$view.fit(
-        this.$refs.jsonSource.$source.getExtent(),
-        {
-          duration: 1000
-        }
-      );
-    }, 100),
-
     forests: {
       handler() {
         this.loadMapFeatures().then(f => {
@@ -386,7 +381,23 @@ export default {
       this.$refs.map.$map.getControls().extend([new ScaleLine()]);
       this.returnMapLayers().then(l => {
         this.mapLayers = l;
-      });
+      })
+
+      this.zoomToFeatures()
+    },
+
+    zoomToFeatures() {
+        if (this.timeout) {
+          clearTimeout(this.timeout)
+        }
+        this.timeout = setTimeout(() => {
+          this.$refs.hyakumoriView.$view.fit(
+            this.$refs.jsonSource.$source.getExtent(),
+            {
+              duration: 1000
+            }
+          );
+        }, 100)
     },
 
     selectPoly(val) {
