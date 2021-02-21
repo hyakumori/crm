@@ -391,7 +391,7 @@ export default {
         this.$refs.hyakumoriView.$view.fit(
           this.$refs.jsonSource.$source.getExtent(),
           {
-            duration: 1000
+            duration: 50
           }
         );
       }, 100);
