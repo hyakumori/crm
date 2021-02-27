@@ -128,6 +128,11 @@ Note that if you add or remove base layers, you must modify the `rLayers()` func
 The `returnLayerLabel` function must also be modified. This is currently on Line 443. Here, the string that you wish to be seen by the client must be added. For example, the `std` base layer is named `標準地図` on line 449.
 
 
+## Geoserver
+
+If new layers are added to the geoserver, you will need to also add them in `MapContainer.vue`. Modifying the base layers and raster layers, as noted above, should be enough to get you started.
+
+Also note that if you change any of the currently default layer names, you may need to change the layer identifications in the `rasterLayers` variable. For example, if you changed the layer `"red"` to something other than `"raster:赤色立体図データ"`, you would have to change that line of code to match what the new layer name is.
 
 
 
