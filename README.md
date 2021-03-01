@@ -62,7 +62,7 @@ The map is created using elements from [VueLayers], which is a wrapper for [Open
 ***Caution***: Any styling changed within `MapContainer.vue` will be reflected across all pages that the `map-container` is called in.
 
 ### Map Element
-On Line 3 is the `vl-map` declaration. This contains styling for the map's size: `style="height: 400px; width: 100%;"` Changing this will change the size of the map on all pages.
+[The  `vl-map`] declaration. This contains styling for the map's size: `style="height: 400px; width: 100%;"` Changing this will change the size of the map on all pages.
 
 ### Map Container Panel Area
 
@@ -79,9 +79,9 @@ There are two functions that stylize the vector layers when they are selected / 
 
 ## Layers
 
-For the time being, layers are located within the `MapContainer.vue` file, starting with line 246.
+For the time being, layers are [located here] within the `MapContainer.vue` file.
 
-Base Layers are configured with two variables: `baseLayers` on Line 246, and `rasterLayers` on Line 257. For example, if you wish to add more raster layers, you shall add them to the `rasterLayers` variable.
+Base Layers are configured with two variables: [`baseLayers`]  and [`rasterLayers`]. For example, if you wish to add more raster layers, you shall add them to the `rasterLayers` variable.
 
 ### Raster Layers
 
@@ -104,9 +104,9 @@ Raster layers are layers that are served from the geoserver. The properties for 
 
 ```
 
-Note that if you add or remove raster layers, you must modify the `rLayers()` function on line 343. The `return` must include the ID that is assigned to the layer that is added. Remove the ID from the return clause if you have removed a raster layer.
+Note that if you add or remove raster layers, you must modify the [`rLayers()`] function. The `return` must include the ID that is assigned to the layer that is added. Remove the ID from the return clause if you have removed a raster layer.
 
-The `returnLayerLabel` function must also be modified. This is currently on Line 443. Here, the string that you wish to be seen by the client must be added. For example, the `red` raster layer is named `赤色立体図` on line 448.
+The [`returnLayerLabel`] function must also be modified. Here, the string that you wish to be seen by the client must be added. For example, the `red` raster layer is named `赤色立体図`.
 
 
 ### Base Layers
@@ -123,9 +123,9 @@ The base layer is currently served from a source outside of the geoserver. Open 
 }
 ```
 
-Note that if you add or remove base layers, you must modify the `rLayers()` function on line 343. The `return` must include the ID that is assigned to the layer that is added. Remove the ID from the return clause if you have removed a base layer.
+Note that if you add or remove base layers, you must modify the `rLayers()` function. The `return` must include the ID that is assigned to the layer that is added. Remove the ID from the return clause if you have removed a base layer.
 
-The `returnLayerLabel` function must also be modified. This is currently on Line 443. Here, the string that you wish to be seen by the client must be added. For example, the `std` base layer is named `標準地図` on line 449.
+The `returnLayerLabel` function must also be modified. Here, the string that you wish to be seen by the client must be added. For example, the `std` base layer is named `標準地図`.
 
 
 ## Geoserver
@@ -140,3 +140,9 @@ Also note that if you change any of the currently default layer names, you may n
   [Vuetify]: <https://vuetifyjs.com/en/getting-started/installation/>
   [VueLayers]: <https://vuelayers.github.io/#/>
   [OpenLayers]: <https://openlayers.org>
+  [The `vl-map`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L3>
+  [located here]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>
+  [`rasterLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L244>
+  [`baseLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>
+  [`rLayers()`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L314>
+  [`returnLayerLabel`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L425>
