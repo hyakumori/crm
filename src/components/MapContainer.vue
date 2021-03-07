@@ -461,13 +461,12 @@ export default {
       if (this.$refs.hyakumoriSource) {
         try {
           this.$refs.map.forEachLayerAtPixel(event.pixel, x => {
-            return x
-          })
-        }
-        catch(e) {
-          console.log('No layer here!')
-          this.showCard = false
-          return
+            return x;
+          });
+        } catch (e) {
+          console.log("No layer here!");
+          this.showCard = false;
+          return;
         }
         const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
           event.coordinate,
