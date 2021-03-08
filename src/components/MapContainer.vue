@@ -207,7 +207,7 @@ export default {
       default: false
     },
 
-    echoedForestIdFromTable: {
+    echoedForestFromTable: {
       type: Object,
       default: null
     }
@@ -333,17 +333,24 @@ export default {
       }
     },
 
-    echoedForestIdFromTable(val, prev) {
+    echoedForestFromTable(val, prev) {
+      console.log(val, "vlaue?");
       const featuresSource = this.vLayers
         .find(l => l.values_.id === "tableLayer")
         .getSource();
+
       const filteredFeature = featuresSource
         .getFeatures()
-        .find(f => f.getId() === val);
-      const prevFilteredFeature = featuresSource
-        .getFeatures()
-        .find(f => f.getId() === prev);
+        .find(f => f.getId() === val.id);
 
+      let prevFilteredFeature = null;
+      if (prev) {
+        prevFilteredFeature = featuresSource
+          .getFeatures()
+          .find(f => f.getId() === prev.id);
+      }
+
+      console.log(filteredFeature);
       if (filteredFeature) {
         const style = new Style({
           stroke: new Stroke({ color: "FFF" }),

@@ -76,7 +76,7 @@
         v-if="forestsInfo"
         class="px-7"
         :forests="forestsForMap"
-        :echoedForestIdFromTable="echoedTableForest"
+        :echoedForestFromTable="echoedTableForest"
         @echoSelectedFeature="setSelectedFeatureFromMap"
         :big="true"
       >
@@ -456,7 +456,7 @@ export default {
     },
 
     setSelectedFeatureFromTable(val) {
-      console.log(this.echoedForest, "echoed forest");
+      console.log(val, "echoed forest");
       this.echoedTableForest = val;
     }
   },

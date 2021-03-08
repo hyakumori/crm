@@ -250,6 +250,11 @@ export default {
       const innerHeight = window.innerHeight < 835 ? 835 : window.innerHeight;
       this.tableHeight =
         innerHeight - 270 <= 625 ? innerHeight : innerHeight - 270 - (56 + 16);
+    },
+
+    sendSelectedToMap(val) {
+      console.log(val[0]);
+      this.$emit("showSelectedOntoMap", val[0]);
     }
   },
   beforeUpdate() {
@@ -283,6 +288,7 @@ export default {
 
     selected(newVal, oldVal) {
       if (newVal !== oldVal) {
+        this.sendSelectedToMap(newVal)
         this.$emit("selectedRow", newVal);
       }
     },
