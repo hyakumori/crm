@@ -76,6 +76,8 @@
         v-if="forestsInfo"
         class="px-7"
         :forests="forestsForMap"
+        :echoedForestIdFromTable="echoedTableForest"
+        @echoSelectedFeature="setSelectedFeatureFromMap"
         :big="true"
       >
       </map-container>
@@ -114,6 +116,8 @@
           :tableRowIcon="tableRowIcon"
           @rowData="rowData"
           @selectedRow="selectedRows"
+          @showSelectedOntoMap="setSelectedFeatureFromTable"
+          :echoedForestIdFromMap="echoedMapForest"
           itemKey="id"
           mode="forest"
           ref="table"
@@ -215,7 +219,9 @@ export default {
       uploadCsvLoading: false,
       contractTypes: [],
       bulkUpdateLoading: false,
-      forestsForMap: null
+      forestsForMap: null,
+      echoedTableForest: null,
+      echoedMapForest: null
     };
   },
 
@@ -443,6 +449,15 @@ export default {
         default:
           return;
       }
+    },
+
+    setSelectedFeatureFromMap(val) {
+      this.echoedMapForest = val;
+    },
+
+    setSelectedFeatureFromTable(val) {
+      console.log(this.echoedForest, "echoed forest");
+      this.echoedTableForest = val;
     }
   },
 

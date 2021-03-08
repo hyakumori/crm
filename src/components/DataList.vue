@@ -150,7 +150,8 @@ export default {
     },
     disableSort: { type: Boolean, default: true },
     sortBy: { type: [String, Array], default: () => [] },
-    sortDesc: { type: [Boolean, Array], default: () => [] }
+    sortDesc: { type: [Boolean, Array], default: () => [] },
+    echoedForestIdFromMap: { type: Object, default: () => {} }
   },
 
   data() {
@@ -284,6 +285,11 @@ export default {
       if (newVal !== oldVal) {
         this.$emit("selectedRow", newVal);
       }
+    },
+
+    echoedForestIdFromMap(val) {
+      this.selected.push(this.data.find(i => i.id === val.getId()));
+      this.$emit("selectedRow", val);
     }
   }
 };

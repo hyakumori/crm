@@ -132,7 +132,8 @@
 
         <vl-interaction-select
           :features.sync="selectedFeatures"
-          :condition="singleClick"
+          @select="selectPoly"
+          @unselect="unSelectPoly"
         >
           <vl-style-box>
             <vl-style-stroke color="blue"></vl-style-stroke>
@@ -207,7 +208,7 @@ export default {
     },
 
     echoedForestIdFromTable: {
-      type: String,
+      type: Object,
       default: null
     }
   },
@@ -407,7 +408,8 @@ export default {
       });
       val.setStyle(style);
       this.zoomToSelectedFeature(val);
-      this.$emit("echoSelectedFeature", val.getId());
+      // this.$emit("echoSelectedFeature", val.getId());
+      this.$emit("echoSelectedFeature", val);
     },
 
     unSelectPoly(val) {
