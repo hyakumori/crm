@@ -12,7 +12,6 @@
         :center.sync="center"
         ref="hyakumoriView"
       ></vl-view>
-
       <vl-layer-tile
         v-for="baseLayer in baseLayers"
         :key="baseLayer.name"
@@ -20,27 +19,21 @@
         :visible="baseLayer.visible"
       >
         <vl-source-xyz
+          v-if="baseLayer.type === 'tile'"
           v-bind="baseLayer"
           :url="baseLayer.url"
           :attributions="baseLayer.attributions"
         />
-      </vl-layer-tile>
-
-      <vl-layer-image
-        v-for="raster in rasterLayers"
-        :key="raster.name"
-        :id="raster.id"
-        :visible="raster.visible"
-      >
-        <vl-source-image-wms
-          v-bind="raster"
-          :layers="raster.layer"
-          :url="raster.url"
-          :image-load-function="imageLoader"
+        <vl-source-wms
+          v-if="baseLayer.type === 'image'"
+          v-bind="baseLayer"
+          tiled="true"
+          :layers="baseLayer.layer"
+          :url="baseLayer.url"
+          :tile-load-function="imageLoader"
         >
-        </vl-source-image-wms>
-      </vl-layer-image>
-
+        </vl-source-wms>
+      </vl-layer-tile>
       <v-menu offset-y :z-index="1005" :close-on-content-click="false">
         <template v-slot:activator="{ on, attrs }">
           <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
@@ -67,12 +60,11 @@
           </v-slider>
           <v-radio-group mandatory v-model="layerRadio">
             <v-radio
-              v-for="layer of rLayers"
-              :key="layer.getProperties().name"
-              :label="returnLayerLabel(layer.getProperties().id)"
-              :value="String(layer.getProperties().id)"
-              :name="String(layer.getProperties().id)"
-              @change="showBaseLayer(layer.getProperties().id)"
+              v-for="layer of baseLayers"
+              :key="layer.name"
+              :label="layer.name"
+              :value="layer.id"
+              @change="showBaseLayer(layer.id)"
             >
             </v-radio>
           </v-radio-group>
@@ -213,8 +205,8 @@ export default {
   },
 
   data() {
-    const zoom = 11;
-    const center = [134.33234254149718, 35.2107812998969];
+    const zoom = process.env.MAP_ZOOM ?? 11;
+    const center = process.env.MAP_CENTER ?? [134.33234254149718, 35.2107812998969];
     const features = [];
     const loading = false;
     const mapLayers = [];
@@ -232,25 +224,25 @@ export default {
 
     const baseLayers = [
       {
+        type: "tile",
         name: "標準地図",
         id: "std",
         visible: true,
         url: "https://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20201001a",
         attributions:
           '<a href="https://maps.gsi.go.jp/development/ichiran.html"> 国土地理院 </a>'
-      }
-    ];
-
-    const rasterLayers = [
+      },
       {
+        type: "image",
         name: "赤色立体図",
         id: "red",
-        visible: false,
+        visible: true,
         url: geoserver_baseUrl.concat("/raster/wms"),
         layer: "raster:赤色立体図データ",
         projection: "EPSG:4326"
       },
       {
+        type: "image",
         name: "DEM",
         id: "dem",
         visible: false,
@@ -259,6 +251,7 @@ export default {
         projection: "EPSG:4326"
       },
       {
+        type: "image",
         name: "航空写真",
         id: "rgb",
         visible: false,
@@ -279,7 +272,6 @@ export default {
       panelOpen,
       mapVisible,
       baseLayers,
-      rasterLayers,
       selectedFeature,
       selectedFeatures,
       overlayCoordinate,
@@ -309,12 +301,6 @@ export default {
       const allLayers = this.mapLayers;
       return allLayers.filter(function(el) {
         return ["wmsLayer", "tableLayer"].includes(el.getProperties().id);
-      });
-    },
-    rLayers() {
-      const allLayers = this.mapLayers;
-      return allLayers.filter(function(el) {
-        return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
       });
     },
 
@@ -425,11 +411,7 @@ export default {
     returnLayerLabel(layerId) {
       const names = {
         wmsLayer: "全ての地番",
-        tableLayer: "表内の情報",
-        dem: "DEM",
-        red: "赤色立体図",
-        std: "標準地図",
-        rgb: "航空写真"
+        tableLayer: "表内の情報"
       };
       return names[layerId];
     },
@@ -485,13 +467,9 @@ export default {
     },
 
     showBaseLayer(id) {
-      let currentLayer =
-        this.baseLayers.find(layer => layer.visible) ||
-        this.rasterLayers.find(layer => layer.visible);
+      let currentLayer = this.baseLayers.find(layer => layer.visible);
       currentLayer.visible = false;
-      let newLayer =
-        this.baseLayers.find(layer => layer.id === id) ||
-        this.rasterLayers.find(layer => layer.id === id);
+      let newLayer = this.baseLayers.find(layer => layer.id === id);
       newLayer.visible = true;
     },
 
