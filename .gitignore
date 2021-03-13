@@ -211,5 +211,3 @@ media/**/*
 static/**/*
 
 .yarnrc
-
-mapconfig.json

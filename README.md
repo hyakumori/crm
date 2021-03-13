@@ -14,14 +14,7 @@ This repository holds the source code for the Hyakumori CRM.
 cp .env.example .env
 ```
 
-2. Copy `mapconfig.json.example` to `mapconfig.json and fill in necessary variables.
- See below for details.
-
-```
-cp mapconfig.json.example mapconfig.json
-```
-
-3. Install yarn dependencies.
+2. Install yarn dependencies.
 
 ```
 yarn install
