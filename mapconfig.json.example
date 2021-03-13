@@ -2,7 +2,7 @@
   "tilesources": [
     {
       "type": "osm",
-      "name": "Open Street Maps",
+      "name": "OSM",
       "id": "osm"
     },
     {
@@ -23,7 +23,6 @@
     }
   ],
   "cadastral": {
-    "name": "全ての地番",
     "id": "wmsLayer",
     "url": "<add url to wms layer>",
     "layer": "<add layer>",
