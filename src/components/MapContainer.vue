@@ -101,23 +101,17 @@
               <v-card-text v-if="selectedFeature.textTwo" class="text-center">
                 大茅: {{ selectedFeature.textOne }} -
                 {{ selectedFeature.textTwo }}
-                <v-icon
-                  color="primary"
-                  v-on:click="routeForest(selectedFeature.forestID)"
-                >
-                  mdi-arrow-right-circle</v-icon
-                >
+                <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                  <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+                </v-btn>
                 <br />
                 所有者: {{ selectedFeature.textName }}
               </v-card-text>
               <v-card-text v-else class="text-center">
                 大茅: {{ selectedFeature.textOne }}
-                <v-icon
-                  color="primary"
-                  v-on:click="routeForest(selectedFeature.forestID)"
-                >
-                  mdi-arrow-right-circle</v-icon
-                >
+                <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                  <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+                </v-btn>
                 <br />
                 所有者: {{ selectedFeature.textName }}
               </v-card-text>
@@ -451,7 +445,7 @@ export default {
     },
 
     returnPopupText(feature) {
-      const forestID = feature.properties.id;
+      const forestID = feature.id;
       const textOne = JSON.parse(feature.properties.land_attributes)[
         "地番本番"
       ];
