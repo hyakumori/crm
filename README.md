@@ -123,8 +123,6 @@ The map is created using elements from [VueLayers], which is a wrapper for [Open
 ***Caution***: Any styling changed within `MapContainer.vue` will be reflected across all pages that the `map-container` is called in.
 
 **Map Element**
-[The  `vl-map`] declaration. This contains styling for the map's size: `style="height: 400px; width: 100%;"` Changing this will change the size of the map on all pages.
-
 **Map Container Panel Area**
 
 The map has a panel that can be opened and closed by clicking on it. Much of the styling is from Vuetify's integrated styling, which you can read more about in the [Vuetify] documentation. These include the `v-menu, v-switch, v-radio-group, v-radio,` and `v-slider` elements.
@@ -142,7 +140,6 @@ There are two functions that stylize the vector layers when they are selected / 
   [Vuetify]: <https://vuetifyjs.com/en/getting-started/installation/>
   [VueLayers]: <https://vuelayers.github.io/#/>
   [OpenLayers]: <https://openlayers.org>
-  [The `vl-map`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L3>
   [located here]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>
   [`rasterLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L244>
   [`baseLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>

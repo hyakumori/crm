@@ -72,16 +72,20 @@
           </div>
         </template>
       </page-header>
-      <v-expansion-panels>
+    </template>
+
+    <template #forestmap>
+      <v-expansion-panels :value="0">
         <v-expansion-panel>
-          <v-expansion-panel-header disable-icon-rotate color="primary" expand-icon="mdi-layers" style="border-radius: 0px;">
-          地図
+          <v-expansion-panel-header class="map-title">
+            地図
           </v-expansion-panel-header>
-          <v-expansion-panel-content class="pb-12">
+          <v-expansion-panel-content>
             <map-container
               v-if="forestsInfo"
               :forests="forestsForMap"
               :big="true"
+              style="height: 400px; display: inline-block; margin-top: -40px"
             >
             </map-container>
           </v-expansion-panel-content>
@@ -545,5 +549,14 @@ export default {
       visibility: hidden;
     }
   }
+}
+
+.v-expansion-panel::before {
+  box-shadow: none !important;
+}
+
+.map-title {
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

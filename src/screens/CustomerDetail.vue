@@ -40,7 +40,7 @@
 
         <map-container
           v-if="forests.length > 0"
-          style="margin-top: -20px; margin-bottom: 62px"
+          style="height: 400px; margin-top: -20px; margin-bottom: 62px"
           :forests="forests"
           :echoedForestIdFromTable="echoedForest"
           @echoSelectedFeature="setSelectedFeatureFromMap"
