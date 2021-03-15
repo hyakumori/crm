@@ -1,177 +1,174 @@
 <template>
-  <div>
-    <vl-map
-      ref="map"
-      data-projection="EPSG:4326"
-      @mounted="onMapMounted"
-      @singleclick="mapClicked"
-      style="height: 400px; width: 100%;"
+  <vl-map
+    ref="map"
+    data-projection="EPSG:4326"
+    @mounted="onMapMounted"
+    @singleclick="mapClicked"
+  >
+    <vl-view
+      :zoom.sync="zoom"
+      :center.sync="center"
+      ref="hyakumoriView"
+    ></vl-view>
+    <vl-layer-tile
+      v-for="baseLayer in baseLayers"
+      :key="baseLayer.name"
+      :id="baseLayer.id"
+      :visible="baseLayer.visible"
     >
-      <vl-view
-        :zoom.sync="zoom"
-        :center.sync="center"
-        ref="hyakumoriView"
-      ></vl-view>
-      <vl-layer-tile
-        v-for="baseLayer in baseLayers"
-        :key="baseLayer.name"
-        :id="baseLayer.id"
-        :visible="baseLayer.visible"
+      <vl-source-xyz
+        v-if="baseLayer.type.toLowerCase() === 'xyz'"
+        v-bind="baseLayer"
+        :url="baseLayer.url"
+        :attributions="baseLayer.attributions"
+      />
+      <vl-source-wms
+        v-if="baseLayer.type.toLowerCase() === 'tilewms'"
+        v-bind="baseLayer"
+        tiled="true"
+        :layers="baseLayer.layer"
+        :url="baseLayer.url"
+        :tile-load-function="imageLoader"
       >
-        <vl-source-xyz
-          v-if="baseLayer.type.toLowerCase() === 'xyz'"
-          v-bind="baseLayer"
-          :url="baseLayer.url"
-          :attributions="baseLayer.attributions"
-        />
-        <vl-source-wms
-          v-if="baseLayer.type.toLowerCase() === 'tilewms'"
-          v-bind="baseLayer"
-          tiled="true"
-          :layers="baseLayer.layer"
-          :url="baseLayer.url"
-          :tile-load-function="imageLoader"
+      </vl-source-wms>
+      <vl-source-osm
+        v-if="baseLayer.type.toLowerCase() === 'osm'"
+        v-bind="baseLayer"
+      >
+      </vl-source-osm>
+    </vl-layer-tile>
+    <v-menu offset-y :z-index="1005" :close-on-content-click="false">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
+          レイヤー情報
+          <v-icon>mdi-layers</v-icon>
+        </v-btn>
+      </template>
+      <div class="panel-area">
+        <v-switch
+          v-for="layer of vLayers"
+          :key="layer.getProperties().id"
+          inset
+          v-model="layer.getProperties().visible"
+          @change="showMapPanelLayer(layer)"
+          :label="returnLayerLabel(layer.getProperties().id)"
         >
-        </vl-source-wms>
-        <vl-source-osm
-          v-if="baseLayer.type.toLowerCase() === 'osm'"
-          v-bind="baseLayer"
+        </v-switch>
+        <v-slider
+          prepend-icon="mdi-invert-colors"
+          v-model="opacity"
+          thumb-label
+          values="100"
         >
-        </vl-source-osm>
-      </vl-layer-tile>
-      <v-menu offset-y :z-index="1005" :close-on-content-click="false">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
-            レイヤー情報
-            <v-icon>mdi-layers</v-icon>
-          </v-btn>
-        </template>
-        <div class="panel-area">
-          <v-switch
-            v-for="layer of vLayers"
-            :key="layer.getProperties().id"
-            inset
-            v-model="layer.getProperties().visible"
-            @change="showMapPanelLayer(layer)"
-            :label="returnLayerLabel(layer.getProperties().id)"
+        </v-slider>
+        <v-radio-group mandatory v-model="layerRadio">
+          <v-radio
+            v-for="layer of baseLayers"
+            :key="layer.name"
+            :label="layer.name"
+            :value="layer.id"
+            @change="showBaseLayer(layer.id)"
           >
-          </v-switch>
-          <v-slider
-            prepend-icon="mdi-invert-colors"
-            v-model="opacity"
-            thumb-label
-            values="100"
-          >
-          </v-slider>
-          <v-radio-group mandatory v-model="layerRadio">
-            <v-radio
-              v-for="layer of baseLayers"
-              :key="layer.name"
-              :label="layer.name"
-              :value="layer.id"
-              @change="showBaseLayer(layer.id)"
+          </v-radio>
+        </v-radio-group>
+      </div>
+    </v-menu>
+
+    <div v-if="big">
+      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
+        <vl-source-image-wms
+          :url="cadastral.url"
+          :layers="cadastral.layer"
+          :projection="cadastral.projection"
+          :image-load-function="imageLoader"
+          ref="hyakumoriSource"
+        >
+        </vl-source-image-wms>
+      </vl-layer-image>
+
+      <vl-overlay :position="overlayCoordinate">
+        <template v-if="showCard">
+          <v-card>
+            <v-system-bar
+              color="primary darken-2"
+              dark
             >
-            </v-radio>
-          </v-radio-group>
-        </div>
-      </v-menu>
+              <v-spacer></v-spacer>
+              <v-icon @click="showCard = false">mdi-close</v-icon>
+            </v-system-bar>
+            <v-card-text v-if="selectedFeature.textTwo" class="text-center">
+              大茅: {{ selectedFeature.textOne }} -
+              {{ selectedFeature.textTwo }}
+              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+              </v-btn>
+              <br />
+              所有者: {{ selectedFeature.textName }}
+            </v-card-text>
+            <v-card-text v-else class="text-center">
+              大茅: {{ selectedFeature.textOne }}
+              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+              </v-btn>
+              <br />
+              所有者: {{ selectedFeature.textName }}
+            </v-card-text>
+          </v-card>
+        </template>
+      </vl-overlay>
 
-      <div v-if="big">
-        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
-          <vl-source-image-wms
-            :url="cadastral.url"
-            :layers="cadastral.layer"
-            :projection="cadastral.projection"
-            :image-load-function="imageLoader"
-            ref="hyakumoriSource"
-          >
-          </vl-source-image-wms>
-        </vl-layer-image>
+      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+        <vl-source-vector ref="jsonSource" :features.sync="features">
+        </vl-source-vector>
+        <vl-style-box>
+          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+          <vl-style-fill :color="color"></vl-style-fill>
+        </vl-style-box>
+      </vl-layer-vector>
 
-        <vl-overlay :position="overlayCoordinate">
-          <template v-if="showCard">
-            <v-card>
-              <v-system-bar
-                color="primary darken-2"
-                dark
-              >
-                <v-spacer></v-spacer>
-                <v-icon @click="showCard = false">mdi-close</v-icon>
-              </v-system-bar>
-              <v-card-text v-if="selectedFeature.textTwo" class="text-center">
-                大茅: {{ selectedFeature.textOne }} -
-                {{ selectedFeature.textTwo }}
-                <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
-                  <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
-                </v-btn>
-                <br />
-                所有者: {{ selectedFeature.textName }}
-              </v-card-text>
-              <v-card-text v-else class="text-center">
-                大茅: {{ selectedFeature.textOne }}
-                <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
-                  <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
-                </v-btn>
-                <br />
-                所有者: {{ selectedFeature.textName }}
-              </v-card-text>
-            </v-card>
-          </template>
-        </vl-overlay>
+      <vl-interaction-select
+        :features.sync="selectedFeatures"
+        :condition="singleClick"
+      >
+        <vl-style-box>
+          <vl-style-stroke color="blue"></vl-style-stroke>
+          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+        </vl-style-box>
+      </vl-interaction-select>
+    </div>
 
-        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector ref="jsonSource" :features.sync="features">
-          </vl-source-vector>
-          <vl-style-box>
-            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-            <vl-style-fill :color="color"></vl-style-fill>
-          </vl-style-box>
-        </vl-layer-vector>
-
-        <vl-interaction-select
-          :features.sync="selectedFeatures"
-          :condition="singleClick"
+    <div v-else>
+      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+        <vl-source-image-wms
+          :url="cadastral.url"
+          :layers="cadastral.layer"
+          :projection="cadastral.projection"
+          :image-load-function="imageLoader"
         >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-        </vl-interaction-select>
-      </div>
+        </vl-source-image-wms>
+      </vl-layer-image>
 
-      <div v-else>
-        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
-          <vl-source-image-wms
-            :url="cadastral.url"
-            :layers="cadastral.layer"
-            :projection="cadastral.projection"
-            :image-load-function="imageLoader"
-          >
-          </vl-source-image-wms>
-        </vl-layer-image>
+      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+        <vl-source-vector ref="jsonSource" :features.sync="features">
+        </vl-source-vector>
+        <vl-style-box>
+          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+          <vl-style-fill :color="color"></vl-style-fill>
+        </vl-style-box>
+      </vl-layer-vector>
 
-        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector ref="jsonSource" :features.sync="features">
-          </vl-source-vector>
-          <vl-style-box>
-            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-            <vl-style-fill :color="color"></vl-style-fill>
-          </vl-style-box>
-        </vl-layer-vector>
-
-        <vl-interaction-select
-          @select="selectPoly"
-          @unselect="unSelectPoly"
-          :features.sync="selectedFeatures"
-        >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-        </vl-interaction-select>
-      </div>
-    </vl-map>
-  </div>
+      <vl-interaction-select
+        @select="selectPoly"
+        @unselect="unSelectPoly"
+        :features.sync="selectedFeatures"
+      >
+        <vl-style-box>
+          <vl-style-stroke color="blue"></vl-style-stroke>
+          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+        </vl-style-box>
+      </vl-interaction-select>
+    </div>
+  </vl-map>
 </template>
 
 <script>
