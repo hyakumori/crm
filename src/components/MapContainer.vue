@@ -459,21 +459,20 @@ export default {
 
     async mapClicked(event) {
       if (this.$refs.hyakumoriSource) {
-        let itemToShow = null
+        let itemToShow = null;
         try {
           this.$refs.map.forEachLayerAtPixel(event.pixel, l => {
             itemToShow = this.vLayers.find(layer => {
-              const v = layer.values_.id === l.values_.id ? l : null
+              const v = layer.values_.id === l.values_.id ? l : null;
               if (v) {
-                return v.getVisible() ? v : null
+                return v.getVisible() ? v : null;
               } else {
-                return null
+                return null;
               }
-            })
-            return itemToShow
+            });
+            return itemToShow;
           });
         } catch (e) {
-          console.log("No layer here!");
           this.showCard = false;
           return;
         }
@@ -482,11 +481,11 @@ export default {
           const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
             event.coordinate,
             0.000001,
-            "EPSG:4326",
+            this.cadastral.projection,
             {
               INFO_FORMAT: "application/json",
               feature_count: 1,
-              query_layers: "crm:Forests"
+              query_layers: this.cadastral.layer
             }
           );
           this.overlayCoordinate = event.coordinate;
