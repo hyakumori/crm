@@ -445,7 +445,7 @@ export default {
     },
 
     returnPopupText(feature) {
-      const forestID = feature.id;
+      const forestID = feature.properties.id;
       const textOne = JSON.parse(feature.properties.land_attributes)[
         "地番本番"
       ];
