@@ -459,24 +459,46 @@ export default {
 
     async mapClicked(event) {
       if (this.$refs.hyakumoriSource) {
-        const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
-          event.coordinate,
-          0.000001,
-          "EPSG:4326",
-          {
-            INFO_FORMAT: "application/json",
-            feature_count: 1,
-            query_layers: "crm:Forests"
-          }
-        );
-        this.overlayCoordinate = event.coordinate;
+        let itemToShow = null;
+        try {
+          this.$refs.map.forEachLayerAtPixel(event.pixel, l => {
+            itemToShow = this.vLayers.find(layer => {
+              const v = layer.values_.id === l.values_.id ? l : null;
+              if (v) {
+                return v.getVisible() ? v : null;
+              } else {
+                return null;
+              }
+            });
+            return itemToShow;
+          });
+        } catch (e) {
+          this.showCard = false;
+          return;
+        }
 
-        let featureRequest = await this.$rest(loggedURL);
-        if (featureRequest.numberReturned > 0) {
-          this.selectedFeature = this.returnPopupText(
-            featureRequest.features[0]
+        if (itemToShow) {
+          const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
+            event.coordinate,
+            0.000001,
+            this.cadastral.projection,
+            {
+              INFO_FORMAT: "application/json",
+              feature_count: 1,
+              query_layers: this.cadastral.layer
+            }
           );
-          this.showCard = true;
+          this.overlayCoordinate = event.coordinate;
+
+          let featureRequest = await this.$rest(loggedURL);
+          if (featureRequest.numberReturned > 0) {
+            this.selectedFeature = this.returnPopupText(
+              featureRequest.features[0]
+            );
+            this.showCard = true;
+          } else {
+            this.showCard = false;
+          }
         } else {
           this.showCard = false;
         }
