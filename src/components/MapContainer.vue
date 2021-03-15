@@ -91,6 +91,13 @@
         <vl-overlay :position="overlayCoordinate">
           <template v-if="showCard">
             <v-card>
+              <v-system-bar
+                color="primary darken-2"
+                dark
+              >
+                <v-spacer></v-spacer>
+                <v-icon @click="showCard = false">mdi-close</v-icon>
+              </v-system-bar>
               <v-card-text v-if="selectedFeature.textTwo" class="text-center">
                 大茅: {{ selectedFeature.textOne }} -
                 {{ selectedFeature.textTwo }}
