@@ -444,6 +444,8 @@ export default {
     },
 
     async mapClicked(event) {
+      const mapFeatures = this.$refs.map.getFeaturesAtPixel(event.pixel);
+      this.$emit("unselectAll", mapFeatures);
       if (this.$refs.hyakumoriSource) {
         let itemToShow = null;
         try {

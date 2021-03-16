@@ -89,6 +89,7 @@
               :echoedForestIdFromTable="selectedRowIds"
               @select="onSelect"
               @unselect="onUnselect"
+              @unselectAll="onUnselectAll"
             >
             </map-container>
           </v-expansion-panel-content>
@@ -281,6 +282,11 @@ export default {
         this.mapFeatures = null;
       }
       this.removemapFeatures = feature.id_;
+    },
+    onUnselectAll(features) {
+      if (!features) {
+        this.$refs.table.selected = [];
+      }
     },
     confirmReload(e) {
       e.returnValue = this.$t("messages.confirm_leave");
