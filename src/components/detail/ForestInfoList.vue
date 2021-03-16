@@ -39,8 +39,7 @@ export default {
     forests: Array,
     isUpdate: Boolean,
     selectedId: String,
-    itemClickable: { type: Boolean, default: false },
-    echoedForestId: String
+    itemClickable: { type: Boolean, default: false }
   },
 
   data() {
@@ -55,10 +54,6 @@ export default {
   },
 
   watch: {
-    echoedForestId(val) {
-      this.selectedForestId = val;
-    },
-
     selectedId(val) {
       this.selectedForestId = val;
     }

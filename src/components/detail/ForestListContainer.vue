@@ -20,7 +20,6 @@
         }
       "
       :itemClickable="itemClickable"
-      :echoedForestId="echoedForestIdFromMap"
     />
     <addition-button
       ref="addBtn"
@@ -116,7 +115,8 @@ export default {
     displayAdditionBtn: Boolean,
     selectingForestId: String,
     itemClickable: { type: Boolean, default: false },
-    echoedForestIdFromMap: { type: String, default: null }
+    selectedFeatures: String,
+    unselectedFeatures: String
   },
   data() {
     return {
@@ -144,10 +144,6 @@ export default {
         this.forestIdsToDelete.length === 0 && this.forestIdsToAdd.length === 0
       );
     }
-
-    // selectedForestId() {
-    //   return this.echoedForestId
-    // },
   },
   methods: {
     getForestDisplayName,
@@ -213,7 +209,6 @@ export default {
   watch: {
     selectingForestId_(val) {
       this.$emit("update:selectingForestId", val);
-      this.$emit("echoSelectedFeature", val);
     },
     isEditing(val) {
       if (!val) {
@@ -230,9 +225,17 @@ export default {
         }
       }
     },
-
-    echoedForestIdFromMap(val) {
-      this.selectingForestId_ = val;
+    selectedFeatures(val) {
+      if (val) {
+        this.selectingForestId_ = val;
+      }
+    },
+    unselectedFeatures(val) {
+      if (val) {
+        if (val === this.selectingForestId_) {
+          this.selectingForestId_ = null;
+        }
+      }
     }
   }
 };
