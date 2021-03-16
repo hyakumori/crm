@@ -196,7 +196,7 @@ export default {
       default: false
     },
     selectedRow: String,
-    echoedForestIdFromTable: {
+    selectedFromTable: {
       type: Array,
       default: null
     }
@@ -251,7 +251,7 @@ export default {
 
   mounted() {
     this.$watch(
-      () => this.echoedForestIdFromTable,
+      () => this.selectedFromTable,
       val => {
         const pastSelection = this.pastSelection;
         this.saveSelection();
@@ -327,7 +327,7 @@ export default {
 
   methods: {
     saveSelection() {
-      this.pastSelection = this.echoedForestIdFromTable;
+      this.pastSelection = this.selectedFromTable;
     },
 
     onSelect(feature) {

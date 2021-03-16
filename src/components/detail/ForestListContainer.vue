@@ -209,7 +209,6 @@ export default {
   watch: {
     selectingForestId_(val) {
       this.$emit("update:selectingForestId", val);
-      this.$emit("echoSelectedFeature", val);
     },
     isEditing(val) {
       if (!val) {

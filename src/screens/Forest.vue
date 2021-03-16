@@ -86,7 +86,7 @@
               style="height: 400px; display: inline-block; margin-top: -40px"
               :forests="forestsForMap"
               :big="true"
-              :echoedForestIdFromTable="selectedRowIds"
+              :selectedFromTable="selectedRowIds"
               @select="onSelect"
               @unselect="onUnselect"
               @unselectAll="onUnselectAll"

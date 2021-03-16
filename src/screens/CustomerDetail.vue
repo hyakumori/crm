@@ -402,14 +402,6 @@ export default {
       this.fetchForests();
       this.fetchContacts();
       this.fetchContactsForests();
-    },
-
-    setSelectedFeatureFromMap(val) {
-      this.echoedForest = val;
-    },
-
-    setSelectedFeatureFromTable(val) {
-      this.echoedForest = val;
     }
   },
 
