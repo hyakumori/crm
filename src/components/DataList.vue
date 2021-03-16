@@ -150,7 +150,9 @@ export default {
     },
     disableSort: { type: Boolean, default: true },
     sortBy: { type: [String, Array], default: () => [] },
-    sortDesc: { type: [Boolean, Array], default: () => [] }
+    sortDesc: { type: [Boolean, Array], default: () => [] },
+    selectedFeatures: { type: String, default: null },
+    unselectedFeatures: { type: String, default: null }
   },
 
   data() {
@@ -283,6 +285,25 @@ export default {
     selected(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.$emit("selectedRow", newVal);
+      }
+    },
+
+    selectedFeatures(val) {
+      if (val) {
+        const vv = this.data.find(i => i.id === val);
+        if (!(this.selected.indexOf(vv) > -1)){
+          this.selected.push(vv);
+        }
+      }
+    },
+
+    unselectedFeatures(val) {
+      if (val) {
+        const vv = this.data.find(i => i.id === val);
+        const indexOfFeature = this.selected.indexOf(vv);
+        if (this.selected.indexOf(vv) > -1) {
+          this.selected.splice(indexOfFeature, 1);
+        }
       }
     }
   }

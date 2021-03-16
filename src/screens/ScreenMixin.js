@@ -57,7 +57,6 @@ export default {
 
     selectedRowIds() {
       return (
-        this.tableSelectedRows.length > 0 &&
         this.tableSelectedRows.map(row => row.id)
       );
     }

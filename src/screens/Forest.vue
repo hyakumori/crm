@@ -83,9 +83,12 @@
           <v-expansion-panel-content>
             <map-container
               v-if="forestsInfo"
+              style="height: 400px; display: inline-block; margin-top: -40px"
               :forests="forestsForMap"
               :big="true"
-              style="height: 400px; display: inline-block; margin-top: -40px"
+              :echoedForestIdFromTable="selectedRowIds"
+              @select="onSelect"
+              @unselect="onUnselect"
             >
             </map-container>
           </v-expansion-panel-content>
@@ -124,12 +127,14 @@
           :serverItemsLength="getTotalForests"
           :showSelect="true"
           :tableRowIcon="tableRowIcon"
-          @rowData="rowData"
-          @selectedRow="selectedRows"
+          :icon-row-value-slice="{ shouldSlice: true, length: 0 }"
+          :selectedFeatures="mapFeatures"
+          :unselectedFeatures="removemapFeatures"
           itemKey="id"
           mode="forest"
           ref="table"
-          :icon-row-value-slice="{ shouldSlice: true, length: 0 }"
+          @rowData="rowData"
+          @selectedRow="selectedRows"
         ></data-list>
       </div>
 
@@ -227,7 +232,9 @@ export default {
       uploadCsvLoading: false,
       contractTypes: [],
       bulkUpdateLoading: false,
-      forestsForMap: null
+      forestsForMap: null,
+      mapFeatures: null,
+      removemapFeatures: null
     };
   },
 
@@ -263,6 +270,18 @@ export default {
     else next();
   },
   methods: {
+    onSelect(feature) {
+      if (feature.id_ === this.removemapFeatures) {
+        this.removemapFeatures = null;
+      }
+      this.mapFeatures = feature.id_;
+    },
+    onUnselect(feature) {
+      if (feature.id_ === this.mapFeatures) {
+        this.mapFeatures = null;
+      }
+      this.removemapFeatures = feature.id_;
+    },
     confirmReload(e) {
       e.returnValue = this.$t("messages.confirm_leave");
     },
@@ -291,7 +310,6 @@ export default {
     onSearch() {
       this.filter = { ...this.filter, page: 1, filters: this.requestFilters };
       this.options = { ...this.options, page: 1 };
-      // this.$apollo.queries.forestsInfo.refetch();
     },
 
     uploadCsv() {

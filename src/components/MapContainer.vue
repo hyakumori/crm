@@ -127,13 +127,11 @@
       </vl-layer-vector>
 
       <vl-interaction-select
-        :features.sync="selectedFeatures"
+        ref="select"
         :condition="singleClick"
+        @select="onSelect"
+        @unselect="onUnselect"
       >
-        <vl-style-box>
-          <vl-style-stroke color="blue"></vl-style-stroke>
-          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-        </vl-style-box>
       </vl-interaction-select>
     </div>
 
@@ -158,14 +156,12 @@
       </vl-layer-vector>
 
       <vl-interaction-select
-        @select="selectPoly"
-        @unselect="unSelectPoly"
-        :features.sync="selectedFeatures"
+        ref="select"
+        :condition="singleClick"
+        :multi="false"
+        @select="onSelect"
+        @unselect="onUnselect"
       >
-        <vl-style-box>
-          <vl-style-stroke color="blue"></vl-style-stroke>
-          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-        </vl-style-box>
       </vl-interaction-select>
     </div>
   </vl-map>
@@ -179,7 +175,6 @@ import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
-import { Fill, Stroke, Text, Style } from "ol/style";
 import { singleClick } from "ol/events/condition";
 import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
 
@@ -200,9 +195,9 @@ export default {
       type: Boolean,
       default: false
     },
-
+    selectedRow: String,
     echoedForestIdFromTable: {
-      type: String,
+      type: Array,
       default: null
     }
   },
@@ -231,6 +226,8 @@ export default {
 
     const timeout = null;
 
+    const pastSelection = [];
+
     return {
       zoom,
       center,
@@ -247,11 +244,52 @@ export default {
       opacity,
       layerRadio,
       timeout,
-      cadastral
+      cadastral,
+      pastSelection
     };
   },
 
   mounted() {
+    this.$watch(
+      () => this.echoedForestIdFromTable,
+      val => {
+        const pastSelection = this.pastSelection;
+        this.saveSelection();
+        let difference = pastSelection.filter(x => !val.includes(x));
+        const selectInteraction = this.$refs.select;
+        const featuresSource = this.vLayers
+          .find(l => l.values_.id === "tableLayer")
+          .getSource();
+        val.forEach(row => {
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === row);
+          selectInteraction.addFeature(filteredFeature);
+        });
+        difference.forEach(row => {
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === row);
+          selectInteraction.removeFeature(filteredFeature);
+        });
+      }
+    );
+    this.$watch(
+      () => this.selectedRow,
+      val => {
+        const selectInteraction = this.$refs.select;
+        selectInteraction.clearFeatures()
+        if (val) {
+          const featuresSource = this.vLayers
+            .find(l => l.values_.id === "tableLayer")
+            .getSource();
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === val);
+          selectInteraction.addFeature(filteredFeature);
+        }
+      }
+    );
     this.loading = true;
     this.loadMapFeatures().then(f => {
       this.features = f;
@@ -284,46 +322,22 @@ export default {
           this.features = f;
         });
       }
-    },
-
-    echoedForestIdFromTable(val, prev) {
-      const featuresSource = this.vLayers
-        .find(l => l.values_.id === "tableLayer")
-        .getSource();
-      const filteredFeature = featuresSource
-        .getFeatures()
-        .find(f => f.getId() === val);
-      const prevFilteredFeature = featuresSource
-        .getFeatures()
-        .find(f => f.getId() === prev);
-
-      if (filteredFeature) {
-        const style = new Style({
-          stroke: new Stroke({ color: "FFF" }),
-          fill: new Fill({ color: "gray" }),
-          text: new Text({
-            text: filteredFeature.values_.nametag
-          })
-        });
-
-        filteredFeature.setStyle(style);
-      }
-
-      if (prev) {
-        const unstyle = new Style({
-          stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
-          fill: new Fill({ color: this.color }),
-          text: new Text({
-            text: prevFilteredFeature.values_.nametag
-          })
-        });
-
-        prevFilteredFeature.setStyle(unstyle);
-      }
     }
   },
 
   methods: {
+    saveSelection() {
+      this.pastSelection = this.echoedForestIdFromTable;
+    },
+
+    onSelect(feature) {
+      this.$emit("select", feature);
+    },
+
+    onUnselect(feature) {
+      this.$emit("unselect", feature);
+    },
+
     routeForest(val) {
       this.$router.push(`forests/${val}`);
     },
@@ -349,31 +363,6 @@ export default {
           }
         );
       }, 100);
-    },
-
-    selectPoly(val) {
-      const style = new Style({
-        stroke: new Stroke({ color: "FFF" }),
-        fill: new Fill({ color: "gray" }),
-        text: new Text({
-          text: val.values_.nametag
-        })
-      });
-      val.setStyle(style);
-      this.zoomToSelectedFeature(val);
-      this.$emit("echoSelectedFeature", val.getId());
-    },
-
-    unSelectPoly(val) {
-      const style = new Style({
-        stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
-        fill: new Fill({ color: this.color }),
-        text: new Text({
-          text: val.values_.nametag
-        })
-      });
-      val.setStyle(style);
-      this.$emit("echoSelectedFeature", null);
     },
 
     returnLayerLabel(layerId) {
