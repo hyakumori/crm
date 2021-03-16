@@ -17,7 +17,7 @@
       "type": "tilewms",
       "name": "赤色立体図",
       "id": "red",
-      "url": "https://crm-server.demo.georeport.org/geoserver/raster/wms",
+      "url": "https://crm-server.hyakumori.net/geoserver/raster/wms",
       "layer": "raster:赤色立体図データ",
       "projection": "EPSG:4326"
     },
@@ -25,7 +25,7 @@
       "type": "tilewms",
       "name": "DEM",
       "id": "dem",
-      "url": "https://crm-server.demo.georeport.org/geoserver/raster/wms",
+      "url": "https://crm-server.hyakumori.net/geoserver/raster/wms",
       "layer": "raster:DEMデータ",
       "projection": "EPSG:4326"
     },
@@ -33,14 +33,14 @@
       "type": "tilewms",
       "name": "航空写真",
       "id": "rgb",
-      "url": "https://crm-server.demo.georeport.org/geoserver/raster/wms",
+      "url": "https://crm-server.hyakumori.net/geoserver/raster/wms",
       "layer": "raster:航空写真データ",
       "projection": "EPSG:4326"
     }
   ],
   "cadastral": {
     "id": "wmsLayer",
-    "url": "https://crm-server.demo.georeport.org/geoserver/crm/wms",
+    "url": "https://crm-server.hyakumori.net/geoserver/crm/wms",
     "layer": "crm:Forests",
     "projection": "EPSG:4326"
   },
