@@ -79,7 +79,7 @@ Map configurations are set in the `mapconfig.json` file. The current settings ar
           "type": "tilewms",
           "name": "赤色立体図",
           "id": "red",
-          "url": "https://crm-server.hyakumori.net/geoserver/raster/wms",
+          "url": "http://localhost:8000/geoserver/raster/wms",
           "layer": "raster:赤色立体図データ",
           "projection": "EPSG:4326"
         }]
@@ -96,8 +96,8 @@ Map configurations are set in the `mapconfig.json` file. The current settings ar
     ```json
       {
         "id": "wmsLayer",
-        "url": "<add url to wms layer>",
-        "layer": "<add layer>",
+        "url": "http://localhost:8000/geoserver/crm/wms",
+        "layer": "crm:Forests",
         "projection": "EPSG:4326"
       }
     ```
