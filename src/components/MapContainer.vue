@@ -1,179 +1,170 @@
 <template>
-  <div>
-    <vl-map
-      ref="map"
-      data-projection="EPSG:4326"
-      @mounted="onMapMounted"
-      @singleclick="mapClicked"
-      style="height: 400px; width: 100%;"
+  <vl-map
+    ref="map"
+    data-projection="EPSG:4326"
+    @mounted="onMapMounted"
+    @singleclick="mapClicked"
+  >
+    <vl-view
+      :zoom.sync="zoom"
+      :center.sync="center"
+      ref="hyakumoriView"
+    ></vl-view>
+    <vl-layer-tile
+      v-for="baseLayer in baseLayers"
+      :key="baseLayer.name"
+      :id="baseLayer.id"
+      :visible="baseLayer.visible"
     >
-      <vl-view
-        :zoom.sync="zoom"
-        :center.sync="center"
-        ref="hyakumoriView"
-      ></vl-view>
-
-      <vl-layer-tile
-        v-for="baseLayer in baseLayers"
-        :key="baseLayer.name"
-        :id="baseLayer.id"
-        :visible="baseLayer.visible"
+      <vl-source-xyz
+        v-if="baseLayer.type.toLowerCase() === 'xyz'"
+        v-bind="baseLayer"
+        :url="baseLayer.url"
+        :attributions="baseLayer.attributions"
+      />
+      <vl-source-wms
+        v-if="baseLayer.type.toLowerCase() === 'tilewms'"
+        v-bind="baseLayer"
+        tiled="true"
+        :layers="baseLayer.layer"
+        :url="baseLayer.url"
+        :tile-load-function="imageLoader"
       >
-        <vl-source-xyz
-          v-bind="baseLayer"
-          :url="baseLayer.url"
-          :attributions="baseLayer.attributions"
-        />
-      </vl-layer-tile>
-
-      <vl-layer-image
-        v-for="raster in rasterLayers"
-        :key="raster.name"
-        :id="raster.id"
-        :visible="raster.visible"
+      </vl-source-wms>
+      <vl-source-osm
+        v-if="baseLayer.type.toLowerCase() === 'osm'"
+        v-bind="baseLayer"
       >
+      </vl-source-osm>
+    </vl-layer-tile>
+    <v-menu offset-y :z-index="1005" :close-on-content-click="false">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
+          レイヤー情報
+          <v-icon>mdi-layers</v-icon>
+        </v-btn>
+      </template>
+      <div class="panel-area">
+        <v-switch
+          v-for="layer of vLayers"
+          :key="layer.getProperties().id"
+          inset
+          v-model="layer.getProperties().visible"
+          @change="showMapPanelLayer(layer)"
+          :label="returnLayerLabel(layer.getProperties().id)"
+        >
+        </v-switch>
+        <v-slider
+          prepend-icon="mdi-invert-colors"
+          v-model="opacity"
+          thumb-label
+          values="100"
+        >
+        </v-slider>
+        <v-radio-group mandatory v-model="layerRadio">
+          <v-radio
+            v-for="layer of baseLayers"
+            :key="layer.name"
+            :label="layer.name"
+            :value="layer.id"
+            @change="showBaseLayer(layer.id)"
+          >
+          </v-radio>
+        </v-radio-group>
+      </div>
+    </v-menu>
+
+    <div v-if="big">
+      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
         <vl-source-image-wms
-          v-bind="raster"
-          :layers="raster.layer"
-          :url="raster.url"
+          :url="cadastral.url"
+          :layers="cadastral.layer"
+          :projection="cadastral.projection"
+          :image-load-function="imageLoader"
+          ref="hyakumoriSource"
+        >
+        </vl-source-image-wms>
+      </vl-layer-image>
+
+      <vl-overlay :position="overlayCoordinate">
+        <template v-if="showCard">
+          <v-card>
+            <v-system-bar
+              color="primary darken-2"
+              dark
+            >
+              <v-spacer></v-spacer>
+              <v-icon @click="showCard = false">mdi-close</v-icon>
+            </v-system-bar>
+            <v-card-text v-if="selectedFeature.textTwo" class="text-center">
+              大茅: {{ selectedFeature.textOne }} -
+              {{ selectedFeature.textTwo }}
+              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+              </v-btn>
+              <br />
+              所有者: {{ selectedFeature.textName }}
+            </v-card-text>
+            <v-card-text v-else class="text-center">
+              大茅: {{ selectedFeature.textOne }}
+              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
+                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+              </v-btn>
+              <br />
+              所有者: {{ selectedFeature.textName }}
+            </v-card-text>
+          </v-card>
+        </template>
+      </vl-overlay>
+
+      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+        <vl-source-vector ref="jsonSource" :features.sync="features">
+        </vl-source-vector>
+        <vl-style-box>
+          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+          <vl-style-fill :color="color"></vl-style-fill>
+        </vl-style-box>
+      </vl-layer-vector>
+
+      <vl-interaction-select
+        ref="select"
+        :condition="singleClick"
+        @select="onSelect"
+        @unselect="onUnselect"
+      >
+      </vl-interaction-select>
+    </div>
+
+    <div v-else>
+      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+        <vl-source-image-wms
+          :url="cadastral.url"
+          :layers="cadastral.layer"
+          :projection="cadastral.projection"
           :image-load-function="imageLoader"
         >
         </vl-source-image-wms>
       </vl-layer-image>
 
-      <v-menu offset-y :z-index="1005" :close-on-content-click="false">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn class="mapLayerBtn" color="primary" v-bind="attrs" v-on="on">
-            レイヤー情報
-            <v-icon>mdi-layers</v-icon>
-          </v-btn>
-        </template>
-        <div class="panel-area">
-          <v-switch
-            v-for="layer of vLayers"
-            :key="layer.getProperties().id"
-            inset
-            v-model="layer.getProperties().visible"
-            @change="showMapPanelLayer(layer)"
-            :label="returnLayerLabel(layer.getProperties().id)"
-          >
-          </v-switch>
-          <v-slider
-            prepend-icon="mdi-invert-colors"
-            v-model="opacity"
-            thumb-label
-            values="100"
-          >
-          </v-slider>
-          <v-radio-group mandatory v-model="layerRadio">
-            <v-radio
-              v-for="layer of rLayers"
-              :key="layer.getProperties().name"
-              :label="returnLayerLabel(layer.getProperties().id)"
-              :value="String(layer.getProperties().id)"
-              :name="String(layer.getProperties().id)"
-              @change="showBaseLayer(layer.getProperties().id)"
-            >
-            </v-radio>
-          </v-radio-group>
-        </div>
-      </v-menu>
+      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+        <vl-source-vector ref="jsonSource" :features.sync="features">
+        </vl-source-vector>
+        <vl-style-box>
+          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+          <vl-style-fill :color="color"></vl-style-fill>
+        </vl-style-box>
+      </vl-layer-vector>
 
-      <div v-if="big">
-        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
-          <vl-source-image-wms
-            :url="geoserver_baseUrl.concat('/crm/wms')"
-            :image-load-function="imageLoader"
-            ref="hyakumoriSource"
-            layers="crm:Forests"
-            projection="EPSG:4326"
-          >
-          </vl-source-image-wms>
-        </vl-layer-image>
-
-        <vl-overlay :position="overlayCoordinate">
-          <template v-if="showCard">
-            <v-card>
-              <v-card-text v-if="selectedFeature.textTwo" class="text-center">
-                大茅: {{ selectedFeature.textOne }} -
-                {{ selectedFeature.textTwo }}
-                <v-icon
-                  color="primary"
-                  v-on:click="routeForest(selectedFeature.forestID)"
-                >
-                  mdi-arrow-right-circle</v-icon
-                >
-                <br />
-                所有者: {{ selectedFeature.textName }}
-              </v-card-text>
-              <v-card-text v-else class="text-center">
-                大茅: {{ selectedFeature.textOne }}
-                <v-icon
-                  color="primary"
-                  v-on:click="routeForest(selectedFeature.forestID)"
-                >
-                  mdi-arrow-right-circle</v-icon
-                >
-                <br />
-                所有者: {{ selectedFeature.textName }}
-              </v-card-text>
-            </v-card>
-          </template>
-        </vl-overlay>
-
-        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector ref="jsonSource" :features.sync="features">
-          </vl-source-vector>
-          <vl-style-box>
-            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-            <vl-style-fill :color="color"></vl-style-fill>
-          </vl-style-box>
-        </vl-layer-vector>
-
-        <vl-interaction-select
-          :features.sync="selectedFeatures"
-          :condition="singleClick"
-        >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-        </vl-interaction-select>
-      </div>
-
-      <div v-else>
-        <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
-          <vl-source-image-wms
-            :url="geoserver_baseUrl.concat('/crm/wms')"
-            :image-load-function="imageLoader"
-            layers="crm:Forests"
-            projection="EPSG:4326"
-          >
-          </vl-source-image-wms>
-        </vl-layer-image>
-
-        <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-          <vl-source-vector ref="jsonSource" :features.sync="features">
-          </vl-source-vector>
-          <vl-style-box>
-            <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-            <vl-style-fill :color="color"></vl-style-fill>
-          </vl-style-box>
-        </vl-layer-vector>
-
-        <vl-interaction-select
-          @select="selectPoly"
-          @unselect="unSelectPoly"
-          :features.sync="selectedFeatures"
-        >
-          <vl-style-box>
-            <vl-style-stroke color="blue"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-          </vl-style-box>
-        </vl-interaction-select>
-      </div>
-    </vl-map>
-  </div>
+      <vl-interaction-select
+        ref="select"
+        :condition="singleClick"
+        :multi="false"
+        @select="onSelect"
+        @unselect="onUnselect"
+      >
+      </vl-interaction-select>
+    </div>
+  </vl-map>
 </template>
 
 <script>
@@ -184,7 +175,6 @@ import WmsSource from "vuelayers";
 import "vuelayers/lib/style.css";
 import { ScaleLine } from "ol/control";
 import { SelectInteraction } from "vuelayers";
-import { Fill, Stroke, Text, Style } from "ol/style";
 import { singleClick } from "ol/events/condition";
 import { findPointOnSurface } from "vuelayers/src/ol-ext/geom";
 
@@ -205,16 +195,16 @@ export default {
       type: Boolean,
       default: false
     },
-
-    echoedForestIdFromTable: {
-      type: String,
+    selectedRow: String,
+    selectedFromTable: {
+      type: Array,
       default: null
     }
   },
 
   data() {
-    const zoom = 11;
-    const center = [134.33234254149718, 35.2107812998969];
+    const zoom = parseInt(process.env.VUE_APP_MAP_ZOOM);
+    const center = process.env.VUE_APP_MAP_CENTER.split(" ");
     const features = [];
     const loading = false;
     const mapLayers = [];
@@ -225,50 +215,18 @@ export default {
     const selectedFeatures = [];
     const overlayCoordinate = [0, 0];
     const opacity = 50;
-    const layerRadio = "std";
 
-    const geoserver_baseUrl =
-      process.env.VUE_APP_GEOSERVER ?? "http://localhost:8000/geoserver";
+    let baseLayers = JSON.parse(process.env.VUE_APP_MAP_TILESOURCES);
+    baseLayers = baseLayers.map(obj => ({ ...obj, visible: false }));
+    baseLayers[0].visible = true;
 
-    const baseLayers = [
-      {
-        name: "標準地図",
-        id: "std",
-        visible: true,
-        url: "https://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20201001a",
-        attributions:
-          '<a href="https://maps.gsi.go.jp/development/ichiran.html"> 国土地理院 </a>'
-      }
-    ];
+    const cadastral = JSON.parse(process.env.VUE_APP_MAP_CADASTRAL);
 
-    const rasterLayers = [
-      {
-        name: "赤色立体図",
-        id: "red",
-        visible: false,
-        url: geoserver_baseUrl.concat("/raster/wms"),
-        layer: "raster:赤色立体図データ",
-        projection: "EPSG:4326"
-      },
-      {
-        name: "DEM",
-        id: "dem",
-        visible: false,
-        url: geoserver_baseUrl.concat("/raster/wms"),
-        layer: "raster:DEMデータ",
-        projection: "EPSG:4326"
-      },
-      {
-        name: "航空写真",
-        id: "rgb",
-        visible: false,
-        url: geoserver_baseUrl.concat("/raster/wms"),
-        layer: "raster:航空写真データ",
-        projection: "EPSG:4326"
-      }
-    ];
+    const layerRadio = baseLayers[0]["id"];
 
     const timeout = null;
+
+    const pastSelection = [];
 
     return {
       zoom,
@@ -279,19 +237,59 @@ export default {
       panelOpen,
       mapVisible,
       baseLayers,
-      rasterLayers,
       selectedFeature,
       selectedFeatures,
       overlayCoordinate,
       showCard,
       opacity,
-      geoserver_baseUrl,
       layerRadio,
-      timeout
+      timeout,
+      cadastral,
+      pastSelection
     };
   },
 
   mounted() {
+    this.$watch(
+      () => this.selectedFromTable,
+      val => {
+        const pastSelection = this.pastSelection;
+        this.saveSelection();
+        let difference = pastSelection.filter(x => !val.includes(x));
+        const selectInteraction = this.$refs.select;
+        const featuresSource = this.vLayers
+          .find(l => l.values_.id === "tableLayer")
+          .getSource();
+        val.forEach(row => {
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === row);
+          selectInteraction.addFeature(filteredFeature);
+        });
+        difference.forEach(row => {
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === row);
+          selectInteraction.removeFeature(filteredFeature);
+        });
+      }
+    );
+    this.$watch(
+      () => this.selectedRow,
+      val => {
+        const selectInteraction = this.$refs.select;
+        selectInteraction.clearFeatures()
+        if (val) {
+          const featuresSource = this.vLayers
+            .find(l => l.values_.id === "tableLayer")
+            .getSource();
+          const filteredFeature = featuresSource
+            .getFeatures()
+            .find(f => f.getId() === val);
+          selectInteraction.addFeature(filteredFeature);
+        }
+      }
+    );
     this.loading = true;
     this.loadMapFeatures().then(f => {
       this.features = f;
@@ -311,12 +309,6 @@ export default {
         return ["wmsLayer", "tableLayer"].includes(el.getProperties().id);
       });
     },
-    rLayers() {
-      const allLayers = this.mapLayers;
-      return allLayers.filter(function(el) {
-        return ["std", "red", "dem", "rgb"].includes(el.getProperties().id);
-      });
-    },
 
     singleClick() {
       return singleClick;
@@ -330,46 +322,22 @@ export default {
           this.features = f;
         });
       }
-    },
-
-    echoedForestIdFromTable(val, prev) {
-      const featuresSource = this.vLayers
-        .find(l => l.values_.id === "tableLayer")
-        .getSource();
-      const filteredFeature = featuresSource
-        .getFeatures()
-        .find(f => f.getId() === val);
-      const prevFilteredFeature = featuresSource
-        .getFeatures()
-        .find(f => f.getId() === prev);
-
-      if (filteredFeature) {
-        const style = new Style({
-          stroke: new Stroke({ color: "FFF" }),
-          fill: new Fill({ color: "gray" }),
-          text: new Text({
-            text: filteredFeature.values_.nametag
-          })
-        });
-
-        filteredFeature.setStyle(style);
-      }
-
-      if (prev) {
-        const unstyle = new Style({
-          stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
-          fill: new Fill({ color: this.color }),
-          text: new Text({
-            text: prevFilteredFeature.values_.nametag
-          })
-        });
-
-        prevFilteredFeature.setStyle(unstyle);
-      }
     }
   },
 
   methods: {
+    saveSelection() {
+      this.pastSelection = this.selectedFromTable;
+    },
+
+    onSelect(feature) {
+      this.$emit("select", feature);
+    },
+
+    onUnselect(feature) {
+      this.$emit("unselect", feature);
+    },
+
     routeForest(val) {
       this.$router.push(`forests/${val}`);
     },
@@ -397,39 +365,10 @@ export default {
       }, 100);
     },
 
-    selectPoly(val) {
-      const style = new Style({
-        stroke: new Stroke({ color: "FFF" }),
-        fill: new Fill({ color: "gray" }),
-        text: new Text({
-          text: val.values_.nametag
-        })
-      });
-      val.setStyle(style);
-      this.zoomToSelectedFeature(val);
-      this.$emit("echoSelectedFeature", val.getId());
-    },
-
-    unSelectPoly(val) {
-      const style = new Style({
-        stroke: new Stroke({ color: "rgb(39,78,19)", width: 2 }),
-        fill: new Fill({ color: this.color }),
-        text: new Text({
-          text: val.values_.nametag
-        })
-      });
-      val.setStyle(style);
-      this.$emit("echoSelectedFeature", null);
-    },
-
     returnLayerLabel(layerId) {
       const names = {
         wmsLayer: "全ての地番",
-        tableLayer: "表内の情報",
-        dem: "DEM",
-        red: "赤色立体図",
-        std: "標準地図",
-        rgb: "航空写真"
+        tableLayer: "表内の情報"
       };
       return names[layerId];
     },
@@ -485,13 +424,9 @@ export default {
     },
 
     showBaseLayer(id) {
-      let currentLayer =
-        this.baseLayers.find(layer => layer.visible) ||
-        this.rasterLayers.find(layer => layer.visible);
+      let currentLayer = this.baseLayers.find(layer => layer.visible);
       currentLayer.visible = false;
-      let newLayer =
-        this.baseLayers.find(layer => layer.id === id) ||
-        this.rasterLayers.find(layer => layer.id === id);
+      let newLayer = this.baseLayers.find(layer => layer.id === id);
       newLayer.visible = true;
     },
 
@@ -509,25 +444,49 @@ export default {
     },
 
     async mapClicked(event) {
+      const mapFeatures = this.$refs.map.getFeaturesAtPixel(event.pixel);
+      this.$emit("unselectAll", mapFeatures);
       if (this.$refs.hyakumoriSource) {
-        const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
-          event.coordinate,
-          0.000001,
-          "EPSG:4326",
-          {
-            INFO_FORMAT: "application/json",
-            feature_count: 1,
-            query_layers: "crm:Forests"
-          }
-        );
-        this.overlayCoordinate = event.coordinate;
+        let itemToShow = null;
+        try {
+          this.$refs.map.forEachLayerAtPixel(event.pixel, l => {
+            itemToShow = this.vLayers.find(layer => {
+              const v = layer.values_.id === l.values_.id ? l : null;
+              if (v) {
+                return v.getVisible() ? v : null;
+              } else {
+                return null;
+              }
+            });
+            return itemToShow;
+          });
+        } catch (e) {
+          this.showCard = false;
+          return;
+        }
 
-        let featureRequest = await this.$rest(loggedURL);
-        if (featureRequest.numberReturned > 0) {
-          this.selectedFeature = this.returnPopupText(
-            featureRequest.features[0]
+        if (itemToShow) {
+          const loggedURL = this.$refs.hyakumoriSource.getFeatureInfoUrl(
+            event.coordinate,
+            0.000001,
+            this.cadastral.projection,
+            {
+              INFO_FORMAT: "application/json",
+              feature_count: 1,
+              query_layers: this.cadastral.layer
+            }
           );
-          this.showCard = true;
+          this.overlayCoordinate = event.coordinate;
+
+          let featureRequest = await this.$rest(loggedURL);
+          if (featureRequest.numberReturned > 0) {
+            this.selectedFeature = this.returnPopupText(
+              featureRequest.features[0]
+            );
+            this.showCard = true;
+          } else {
+            this.showCard = false;
+          }
         } else {
           this.showCard = false;
         }

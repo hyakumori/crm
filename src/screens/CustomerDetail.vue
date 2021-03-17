@@ -34,16 +34,17 @@
           @saved="handleForestsSaved"
           :selectingForestId.sync="selectingForestId"
           itemClickable
-          @echoSelectedFeature="setSelectedFeatureFromTable"
-          :echoedForestIdFromMap="echoedForest"
+          :selectedFeatures="mapFeatures"
+          :unselectedFeatures="removemapFeatures"
         />
 
         <map-container
           v-if="forests.length > 0"
-          style="margin-top: -20px; margin-bottom: 62px"
+          style="height: 400px; margin-top: -20px; margin-bottom: 62px"
           :forests="forests"
-          :echoedForestIdFromTable="echoedForest"
-          @echoSelectedFeature="setSelectedFeatureFromMap"
+          :selectedRow="selectingForestId"
+          @select="onSelect"
+          @unselect="onUnselect"
         >
         </map-container>
 
@@ -254,7 +255,8 @@ export default {
       postalHistoriesLoading: this.checkAndShowLoading(),
       contactsForests: [],
       contactsForestsLoading: this.checkAndShowLoading(),
-      echoedForest: null
+      mapFeatures: null,
+      removemapFeatures: null
     };
   },
 
@@ -282,6 +284,18 @@ export default {
   },
 
   methods: {
+    onSelect(feature) {
+      if (feature.id_ === this.removemapFeatures) {
+        this.removemapFeatures = null;
+      }
+      this.mapFeatures = feature.id_;
+    },
+    onUnselect(feature) {
+      if (feature.id_ === this.mapFeatures) {
+        this.mapFeatures = null;
+      }
+      this.removemapFeatures = feature.id_;
+    },
     getForestDisplayName,
     async resolveBusinessId() {
       if (!this.isDetail) {
@@ -388,14 +402,6 @@ export default {
       this.fetchForests();
       this.fetchContacts();
       this.fetchContactsForests();
-    },
-
-    setSelectedFeatureFromMap(val) {
-      this.echoedForest = val;
-    },
-
-    setSelectedFeatureFromTable(val) {
-      this.echoedForest = val;
     }
   },
 

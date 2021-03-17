@@ -72,13 +72,29 @@
           </div>
         </template>
       </page-header>
-      <map-container
-        v-if="forestsInfo"
-        class="px-7"
-        :forests="forestsForMap"
-        :big="true"
-      >
-      </map-container>
+    </template>
+
+    <template #forestmap>
+      <v-expansion-panels :value="0">
+        <v-expansion-panel>
+          <v-expansion-panel-header class="map-title">
+            地図
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <map-container
+              v-if="forestsInfo"
+              style="height: 400px; display: inline-block; margin-top: -40px"
+              :forests="forestsForMap"
+              :big="true"
+              :selectedFromTable="selectedRowIds"
+              @select="onSelect"
+              @unselect="onUnselect"
+              @unselectAll="onUnselectAll"
+            >
+            </map-container>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </template>
 
     <template #section>
@@ -112,12 +128,14 @@
           :serverItemsLength="getTotalForests"
           :showSelect="true"
           :tableRowIcon="tableRowIcon"
-          @rowData="rowData"
-          @selectedRow="selectedRows"
+          :icon-row-value-slice="{ shouldSlice: true, length: 0 }"
+          :selectedFeatures="mapFeatures"
+          :unselectedFeatures="removemapFeatures"
           itemKey="id"
           mode="forest"
           ref="table"
-          :icon-row-value-slice="{ shouldSlice: true, length: 0 }"
+          @rowData="rowData"
+          @selectedRow="selectedRows"
         ></data-list>
       </div>
 
@@ -215,7 +233,9 @@ export default {
       uploadCsvLoading: false,
       contractTypes: [],
       bulkUpdateLoading: false,
-      forestsForMap: null
+      forestsForMap: null,
+      mapFeatures: null,
+      removemapFeatures: null
     };
   },
 
@@ -251,6 +271,23 @@ export default {
     else next();
   },
   methods: {
+    onSelect(feature) {
+      if (feature.id_ === this.removemapFeatures) {
+        this.removemapFeatures = null;
+      }
+      this.mapFeatures = feature.id_;
+    },
+    onUnselect(feature) {
+      if (feature.id_ === this.mapFeatures) {
+        this.mapFeatures = null;
+      }
+      this.removemapFeatures = feature.id_;
+    },
+    onUnselectAll(features) {
+      if (!features) {
+        this.$refs.table.selected = [];
+      }
+    },
     confirmReload(e) {
       e.returnValue = this.$t("messages.confirm_leave");
     },
@@ -279,7 +316,6 @@ export default {
     onSearch() {
       this.filter = { ...this.filter, page: 1, filters: this.requestFilters };
       this.options = { ...this.options, page: 1 };
-      // this.$apollo.queries.forestsInfo.refetch();
     },
 
     uploadCsv() {
@@ -537,5 +573,14 @@ export default {
       visibility: hidden;
     }
   }
+}
+
+.v-expansion-panel::before {
+  box-shadow: none !important;
+}
+
+.map-title {
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>
