@@ -88,14 +88,16 @@ Map configurations are set in the `mapconfig.json` file. The current settings ar
   - An object defining the source of the WMS layer for the cadastral data.
   - Required (source must be a WMS layer).
   - Properties must include:
-    - `id`: Unique identifier for the layer. Currently, this _must_ be set to `wmsLayer`.
-    - `url`: URL to the wms layer source.
-    - `layer`: WMS layer name.
-    - `projection`: WMS layer projection. 
+    - `id`: (required) Unique identifier for the layer. Must _not_ be `tableLayer` (reserved for an internal layer).
+    - `name`: (required) the name of the layer. Used for labeling. 
+    - `url`: (required) URL to the wms layer source.
+    - `layer`: (required) WMS layer name.
+    - `projection`: (required) WMS layer projection. 
   - e.g.: 
     ```json
       {
         "id": "wmsLayer",
+        "name": "全ての地番",
         "url": "http://localhost:8000/geoserver/crm/wms",
         "layer": "crm:Forests",
         "projection": "EPSG:4326"
