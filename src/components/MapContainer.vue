@@ -300,14 +300,14 @@ export default {
 
   computed: {
     color() {
-      return "rgba(106,168,79,".concat(String(this.opacity / 100)).concat(")");
+      return "rgba(18,199,166,".concat(String(this.opacity / 100)).concat(")");
     },
 
     vLayers() {
-      const foo = this.cadastral.id;
+      const cadastralId = this.cadastral.id;
       const allLayers = this.mapLayers;
       return allLayers.filter(function(el) {
-        return [foo, "tableLayer"].includes(el.getProperties().id);
+        return [cadastralId, "tableLayer"].includes(el.getProperties().id);
       });
     },
 
