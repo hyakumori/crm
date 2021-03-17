@@ -3,6 +3,7 @@
     <template #section>
       <div class="forest-detail__section px-7">
         <map-container
+          :key="id"
           style="height: 400px; margin-top: -40px; margin-bottom: 52px"
           v-if="forestDetailMapInfo"
           :forests="[forestDetailMapInfo]"
@@ -346,6 +347,17 @@ export default {
       }
       return attributes;
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    const id = to.params.id;
+    this.$store.dispatch("forest/getForest", id).then(() => {
+      this.$store.dispatch(
+        "setHeaderInfo",
+        this.$store.getters["forest/headerInfo"]
+      );
+      this.forestDetailMapInfo = this.$store.state.forest.forest;
+    });
+    next();
   }
 };
 </script>
