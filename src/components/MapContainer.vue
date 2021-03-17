@@ -75,7 +75,7 @@
     </v-menu>
 
     <div v-if="big">
-      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
+      <vl-layer-image :id="cadastral.id" :z-index="1000" :visible="true">
         <vl-source-image-wms
           :url="cadastral.url"
           :layers="cadastral.layer"
@@ -136,7 +136,7 @@
     </div>
 
     <div v-else>
-      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+      <vl-layer-image :id="cadastral.id" :z-index="1000" :visible="false">
         <vl-source-image-wms
           :url="cadastral.url"
           :layers="cadastral.layer"
@@ -304,9 +304,10 @@ export default {
     },
 
     vLayers() {
+      const foo = this.cadastral.id;
       const allLayers = this.mapLayers;
       return allLayers.filter(function(el) {
-        return ["wmsLayer", "tableLayer"].includes(el.getProperties().id);
+        return [foo, "tableLayer"].includes(el.getProperties().id);
       });
     },
 
@@ -367,7 +368,7 @@ export default {
 
     returnLayerLabel(layerId) {
       const names = {
-        wmsLayer: "全ての地番",
+        [this.cadastral.id]: this.cadastral.name,
         tableLayer: "表内の情報"
       };
       return names[layerId];
