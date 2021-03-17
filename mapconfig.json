@@ -40,6 +40,7 @@
   ],
   "cadastral": {
     "id": "wmsLayer",
+    "name": "全ての地番",
     "url": "https://crm-server.hyakumori.net/geoserver/crm/wms",
     "layer": "crm:Forests",
     "projection": "EPSG:4326"

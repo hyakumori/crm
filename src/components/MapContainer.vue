@@ -55,7 +55,7 @@
         >
         </v-switch>
         <v-slider
-          prepend-icon="mdi-invert-colors"
+          prepend-icon="mdi-opacity"
           v-model="opacity"
           thumb-label
           values="100"
@@ -73,9 +73,53 @@
         </v-radio-group>
       </div>
     </v-menu>
-
+    <vl-overlay :position="overlayCoordinate">
+      <template v-if="showCard">
+        <v-card>
+          <v-system-bar color="primary darken-2" dark>
+            <v-spacer></v-spacer>
+            <v-icon @click="showCard = false">mdi-close</v-icon>
+          </v-system-bar>
+          <v-card-text v-if="selectedFeature.textTwo" class="text-center">
+            大茅: {{ selectedFeature.textOne }} -
+            {{ selectedFeature.textTwo }}
+            <v-btn
+              :to="`/forests/${selectedFeature.forestID}`"
+              depressed
+              medium
+              icon
+            >
+              <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+            </v-btn>
+            <br />
+            所有者: {{ selectedFeature.textName }}
+          </v-card-text>
+          <v-card-text v-else class="text-center">
+            大茅: {{ selectedFeature.textOne }}
+            <v-btn
+              :to="`/forests/${selectedFeature.forestID}`"
+              depressed
+              medium
+              icon
+            >
+              <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
+            </v-btn>
+            <br />
+            所有者: {{ selectedFeature.textName }}
+          </v-card-text>
+        </v-card>
+      </template>
+    </vl-overlay>
+    <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
+      <vl-source-vector ref="jsonSource" :features.sync="features">
+      </vl-source-vector>
+      <vl-style-box>
+        <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
+        <vl-style-fill :color="color"></vl-style-fill>
+      </vl-style-box>
+    </vl-layer-vector>
     <div v-if="big">
-      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="true">
+      <vl-layer-image :id="cadastral.id" :z-index="1000" :visible="true">
         <vl-source-image-wms
           :url="cadastral.url"
           :layers="cadastral.layer"
@@ -85,47 +129,6 @@
         >
         </vl-source-image-wms>
       </vl-layer-image>
-
-      <vl-overlay :position="overlayCoordinate">
-        <template v-if="showCard">
-          <v-card>
-            <v-system-bar
-              color="primary darken-2"
-              dark
-            >
-              <v-spacer></v-spacer>
-              <v-icon @click="showCard = false">mdi-close</v-icon>
-            </v-system-bar>
-            <v-card-text v-if="selectedFeature.textTwo" class="text-center">
-              大茅: {{ selectedFeature.textOne }} -
-              {{ selectedFeature.textTwo }}
-              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
-                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
-              </v-btn>
-              <br />
-              所有者: {{ selectedFeature.textName }}
-            </v-card-text>
-            <v-card-text v-else class="text-center">
-              大茅: {{ selectedFeature.textOne }}
-              <v-btn :to="`forests/${selectedFeature.forestID}`"  depressed medium icon>
-                <v-icon color="primary"> mdi-arrow-right-circle </v-icon>
-              </v-btn>
-              <br />
-              所有者: {{ selectedFeature.textName }}
-            </v-card-text>
-          </v-card>
-        </template>
-      </vl-overlay>
-
-      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-        <vl-source-vector ref="jsonSource" :features.sync="features">
-        </vl-source-vector>
-        <vl-style-box>
-          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-          <vl-style-fill :color="color"></vl-style-fill>
-        </vl-style-box>
-      </vl-layer-vector>
-
       <vl-interaction-select
         ref="select"
         :condition="singleClick"
@@ -134,27 +137,17 @@
       >
       </vl-interaction-select>
     </div>
-
     <div v-else>
-      <vl-layer-image id="wmsLayer" :z-index="1000" :visible="false">
+      <vl-layer-image :id="cadastral.id" :z-index="1000" :visible="false">
         <vl-source-image-wms
           :url="cadastral.url"
           :layers="cadastral.layer"
           :projection="cadastral.projection"
           :image-load-function="imageLoader"
+          ref="hyakumoriSource"
         >
         </vl-source-image-wms>
       </vl-layer-image>
-
-      <vl-layer-vector id="tableLayer" :z-index="1001" :visible="true">
-        <vl-source-vector ref="jsonSource" :features.sync="features">
-        </vl-source-vector>
-        <vl-style-box>
-          <vl-style-stroke color="rgb(39,78,19)" :width="2"></vl-style-stroke>
-          <vl-style-fill :color="color"></vl-style-fill>
-        </vl-style-box>
-      </vl-layer-vector>
-
       <vl-interaction-select
         ref="select"
         :condition="singleClick"
@@ -300,13 +293,14 @@ export default {
 
   computed: {
     color() {
-      return "rgba(106,168,79,".concat(String(this.opacity / 100)).concat(")");
+      return "rgba(18,199,166,".concat(String(this.opacity / 100)).concat(")");
     },
 
     vLayers() {
+      const cadastralId = this.cadastral.id;
       const allLayers = this.mapLayers;
       return allLayers.filter(function(el) {
-        return ["wmsLayer", "tableLayer"].includes(el.getProperties().id);
+        return [cadastralId, "tableLayer"].includes(el.getProperties().id);
       });
     },
 
@@ -338,10 +332,6 @@ export default {
       this.$emit("unselect", feature);
     },
 
-    routeForest(val) {
-      this.$router.push(`forests/${val}`);
-    },
-
     onMapMounted() {
       this.$refs.map.$map.getControls().extend([new ScaleLine()]);
       this.returnMapLayers().then(l => {
@@ -367,7 +357,7 @@ export default {
 
     returnLayerLabel(layerId) {
       const names = {
-        wmsLayer: "全ての地番",
+        [this.cadastral.id]: this.cadastral.name,
         tableLayer: "表内の情報"
       };
       return names[layerId];
