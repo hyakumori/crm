@@ -84,7 +84,7 @@
             大茅: {{ selectedFeature.textOne }} -
             {{ selectedFeature.textTwo }}
             <v-btn
-              :to="`forests/${selectedFeature.forestID}`"
+              :to="`/forests/${selectedFeature.forestID}`"
               depressed
               medium
               icon
@@ -97,7 +97,7 @@
           <v-card-text v-else class="text-center">
             大茅: {{ selectedFeature.textOne }}
             <v-btn
-              :to="`forests/${selectedFeature.forestID}`"
+              :to="`/forests/${selectedFeature.forestID}`"
               depressed
               medium
               icon
@@ -330,10 +330,6 @@ export default {
 
     onUnselect(feature) {
       this.$emit("unselect", feature);
-    },
-
-    routeForest(val) {
-      this.$router.push(`forests/${val}`);
     },
 
     onMapMounted() {
