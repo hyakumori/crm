@@ -1,6 +1,6 @@
 # Hyakumori CRM
 
-This repository holds the source code for the Hyakumori CRM.
+A CRM web application for forestry management under the Hyakumori Project.   
 
 ## Requirements
 
@@ -20,7 +20,7 @@ cp .env.example .env
 yarn install
 ```
 
-## Usage
+## How to use
 
 Compile the app and launch with hot-reload for development with:
 
@@ -79,7 +79,7 @@ Map configurations are set in the `mapconfig.json` file. The current settings ar
           "type": "tilewms",
           "name": "赤色立体図",
           "id": "red",
-          "url": "https://crm-server.demo.georeport.org/geoserver/raster/wms",
+          "url": "https://crm-server.hyakumori.net/geoserver/raster/wms",
           "layer": "raster:赤色立体図データ",
           "projection": "EPSG:4326"
         }]
@@ -110,38 +110,21 @@ Map configurations are set in the `mapconfig.json` file. The current settings ar
   - Required. Must be a number surrounded by quotation marks.
   - e.g. `"11"`
 
-#### Map Code
-The map file is in `src/components/MapContainer.vue`. This file is imported into three separate files:
-- Forests.vue
-- CustomerDetail.vue
-- ForestDetail.vue
+Note, if map layers are being served by the Hyakumori API (over proxy), then it is important
+ that the URL matches backend env variables defined in the `.env` file.
 
-Some minor styling is applied to the `<map-container>` component within these files for margin and padding.
+## Contributing and Support
 
-The map is created using elements from [VueLayers], which is a wrapper for [OpenLayers]. Some of the documentation in VueLayers is limited, so please refer to OpenLayers for more details.
+The Hyakumori Project appreciates any [contributions](https://github.com/hyakumori/.github/blob/main/CONTRIBUTING.md).
 
-***Caution***: Any styling changed within `MapContainer.vue` will be reflected across all pages that the `map-container` is called in.
+## Authors
 
-**Map Element**
-**Map Container Panel Area**
+The Hyakumori CRM was developed by the Hyakumori Team with additional contributions from:
 
-The map has a panel that can be opened and closed by clicking on it. Much of the styling is from Vuetify's integrated styling, which you can read more about in the [Vuetify] documentation. These include the `v-menu, v-switch, v-radio-group, v-radio,` and `v-slider` elements.
+- [Iosefa Percival](https://github.com/iosefa)
+- [Nathaniel Nasarow](https://github.com/Torgian)
+- ... [and others](https://github.com/hyakumori/crm-server/graphs/contributors)
 
-The class `.panel-area` controls the styling for the map's panel selection area. The button that controls this panel is styled by the class `.mapLayerBtn`, which controls the location of where the button is.
+## LICENSE
 
-**Vector Layer styling**
-
-The vector layers are styled using the `vl-style-box` element and its child elements. `vl-style-stroke` and `vl-style-fill` declares the stroke and fill colors respectively.
-
-There are two functions that stylize the vector layers when they are selected / unselected, such as on the map in `Forests.vue`. These are the `selectPoly` and `unSelectPoly` functions. They control the stroke, fill, and text for the selected / unselected features in a map if they are vector features.
-
-
-
-  [Vuetify]: <https://vuetifyjs.com/en/getting-started/installation/>
-  [VueLayers]: <https://vuelayers.github.io/#/>
-  [OpenLayers]: <https://openlayers.org>
-  [located here]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>
-  [`rasterLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L244>
-  [`baseLayers`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L233>
-  [`rLayers()`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L314>
-  [`returnLayerLabel`]: <https://github.com/hyakumori/crm/blob/e2d824ea06a2d415f845efed66ac778a1537c5a4/src/components/MapContainer.vue#L425>
+This program is free software. See [LICENSE](LICENSE) for more information.
