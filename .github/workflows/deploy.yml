@@ -16,6 +16,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: schdck/create-env-json@v2
+        id: create-mapconfig
+        with:
+          file-name: 'mapconfig.json'
+          tilesources: ${{ secrets.TILESOURCES }}
+          cadastral: ${{ secrets.CADASTRAL }}
+          center: ${{ secrets.CENTER }}
+          zoom: ${{ secrets.ZOOM }}
+
       - name: Install dependencies
         run: yarn
 
