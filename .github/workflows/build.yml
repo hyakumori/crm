@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ next ]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      BACKEND_URL: ${{ secrets.BACKEND_URL }}
+      VUE_APP_GRAPHQL_HTTP: ${{ secrets.VUE_APP_GRAPHQL_HTTP }}
+      VUE_APP_REST_HTTP: ${{ secrets.VUE_APP_REST_HTTP }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: schdck/create-env-json@v2
+        id: create-mapconfig
+        with:
+          file-name: 'mapconfig.json'
+          tilesources: ${{ secrets.TILESOURCES }}
+          cadastral: ${{ secrets.CADASTRAL }}
+          center: ${{ secrets.CENTER }}
+          zoom: ${{ secrets.ZOOM }}
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build
+        run: yarn build
