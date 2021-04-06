@@ -14,7 +14,14 @@ A CRM web application for forestry management under the Hyakumori Project.
 cp .env.example .env
 ```
 
-2. Install yarn dependencies.
+2. Copy `mapconfig.example.json` to `mapconfig.json` and fill necessary variables. See below for details about
+ the map configuration.
+
+```
+cp .env.example .env
+```
+
+3. Install yarn dependencies.
 
 ```
 yarn install
