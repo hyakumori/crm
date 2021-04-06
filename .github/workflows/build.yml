@@ -5,7 +5,7 @@ on:
     branches: [ next ]
 
 jobs:
-  run:
+  build:
     runs-on: ubuntu-latest
     env:
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
