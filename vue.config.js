@@ -3,10 +3,10 @@ const CompressionPlugin = require("compression-webpack-plugin");
 
 const config = require("./mapconfig.json");
 
-process.env.VUE_APP_MAP_TILESOURCES = JSON.stringify(config.tilesources);
-process.env.VUE_APP_MAP_CADASTRAL = JSON.stringify(config.cadastral);
-process.env.VUE_APP_MAP_ZOOM = config.zoom;
-process.env.VUE_APP_MAP_CENTER = config.center;
+process.env.VUE_APP_MAP_TILESOURCES = JSON.stringify(config.TILESOURCES);
+process.env.VUE_APP_MAP_CADASTRAL = JSON.stringify(config.CADASTRAL);
+process.env.VUE_APP_MAP_ZOOM = config.ZOOM;
+process.env.VUE_APP_MAP_CENTER = config.CENTER;
 
 module.exports = {
   devServer: {
