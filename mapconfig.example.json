@@ -1,0 +1,34 @@
+{
+  "tilesources": [
+    {
+      "type": "osm",
+      "name": "OSM",
+      "id": "osm"
+    },
+    {
+      "type": "xyz",
+      "name": "標準地図",
+      "id": "std",
+      "url": "https://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20201001a",
+      "attributions":
+      "<a href=\"https://maps.gsi.go.jp/development/ichiran.html\"> 国土地理院 </a>"
+    },
+    {
+      "type": "tilewms",
+      "name": "",
+      "id": "",
+      "url": "",
+      "layer": "",
+      "projection": ""
+    }
+  ],
+  "cadastral": {
+    "id": "",
+    "name": "",
+    "url": "",
+    "layer": "",
+    "projection": ""
+  },
+  "center": "0 0",
+  "zoom": "12"
+}
