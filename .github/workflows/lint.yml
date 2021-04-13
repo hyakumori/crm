@@ -9,18 +9,13 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-
+    env:
+      MAPCONFIG: ${{secrets.MAPCONFIG}}
     steps:
       - uses: actions/checkout@v2
 
-      - uses: schdck/create-env-json@v2
-        id: create-mapconfig
-        with:
-          file-name: 'mapconfig.json'
-          tilesources: ${{ secrets.MAPCONFIG_TILESOURCES }}
-          cadastral: ${{ secrets.MAPCONFIG_CADASTRAL }}
-          center: ${{ secrets.MAPCONFIG_CENTER }}
-          zoom: ${{ secrets.MAPCONFIG_ZOOM }}
+      - name: create mapconfig
+        run: jq -rc -n env.MAPCONFIG > mapconfig.json
 
       - name: Lint Vue
         run: |
