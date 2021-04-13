@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: create mapconfig
-        run: jq -n '{"TILESOURCES":env.TILESOURCES, "CADASTRAL":env.CADASTRAL, "CENTER":env.CENTER, "ZOOM":env.ZOOM}' > mapconfig.json
+        run: jq -rc -n ${{ secrets.MAPCONFIG }} > mapconfig.json
 
       - name: upload mapconfig
         uses: actions/upload-artifact@v2
