@@ -22,8 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: create mapconfig.json
-        run: jq -n '{"TILESOURCES":env.TILESOURCES,"CADASTRAL":env.CADASTRAL,"CENTER":env.CENTER,"ZOOM":env.ZOOM}' > mapconfig.json
+      - name: mapconfig
+        uses: actions/upload-artifact@v2
+        with:
+          name: create mapconfig
+          run: jq -n '{"TILESOURCES":env.TILESOURCES, "CADASTRAL":env.CADASTRAL, "CENTER":env.CENTER, "ZOOM":env.ZOOM}' > mapconfig.json
+          path: mapconfig.json
 
       - name: Install dependencies
         run: yarn
