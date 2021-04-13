@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: create mapconfig.json
-        run: jq -n '{"TILESOURCES":${{ secrets.MAPCONFIG_TILESOURCES }},"CADASTRAL":${{ secrets.MAPCONFIG_CADASTRAL }},"CENTER":${{ secrets.MAPCONFIG_CENTER }},"ZOOM":${{ secrets.MAPCONFIG_ZOOM }}}' > mapconfig.json
+        run: jq -n --arg tilesources ${{ secrets.MAPCONFIG_TILESOURCES }} --arg cadastral ${{ secrets.MAPCONFIG_CADASTRAL }} --arg center ${{ secrets.MAPCONFIG_CENTER }} --arg zoom ${{ secrets.MAPCONFIG_ZOOM }} '{"TILESOURCES":$tilesources,"CADASTRAL":$cadastral,"CENTER":$center,"ZOOM":$zoom}' > mapconfig.json
 
       - name: Install dependencies
         run: yarn
