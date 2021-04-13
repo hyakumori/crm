@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Deploy
+      - name: Stage
         uses: reggionick/s3-deploy@v3
         with:
           folder: dist
