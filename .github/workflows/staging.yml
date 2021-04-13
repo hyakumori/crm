@@ -26,10 +26,10 @@ jobs:
         id: create-mapconfig
         with:
           file-name: 'mapconfig.json'
-          TILESOURCES: ${{ TILESOURCES }}
-          CADASTRAL: ${{ CADASTRAL }}
-          CENTER: ${{ CENTER }}
-          ZOOM: ${{ ZOOM }}
+          TILESOURCES: ${{ env.TILESOURCES }}
+          CADASTRAL: ${{ env.CADASTRAL }}
+          CENTER: ${{ env.CENTER }}
+          ZOOM: ${{ env.ZOOM }}
 
       - name: Install dependencies
         run: yarn
