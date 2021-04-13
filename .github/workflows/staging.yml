@@ -15,6 +15,10 @@ jobs:
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
       VUE_APP_GRAPHQL_HTTP: ${{ secrets.VUE_APP_GRAPHQL_HTTP }}
       VUE_APP_REST_HTTP: ${{ secrets.VUE_APP_REST_HTTP }}
+      TILESOURCES: ${{ secrets.MAPCONFIG_TILESOURCES }}
+      CADASTRAL: ${{ secrets.MAPCONFIG_CADASTRAL }}
+      CENTER: ${{ secrets.MAPCONFIG_CENTER }}
+      ZOOM: ${{ secrets.MAPCONFIG_ZOOM }}
     steps:
       - uses: actions/checkout@v2
 
@@ -22,10 +26,10 @@ jobs:
         id: create-mapconfig
         with:
           file-name: 'mapconfig.json'
-          TILESOURCES: ${{ secrets.MAPCONFIG_TILESOURCES }}
-          CADASTRAL: ${{ secrets.MAPCONFIG_CADASTRAL }}
-          CENTER: ${{ secrets.MAPCONFIG_CENTER }}
-          ZOOM: ${{ secrets.MAPCONFIG_ZOOM }}
+          TILESOURCES: ${{ TILESOURCES }}
+          CADASTRAL: ${{ CADASTRAL }}
+          CENTER: ${{ CENTER }}
+          ZOOM: ${{ ZOOM }}
 
       - name: Install dependencies
         run: yarn
