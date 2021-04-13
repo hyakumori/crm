@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: schdck/create-env-json@v2
+      - uses: schdck/create-env-json@v1
         id: create-mapconfig
         with:
           file-name: 'mapconfig.json'
