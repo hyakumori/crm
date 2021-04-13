@@ -7,7 +7,7 @@ on:
     branches: [ use-staging ]
 
 jobs:
-  deploy:
+  staging:
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
