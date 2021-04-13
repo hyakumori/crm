@@ -19,11 +19,12 @@ jobs:
       CADASTRAL: ${{secrets.MAPCONFIG_CADASTRAL}}
       CENTER: ${{secrets.MAPCONFIG_CENTER}}
       ZOOM: ${{secrets.MAPCONFIG_ZOOM}}
+      MAPCONFIG: ${{secrets.MAPCONFIG}}
     steps:
       - uses: actions/checkout@v2
 
       - name: create mapconfig
-        run: jq -rc -n ${{ secrets.MAPCONFIG }} > mapconfig.json
+        run: jq -rc -n env.MAPCONFIG > mapconfig.json
 
       - name: upload mapconfig
         uses: actions/upload-artifact@v2
