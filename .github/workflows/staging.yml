@@ -22,11 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: mapconfig
-        uses: actions/upload-artifact@v2
+      - name: create mapconfig
         run: jq -n '{"TILESOURCES":env.TILESOURCES, "CADASTRAL":env.CADASTRAL, "CENTER":env.CENTER, "ZOOM":env.ZOOM}' > mapconfig.json
+
+      - name: upload mapconfig
+        uses: actions/upload-artifact@v2
         with:
-          name: create mapconfig
+          name: mapconfig-artifact
           path: mapconfig.json
 
       - name: Install dependencies
