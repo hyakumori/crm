@@ -13,11 +13,12 @@ jobs:
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
       VUE_APP_GRAPHQL_HTTP: ${{ secrets.VUE_APP_GRAPHQL_HTTP }}
       VUE_APP_REST_HTTP: ${{ secrets.VUE_APP_REST_HTTP }}
+      MAPCONFIG: ${{secrets.MAPCONFIG}}
     steps:
       - uses: actions/checkout@v2
 
       - name: create mapconfig
-        run: echo ${{ secrets.MAPCONFIG }} > mapconfig.json
+        run: echo ${env.MAPCONFIG} > mapconfig.json
 
       - name: Install dependencies
         run: yarn
