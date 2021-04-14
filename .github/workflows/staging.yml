@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: create mapconfig
-        run: echo ${env.MAPCONFIG} > mapconfig.json
+        run: echo ${MAPCONFIG} > mapconfig.json
 
       - name: Install dependencies
         run: yarn
