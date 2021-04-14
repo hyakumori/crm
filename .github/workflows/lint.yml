@@ -10,12 +10,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     env:
-      MAPCONFIG: ${{secrets.MAPCONFIG}}
+      MAPCONFIG: ${{ secrets.MAPCONFIG }}
     steps:
       - uses: actions/checkout@v2
 
       - name: create mapconfig
-        run: jq -rc -n env.MAPCONFIG > mapconfig.json
+        run: echo ${MAPCONFIG} > mapconfig.json
 
       - name: Lint Vue
         run: |
