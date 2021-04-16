@@ -2,18 +2,20 @@ name: Lint
 
 on:
   push:
-    branches: [ next ]
-  pull_request:
-    branches: [ next ]
+    branches: ['**']
 
   workflow_dispatch:
 
 jobs:
-  frontend:
+  lint:
     runs-on: ubuntu-latest
-
+    env:
+      MAPCONFIG: ${{ secrets.MAPCONFIG }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: create mapconfig
+        run: echo ${MAPCONFIG} > mapconfig.json
 
       - name: Lint Vue
         run: |
